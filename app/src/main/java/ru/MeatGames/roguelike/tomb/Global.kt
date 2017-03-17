@@ -1,5 +1,6 @@
 package ru.MeatGames.roguelike.tomb
 
+import android.graphics.Bitmap
 import android.os.Vibrator
 import ru.MeatGames.roguelike.tomb.db.ItemDB
 import ru.MeatGames.roguelike.tomb.db.MobDB
@@ -26,6 +27,7 @@ object Global {
     lateinit var itemDB: Array<ItemDB>
     lateinit var mobDB: Array<MobDB>
     lateinit var stats: Array<StatsDB>
+    lateinit var walls: Array<Bitmap>
 
     lateinit var mAssetHelper: AssetHelper
 

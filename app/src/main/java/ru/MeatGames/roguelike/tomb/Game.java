@@ -36,8 +36,8 @@ public class Game extends Activity {
 
     public static int curLvls = 0;
 
-    public final int mw = 96; //64
-    public final int mh = 96; //64
+    public final int mapWidth = 96;
+    public final int mapHeight = 96;
     public final int mTileSize = 24; // in pixels
     private float mScaleAmount;
     private float mActualTileSize;
@@ -100,9 +100,9 @@ public class Game extends Activity {
         mScaleAmount = screenSize.x / (mTileSize * 10f);
         mActualTileSize = mTileSize * mScaleAmount;
 
-        Global.INSTANCE.setMap(new MapClass[mw][mh]);
-        for (int x = 0; x < mw; x++)
-            for (int y = 0; y < mh; y++)
+        Global.INSTANCE.setMap(new MapClass[mapWidth][mapHeight]);
+        for (int x = 0; x < mapWidth; x++)
+            for (int y = 0; y < mapHeight; y++)
                 Global.INSTANCE.getMap()[x][y] = new MapClass();
 
         Global.INSTANCE.setHero(new HeroClass());
@@ -270,7 +270,7 @@ public class Game extends Activity {
     }
 
     public void isCollision(int mx, int my) {
-        if (mx > -1 && mx < mw && my < mh && my > -1) {
+        if (mx > -1 && mx < mapWidth && my < mapHeight && my > -1) {
             if (Global.INSTANCE.getMap()[mx][my].mIsUsable) {
                 switch (Game.getObject(mx, my)) {
                     case 31:
@@ -361,8 +361,8 @@ public class Game extends Activity {
         int xl, xr, yl, yr;
         xl = (Global.INSTANCE.getMapview().getCamx() - 1 < 1) ? 1 : Global.INSTANCE.getMapview().getCamx() - 1;
         yl = (Global.INSTANCE.getMapview().getCamy() - 1 < 1) ? 1 : Global.INSTANCE.getMapview().getCamy() - 1;
-        xr = (Global.INSTANCE.getMapview().getCamx() + 10 > mw - 2) ? mw - 2 : Global.INSTANCE.getMapview().getCamx() + 10;
-        yr = (Global.INSTANCE.getMapview().getCamy() + 10 > mh - 2) ? mh - 2 : Global.INSTANCE.getMapview().getCamy() + 10;
+        xr = (Global.INSTANCE.getMapview().getCamx() + 10 > mapWidth - 2) ? mapWidth - 2 : Global.INSTANCE.getMapview().getCamx() + 10;
+        yr = (Global.INSTANCE.getMapview().getCamy() + 10 > mapHeight - 2) ? mapHeight - 2 : Global.INSTANCE.getMapview().getCamy() + 10;
         for (int c = 0; c < 5; c++)
             for (int i = xl; i < xr; i++)
                 for (int j = yl; j < yr; j++)
@@ -393,8 +393,8 @@ public class Game extends Activity {
                 deleteMob(map);
                 int x4, y4;
                 do {
-                    x4 = mRandom.nextInt(Global.INSTANCE.getGame().mw);
-                    y4 = mRandom.nextInt(Global.INSTANCE.getGame().mh);
+                    x4 = mRandom.nextInt(Global.INSTANCE.getGame().mapWidth);
+                    y4 = mRandom.nextInt(Global.INSTANCE.getGame().mapHeight);
                 }
                 while (!Global.INSTANCE.getMap()[x4][y4].mIsPassable || Global.INSTANCE.getMap()[x4][y4].mCurrentlyVisible || Global.INSTANCE.getMap()[x4][y4].hasMob());
                 int en = mRandom.nextInt(Global.INSTANCE.getGame().maxMobs - curLvls - 1) + curLvls;
@@ -491,6 +491,12 @@ public class Game extends Activity {
         for (int x = 0; x < maxMobs; x++) {
             Global.mobDB[x].getImg()[0] = Bitmap.createBitmap(temp, x * 24, 0, 24, 24);
             Global.mobDB[x].getImg()[1] = Bitmap.createBitmap(temp, x * 24, 24, 24, 24);
+        }
+
+        temp = assetHelper.getBitmapFromAsset("walls_tileset");
+        Global.walls = new Bitmap[16];
+        for (int x = 0; x < 16; x++) {
+            Global.walls[x] = Bitmap.createBitmap(temp, (x % 4) * 24, (x / 4) * 24, 24, 24);
         }
     }
 

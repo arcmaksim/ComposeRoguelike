@@ -155,7 +155,7 @@ class MapGenerator {
     }
 
     fun checkZone(n: Int, m: Int, ln: Int, lm: Int): Boolean {
-        if (n + ln > Global.game.mw - 3 || m + lm > Global.game.mh - 3 || n < 2 || m < 2)
+        if (n + ln > Global.game.mapWidth - 3 || m + lm > Global.game.mapHeight - 3 || n < 2 || m < 2)
             return false
         for (n1 in n..n + ln + 1 - 1)
             for (m1 in m..m + lm + 1 - 1)
@@ -237,11 +237,11 @@ class MapGenerator {
         rc = 0
         var lx: Int
         var ly: Int
-        fillArea(0, 0, Global.game.mw, Global.game.mh, 5030)
+        fillArea(0, 0, Global.game.mapWidth, Global.game.mapHeight, 5030)
         for (i in 0..rc - 1)
             room1[i] = null
-        for (x in 0..Global.game.mw - 1)
-            for (y in 0..Global.game.mh - 1) {
+        for (x in 0..Global.game.mapWidth - 1)
+            for (y in 0..Global.game.mapHeight - 1) {
                 Global.map!![x][y].deleteItems()
                 Global.map!![x][y].mIsDiscovered = false
                 Global.map!![x][y].mCurrentlyVisible = false
@@ -257,8 +257,8 @@ class MapGenerator {
         var down: Boolean
         var left: Boolean
         var right: Boolean
-        lx = rnd.nextInt(Global.game.mw / 2) + 16
-        ly = rnd.nextInt(Global.game.mh / 2) + 16
+        lx = rnd.nextInt(Global.game.mapWidth / 2) + 16
+        ly = rnd.nextInt(Global.game.mapHeight / 2) + 16
         Global.mapview.camx = lx - 2
         Global.mapview.camy = ly - 2
         Global.hero!!.mx = lx + 2
@@ -278,96 +278,97 @@ class MapGenerator {
                 up = Global.map!![z][z1 + 1].mIsPassable
                 if (right xor left xor (down xor up)) {
                     var n = 0
-                    val b = rnd.nextInt(100)
-                    if (b < 7) {
-                        lx = 4
-                        ly = 3
-                        n = 0
-                    }
-                    if (b > 6 && b < 12) {
-                        ly = 5
-                        lx = ly
-                        n = 1
-                    }
-                    if (b > 11 && b < 16) {
-                        lx = 8
-                        ly = 6
-                        n = 2
-                    }
-                    if (b > 15 && b < 19) {
-                        ly = 5
-                        lx = ly
-                        n = 3
-                    }
-                    if (b > 18 && b < 22) {
-                        ly = 5
-                        lx = ly
-                        n = 4
-                    }
-                    if (b > 21 && b < 26) {
-                        ly = 4
-                        lx = ly
-                        n = 5
-                    }
-                    if (b > 25 && b < 30) {
-                        ly = 9
-                        lx = ly
-                        n = 6
-                    }
-                    if (b > 29 && b < 35) {
-                        lx = 9
-                        ly = 5
-                        n = 7
-                    }
-                    if (b > 34 && b < 41) {
-                        ly = 5
-                        lx = ly
-                        n = 7
-                    }
-                    if (b > 40 && b < 47) {
-                        ly = 4
-                        lx = ly
-                        n = 8
-                    }
-                    if (b > 46 && b < 52) {
-                        ly = 7
-                        lx = ly
-                        n = 8
-                    }
-                    if (b > 51 && b < 61) {
-                        lx = 6
-                        ly = 9
-                        n = 9
-                    }
-                    if (b > 60 && b < 70) {
-                        ly = 5
-                        lx = ly
-                        n = 10
-                    }
-                    if (b > 69 && b < 78) {
-                        lx = 12
-                        ly = 16
-                        n = 11
-                    }
-                    if (b > 77 && b < 86) {
-                        n = 12
-                        ly = n
-                        lx = ly
-                    }
-                    if (b > 85 && b < 92) {
-                        lx = 7
-                        ly = 5
-                        n = 13
-                    }
-                    if (b > 91 && b < 96) {
-                        lx = 5
-                        ly = 4
-                        n = 14
-                    }
-                    if (b > 95) {
-                        lx = rnd.nextInt(8) + 3
-                        ly = rnd.nextInt(8) + 3
-                        n = 100
+                    when(rnd.nextInt(100)) {
+                        in 0..6 -> {
+                            lx = 4
+                            ly = 3
+                            n = 0
+                        }
+                        in 7..11 -> {
+                            ly = 5
+                            lx = ly
+                            n = 1
+                        }
+                        in 12..15 -> {
+                            lx = 8
+                            ly = 6
+                            n = 2
+                        }
+                        in 16..18 -> {
+                            ly = 5
+                            lx = ly
+                            n = 3
+                        }
+                        in 19..21 -> {
+                            ly = 5
+                            lx = ly
+                            n = 4
+                        }
+                        in 22..25 -> {
+                            ly = 4
+                            lx = ly
+                            n = 5
+                        }
+                        in 26..29 -> {
+                            ly = 9
+                            lx = ly
+                            n = 6
+                        }
+                        in 30..34 -> {
+                            lx = 9
+                            ly = 5
+                            n = 7
+                        }
+                        in 35..40 -> {
+                            ly = 5
+                            lx = ly
+                            n = 7
+                        }
+                        in 41..46 -> {
+                            ly = 4
+                            lx = ly
+                            n = 8
+                        }
+                        in 47..51 -> {
+                            ly = 7
+                            lx = ly
+                            n = 8
+                        }
+                        in 52..60 -> {
+                            lx = 6
+                            ly = 9
+                            n = 9
+                        }
+                        in 61..69 -> {
+                            ly = 5
+                            lx = ly
+                            n = 10
+                        }
+                        in 70..77 -> {
+                            lx = 12
+                            ly = 16
+                            n = 11
+                        }
+                        in 78..85 -> {
+                            n = 12
+                            ly = n
+                            lx = ly
+                        }
+                        in 86..91 -> {
+                            lx = 7
+                            ly = 5
+                            n = 13
+                        }
+                        in 92..95 -> {
+                            lx = 5
+                            ly = 4
+                            n = 14
+                        }
+                        in 96..99 -> {
+                            lx = rnd.nextInt(8) + 3
+                            ly = rnd.nextInt(8) + 3
+                            n = 100
+                        }
                     }
                     if (n != 100) {
                         val tmp: Int
@@ -476,13 +477,13 @@ class MapGenerator {
                         if (x2 < xl) xl = x2 - 1
                         if (x2 + lx > xr) xr = x2 + lx + 1
                         if (xl < 2) xl = 2
-                        if (xr > Global.game.mw - 2)
-                            xr = Global.game.mw - 2
+                        if (xr > Global.game.mapWidth - 2)
+                            xr = Global.game.mapWidth - 2
                         if (y2 < yl) yl = y2 - 1
                         if (y2 + ly > yr) yr = y2 + ly + 1
                         if (yl < 2) yl = 2
-                        if (yr > Global.game.mh - 2)
-                            yr = Global.game.mh - 2
+                        if (yr > Global.game.mapHeight - 2)
+                            yr = Global.game.mapHeight - 2
                         room1[rc] = RoomDBClass(x2, y2, lx, ly)
                         if (rnd.nextInt(2) == 0) {
                             if (up) {
@@ -527,8 +528,8 @@ class MapGenerator {
         var y4: Int
         for (x in 0..30 + Game.curLvls * 7 - 1) {
             do {
-                x4 = rnd.nextInt(Global.game.mw)
-                y4 = rnd.nextInt(Global.game.mh)
+                x4 = rnd.nextInt(Global.game.mapWidth)
+                y4 = rnd.nextInt(Global.game.mapHeight)
             } while (!Global.map!![x4][y4].mIsPassable || Global.map!![x4][y4].mCurrentlyVisible || Global.map!![x4][y4].hasMob())
             val en = rnd.nextInt(Global.game.maxMobs - Game.curLvls - 1) + Game.curLvls
             if (en < 3 && rnd.nextInt(3) == 0) {
@@ -541,8 +542,8 @@ class MapGenerator {
         }
         if (Game.curLvls < Global.game.maxLvl - 1) {
             while (true) {
-                x4 = rnd.nextInt(Global.game.mw)
-                y4 = rnd.nextInt(Global.game.mh)
+                x4 = rnd.nextInt(Global.game.mapWidth)
+                y4 = rnd.nextInt(Global.game.mapHeight)
                 if (Global.map!![x4][y4].mObjectID == 0 && !Global.map!![x4][y4].mCurrentlyVisible) {
                     Global.map!![x4][y4].mObjectID = 40
                     m = x4 - 2
@@ -551,6 +552,8 @@ class MapGenerator {
                 }
             }
         }
+
+        cleanupMap()
     }
 
     private fun placeFinalRoom() {
@@ -607,6 +610,31 @@ class MapGenerator {
                 }
             }
         }
+    }
+
+    private fun cleanupMap() {
+        val game = Global.game
+        val map = Global.map!!
+        for (x in 0..game.mapWidth - 1)
+            for (y in 0..game.mapHeight - 1) {
+                if (map!![x][y].mObjectID == 30) {
+                    var flag = true
+
+                    flag = (y - 1 > -1 && !map[x][y - 1].mIsTransparent)
+                    if (flag) flag = (y - 1 > -1 && x + 1 < game.mapWidth && !map[x + 1][y - 1].mIsTransparent)
+                    if (flag) flag = (x + 1 < game.mapWidth && !map[x + 1][y].mIsTransparent)
+                    if (flag) flag = (x + 1 < game.mapWidth && y + 1 < game.mapHeight && !map[x + 1][y + 1].mIsTransparent)
+                    if (flag) flag = (y + 1 < game.mapHeight && !map[x][y + 1].mIsTransparent)
+                    if (flag) flag = (y + 1 < game.mapHeight && x - 1 > -1 && !map[x - 1][y + 1].mIsTransparent)
+                    if (flag) flag = (x - 1 > -1 && !map[x - 1][y].mIsTransparent)
+                    if (flag) flag = (x - 1 > -1 && y - 1 > -1 && !map[x - 1][y - 1].mIsTransparent)
+
+                    if (flag) {
+                        map[x][y].mObjectID = 0
+                    }
+
+                }
+            }
     }
 
 }

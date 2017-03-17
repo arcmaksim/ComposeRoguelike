@@ -39,13 +39,13 @@ class MapScreen(context: Context) : BasicScreen(context) {
                 mScreenWidth,
                 mScreenHeight)
 
-        mMarkerSize = (mScreenWidth / Global.game.mw).toFloat()
+        mMarkerSize = (mScreenWidth / Global.game.mapWidth).toFloat()
     }
 
     override fun onDraw(canvas: Canvas) {
         drawBackground(canvas)
-        for (x in 0..Global.game.mw - 1)
-            for (y in 0..Global.game.mh - 1) {
+        for (x in 0..Global.game.mapWidth - 1)
+            for (y in 0..Global.game.mapHeight - 1) {
                 if (Global.map!![x][y].mIsDiscovered) {
                     when (Global.map!![x][y].mObjectID) {
                         0 -> canvas.drawRect(x * mMarkerSize,

@@ -139,9 +139,18 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 val currentPixelYtoDraw = (Global.game.mTileSize * cy + mMapOffsetY)
                 val rightDrawBorder = (Global.game.mTileSize * (cy + 1) + mMapOffsetY)
 
-                if (x > -1 && y > -1 && x < Global.game.mw && y < Global.game.mh && Global.map!![x][y].mCurrentlyVisible) {
+                val shadowX = cx - 4
+                val shadowY = cy - 4
+                val shadowSum = Math.abs(shadowX) + Math.abs(shadowY)
+
+                if (x > -1 && y > -1 && x < Global.game.mapWidth && y < Global.game.mapHeight && Global.map!![x][y].mCurrentlyVisible) {
                     canvas.drawBitmap(Global.map!![x][y].floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
-                    canvas.drawBitmap(Global.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+
+                    if (Global.map!![x][y].mObjectID == 30) {
+                        canvas.drawBitmap(Global.walls[getWall(x, y)], currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    } else {
+                        canvas.drawBitmap(Global.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    }
 
                     if (Global.map!![x][y].hasItem()) {
                         canvas.drawBitmap(Global.map!![x][y].itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
@@ -151,16 +160,26 @@ class GameScreen(context: Context) : BasicScreen(context) {
                         canvas.drawBitmap(Global.map!![x][y].mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
-                    if ((cx - 4 == 0 || cy - 4 == 0) && Math.abs(cx - 4) + Math.abs(cy - 4) == 3 || cx - 4 != 0 && cy - 4 != 0 && Math.abs(cx - 4) + Math.abs(cy - 4) == 4) {
+                    if ((shadowX == 0 || shadowY == 0) && shadowSum == 3 || shadowX != 0 && shadowY != 0 && shadowSum == 4) {
                         canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, mLightShadowPaint)
                     }
 
-                    if ((Math.abs(cx - 4) == 0 || Math.abs(cy - 4) == 0) && Math.abs(cx - 4) + Math.abs(cy - 4) == 4 || (Math.abs(cx - 4) != 0 || Math.abs(cy - 4) != 0) && Math.abs(cx - 4) + Math.abs(cy - 4) == 5 || Math.abs(cx - 4) == Math.abs(cy - 4) && Math.abs(cx - 4) == 3) {
+                    if ((shadowX == 0 || shadowY == 0) && shadowSum == 4 || (Math.abs(shadowX) != 0 || Math.abs(shadowY) != 0)
+                            && shadowSum == 5 || Math.abs(shadowX) == Math.abs(shadowY) && Math.abs(shadowX) == 3) {
                         canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, mDarkShadowPaint)
                     }
                 }
             }
         }
+    }
+
+    private fun getWall(x: Int, y: Int): Int {
+        var wall = 0
+        if (x > 0 && Global.map!![x-1][y].mObjectID == 30) wall += 8
+        if (x < Global.game.mapWidth - 1 && Global.map!![x+1][y].mObjectID == 30) wall += 2
+        if (y > 0 && Global.map!![x][y-1].mObjectID == 30) wall += 1
+        if (y < Global.game.mapHeight - 1 && Global.map!![x][y+1].mObjectID == 30) wall += 4
+        return wall
     }
 
     private fun drawHUD(canvas: Canvas) {
@@ -354,7 +373,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 x += pdx
                 y += pdy
             }
-            if (x > -1 && y > -1 && x < Global.game.mw && y < Global.game.mh) {
+            if (x > -1 && y > -1 && x < Global.game.mapWidth && y < Global.game.mapHeight) {
                 if (!Global.map!![x][y].mCurrentlyVisible)
                     Global.map!![x][y].mCurrentlyVisible = v
                 if (v)
@@ -368,8 +387,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     fun calculateLineOfSight(x: Int, y: Int) {
         val cm = if (camx < 0) 0 else camx
         val cm1 = if (camy < 0) 0 else camy
-        for (c in cm..(if (cm + 9 >= Global.game.mw) Global.game.mw else cm + 9) - 1)
-            for (c1 in cm1..(if (cm1 + 9 >= Global.game.mw) Global.game.mw else cm1 + 9) - 1)
+        for (c in cm..(if (cm + 9 >= Global.game.mapWidth) Global.game.mapWidth else cm + 9) - 1)
+            for (c1 in cm1..(if (cm1 + 9 >= Global.game.mapWidth) Global.game.mapWidth else cm1 + 9) - 1)
                 Global.map!![c][c1].mCurrentlyVisible = false
         for (c in x - 1..x + 2 - 1)
             for (c1 in y - 1..y + 2 - 1)
