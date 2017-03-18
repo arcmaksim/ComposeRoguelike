@@ -3,6 +3,7 @@ package ru.MeatGames.roguelike.tomb.screen
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.util.Log
 import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Game
 import ru.MeatGames.roguelike.tomb.Global
@@ -12,6 +13,10 @@ import ru.MeatGames.roguelike.tomb.util.fillFrame
 import java.util.*
 
 class GameScreen(context: Context) : BasicScreen(context) {
+
+    // visible cells dimensions
+    val mMapViewportWidth = 9
+    val mMapViewportHeight = 9
 
     val mMaxLogLines = 8
     var mGameEventsLog: LinkedList<String>
@@ -56,6 +61,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
     val mLongPressTimeThreshold = 500 // in milliseconds
     var mIsLongPress = false
 
+    val mMapBuffer: Array<Array<MapBufferCell>> = array2d(mMapViewportWidth, mMapViewportHeight) { MapBufferCell() }
+    val mMapFpsLogger = FPSLogger()
+    val mFpsLogger = FPSLogger()
+
+    public inline fun <reified INNER> array2d(sizeOuter: Int, sizeInner: Int, noinline innerInit: (Int)->INNER): Array<Array<INNER>>
+            = Array(sizeOuter) { Array<INNER>(sizeInner, innerInit) }
+
     init {
         mGameEventsLog = LinkedList()
 
@@ -79,6 +91,9 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         mMapOffsetX = (mScreenWidth - mTileSize * 9) / 2 / mScaleAmount
         mMapOffsetY = (mScreenHeight - mTileSize * 9) / 2 / mScaleAmount
+
+        mFpsLogger.setTag("ALL")
+        mMapFpsLogger.setTag("MAP")
     }
 
     fun initProgressBar(tileID: Int, duration: Int) {
@@ -88,7 +103,46 @@ class GameScreen(context: Context) : BasicScreen(context) {
         mDrawProgressBar = true
     }
 
+    fun updateMapBuffer() {
+        var mapX: Int
+        var mapY: Int
+        for (bufferX in 0..mMapViewportWidth - 1) {
+            mapX = bufferX + camx
+            for (bufferY in 0..mMapViewportHeight - 1) {
+                mapY = bufferY + camy
+                mMapBuffer[bufferX][bufferY].mIsVisible = mapX > -1
+                        && mapY > -1
+                        && mapX < Global.game.mapWidth
+                        && mapY < Global.game.mapHeight
+                        && Global.map!![mapX][mapY].mCurrentlyVisible
+                if (mMapBuffer[bufferX][bufferY].mIsVisible) {
+                    mMapBuffer[bufferX][bufferY].mFloorID = Global.map!![mapX][mapY].mFloorID
+                    mMapBuffer[bufferX][bufferY].mObjectID = Global.map!![mapX][mapY].mObjectID
+
+                    mMapBuffer[bufferX][bufferY].mHasItem = Global.map!![mapX][mapY].hasItem()
+                    mMapBuffer[bufferX][bufferY].mHasEnemy = Global.map!![mapX][mapY].hasMob()
+
+                    val shadowX = bufferX - 4
+                    val shadowY = bufferY - 4
+                    val shadowSum = Math.abs(shadowX) + Math.abs(shadowY)
+
+                    if ((shadowX == 0 || shadowY == 0) && shadowSum == 3 || shadowX != 0 && shadowY != 0 && shadowSum == 4) {
+                        mMapBuffer[bufferX][bufferY].mShadowPaint = mLightShadowPaint
+                    } else if ((shadowX == 0 || shadowY == 0) && shadowSum == 4 || (Math.abs(shadowX) != 0 || Math.abs(shadowY) != 0)
+                            && shadowSum == 5 || Math.abs(shadowX) == Math.abs(shadowY) && Math.abs(shadowX) == 3) {
+                        mMapBuffer[bufferX][bufferY].mShadowPaint = mDarkShadowPaint
+                    }
+                } else {
+                    mMapBuffer[bufferX][bufferY].init()
+                }
+            }
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
+
+        val frameStartTime = System.nanoTime()
+
         drawBackground(canvas)
 
         if (!mDrawWinScreen) {
@@ -125,9 +179,19 @@ class GameScreen(context: Context) : BasicScreen(context) {
         }
         if (mDrawLog) drawLog(canvas)
         postInvalidate()
+
+        val frameEndTime = System.nanoTime()
+        val frameTime = frameEndTime - frameStartTime
+
+        mFpsLogger.addValue(frameTime)
     }
 
+
     private fun drawMap(canvas: Canvas, animationFrame: Int) {
+
+        val frameStartTime = System.nanoTime()
+
+        var currentMapBufferCell: MapBufferCell
 
         for (x in camx..camx + 9 - 1) {
             val cx = x - camx
@@ -139,46 +203,44 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 val currentPixelYtoDraw = (Global.game.mTileSize * cy + mMapOffsetY)
                 val rightDrawBorder = (Global.game.mTileSize * (cy + 1) + mMapOffsetY)
 
-                val shadowX = cx - 4
-                val shadowY = cy - 4
-                val shadowSum = Math.abs(shadowX) + Math.abs(shadowY)
+                currentMapBufferCell = mMapBuffer[cx][cy]
 
-                if (x > -1 && y > -1 && x < Global.game.mapWidth && y < Global.game.mapHeight && Global.map!![x][y].mCurrentlyVisible) {
+                if (currentMapBufferCell.mIsVisible) {
                     canvas.drawBitmap(Global.map!![x][y].floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    canvas.drawBitmap(Global.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
 
-                    if (Global.map!![x][y].mObjectID == 30) {
-                        canvas.drawBitmap(Global.walls[getWall(x, y)], currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
-                    } else {
-                        canvas.drawBitmap(Global.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
-                    }
-
-                    if (Global.map!![x][y].hasItem()) {
+                    if (currentMapBufferCell.mHasItem) {
                         canvas.drawBitmap(Global.map!![x][y].itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
-                    if (Global.map!![x][y].hasMob()) {
+                    if (currentMapBufferCell.mHasEnemy) {
                         canvas.drawBitmap(Global.map!![x][y].mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
-                    if ((shadowX == 0 || shadowY == 0) && shadowSum == 3 || shadowX != 0 && shadowY != 0 && shadowSum == 4) {
-                        canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, mLightShadowPaint)
-                    }
-
-                    if ((shadowX == 0 || shadowY == 0) && shadowSum == 4 || (Math.abs(shadowX) != 0 || Math.abs(shadowY) != 0)
-                            && shadowSum == 5 || Math.abs(shadowX) == Math.abs(shadowY) && Math.abs(shadowX) == 3) {
-                        canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, mDarkShadowPaint)
+                    currentMapBufferCell.mShadowPaint?.let {
+                        canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, currentMapBufferCell.mShadowPaint)
                     }
                 }
             }
         }
+
+        val frameEndTime = System.nanoTime()
+        val frameTime = frameEndTime - frameStartTime
+
+        mMapFpsLogger.addValue(frameTime)
     }
 
     private fun getWall(x: Int, y: Int): Int {
         var wall = 0
-        if (x > 0 && Global.map!![x-1][y].mObjectID == 30) wall += 8
-        if (x < Global.game.mapWidth - 1 && Global.map!![x+1][y].mObjectID == 30) wall += 2
-        if (y > 0 && Global.map!![x][y-1].mObjectID == 30) wall += 1
-        if (y < Global.game.mapHeight - 1 && Global.map!![x][y+1].mObjectID == 30) wall += 4
+        val horizontal = (x > -1 && x < Global.game.mapWidth - 1 && Global.map!![x - 1][y].mObjectID == Global.map!![x + 1][y].mObjectID)
+        val vertical = (y > -1 && y < Global.game.mapHeight - 1 && Global.map!![x][y - 1].mObjectID == Global.map!![x][y + 1].mObjectID)
+
+        if (!(horizontal && vertical)) {
+            if (x > 0 && Global.map!![x-1][y].mObjectID == 30) wall += 8
+            if (x < Global.game.mapWidth - 1 && Global.map!![x+1][y].mObjectID == 30) wall += 2
+            if (y > 0 && Global.map!![x][y-1].mObjectID == 30) wall += 1
+            if (y < Global.game.mapHeight - 1 && Global.map!![x][y+1].mObjectID == 30) wall += 4
+        }
         return wall
     }
 
@@ -535,6 +597,60 @@ class GameScreen(context: Context) : BasicScreen(context) {
             }
         }
         return true
+    }
+
+    inner class MapBufferCell {
+
+        var mFloorID: Int = 0
+        var mObjectID: Int = 0
+        var mWallBitmap: Int = -1
+        var mIsVisible: Boolean = false
+        var mShadowPaint: Paint? = null
+        var mHasItem: Boolean = false
+        var mHasEnemy: Boolean = false
+
+        init {
+            init()
+        }
+
+        fun init() {
+            mFloorID = 0
+            mObjectID = 0
+            mWallBitmap = -1
+            mIsVisible = false
+            mShadowPaint = null
+            mHasItem = false
+            mHasEnemy = false
+        }
+
+    }
+
+    inner class FPSLogger {
+
+        private val mChunkSize = 10
+        private var mCurrentCell = 0
+        val mFpsLog: Array<Long> = Array(mChunkSize, { 0L })
+
+        var mTag: String = ""
+
+        fun setTag(tag: String) {
+            mTag = tag
+        }
+
+        fun addValue(value: Long) {
+            if (mCurrentCell == mChunkSize) {
+                mCurrentCell = 0
+                val totalTime: Long = (0..mChunkSize - 1)
+                        .map { mFpsLog[it] }
+                        .sum()
+                val averageFrameTime = (totalTime / mChunkSize).toFloat()
+                val fps = 1000000000 / averageFrameTime
+                Log.d(mTag, "FPS: $fps, $averageFrameTime")
+            }
+
+            mFpsLog[mCurrentCell++] = value
+        }
+
     }
 
 }

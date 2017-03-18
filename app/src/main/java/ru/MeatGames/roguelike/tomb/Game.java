@@ -148,6 +148,7 @@ public class Game extends Activity {
         switch (screen) {
             case GAME_SCREEN:
                 view = Global.INSTANCE.getMapview();
+                ((GameScreen) view).updateMapBuffer();
                 break;
             case INVENTORY_SCREEN:
                 lastScreen = Screens.INVENTORY_SCREEN;
@@ -340,6 +341,7 @@ public class Game extends Activity {
             }
         }
         updateZone();
+        Global.INSTANCE.getMapview().updateMapBuffer();
     }
 
     public void spread(int i1, int j1, int c) {
