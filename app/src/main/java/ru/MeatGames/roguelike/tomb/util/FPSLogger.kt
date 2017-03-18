@@ -2,12 +2,12 @@ package ru.MeatGames.roguelike.tomb.util
 
 import android.util.Log
 
-class FPSLogger {
+object FPSLogger {
 
     private val mChunkSize = 10
     private var mCurrentCell = 0
     val mFpsLog: Array<Long> = Array(mChunkSize, { 0L })
-    var mTag: String = ""
+    var mTag: String = "FPS"
 
     fun addEntry(value: Long) {
         if (mCurrentCell == mChunkSize) {

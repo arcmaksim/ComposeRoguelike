@@ -12,14 +12,6 @@ import ru.MeatGames.roguelike.tomb.util.fillFrame
 
 abstract class BasicScreen(context: Context) : View(context) {
 
-    companion object {
-        private val mLogger: FPSLogger = FPSLogger()
-
-        init {
-            mLogger.mTag = "FPS"
-        }
-    }
-
     abstract protected val TAG: String
     protected var mRecordFPS: Boolean = true
 
@@ -47,7 +39,7 @@ abstract class BasicScreen(context: Context) : View(context) {
         mPreviousFrameTime = currentFrameTime
 
         if (mRecordFPS) {
-            mLogger.addEntry(frameTime)
+            FPSLogger.addEntry(frameTime)
         }
 
         drawScreen(canvas)
