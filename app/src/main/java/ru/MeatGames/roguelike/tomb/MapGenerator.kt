@@ -215,16 +215,14 @@ class MapGenerator {
 
     fun newRotateZone(lx: Int, ly: Int, n: Int) {
         zone = Array(ly) { IntArray(lx) }
-        val temp: Array<IntArray>
-        temp = room[n]!!.map.clone()
+        val temp: Array<IntArray> = room[n]!!.map.clone()
         for (x in 0..lx - 1)
             for (y in 0..ly - 1)
                 zone!![y][x] = temp[x][y]
     }
 
     fun getRoom(x: Int, y: Int): Int {
-        var xx: Int
-        xx = 0
+        var xx: Int = 0
         while (xx < room1.size) {
             if (room1[xx] != null && x >= room1[xx]!!.x && y >= room1[xx]!!.y && x <= room1[xx]!!.x + room1[xx]!!.lx - 1 && y <= room1[xx]!!.y + room1[xx]!!.ly - 1)
                 return xx
@@ -552,8 +550,6 @@ class MapGenerator {
                 }
             }
         }
-
-        cleanupMap()
     }
 
     private fun placeFinalRoom() {
@@ -610,31 +606,6 @@ class MapGenerator {
                 }
             }
         }
-    }
-
-    private fun cleanupMap() {
-        val game = Global.game
-        val map = Global.map!!
-        for (x in 0..game.mapWidth - 1)
-            for (y in 0..game.mapHeight - 1) {
-                if (map!![x][y].mObjectID == 30) {
-                    var flag = true
-
-                    flag = (y - 1 > -1 && !map[x][y - 1].mIsTransparent)
-                    if (flag) flag = (y - 1 > -1 && x + 1 < game.mapWidth && !map[x + 1][y - 1].mIsTransparent)
-                    if (flag) flag = (x + 1 < game.mapWidth && !map[x + 1][y].mIsTransparent)
-                    if (flag) flag = (x + 1 < game.mapWidth && y + 1 < game.mapHeight && !map[x + 1][y + 1].mIsTransparent)
-                    if (flag) flag = (y + 1 < game.mapHeight && !map[x][y + 1].mIsTransparent)
-                    if (flag) flag = (y + 1 < game.mapHeight && x - 1 > -1 && !map[x - 1][y + 1].mIsTransparent)
-                    if (flag) flag = (x - 1 > -1 && !map[x - 1][y].mIsTransparent)
-                    if (flag) flag = (x - 1 > -1 && y - 1 > -1 && !map[x - 1][y - 1].mIsTransparent)
-
-                    if (flag) {
-                        map[x][y].mObjectID = 0
-                    }
-
-                }
-            }
     }
 
 }
