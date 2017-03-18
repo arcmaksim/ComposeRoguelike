@@ -14,6 +14,8 @@ import ru.MeatGames.roguelike.tomb.view.TextButton
 
 class GearScreen(context: Context) : BasicScreen(context) {
 
+    override val TAG: String = "Gear Screen"
+
     private val mTextPaint: Paint
 
     private val mPrimaryArmRect: Rect
@@ -57,8 +59,8 @@ class GearScreen(context: Context) : BasicScreen(context) {
         mIsTwoHandedWeaponEquipped = Global.hero!!.equipmentList[0]?.mProperty ?: false
     }
 
-    override fun onDraw(canvas: Canvas) {
-        drawBackground(canvas)
+    override fun drawScreen(canvas: Canvas?) {
+        drawBackground(canvas!!)
         drawGear(canvas)
         mLeftSoftButton.draw(canvas)
         mBackButton.draw(canvas)

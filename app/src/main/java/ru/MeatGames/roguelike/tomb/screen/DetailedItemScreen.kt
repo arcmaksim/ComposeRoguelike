@@ -13,7 +13,10 @@ import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.UnitConverter
 import ru.MeatGames.roguelike.tomb.view.TextButton
 
-class DetailedItemScreen(context: Context, selectedItem: Item) : BasicScreen(context) {
+class DetailedItemScreen(context: Context,
+                         selectedItem: Item) : BasicScreen(context) {
+
+    override val TAG: String = "Detailed Item Screen"
 
     private val mMainTextPaint: Paint
     private val mSecondaryTextPaint: Paint
@@ -84,8 +87,8 @@ class DetailedItemScreen(context: Context, selectedItem: Item) : BasicScreen(con
         }
     }
 
-    override fun onDraw(canvas: Canvas) {
-        drawBackground(canvas)
+    override fun drawScreen(canvas: Canvas?) {
+        drawBackground(canvas!!)
         drawItem(canvas)
         mLeftSoftButton.draw(canvas)
         mMiddleSoftButton.draw(canvas)

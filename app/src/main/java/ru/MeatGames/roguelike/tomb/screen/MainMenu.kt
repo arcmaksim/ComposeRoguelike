@@ -13,6 +13,8 @@ import ru.MeatGames.roguelike.tomb.view.TextButton
 
 class MainMenu(mContext: Context) : BasicScreen(mContext) {
 
+    override val TAG: String = "Main Menu"
+
     private val mTitleTextPaint: Paint
     private val mNewGameButton: TextButton
     private val mExitGameButton: TextButton
@@ -38,8 +40,8 @@ class MainMenu(mContext: Context) : BasicScreen(mContext) {
                 mScreenHeight)
     }
 
-    override fun onDraw(canvas: Canvas) {
-        drawBackground(canvas)
+    override fun drawScreen(canvas: Canvas?) {
+        drawBackground(canvas!!)
         canvas.drawText("Yet Another",
                 (mScreenWidth / 2).toFloat(),
                 (mScreenHeight / 8 * 3).toFloat(),
@@ -50,7 +52,7 @@ class MainMenu(mContext: Context) : BasicScreen(mContext) {
                 mTitleTextPaint)
         mNewGameButton.draw(canvas)
         mExitGameButton.draw(canvas)
-        postInvalidate()
+        //postInvalidate()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {

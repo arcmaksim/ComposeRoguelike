@@ -14,6 +14,8 @@ import ru.MeatGames.roguelike.tomb.view.TextButton
 // displays explored map
 class MapScreen(context: Context) : BasicScreen(context) {
 
+    override val TAG: String = "Map Screen"
+
     private val mDoorMarkerPaint = Paint()
     private val mRoomBackgroundPaint = Paint()
     private val mHeroMarkerPaint = Paint()
@@ -42,8 +44,8 @@ class MapScreen(context: Context) : BasicScreen(context) {
         mMarkerSize = (mScreenWidth / Global.game.mapWidth).toFloat()
     }
 
-    override fun onDraw(canvas: Canvas) {
-        drawBackground(canvas)
+    override fun drawScreen(canvas: Canvas?) {
+        drawBackground(canvas!!)
         for (x in 0..Global.game.mapWidth - 1)
             for (y in 0..Global.game.mapHeight - 1) {
                 if (Global.map!![x][y].mIsDiscovered) {

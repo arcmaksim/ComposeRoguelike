@@ -12,6 +12,8 @@ import ru.MeatGames.roguelike.tomb.view.TextButton
 
 class CharacterScreen(context: Context) : BasicScreen(context) {
 
+    override val TAG: String = "Character Screen"
+
     private val mTextPaint: Paint
     private val mBackButton: TextButton
     private val mTextOffsetX: Float
@@ -31,8 +33,8 @@ class CharacterScreen(context: Context) : BasicScreen(context) {
         mTextOffsetX = mScreenWidth * 0.146F
     }
 
-    override fun onDraw(canvas: Canvas) {
-        drawBackground(canvas)
+    override fun drawScreen(canvas: Canvas?) {
+        drawBackground(canvas!!)
         canvas.drawText("Уровень ${Global.hero!!.getStat(31)}", mTextOffsetX, mScreenHeight * 0.15F, mTextPaint)
         canvas.drawText("Сила ${Global.hero!!.getStat(0)}", mTextOffsetX, mScreenHeight * 0.2F, mTextPaint)
         canvas.drawText("Ловкость ${Global.hero!!.getStat(1)}", mTextOffsetX, mScreenHeight * 0.2375F, mTextPaint)

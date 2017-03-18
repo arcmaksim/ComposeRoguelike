@@ -12,7 +12,10 @@ import ru.MeatGames.roguelike.tomb.util.UnitConverter
 import ru.MeatGames.roguelike.tomb.view.TextButton
 import java.util.*
 
-class InventoryScreen(context: Context, filter: InventoryFilterType?) : BasicScreen(context) {
+class InventoryScreen(context: Context,
+                      filter: InventoryFilterType?) : BasicScreen(context) {
+
+    override val TAG: String = "Inventory Screen"
 
     private val mEquippedItemBackgroundPaint = Paint()
     private val mMainTextPaint: Paint
@@ -200,8 +203,8 @@ class InventoryScreen(context: Context, filter: InventoryFilterType?) : BasicScr
         canvas.clipRect(mScreenRect, Region.Op.REPLACE)
     }
 
-    override fun onDraw(canvas: Canvas) {
-        drawBackground(canvas)
+    override fun drawScreen(canvas: Canvas?) {
+        drawBackground(canvas!!)
         drawFlags(canvas)
         drawList(canvas)
         mLeftSoftButton.draw(canvas)

@@ -12,6 +12,8 @@ import ru.MeatGames.roguelike.tomb.view.TextButton
 
 class DeathScreen(context: Context) : BasicScreen(context) {
 
+    override val TAG: String = "Death Screen"
+
     private val mTextPaint: Paint
     private val mMainMenuButton: TextButton
 
@@ -26,8 +28,8 @@ class DeathScreen(context: Context) : BasicScreen(context) {
         mTextPaint.textSize = 24f
     }
 
-    override fun onDraw(canvas: Canvas) {
-        drawBackground(canvas)
+    override fun drawScreen(canvas: Canvas?) {
+        drawBackground(canvas!!)
 
         canvas.drawText(context.getString(R.string.death_from_label), mScreenWidth * 0.5F, mScreenHeight * 0.4F, mTextPaint)
         canvas.drawBitmap(Global.game.lastAttack, (mScreenWidth - Global.game.lastAttack.width) * 0.5F, mScreenHeight * 0.425F, null)

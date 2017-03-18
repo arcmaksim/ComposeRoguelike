@@ -3,7 +3,6 @@ package ru.MeatGames.roguelike.tomb.screen
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.util.Log
 import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Game
 import ru.MeatGames.roguelike.tomb.Global
@@ -13,6 +12,8 @@ import ru.MeatGames.roguelike.tomb.util.fillFrame
 import java.util.*
 
 class GameScreen(context: Context) : BasicScreen(context) {
+
+    override val TAG: String = "Game Screen"
 
     // visible cells dimensions
     val mMapViewportWidth = 9
@@ -62,10 +63,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     var mIsLongPress = false
 
     val mMapBuffer: Array<Array<MapBufferCell>> = array2d(mMapViewportWidth, mMapViewportHeight) { MapBufferCell() }
-    val mMapFpsLogger = FPSLogger()
-    val mFpsLogger = FPSLogger()
 
-    public inline fun <reified INNER> array2d(sizeOuter: Int, sizeInner: Int, noinline innerInit: (Int)->INNER): Array<Array<INNER>>
+    inline fun <reified INNER> array2d(sizeOuter: Int, sizeInner: Int, noinline innerInit: (Int)->INNER): Array<Array<INNER>>
             = Array(sizeOuter) { Array<INNER>(sizeInner, innerInit) }
 
     init {
@@ -91,9 +90,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         mMapOffsetX = (mScreenWidth - mTileSize * 9) / 2 / mScaleAmount
         mMapOffsetY = (mScreenHeight - mTileSize * 9) / 2 / mScaleAmount
-
-        mFpsLogger.setTag("ALL")
-        mMapFpsLogger.setTag("MAP")
     }
 
     fun initProgressBar(tileID: Int, duration: Int) {
@@ -139,11 +135,9 @@ class GameScreen(context: Context) : BasicScreen(context) {
         }
     }
 
-    override fun onDraw(canvas: Canvas) {
+    override fun drawScreen(canvas: Canvas?) {
 
-        val frameStartTime = System.nanoTime()
-
-        drawBackground(canvas)
+        drawBackground(canvas!!)
 
         if (!mDrawWinScreen) {
 
@@ -177,19 +171,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
         } else {
             drawFinalScreen(canvas)
         }
+
         if (mDrawLog) drawLog(canvas)
-        postInvalidate()
 
-        val frameEndTime = System.nanoTime()
-        val frameTime = frameEndTime - frameStartTime
-
-        mFpsLogger.addValue(frameTime)
     }
 
 
     private fun drawMap(canvas: Canvas, animationFrame: Int) {
-
-        val frameStartTime = System.nanoTime()
 
         var currentMapBufferCell: MapBufferCell
 
@@ -224,10 +212,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
             }
         }
 
-        val frameEndTime = System.nanoTime()
-        val frameTime = frameEndTime - frameStartTime
-
-        mMapFpsLogger.addValue(frameTime)
     }
 
     private fun getWall(x: Int, y: Int): Int {
@@ -621,34 +605,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
             mShadowPaint = null
             mHasItem = false
             mHasEnemy = false
-        }
-
-    }
-
-    inner class FPSLogger {
-
-        private val mChunkSize = 10
-        private var mCurrentCell = 0
-        val mFpsLog: Array<Long> = Array(mChunkSize, { 0L })
-
-        var mTag: String = ""
-
-        fun setTag(tag: String) {
-            mTag = tag
-        }
-
-        fun addValue(value: Long) {
-            if (mCurrentCell == mChunkSize) {
-                mCurrentCell = 0
-                val totalTime: Long = (0..mChunkSize - 1)
-                        .map { mFpsLog[it] }
-                        .sum()
-                val averageFrameTime = (totalTime / mChunkSize).toFloat()
-                val fps = 1000000000 / averageFrameTime
-                Log.d(mTag, "FPS: $fps, $averageFrameTime")
-            }
-
-            mFpsLog[mCurrentCell++] = value
         }
 
     }
