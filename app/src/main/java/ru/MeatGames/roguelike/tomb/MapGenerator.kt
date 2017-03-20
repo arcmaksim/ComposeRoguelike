@@ -158,76 +158,84 @@ class MapGenerator {
                 intArrayOf(8000, 9000, 8000, 9000, 8000, 9000, 8000)))
     }
 
-    fun correctPlace(x: Int, y: Int): Boolean {
-        return Global.map!![x][y].isWall && !Global.map!![x][y - 1].isWall xor !Global.map!![x][y + 1].isWall xor (!Global.map!![x - 1][y].isWall xor !Global.map!![x + 1][y].isWall)
-    }
-
     fun findCell(): Boolean {
         for (z2 in 0..19) {
             z = rnd.nextInt(xr - xl + 1) + xl
             z1 = rnd.nextInt(yr - yl - 1) + yl
-            if (correctPlace(z, z1))
-                return true
+            if (correctPlace(z, z1)) return true
         }
         return false
     }
 
+    fun correctPlace(x: Int, y: Int): Boolean {
+        return Global.map!![x][y].isWall && !Global.map!![x][y - 1].isWall xor !Global.map!![x][y + 1].isWall xor (!Global.map!![x - 1][y].isWall xor !Global.map!![x + 1][y].isWall)
+    }
+
     fun checkZone(n: Int, m: Int, ln: Int, lm: Int): Boolean {
-        if (n + ln > MapHelper.mapWidth - 3 || m + lm > MapHelper.mapHeight - 3 || n < 2 || m < 2)
-            return false
-        for (n1 in n..n + ln + 1 - 1)
-            for (m1 in m..m + lm + 1 - 1)
-                if (!Global.map!![n1][m1].isWall)
-                    return false
+        if (n + ln > MapHelper.mapWidth - 3 || m + lm > MapHelper.mapHeight - 3 || n < 2 || m < 2) return false
+        for (n1 in n..n + ln + 1 - 1) {
+            for (m1 in m..m + lm + 1 - 1) {
+                if (!Global.map!![n1][m1].isWall) return false
+            }
+        }
         return true
     }
 
-    fun deleteObjects(x: Int, y: Int, lx: Int, ly: Int) {
-        for (x1 in 0..lx - 1)
-            for (y1 in 0..ly - 1)
-                if (!Global.map!![x + x1][y + y1].isWall) {
-                    Global.map!![x + x1][y + y1].mObjectID = 0
-                    MapHelper.modifyTile(x + x1, y + y1, Global.map!![x + x1][y + y1].mFloorID, 0)
+    fun deleteObjects(startMapX: Int, startMapY: Int, width: Int, height: Int) {
+        for (x1 in 0..width - 1) {
+            for (y1 in 0..height - 1) {
+                if (!Global.map!![startMapX + x1][startMapY + y1].isWall) {
+                    MapHelper.changeObject(startMapX + x1, startMapY + y1, 0)
                 }
-    }
-
-    fun horizontalMirror(lx: Int, ly: Int) {
-        var temp: Int
-        for (y in 0..ly / 2 - 1)
-            for (x in 0..lx - 1) {
-                temp = zone!![x][y]
-                zone!![x][y] = zone!![x][ly - 1 - y]
-                zone!![x][ly - 1 - y] = temp
             }
+        }
     }
 
-    fun verticalMirror(lx: Int, ly: Int) {
+    fun horizontalMirror(width: Int, height: Int) {
         var temp: Int
-        for (x in 0..lx / 2 - 1)
-            for (y in 0..ly - 1) {
+        for (y in 0..height / 2 - 1) {
+            for (x in 0..width - 1) {
                 temp = zone!![x][y]
-                zone!![x][y] = zone!![lx - 1 - x][y]
-                zone!![lx - 1 - x][y] = temp
+                zone!![x][y] = zone!![x][height - 1 - y]
+                zone!![x][height - 1 - y] = temp
             }
+        }
     }
 
-    fun newZone(lx: Int, ly: Int, n: Int) {
-        zone = Array(lx) { IntArray(ly) }
-        zone = room[n]!!.map.clone()
+    fun verticalMirror(width: Int, height: Int) {
+        var temp: Int
+        for (x in 0..width / 2 - 1) {
+            for (y in 0..height - 1) {
+                temp = zone!![x][y]
+                zone!![x][y] = zone!![width - 1 - x][y]
+                zone!![width - 1 - x][y] = temp
+            }
+        }
     }
 
-    fun newRotateZone(lx: Int, ly: Int, n: Int) {
-        zone = Array(ly) { IntArray(lx) }
-        val temp: Array<IntArray> = room[n]!!.map.clone()
-        for (x in 0..lx - 1)
-            for (y in 0..ly - 1)
+    fun newZone(width: Int, height: Int, roomIndex: Int) {
+        zone = Array(width) { IntArray(height) }
+        zone = room[roomIndex]!!.map.clone()
+    }
+
+    fun newRotateZone(width: Int, height: Int, roomIndex: Int) {
+        zone = Array(height) { IntArray(width) }
+        val temp: Array<IntArray> = room[roomIndex]!!.map.clone()
+        for (x in 0..width - 1) {
+            for (y in 0..height - 1) {
                 zone!![y][x] = temp[x][y]
+            }
+        }
     }
 
-    fun getRoom(x: Int, y: Int): Int {
+    fun getRoom(mapX: Int, mapY: Int): Int {
         var xx: Int = 0
         while (xx < room1.size) {
-            if (room1[xx] != null && x >= room1[xx]!!.x && y >= room1[xx]!!.y && x <= room1[xx]!!.x + room1[xx]!!.lx - 1 && y <= room1[xx]!!.y + room1[xx]!!.ly - 1)
+            if (room1[xx] != null
+                    && mapX >= room1[xx]!!.x
+                    && mapY >= room1[xx]!!.y
+                    && mapX <= room1[xx]!!.x + room1[xx]!!.lx - 1
+                    && mapY <= room1[xx]!!.y + room1[xx]!!.ly - 1)
                 return xx
             xx++
         }
@@ -239,19 +247,25 @@ class MapGenerator {
         var lx: Int
         var ly: Int
         MapHelper.fillArea(0, 0, MapHelper.mapWidth, MapHelper.mapHeight, 4001)
-        for (i in 0..rc - 1)
+
+        for (i in 0..rc - 1) {
             room1[i] = null
-        for (x in 0..MapHelper.mapWidth - 1)
+        }
+
+        for (x in 0..MapHelper.mapWidth - 1) {
             for (y in 0..MapHelper.mapHeight - 1) {
                 Global.map!![x][y].deleteItems()
                 Global.map!![x][y].mIsDiscovered = false
                 Global.map!![x][y].mCurrentlyVisible = false
             }
+        }
+
         while (Global.game.firstMob != null) {
             Global.game.firstMob.map.deleteMob()
             Global.game.firstMob.mob = null
             Global.game.firstMob = Global.game.firstMob.next
         }
+
         var x2 = 0
         var y2 = 0
         var up: Boolean
@@ -278,8 +292,10 @@ class MapGenerator {
                 left = Global.map!![z + 1][z1].mIsPassable
                 down = Global.map!![z][z1 - 1].mIsPassable
                 up = Global.map!![z][z1 + 1].mIsPassable
+
                 if (right xor left xor (down xor up)) {
                     var n = 0
+
                     when (rnd.nextInt(100)) {
                         in 0..6 -> {
                             lx = 4
@@ -372,6 +388,7 @@ class MapGenerator {
                             n = 100
                         }
                     }
+
                     if (n != 100) {
                         val tmp: Int
                         when (rnd.nextInt(13)) {
@@ -419,6 +436,7 @@ class MapGenerator {
                             else -> newZone(lx, ly, n)
                         }
                     }
+
                     if (up) {
                         y2 = z1 - ly
                         if (n != 100) {
@@ -429,6 +447,7 @@ class MapGenerator {
                             x2 = z - rnd.nextInt(lx)
                         }
                     }
+
                     if (down) {
                         y2 = z1 + 1
                         if (n != 100) {
@@ -439,6 +458,7 @@ class MapGenerator {
                             x2 = z - rnd.nextInt(lx)
                         }
                     }
+
                     if (left) {
                         x2 = z - lx
                         if (n != 100) {
@@ -449,6 +469,7 @@ class MapGenerator {
                             y2 = z1 - rnd.nextInt(ly)
                         }
                     }
+
                     if (right) {
                         x2 = z + 1
                         if (n != 100) {
@@ -459,33 +480,37 @@ class MapGenerator {
                             y2 = z1 - rnd.nextInt(ly)
                         }
                     }
+
                     if (checkZone(x2 - 1, y2 - 1, lx + 1, ly + 1)) {
                         rc++
                         if (n != 100) {
-                            for (x in 0..lx - 1)
+                            for (x in 0..lx - 1) {
                                 for (y in 0..ly - 1) {
-                                    val v = zone!![x][y]
-                                    Global.map!![x2 + x][y2 + y].mFloorID = v / 1000
-                                    Global.map!![x2 + x][y2 + y].mObjectID = v % 1000
-                                    MapHelper.modifyTile(x2 + x, y2 + y, v / 1000, v % 1000)
+                                    MapHelper.changeTile(x2 + x, y2 + y, zone!![x][y])
                                 }
+                            }
                             if (up) deleteObjects(z, z1 - 1, 1, 1)
                             if (down) deleteObjects(z, z1 + 1, 1, 1)
                             if (right) deleteObjects(z + 1, z1, 1, 1)
                             if (left) deleteObjects(z - 1, z1, 1, 1)
-                        } else
+                        } else {
                             MapHelper.fillArea(x2, y2, lx, ly, 4000)
+                        }
+
                         MapHelper.fillArea(z, z1, 1, 1, 4002)
                         if (x2 < xl) xl = x2 - 1
                         if (x2 + lx > xr) xr = x2 + lx + 1
                         if (xl < 2) xl = 2
-                        if (xr > MapHelper.mapWidth - 2)
+                        if (xr > MapHelper.mapWidth - 2) {
                             xr = MapHelper.mapWidth - 2
+                        }
                         if (y2 < yl) yl = y2 - 1
                         if (y2 + ly > yr) yr = y2 + ly + 1
                         if (yl < 2) yl = 2
-                        if (yr > MapHelper.mapHeight - 2)
+                        if (yr > MapHelper.mapHeight - 2) {
                             yr = MapHelper.mapHeight - 2
+                        }
+
                         room1[rc] = RoomDBClass(x2, y2, lx, ly)
                         if (rnd.nextInt(2) == 0) {
                             if (up) {
@@ -594,13 +619,11 @@ class MapGenerator {
                     }
                     if (checkZone(x2 - 1, y2 - 1, lx + 1, ly + 1)) {
                         rc++
-                        for (x in 0..lx - 1)
+                        for (x in 0..lx - 1) {
                             for (y in 0..ly - 1) {
-                                val v = zone!![x][y]
-                                Global.map!![x2 + x][y2 + y].mFloorID = v / 1000
-                                Global.map!![x2 + x][y2 + y].mObjectID = v % 1000
-                                MapHelper.modifyTile(x2 + x, y2 + y, v / 1000, v % 1000)
+                                MapHelper.changeTile(x2 + x, y2 + y, zone!![x][y])
                             }
+                        }
                         MapHelper.fillArea(z, z1, 1, 1, 4002)
                         Global.game.createMob(x2 + 3, y2 + 3, 5)
                         Global.game.createMob(x2 + 4, y2 + 3, 4)

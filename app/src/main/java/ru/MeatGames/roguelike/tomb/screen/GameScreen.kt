@@ -398,21 +398,21 @@ class GameScreen(context: Context) : BasicScreen(context) {
             afterProgressBar(mObjectId)
             return
         }
-        val offsetX = Global.hero!!.x - mTileSize / mScaleAmount
+        val offsetX = mHeroX - mTileSize / mScaleAmount
         canvas.drawRect(offsetX,
-                Global.hero!!.y - mTileSize * 0.75F / mScaleAmount,
+                mHeroY - mTileSize * 0.75F / mScaleAmount,
                 offsetX + mTileSize * 3 / mScaleAmount,
-                Global.hero!!.y - mTileSize * 0.25F / mScaleAmount,
+                mHeroY - mTileSize * 0.25F / mScaleAmount,
                 mTextPaint)
         canvas.drawRect(offsetX,
-                Global.hero!!.y - mTileSize * 0.75F / mScaleAmount,
+                mHeroY - mTileSize * 0.75F / mScaleAmount,
                 offsetX + (Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime) * (mTileSize * 3F / mProgressBarDuration) / mScaleAmount,
-                Global.hero!!.y - mTileSize * 0.25F / mScaleAmount,
+                mHeroY - mTileSize * 0.25F / mScaleAmount,
                 mLightBluePaint)
 
         mTextPaint.textAlign = Paint.Align.CENTER
         mTextPaint.textSize /= mScaleAmount
-        canvas.drawText(context.getString(R.string.searching_label), mScreenWidth * 0.5F / mScaleAmount, Global.hero!!.y - mTileSize * 0.35F / mScaleAmount, mTextPaint)
+        canvas.drawText(context.getString(R.string.searching_label), mScreenWidth * 0.5F / mScaleAmount, mHeroY - mTileSize * 0.35F / mScaleAmount, mTextPaint)
         mTextPaint.textSize *= mScaleAmount
     }
 
@@ -430,12 +430,12 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun afterProgressBar(result: Int) {
         when (result) {
             4 -> {
-                MapHelper.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 6)
+                MapHelper.changeAreaObjects(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, 6)
                 Global.mapview.addLine(context.getString(R.string.search_chest_message))
                 Global.game.createItem(Global.hero!!.mx + mx, Global.hero!!.my + my)
             }
             7 -> {
-                MapHelper.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 8)
+                MapHelper.changeAreaObjects(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, 8)
                 addLine(context.getString(R.string.search_bookshelf_message))
                 if (Global.game.mRandom.nextInt(3) != 0) {
                     addLine(context.getString(R.string.experience_earned_message))
@@ -451,9 +451,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     fun addLine(message: String) = mGameEventsLog.add(message)
 
-    private fun sign(x: Int): Int {
-        return if (x > 0) 1 else if (x < 0) -1 else 0
-    }
+    private fun sign(x: Int) = if (x > 0) 1 else if (x < 0) -1 else 0
 
     fun line(xstart: Int, ystart: Int, xend: Int, yend: Int) {
         var x: Int
@@ -501,13 +499,16 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 x += pdx
                 y += pdy
             }
-            if (x > -1 && y > -1 && x < MapHelper.mapWidth && y < MapHelper.mapHeight) {
-                if (!Global.map!![x][y].mCurrentlyVisible)
+            if (MapHelper.horizontal(x) && MapHelper.vertical(y)) {
+                if (!Global.map!![x][y].mCurrentlyVisible) {
                     Global.map!![x][y].mCurrentlyVisible = v
-                if (v)
+                }
+                if (v) {
                     Global.map!![x][y].mIsDiscovered = true
-                if (!Global.map!![x][y].mIsTransparent)
+                }
+                if (!Global.map!![x][y].mIsTransparent) {
                     v = false
+                }
             }
         }
     }
@@ -562,6 +563,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 if (Global.map!![Global.hero!!.mx][Global.hero!!.my].mObjectID == 11) {
                     Game.curLvls++
                     Global.game.generateNewMap()
+                    Global.mapview.updateMapBuffer()
                     Global.game.skipTurn()
                 }
                 if (Global.map!![Global.hero!!.mx][Global.hero!!.my].hasItem()) {

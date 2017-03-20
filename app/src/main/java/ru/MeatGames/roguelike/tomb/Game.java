@@ -250,11 +250,11 @@ public class Game extends Activity {
             if (mapCell.mIsUsable) {
                 switch (Game.getObject(mx, my)) {
                     case 2:
-                        MapHelper.fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 3);
+                        MapHelper.changeObject(mx, my, 3);
                         Global.INSTANCE.getMapview().addLine(getString(R.string.door_opened_message));
                         break;
                     case 4:
-                        MapHelper.fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 5);
+                        MapHelper.changeObject(mx, my, 5);
                         Global.INSTANCE.getMapview().setMDrawLog(false);
                         Global.INSTANCE.getMapview().initProgressBar(4, 159);
                         break;
