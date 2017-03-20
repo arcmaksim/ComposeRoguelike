@@ -257,18 +257,18 @@ public class Game extends Activity {
         if (mapCell != null) {
             if (mapCell.mIsUsable) {
                 switch (Game.getObject(mx, my)) {
-                    case 31:
-                        fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 32);
+                    case 2:
+                        fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 3);
                         Global.INSTANCE.getMapview().addLine(getString(R.string.door_opened_message));
                         break;
-                    case 33:
-                        fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 34);
+                    case 4:
+                        fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 5);
                         Global.INSTANCE.getMapview().setMDrawLog(false);
-                        Global.INSTANCE.getMapview().initProgressBar(33, 159);
+                        Global.INSTANCE.getMapview().initProgressBar(4, 159);
                         break;
-                    case 36:
+                    case 7:
                         Global.INSTANCE.getMapview().setMDrawLog(false);
-                        Global.INSTANCE.getMapview().initProgressBar(36, 259);
+                        Global.INSTANCE.getMapview().initProgressBar(7, 259);
                         break;
                 }
                 mIsPlayerTurn = false;
@@ -281,11 +281,11 @@ public class Game extends Activity {
             if (mapCell.mIsPassable) {
                 mIsPlayerTurn = false;
                 mIsPlayerMoved = true; // ?
-                if (Game.getObject(mx, my) == 44) {
+                if (Game.getObject(mx, my) == 15) {
                     Global.INSTANCE.getHero().modifyStat(5, mRandom.nextInt(3) + 1, -1);
                     Global.INSTANCE.getMapview().addLine(getString(R.string.trap_message));
                     if (Global.INSTANCE.getHero().getStat(5) < 1) {
-                        lastAttack = Bitmap.createScaledBitmap(Global.INSTANCE.getTiles()[44].getImg(), 72, 72, false);
+                        lastAttack = Bitmap.createScaledBitmap(Global.INSTANCE.getObjects()[15].getImg(), 72, 72, false);
                         changeScreen(Screens.DEATH_SCREEN);
                     }
                 }
@@ -457,9 +457,9 @@ public class Game extends Activity {
         Global.INSTANCE.getMap()[px][py].mIsPassable = Global.INSTANCE.getTiles()[f].getMIsPassable();
         Global.INSTANCE.getMap()[px][py].mIsTransparent = Global.INSTANCE.getTiles()[f].getMIsTransparent();
         Global.INSTANCE.getMap()[px][py].mIsUsable = Global.INSTANCE.getTiles()[f].getMIsUsable();
-        Global.INSTANCE.getMap()[px][py].mIsPassable = Global.INSTANCE.getTiles()[o].getMIsPassable();
-        Global.INSTANCE.getMap()[px][py].mIsTransparent = Global.INSTANCE.getTiles()[o].getMIsTransparent();
-        Global.INSTANCE.getMap()[px][py].mIsUsable = Global.INSTANCE.getTiles()[o].getMIsUsable();
+        Global.INSTANCE.getMap()[px][py].mIsPassable = Global.INSTANCE.getObjects()[o].getMIsPassable();
+        Global.INSTANCE.getMap()[px][py].mIsTransparent = Global.INSTANCE.getObjects()[o].getMIsTransparent();
+        Global.INSTANCE.getMap()[px][py].mIsUsable = Global.INSTANCE.getObjects()[o].getMIsUsable();
     }
 
     public void fillArea(int sx, int sy, int lx1, int ly1, int f, int o) {

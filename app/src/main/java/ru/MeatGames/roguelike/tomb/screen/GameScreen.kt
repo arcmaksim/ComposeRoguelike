@@ -31,10 +31,12 @@ class GameScreen(context: Context) : BasicScreen(context) {
     val mMenuBackgroundPaint = Paint()
     val mTextPaint: Paint
 
-    var mTileID: Int = 0 // tile id for ProgressBar
+    var mObjectId: Int = 0 // tile id for ProgressBar
     var mProgressBarDuration: Int = 0
     var mProgressBarStartingTime: Long = 0
 
+    var mHeroX: Float = 0f
+    var mHeroY: Float = 0f
     var camx: Int = 0
     var camy: Int = 0
     var mDrawExitDialog = false
@@ -84,8 +86,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
         black = Paint()
         black.color = resources.getColor(R.color.black)
 
-        Global.hero!!.x = (mScreenWidth - mTileSize) / 2 / mScaleAmount
-        Global.hero!!.y = (mScreenHeight - mTileSize) / 2 / mScaleAmount
+        mHeroX = (mScreenWidth - mTileSize) / 2 / mScaleAmount
+        mHeroY = (mScreenHeight - mTileSize) / 2 / mScaleAmount
 
         mBitmapPaint.isFilterBitmap = false
 
@@ -93,10 +95,10 @@ class GameScreen(context: Context) : BasicScreen(context) {
         mMapOffsetY = (mScreenHeight - mTileSize * 9) / 2 / mScaleAmount
     }
 
-    fun initProgressBar(tileID: Int, duration: Int) {
+    fun initProgressBar(objectId: Int, duration: Int) {
         mProgressBarDuration = duration
         mProgressBarStartingTime = Math.abs(System.currentTimeMillis()) / 10
-        mTileID = tileID
+        mObjectId = objectId
         mDrawProgressBar = true
     }
 
@@ -116,7 +118,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
                     mMapBuffer[bufferX][bufferY].mFloorID = mapCell!!.mFloorID
                     mMapBuffer[bufferX][bufferY].mObjectID = mapCell.mObjectID
 
-                    if (mMapBuffer[bufferX][bufferY].mObjectID == 30) {
+                    if (mMapBuffer[bufferX][bufferY].mObjectID == 1) {
                         mMapBuffer[bufferX][bufferY].mWallBitmap = 0
                     } else {
                         mMapBuffer[bufferX][bufferY].mWallBitmap = -1
@@ -149,10 +151,10 @@ class GameScreen(context: Context) : BasicScreen(context) {
         for (x in 0..mMapViewportWidth - 1) {
             for (y in 0..mMapViewportHeight - 1) {
                 if (mMapBuffer[x][y].mWallBitmap == 0) {
-                    val isConnectedToTheTop = (camy + y - 1 > -1 && Global.map!![camx + x][camy + y - 1].mObjectID == 30)
-                    val isConnectedToTheRight = (camx + x + 1 < MapHelper.mapWidth && Global.map!![camx + x + 1][camy + y].mObjectID == 30)
-                    val isConnectedToTheBottom = (camy + y + 1 < MapHelper.mapHeight && Global.map!![camx + x][camy + y + 1].mObjectID == 30)
-                    val isConnectedToTheLeft = (camx + x - 1 > -1 && Global.map!![camx + x - 1][camy + y].mObjectID == 30)
+                    val isConnectedToTheTop = (camy + y - 1 > -1 && Global.map!![camx + x][camy + y - 1].mObjectID == 1)
+                    val isConnectedToTheRight = (camx + x + 1 < MapHelper.mapWidth && Global.map!![camx + x + 1][camy + y].mObjectID == 1)
+                    val isConnectedToTheBottom = (camy + y + 1 < MapHelper.mapHeight && Global.map!![camx + x][camy + y + 1].mObjectID == 1)
+                    val isConnectedToTheLeft = (camx + x - 1 > -1 && Global.map!![camx + x - 1][camy + y].mObjectID == 1)
 
                     val horizontalWall = (isConnectedToTheLeft && isConnectedToTheRight)
                     val verticalWall = (isConnectedToTheTop && isConnectedToTheBottom)
@@ -238,7 +240,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
             if (!Global.hero!!.mIsFacingLeft) {
                 animationFrame += 2
             }
-            canvas.drawBitmap(Global.getHeroSprite(animationFrame), Global.hero!!.x, Global.hero!!.y, mBitmapPaint)
+            canvas.drawBitmap(Global.getHeroSprite(animationFrame), mHeroX, mHeroY, mBitmapPaint)
 
             canvas.restore()
 
@@ -393,7 +395,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         if (Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime > mProgressBarDuration) {
             mDrawProgressBar = false
             mDrawLog = true
-            afterProgressBar(mTileID)
+            afterProgressBar(mObjectId)
             return
         }
         val offsetX = Global.hero!!.x - mTileSize / mScaleAmount
@@ -427,13 +429,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     private fun afterProgressBar(result: Int) {
         when (result) {
-            33 -> {
-                Global.game.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 35)
+            4 -> {
+                Global.game.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 6)
                 Global.mapview.addLine(context.getString(R.string.search_chest_message))
                 Global.game.createItem(Global.hero!!.mx + mx, Global.hero!!.my + my)
             }
-            36 -> {
-                Global.game.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 37)
+            7 -> {
+                Global.game.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 8)
                 addLine(context.getString(R.string.search_bookshelf_message))
                 if (Global.game.mRandom.nextInt(3) != 0) {
                     addLine(context.getString(R.string.experience_earned_message))
@@ -557,7 +559,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
             val y = ((touchY - mScreenWidth * 0.1F) / temp).toInt() - 1
 
             if (x == 0 && y == 0) {
-                if (Global.map!![Global.hero!!.mx][Global.hero!!.my].mObjectID == 40) {
+                if (Global.map!![Global.hero!!.mx][Global.hero!!.my].mObjectID == 11) {
                     Game.curLvls++
                     Global.game.generateNewMap()
                     Global.game.skipTurn()

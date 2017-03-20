@@ -1,11 +1,7 @@
 <tiles>
     <tile passable="t" transparent="t" usable="f"/>
     <tile passable="t" transparent="t" usable="f"/>
-    <tile passable="t" transparent="t" usable="f"/>
     <tile passable="f" transparent="t" usable="f"/>
-    <tile passable="t" transparent="t" usable="f"/>
-    <tile passable="t" transparent="t" usable="f"/>
-    <tile passable="t" transparent="t" usable="f"/>
     <tile passable="t" transparent="t" usable="f"/>
     <tile passable="t" transparent="t" usable="f"/>
     <tile passable="t" transparent="t" usable="f"/>

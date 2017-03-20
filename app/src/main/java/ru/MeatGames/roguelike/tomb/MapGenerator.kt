@@ -7,7 +7,7 @@ import java.util.*
 
 class MapGenerator {
 
-    var room: Array<RoomClass?> = arrayOfNulls<RoomClass>(16)
+    var room: Array<RoomClass?>
     var room1: Array<RoomDBClass?>
     var zone: Array<IntArray>? = null
     var rnd: Random
@@ -24,121 +24,138 @@ class MapGenerator {
 
     init {
         rnd = Random()
+        room = arrayOfNulls(16)
         room1 = arrayOfNulls<RoomDBClass>(mr)
         loadingRooms()
     }
 
     fun loadingRooms() {
-        room[0] = RoomClass(arrayOf(intArrayOf(5030, 5000, 5041),
-                intArrayOf(5041, 5000, 5038),
-                intArrayOf(5038, 5000, 5041),
-                intArrayOf(5041, 5000, 5030)))
-        room[1] = RoomClass(arrayOf(intArrayOf(5030, 11036, 12036, 11036, 5030),
-                intArrayOf(11036, 12000, 11000, 12000, 11036),
-                intArrayOf(12036, 11000, 12000, 11000, 12036),
-                intArrayOf(11036, 12000, 11000, 12000, 11036),
-                intArrayOf(5030, 11036, 12036, 11036, 5030)))
-        room[2] = RoomClass(arrayOf(intArrayOf(5030, 5030, 5000, 5000, 5041, 5030),
-                intArrayOf(5000, 5000, 5000, 5041, 5038, 5041),
-                intArrayOf(5000, 5041, 5000, 5000, 5041, 5000),
-                intArrayOf(5041, 5038, 5041, 5000, 5000, 5000),
-                intArrayOf(5041, 5038, 5041, 5000, 5000, 5000),
-                intArrayOf(5000, 5041, 5000, 5000, 5041, 5000),
-                intArrayOf(5000, 5000, 5000, 5041, 5038, 5041),
-                intArrayOf(5030, 5030, 5000, 5000, 5041, 5030)))
-        room[3] = RoomClass(arrayOf(intArrayOf(5030, 5030, 5033, 5030, 5030),
-                intArrayOf(5033, 5000, 5000, 5000, 5033),
-                intArrayOf(5030, 5000, 5042, 5000, 5030),
-                intArrayOf(5033, 5000, 5000, 5000, 5033),
-                intArrayOf(5030, 5030, 5033, 5030, 5030)))
-        room[4] = RoomClass(arrayOf(intArrayOf(5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 6000, 6000, 6000, 5000),
-                intArrayOf(5000, 6000, 6033, 6000, 5000),
-                intArrayOf(5000, 6000, 6000, 6000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000)))
-        room[5] = RoomClass(arrayOf(intArrayOf(6036, 6000, 6041, 6030),
-                intArrayOf(6036, 6000, 6038, 6041),
-                intArrayOf(6036, 6000, 6000, 6000),
-                intArrayOf(6030, 6036, 6036, 6036)))
-        room[6] = RoomClass(arrayOf(intArrayOf(11030, 12036, 11036, 12036, 11036, 12036, 11036, 12036, 11030),
-                intArrayOf(12036, 11000, 12000, 11000, 12000, 11000, 12000, 11000, 12036),
-                intArrayOf(11036, 12000, 11036, 12036, 11000, 12036, 11036, 12000, 11036),
-                intArrayOf(12036, 11000, 12036, 11000, 12000, 11000, 12036, 11000, 12036),
-                intArrayOf(11036, 12000, 11000, 12000, 11036, 12000, 11000, 12000, 11036),
-                intArrayOf(12036, 11000, 12036, 11000, 12000, 11000, 12036, 11000, 12036),
-                intArrayOf(11036, 12000, 11036, 12036, 11000, 12036, 11036, 12000, 11036),
-                intArrayOf(12036, 11000, 12000, 11000, 12000, 11000, 12000, 11000, 12036),
-                intArrayOf(11030, 12036, 11036, 12036, 11036, 12036, 11036, 12036, 11030)))
-        room[7] = RoomClass(arrayOf(intArrayOf(5030, 5000, 5000, 5000, 5030),
+        room[0] = RoomClass(arrayOf(
+                intArrayOf(4001, 4000, 4012),
+                intArrayOf(4012, 4000, 4009),
+                intArrayOf(4009, 4000, 4012),
+                intArrayOf(4012, 4000, 4001)))
+        room[1] = RoomClass(arrayOf(
+                intArrayOf(4001, 10007, 11007, 10007, 4001),
+                intArrayOf(10007, 11000, 10000, 11000, 10007),
+                intArrayOf(11007, 10000, 11000, 10000, 11007),
+                intArrayOf(10007, 11000, 10000, 11000, 10007),
+                intArrayOf(4001, 10007, 11007, 10007, 4001)))
+        room[2] = RoomClass(arrayOf(
+                intArrayOf(4001, 4001, 4000, 4000, 4012, 4001),
+                intArrayOf(4000, 4000, 4000, 4012, 4009, 4012),
+                intArrayOf(4000, 4012, 4000, 4000, 4012, 4000),
+                intArrayOf(4012, 4009, 4012, 4000, 4000, 4000),
+                intArrayOf(4012, 4009, 4012, 4000, 4000, 4000),
+                intArrayOf(4000, 4012, 4000, 4000, 4012, 4000),
+                intArrayOf(4000, 4000, 4000, 4012, 4009, 4012),
+                intArrayOf(4001, 4001, 4000, 4000, 4012, 4001)))
+        room[3] = RoomClass(arrayOf(
+                intArrayOf(4001, 4001, 4004, 4001, 4001),
+                intArrayOf(4004, 4000, 4000, 4000, 4004),
+                intArrayOf(4001, 4000, 4013, 4000, 4001),
+                intArrayOf(4004, 4000, 4000, 4000, 4004),
+                intArrayOf(4001, 4001, 4004, 4001, 4001)))
+        room[4] = RoomClass(arrayOf(
+                intArrayOf(4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 5000, 5000, 5000, 4000),
+                intArrayOf(4000, 5000, 5004, 5000, 4000),
+                intArrayOf(4000, 5000, 5000, 5000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000)))
+        room[5] = RoomClass(arrayOf(
+                intArrayOf(5007, 5000, 5012, 5001),
+                intArrayOf(5007, 5000, 5009, 5012),
+                intArrayOf(5007, 5000, 5000, 5000),
+                intArrayOf(5001, 5007, 5007, 5007)))
+        room[6] = RoomClass(arrayOf(
+                intArrayOf(10001, 11007, 10007, 11007, 10007, 11007, 10007, 11007, 10001),
+                intArrayOf(11007, 10000, 11000, 10000, 11000, 10000, 11000, 10000, 11007),
+                intArrayOf(10007, 11000, 10007, 11007, 10000, 11007, 10007, 11000, 10007),
+                intArrayOf(11007, 10000, 11007, 10000, 11000, 10000, 11007, 10000, 11007),
+                intArrayOf(10007, 11000, 10000, 11000, 10007, 11000, 10000, 11000, 10007),
+                intArrayOf(11007, 10000, 11007, 10000, 11000, 10000, 11007, 10000, 11007),
+                intArrayOf(10007, 11000, 10007, 11007, 10000, 11007, 10007, 11000, 10007),
+                intArrayOf(11007, 10000, 11000, 10000, 11000, 10000, 11000, 10000, 11007),
+                intArrayOf(10001, 11007, 10007, 11007, 10007, 11007, 10007, 11007, 10001)))
+        room[7] = RoomClass(arrayOf(
+                intArrayOf(4001, 4000, 4000, 4000, 4001),
+                intArrayOf(4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4001, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4001, 4000, 4000, 4000, 4001),
+                intArrayOf(4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4001, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4001, 4000, 4000, 4000, 4001)))
+        room[8] = RoomClass(arrayOf(
+                intArrayOf(4001, 4000, 4000, 4000, 4000, 4000, 4001),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4001, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4001, 4000, 4000, 4000, 4000, 4000, 4001)))
+        room[9] = RoomClass(arrayOf(
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 4000),
+                intArrayOf(4000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 4000),
+                intArrayOf(4000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 4000),
+                intArrayOf(4000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000)))
+        room[10] = RoomClass(arrayOf(
+                intArrayOf(4001, 4000, 5000, 4000, 4001),
+                intArrayOf(4000, 4000, 5000, 4000, 4000),
                 intArrayOf(5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5030, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5030, 5000, 5000, 5000, 5030),
-                intArrayOf(5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5030, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5030, 5000, 5000, 5000, 5030)))
-        room[8] = RoomClass(arrayOf(intArrayOf(5030, 5000, 5000, 5000, 5000, 5000, 5030),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5030, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5030, 5000, 5000, 5000, 5000, 5000, 5030)))
-        room[9] = RoomClass(arrayOf(intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 5000),
-                intArrayOf(5000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 5000),
-                intArrayOf(5000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 5000),
-                intArrayOf(5000, 6000, 6000, 6000, 6000, 6000, 6000, 6000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000)))
-        room[10] = RoomClass(arrayOf(intArrayOf(5030, 5000, 6000, 5000, 5030),
-                intArrayOf(5000, 5000, 6000, 5000, 5000),
-                intArrayOf(6000, 6000, 6000, 6000, 6000),
-                intArrayOf(5000, 5000, 6000, 5000, 5000),
-                intArrayOf(5030, 5000, 6000, 5000, 5030)))
-        room[11] = RoomClass(arrayOf(intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5030, 5000, 5000, 5030, 5000, 5000, 5030, 5000, 5000, 5030, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5030, 5000, 5000, 5030, 5000, 5000, 5030, 5000, 5000, 5030, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000)))
-        room[12] = RoomClass(arrayOf(intArrayOf(5030, 5030, 5030, 5000, 5000, 5000, 5000, 5000, 5000, 5030, 5030, 5030),
-                intArrayOf(5030, 5030, 5030, 5000, 5000, 5000, 5000, 5000, 5000, 5030, 5030, 5030),
-                intArrayOf(5030, 5030, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5030, 5030),
-                intArrayOf(5000, 5000, 5000, 5030, 5000, 5000, 5000, 5000, 5030, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000),
-                intArrayOf(5000, 5000, 5000, 5030, 5000, 5000, 5000, 5000, 5030, 5000, 5000, 5000),
-                intArrayOf(5030, 5030, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5030, 5030),
-                intArrayOf(5030, 5030, 5030, 5000, 5000, 5000, 5000, 5000, 5000, 5030, 5030, 5030),
-                intArrayOf(5030, 5030, 5030, 5000, 5000, 5000, 5000, 5000, 5000, 5030, 5030, 5030)))
-        room[13] = RoomClass(arrayOf(intArrayOf(11000, 12000, 11000, 12000, 11000),
-                intArrayOf(12000, 11038, 12000, 11036, 12000),
-                intArrayOf(11000, 12000, 11000, 12036, 11000),
-                intArrayOf(12000, 11036, 12000, 11036, 12000),
-                intArrayOf(11000, 12036, 11000, 12000, 11000),
-                intArrayOf(12000, 11036, 12000, 11038, 12000),
-                intArrayOf(11000, 12000, 11000, 12000, 11000)))
-        room[14] = RoomClass(arrayOf(intArrayOf(5030, 12036, 11036, 12036),
-                intArrayOf(12038, 11000, 12000, 11000),
-                intArrayOf(11045, 12000, 11000, 12000),
-                intArrayOf(12038, 11000, 12000, 11000),
-                intArrayOf(5030, 12036, 11036, 12036)))
-        room[15] = RoomClass(arrayOf(intArrayOf(9000, 10000, 9000, 10000, 9000, 10000, 9000),
-                intArrayOf(10000, 9000, 10000, 9000, 10000, 9000, 10000),
-                intArrayOf(9000, 10000, 9000, 10000, 9000, 10000, 9000),
-                intArrayOf(10000, 9000, 10000, 9000, 10000, 9000, 10000),
-                intArrayOf(9000, 10000, 9000, 10000, 9000, 10000, 9000),
-                intArrayOf(10000, 9000, 10000, 9000, 10000, 9000, 10000),
-                intArrayOf(9000, 10000, 9000, 10000, 9000, 10000, 9000)))
+                intArrayOf(4000, 4000, 5000, 4000, 4000),
+                intArrayOf(4001, 4000, 5000, 4000, 4001)))
+        room[11] = RoomClass(arrayOf(
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4001, 4000, 4000, 4001, 4000, 4000, 4001, 4000, 4000, 4001, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4001, 4000, 4000, 4001, 4000, 4000, 4001, 4000, 4000, 4001, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000)))
+        room[12] = RoomClass(arrayOf(
+                intArrayOf(4001, 4001, 4001, 4000, 4000, 4000, 4000, 4000, 4000, 4001, 4001, 4001),
+                intArrayOf(4001, 4001, 4001, 4000, 4000, 4000, 4000, 4000, 4000, 4001, 4001, 4001),
+                intArrayOf(4001, 4001, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4001, 4001),
+                intArrayOf(4000, 4000, 4000, 4001, 4000, 4000, 4000, 4000, 4001, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000),
+                intArrayOf(4000, 4000, 4000, 4001, 4000, 4000, 4000, 4000, 4001, 4000, 4000, 4000),
+                intArrayOf(4001, 4001, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4001, 4001),
+                intArrayOf(4001, 4001, 4001, 4000, 4000, 4000, 4000, 4000, 4000, 4001, 4001, 4001),
+                intArrayOf(4001, 4001, 4001, 4000, 4000, 4000, 4000, 4000, 4000, 4001, 4001, 4001)))
+        room[13] = RoomClass(arrayOf(
+                intArrayOf(10000, 11000, 10000, 11000, 10000),
+                intArrayOf(11000, 10009, 11000, 10007, 11000),
+                intArrayOf(10000, 11000, 10000, 11007, 10000),
+                intArrayOf(11000, 10007, 11000, 10007, 11000),
+                intArrayOf(10000, 11007, 10000, 11000, 10000),
+                intArrayOf(11000, 10007, 11000, 10009, 11000),
+                intArrayOf(10000, 11000, 10000, 11000, 10000)))
+        room[14] = RoomClass(arrayOf(
+                intArrayOf(4001, 11007, 10007, 11007),
+                intArrayOf(11009, 10000, 11000, 10000),
+                intArrayOf(10016, 11000, 10000, 11000),
+                intArrayOf(11009, 10000, 11000, 10000),
+                intArrayOf(4001, 11007, 10007, 11007)))
+        room[15] = RoomClass(arrayOf(
+                intArrayOf(8000, 9000, 8000, 9000, 8000, 9000, 8000),
+                intArrayOf(9000, 8000, 9000, 8000, 9000, 8000, 9000),
+                intArrayOf(8000, 9000, 8000, 9000, 8000, 9000, 8000),
+                intArrayOf(9000, 8000, 9000, 8000, 9000, 8000, 9000),
+                intArrayOf(8000, 9000, 8000, 9000, 8000, 9000, 8000),
+                intArrayOf(9000, 8000, 9000, 8000, 9000, 8000, 9000),
+                intArrayOf(8000, 9000, 8000, 9000, 8000, 9000, 8000)))
     }
 
     fun correctPlace(x: Int, y: Int): Boolean {
@@ -175,9 +192,9 @@ class MapGenerator {
     }
 
     fun modifyTile(px: Int, py: Int, f: Int, o: Int) {
-        Global.map!![px][py].mIsPassable = Global.tiles[o]!!.mIsPassable
-        Global.map!![px][py].mIsTransparent = Global.tiles[o]!!.mIsTransparent
-        Global.map!![px][py].mIsUsable = Global.tiles[o]!!.mIsUsable
+        Global.map!![px][py].mIsPassable = Global.objects[o]!!.mIsPassable
+        Global.map!![px][py].mIsTransparent = Global.objects[o]!!.mIsTransparent
+        Global.map!![px][py].mIsUsable = Global.objects[o]!!.mIsUsable
     }
 
     fun deleteObjects(x: Int, y: Int, lx: Int, ly: Int) {
@@ -236,7 +253,7 @@ class MapGenerator {
         rc = 0
         var lx: Int
         var ly: Int
-        fillArea(0, 0, MapHelper.mapWidth, MapHelper.mapHeight, 5030)
+        fillArea(0, 0, MapHelper.mapWidth, MapHelper.mapHeight, 4001)
         for (i in 0..rc - 1)
             room1[i] = null
         for (x in 0..MapHelper.mapWidth - 1)
@@ -262,13 +279,14 @@ class MapGenerator {
         Global.mapview.camy = ly - 2
         Global.hero!!.mx = lx + 2
         Global.hero!!.my = ly + 2
-        fillArea(lx, ly, 5, 5, 5000)
-        fillArea(lx + 2, ly + 2, 1, 1, 5039)
+        fillArea(lx, ly, 5, 5, 4000)
+        fillArea(lx + 2, ly + 2, 1, 1, 4010)
         room1[rc] = RoomDBClass(x2, y2, lx, ly)
         xl = lx - 1
         xr = lx + 5
         yl = ly - 1
         yr = ly + 5
+
         while (rc < mr - 1) {
             if (findCell()) {
                 right = Global.map!![z - 1][z1].mIsPassable
@@ -277,7 +295,7 @@ class MapGenerator {
                 up = Global.map!![z][z1 + 1].mIsPassable
                 if (right xor left xor (down xor up)) {
                     var n = 0
-                    when(rnd.nextInt(100)) {
+                    when (rnd.nextInt(100)) {
                         in 0..6 -> {
                             lx = 4
                             ly = 3
@@ -421,7 +439,7 @@ class MapGenerator {
                         if (n != 100) {
                             do {
                                 x2 = z - rnd.nextInt(lx)
-                            } while (zone!![z - x2][ly - 1] % 1000 == 30)
+                            } while (zone!![z - x2][ly - 1] % 1000 == 1)
                         } else {
                             x2 = z - rnd.nextInt(lx)
                         }
@@ -431,7 +449,7 @@ class MapGenerator {
                         if (n != 100) {
                             do {
                                 x2 = z - rnd.nextInt(lx)
-                            } while (zone!![z - x2][0] % 1000 == 30)
+                            } while (zone!![z - x2][0] % 1000 == 1)
                         } else {
                             x2 = z - rnd.nextInt(lx)
                         }
@@ -441,7 +459,7 @@ class MapGenerator {
                         if (n != 100) {
                             do {
                                 y2 = z1 - rnd.nextInt(ly)
-                            } while (zone!![lx - 1][z1 - y2] % 1000 == 30)
+                            } while (zone!![lx - 1][z1 - y2] % 1000 == 1)
                         } else {
                             y2 = z1 - rnd.nextInt(ly)
                         }
@@ -451,7 +469,7 @@ class MapGenerator {
                         if (n != 100) {
                             do {
                                 y2 = z1 - rnd.nextInt(ly)
-                            } while (zone!![0][z1 - y2] % 1000 == 30)
+                            } while (zone!![0][z1 - y2] % 1000 == 1)
                         } else {
                             y2 = z1 - rnd.nextInt(ly)
                         }
@@ -471,8 +489,8 @@ class MapGenerator {
                             if (right) deleteObjects(z + 1, z1, 1, 1)
                             if (left) deleteObjects(z - 1, z1, 1, 1)
                         } else
-                            fillArea(x2, y2, lx, ly, 5000)
-                        fillArea(z, z1, 1, 1, 5031)
+                            fillArea(x2, y2, lx, ly, 4000)
+                        fillArea(z, z1, 1, 1, 4002)
                         if (x2 < xl) xl = x2 - 1
                         if (x2 + lx > xr) xr = x2 + lx + 1
                         if (xl < 2) xl = 2
@@ -523,6 +541,7 @@ class MapGenerator {
         }
         Global.mapview.calculateLineOfSight(Global.hero!!.mx, Global.hero!!.my)
         Global.game.updateZone()
+
         var x4: Int
         var y4: Int
         for (x in 0..30 + Game.curLvls * 7 - 1) {
@@ -539,12 +558,13 @@ class MapGenerator {
             }
             Global.game.createMob(x4, y4, en)
         }
+
         if (Game.curLvls < Global.game.maxLvl - 1) {
             while (true) {
                 x4 = rnd.nextInt(MapHelper.mapWidth)
                 y4 = rnd.nextInt(MapHelper.mapHeight)
                 if (Global.map!![x4][y4].mObjectID == 0 && !Global.map!![x4][y4].mCurrentlyVisible) {
-                    Global.map!![x4][y4].mObjectID = 40
+                    Global.map!![x4][y4].mObjectID = 11
                     m = x4 - 2
                     n = y4 - 2
                     break
@@ -596,7 +616,7 @@ class MapGenerator {
                                 Global.map!![x2 + x][y2 + y].mObjectID = v % 1000
                                 modifyTile(x2 + x, y2 + y, v / 1000, v % 1000)
                             }
-                        fillArea(z, z1, 1, 1, 5031)
+                        fillArea(z, z1, 1, 1, 4002)
                         Global.game.createMob(x2 + 3, y2 + 3, 5)
                         Global.game.createMob(x2 + 4, y2 + 3, 4)
                         Global.game.createMob(x2 + 2, y2 + 3, 4)

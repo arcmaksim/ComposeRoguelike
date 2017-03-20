@@ -1,4 +1,5 @@
 <objects>
+	<object passable="t" transparent="t" usable="f" isWall="f"/>
     <object passable="f" transparent="f" usable="f" isWall="t"/>
     <object passable="f" transparent="f" usable="t" isWall="f"/>
     <object passable="t" transparent="t" usable="f" isWall="f"/>

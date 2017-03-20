@@ -3,10 +3,7 @@ package ru.MeatGames.roguelike.tomb
 import android.graphics.Bitmap
 import android.os.Vibrator
 import org.xmlpull.v1.XmlPullParser
-import ru.MeatGames.roguelike.tomb.db.ItemDB
-import ru.MeatGames.roguelike.tomb.db.MobDB
-import ru.MeatGames.roguelike.tomb.db.StatsDB
-import ru.MeatGames.roguelike.tomb.db.TileDB
+import ru.MeatGames.roguelike.tomb.db.*
 import ru.MeatGames.roguelike.tomb.model.HeroClass
 import ru.MeatGames.roguelike.tomb.model.MapClass
 import ru.MeatGames.roguelike.tomb.screen.GameScreen
@@ -27,8 +24,8 @@ object Global {
     lateinit var mmview: MainMenu
 
     // temporary most of the tiles is null, use carefully
-    lateinit var tiles: Array<TileDB?> // 0 element is opaque
-    lateinit var objects: Array<TileDB>
+    lateinit var tiles: Array<TileDB?>
+    lateinit var objects: Array<ObjectDB> // 0 element is opaque
     lateinit var itemDB: Array<ItemDB>
     lateinit var mobDB: Array<MobDB>
     lateinit var stats: Array<StatsDB>
@@ -41,8 +38,8 @@ object Global {
 
     var mIsInitialDataCreated: Boolean = false
 
-    val maxTiles = 13
-    val maxObjects = 16
+    val maxTiles = 12
+    val maxObjects = 17
     val maxItems = 17
     val maxStats = 35
 
@@ -193,8 +190,9 @@ object Global {
             val isPassable = parser.getAttributeValue(0) == "t"
             val isTransparent = parser.getAttributeValue(1) == "t"
             val isUsable = parser.getAttributeValue(2) == "t"
+            val isWall = parser.getAttributeValue(3) == "t"
             parser.next()
-            TileDB(isPassable, isTransparent, isUsable)
+            ObjectDB(isPassable, isTransparent, isUsable, isWall)
         }
     }
 

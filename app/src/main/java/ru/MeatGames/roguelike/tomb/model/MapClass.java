@@ -57,7 +57,7 @@ public class MapClass {
     }
 
     public boolean isWall() {
-        return Global.INSTANCE.getTiles()[mObjectID].getMIsWall();
+        return Global.INSTANCE.getObjects()[mObjectID].getMIsWall();
     }
 
     public Bitmap getFloorImg() {
@@ -65,7 +65,7 @@ public class MapClass {
     }
 
     public Bitmap getObjectImg() {
-        return Global.INSTANCE.getTiles()[mObjectID].getImg();
+        return Global.INSTANCE.getObjects()[mObjectID].getImg();
     }
 
     public Bitmap getItemImg() {
