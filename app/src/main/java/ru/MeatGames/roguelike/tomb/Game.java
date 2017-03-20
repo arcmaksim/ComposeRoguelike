@@ -114,6 +114,7 @@ public class Game extends Activity {
     }
 
     public void newGame() {
+        Global.initInitialData();
         Global.newHero();
         curLvls = 0;
         generateNewMap();
@@ -126,7 +127,6 @@ public class Game extends Activity {
         View view;
         switch (screen) {
             case GAME_SCREEN:
-                Global.initInitialData();
                 view = Global.INSTANCE.getMapview();
                 ((GameScreen) view).updateMapBuffer();
                 break;

@@ -48,7 +48,7 @@ object Global {
 
     private val mOriginalTileSize = 24
 
-    inline fun <reified INNER> array2d(sizeOuter: Int, sizeInner: Int, noinline innerInit: (Int)->INNER): Array<Array<INNER>>
+    inline fun <reified INNER> array2d(sizeOuter: Int, sizeInner: Int, noinline innerInit: (Int) -> INNER): Array<Array<INNER>>
             = Array(sizeOuter) { Array<INNER>(sizeInner, innerInit) }
 
     @JvmStatic
@@ -66,12 +66,12 @@ object Global {
     @JvmStatic
     fun initInitialData() {
         if (!mIsInitialDataCreated) {
+            loadAssets()
+
             hero = HeroClass()
             mapview = GameScreen(game)
 
-            map = array2d(mapWidth, mapHeight, { MapClass() } )
-
-            loadAssets()
+            map = array2d(mapWidth, mapHeight, { MapClass() })
 
             mIsInitialDataCreated = true
         }
@@ -87,11 +87,13 @@ object Global {
         // loadAssets images
         var temp = mAssetHelper.getBitmapFromAsset("character_animation_sheet")
 
-        heroSprites = Array(4) { i -> Bitmap.createBitmap(temp,
-                i * mOriginalTileSize,
-                0,
-                mOriginalTileSize,
-                mOriginalTileSize)}
+        heroSprites = Array(4) { i ->
+            Bitmap.createBitmap(temp,
+                    i * mOriginalTileSize,
+                    0,
+                    mOriginalTileSize,
+                    mOriginalTileSize)
+        }
 
         game.bag = mAssetHelper.getBitmapFromAsset("bag")
         game.mCharacterIcon = mAssetHelper.getBitmapFromAsset("character_icon")
@@ -142,7 +144,7 @@ object Global {
         }
 
         temp = mAssetHelper.getBitmapFromAsset("walls_tileset")
-        walls = Array<Bitmap>(16) {i -> Bitmap.createBitmap(temp, i % 4 * mOriginalTileSize, i / 4 * mOriginalTileSize, mOriginalTileSize, mOriginalTileSize)}
+        walls = Array<Bitmap>(16) { i -> Bitmap.createBitmap(temp, i % 4 * mOriginalTileSize, i / 4 * mOriginalTileSize, mOriginalTileSize, mOriginalTileSize) }
     }
 
     private fun loadStats() {
@@ -150,7 +152,6 @@ object Global {
         stats = Array(maxStats) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "stat") {
-                    parser.next()
                     break
                 }
                 parser.next()
@@ -158,6 +159,7 @@ object Global {
             val statTitle = parser.getAttributeValue(0)
             val isSingle = parser.getAttributeValue(1) == "t"
             val isMaximum = parser.getAttributeValue(2) == "t"
+            parser.next()
             StatsDB(statTitle, isSingle, isMaximum)
         }
     }
@@ -167,7 +169,6 @@ object Global {
         tiles = Array(maxTiles) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "tile") {
-                    parser.next()
                     break
                 }
                 parser.next()
@@ -175,6 +176,7 @@ object Global {
             val isPassable = parser.getAttributeValue(0) == "t"
             val isTransparent = parser.getAttributeValue(1) == "t"
             val isUsable = parser.getAttributeValue(2) == "t"
+            parser.next()
             TileDB(isPassable, isTransparent, isUsable)
         }
     }
@@ -184,7 +186,6 @@ object Global {
         objects = Array(maxObjects) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "object") {
-                    parser.next()
                     break
                 }
                 parser.next()
@@ -192,6 +193,7 @@ object Global {
             val isPassable = parser.getAttributeValue(0) == "t"
             val isTransparent = parser.getAttributeValue(1) == "t"
             val isUsable = parser.getAttributeValue(2) == "t"
+            parser.next()
             TileDB(isPassable, isTransparent, isUsable)
         }
     }
@@ -200,8 +202,11 @@ object Global {
         val parser = game.resources.getXml(R.xml.items)
         itemDB = Array(maxItems) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
-                if (parser.eventType == XmlPullParser.START_TAG && parser.name == "items") {
-                    parser.next()
+                if (parser.eventType == XmlPullParser.START_TAG &&
+                        (parser.name == "weapon"
+                                || parser.name == "shield"
+                                || parser.name == "armor"
+                                || parser.name == "item")) {
                     break
                 }
                 parser.next()
@@ -226,16 +231,16 @@ object Global {
                 "item" -> type = 5
             }
 
+            parser.next()
             ItemDB(type, title, titleEnding, value1, value2, value3, property)
         }
     }
 
     private fun loadMobs() {
-        val parser = game.resources.getXml(R.xml.mobs   )
+        val parser = game.resources.getXml(R.xml.mobs)
         mobDB = Array(Global.game.maxMobs) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "mob") {
-                    parser.next()
                     break
                 }
                 parser.next()
@@ -248,6 +253,7 @@ object Global {
             val armor = Integer.parseInt(parser.getAttributeValue(4))
             val speed = Integer.parseInt(parser.getAttributeValue(5))
             val damage = Integer.parseInt(parser.getAttributeValue(6))
+            parser.next()
             MobDB(name, health, attack, defense, armor, speed, damage)
         }
     }
