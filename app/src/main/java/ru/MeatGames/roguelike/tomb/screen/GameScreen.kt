@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Game
 import ru.MeatGames.roguelike.tomb.Global
 import ru.MeatGames.roguelike.tomb.R
+import ru.MeatGames.roguelike.tomb.util.MapHelper
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.fillFrame
 import java.util.*
@@ -106,17 +107,23 @@ class GameScreen(context: Context) : BasicScreen(context) {
             mapX = bufferX + camx
             for (bufferY in 0..mMapViewportHeight - 1) {
                 mapY = bufferY + camy
-                mMapBuffer[bufferX][bufferY].mIsVisible = mapX > -1
-                        && mapY > -1
-                        && mapX < Global.game.mapWidth
-                        && mapY < Global.game.mapHeight
-                        && Global.map!![mapX][mapY].mCurrentlyVisible
-                if (mMapBuffer[bufferX][bufferY].mIsVisible) {
-                    mMapBuffer[bufferX][bufferY].mFloorID = Global.map!![mapX][mapY].mFloorID
-                    mMapBuffer[bufferX][bufferY].mObjectID = Global.map!![mapX][mapY].mObjectID
 
-                    mMapBuffer[bufferX][bufferY].mHasItem = Global.map!![mapX][mapY].hasItem()
-                    mMapBuffer[bufferX][bufferY].mHasEnemy = Global.map!![mapX][mapY].hasMob()
+                val mapCell = MapHelper.getMapCell(mapX, mapY)
+
+                mMapBuffer[bufferX][bufferY].mIsVisible = mapCell?.mCurrentlyVisible ?: false
+
+                if (mMapBuffer[bufferX][bufferY].mIsVisible) {
+                    mMapBuffer[bufferX][bufferY].mFloorID = mapCell!!.mFloorID
+                    mMapBuffer[bufferX][bufferY].mObjectID = mapCell.mObjectID
+
+                    if (mMapBuffer[bufferX][bufferY].mObjectID == 30) {
+                        mMapBuffer[bufferX][bufferY].mWallBitmap = 0
+                    } else {
+                        mMapBuffer[bufferX][bufferY].mWallBitmap = -1
+                    }
+
+                    mMapBuffer[bufferX][bufferY].mHasItem = mapCell.hasItem()
+                    mMapBuffer[bufferX][bufferY].mHasEnemy = mapCell.hasMob()
 
                     val shadowX = bufferX - 4
                     val shadowY = bufferY - 4
@@ -130,6 +137,87 @@ class GameScreen(context: Context) : BasicScreen(context) {
                     }
                 } else {
                     mMapBuffer[bufferX][bufferY].init()
+                }
+            }
+        }
+
+        correctWalls()
+        correctCorners()
+    }
+
+    private fun correctWalls() {
+        for (x in 0..mMapViewportWidth - 1) {
+            for (y in 0..mMapViewportHeight - 1) {
+                if (mMapBuffer[x][y].mWallBitmap == 0) {
+                    val isConnectedToTheTop = (camy + y - 1 > -1 && Global.map!![camx + x][camy + y - 1].mObjectID == 30)
+                    val isConnectedToTheRight = (camx + x + 1 < MapHelper.mapWidth && Global.map!![camx + x + 1][camy + y].mObjectID == 30)
+                    val isConnectedToTheBottom = (camy + y + 1 < MapHelper.mapHeight && Global.map!![camx + x][camy + y + 1].mObjectID == 30)
+                    val isConnectedToTheLeft = (camx + x - 1 > -1 && Global.map!![camx + x - 1][camy + y].mObjectID == 30)
+
+                    val horizontalWall = (isConnectedToTheLeft && isConnectedToTheRight)
+                    val verticalWall = (isConnectedToTheTop && isConnectedToTheBottom)
+
+                    if (horizontalWall) {
+                        mMapBuffer[x][y].mWallBitmap = 10
+                    } else if (verticalWall) {
+                        mMapBuffer[x][y].mWallBitmap = 5
+                    } else {
+                        if (isConnectedToTheTop) mMapBuffer[x][y].mWallBitmap += 1
+                        if (isConnectedToTheRight) mMapBuffer[x][y].mWallBitmap += 2
+                        if (isConnectedToTheBottom) mMapBuffer[x][y].mWallBitmap += 4
+                        if (isConnectedToTheLeft) mMapBuffer[x][y].mWallBitmap += 8
+                    }
+                }
+            }
+        }
+    }
+
+    private fun correctCorners() {
+        for (x in 0..mMapViewportWidth - 1) {
+            for (y in 0..mMapViewportHeight - 1) {
+                if (mMapBuffer[x][y].mWallBitmap % 3 == 0
+                        && mMapBuffer[x][y].mWallBitmap % 3 == 0) {
+
+                    if (mMapBuffer[x][y].mWallBitmap % 2 == 1) {
+                        if (MapHelper.top(y - 1) && mMapBuffer[x][y - 1].mIsVisible) {
+                            if (MapHelper.left(x - 1) && mMapBuffer[x - 1][y - 1].mIsVisible) {
+                                mMapBuffer[x][y - 1].mWallBitmap = 12
+                            } else if (MapHelper.right(x + 1) && mMapBuffer[x + 1][y - 1].mIsVisible) {
+                                mMapBuffer[x][y - 1].mWallBitmap = 6
+                            }
+                        }
+                    }
+
+                    if (mMapBuffer[x][y].mWallBitmap and 0x2 == 1) {
+                        if (MapHelper.right(x + 1) && mMapBuffer[x + 1][y].mIsVisible) {
+                            if (MapHelper.top(y - 1) && mMapBuffer[x + 1][y - 1].mIsVisible) {
+                                mMapBuffer[x + 1][y].mWallBitmap = 9
+                            } else if (MapHelper.bottom(y + 1) && mMapBuffer[x + 1][y + 1].mIsVisible) {
+                                mMapBuffer[x + 1][y].mWallBitmap = 12
+                            }
+                        }
+                    }
+
+                    if (mMapBuffer[x][y].mWallBitmap and 0x4 == 1) {
+                        if (MapHelper.bottom(y + 1) && mMapBuffer[x][y + 1].mIsVisible) {
+                            if (MapHelper.left(x - 1) && mMapBuffer[x - 1][y + 1].mIsVisible) {
+                                mMapBuffer[x][y - 1].mWallBitmap = 9
+                            } else if (MapHelper.right(x + 1) && mMapBuffer[x + 1][y + 1].mIsVisible) {
+                                mMapBuffer[x][y - 1].mWallBitmap = 3
+                            }
+                        }
+                    }
+
+                    if (mMapBuffer[x][y].mWallBitmap and 0x8 == 1) {
+                        if (MapHelper.left(x - 1) && mMapBuffer[x - 1][y].mIsVisible) {
+                            if (MapHelper.top(y - 1) && mMapBuffer[x - 1][y - 1].mIsVisible) {
+                                mMapBuffer[x - 1][y].mWallBitmap = 3
+                            } else if (MapHelper.bottom(y + 1) && mMapBuffer[x - 1][y + 1].mIsVisible) {
+                                mMapBuffer[x - 1][y].mWallBitmap = 6
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -150,7 +238,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
             if (!Global.hero!!.mIsFacingLeft) {
                 animationFrame += 2
             }
-            canvas.drawBitmap(Game.getHeroImg(animationFrame), Global.hero!!.x, Global.hero!!.y, mBitmapPaint)
+            canvas.drawBitmap(Global.getHeroSprite(animationFrame), Global.hero!!.x, Global.hero!!.y, mBitmapPaint)
 
             canvas.restore()
 
@@ -195,13 +283,19 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
                 if (currentMapBufferCell.mIsVisible) {
                     canvas.drawBitmap(Global.map!![x][y].floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
-                    canvas.drawBitmap(Global.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+
+                    if (currentMapBufferCell.mWallBitmap != -1) {
+                        canvas.drawBitmap(Global.walls[currentMapBufferCell.mWallBitmap], currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    } else {
+                        canvas.drawBitmap(Global.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    }
 
                     if (currentMapBufferCell.mHasItem) {
                         canvas.drawBitmap(Global.map!![x][y].itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
-                    if (currentMapBufferCell.mHasEnemy) {
+                    //if (currentMapBufferCell.mHasEnemy) {
+                    if (Global.map!![x][y].hasMob()) {
                         canvas.drawBitmap(Global.map!![x][y].mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
@@ -212,20 +306,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
             }
         }
 
-    }
-
-    private fun getWall(x: Int, y: Int): Int {
-        var wall = 0
-        val horizontal = (x > -1 && x < Global.game.mapWidth - 1 && Global.map!![x - 1][y].mObjectID == Global.map!![x + 1][y].mObjectID)
-        val vertical = (y > -1 && y < Global.game.mapHeight - 1 && Global.map!![x][y - 1].mObjectID == Global.map!![x][y + 1].mObjectID)
-
-        if (!(horizontal && vertical)) {
-            if (x > 0 && Global.map!![x-1][y].mObjectID == 30) wall += 8
-            if (x < Global.game.mapWidth - 1 && Global.map!![x+1][y].mObjectID == 30) wall += 2
-            if (y > 0 && Global.map!![x][y-1].mObjectID == 30) wall += 1
-            if (y < Global.game.mapHeight - 1 && Global.map!![x][y+1].mObjectID == 30) wall += 4
-        }
-        return wall
     }
 
     private fun drawHUD(canvas: Canvas) {
@@ -419,7 +499,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 x += pdx
                 y += pdy
             }
-            if (x > -1 && y > -1 && x < Global.game.mapWidth && y < Global.game.mapHeight) {
+            if (x > -1 && y > -1 && x < MapHelper.mapWidth && y < MapHelper.mapHeight) {
                 if (!Global.map!![x][y].mCurrentlyVisible)
                     Global.map!![x][y].mCurrentlyVisible = v
                 if (v)
@@ -433,8 +513,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     fun calculateLineOfSight(x: Int, y: Int) {
         val cm = if (camx < 0) 0 else camx
         val cm1 = if (camy < 0) 0 else camy
-        for (c in cm..(if (cm + 9 >= Global.game.mapWidth) Global.game.mapWidth else cm + 9) - 1)
-            for (c1 in cm1..(if (cm1 + 9 >= Global.game.mapWidth) Global.game.mapWidth else cm1 + 9) - 1)
+        for (c in cm..(if (cm + 9 >= MapHelper.mapWidth) MapHelper.mapWidth else cm + 9) - 1)
+            for (c1 in cm1..(if (cm1 + 9 >= MapHelper.mapWidth) MapHelper.mapWidth else cm1 + 9) - 1)
                 Global.map!![c][c1].mCurrentlyVisible = false
         for (c in x - 1..x + 2 - 1)
             for (c1 in y - 1..y + 2 - 1)

@@ -1,6 +1,5 @@
 package ru.MeatGames.roguelike.tomb.model
 
-import android.graphics.Bitmap
 import ru.MeatGames.roguelike.tomb.Global
 import java.util.*
 
@@ -20,10 +19,13 @@ class HeroClass {
     var regen: Int = 0
     var cregen: Int = 0
     var init = 10
-    var img = arrayOfNulls<Bitmap>(4)
     var mInventory: LinkedList<Item>? = null
 
-    fun newHero() {
+    init {
+        init()
+    }
+
+    fun init() {
         mInventory = null
         mInventory = LinkedList<Item>()
         equipmentList = arrayOfNulls<Item>(3)

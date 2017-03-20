@@ -2,6 +2,7 @@ package ru.MeatGames.roguelike.tomb
 
 import ru.MeatGames.roguelike.tomb.db.RoomDBClass
 import ru.MeatGames.roguelike.tomb.model.RoomClass
+import ru.MeatGames.roguelike.tomb.util.MapHelper
 import java.util.*
 
 class MapGenerator {
@@ -155,7 +156,7 @@ class MapGenerator {
     }
 
     fun checkZone(n: Int, m: Int, ln: Int, lm: Int): Boolean {
-        if (n + ln > Global.game.mapWidth - 3 || m + lm > Global.game.mapHeight - 3 || n < 2 || m < 2)
+        if (n + ln > MapHelper.mapWidth - 3 || m + lm > MapHelper.mapHeight - 3 || n < 2 || m < 2)
             return false
         for (n1 in n..n + ln + 1 - 1)
             for (m1 in m..m + lm + 1 - 1)
@@ -174,9 +175,9 @@ class MapGenerator {
     }
 
     fun modifyTile(px: Int, py: Int, f: Int, o: Int) {
-        Global.map!![px][py].mIsPassable = Global.tiles[o].mIsPassable
-        Global.map!![px][py].mIsTransparent = Global.tiles[o].mIsTransparent
-        Global.map!![px][py].mIsUsable = Global.tiles[o].mIsUsable
+        Global.map!![px][py].mIsPassable = Global.tiles[o]!!.mIsPassable
+        Global.map!![px][py].mIsTransparent = Global.tiles[o]!!.mIsTransparent
+        Global.map!![px][py].mIsUsable = Global.tiles[o]!!.mIsUsable
     }
 
     fun deleteObjects(x: Int, y: Int, lx: Int, ly: Int) {
@@ -235,11 +236,11 @@ class MapGenerator {
         rc = 0
         var lx: Int
         var ly: Int
-        fillArea(0, 0, Global.game.mapWidth, Global.game.mapHeight, 5030)
+        fillArea(0, 0, MapHelper.mapWidth, MapHelper.mapHeight, 5030)
         for (i in 0..rc - 1)
             room1[i] = null
-        for (x in 0..Global.game.mapWidth - 1)
-            for (y in 0..Global.game.mapHeight - 1) {
+        for (x in 0..MapHelper.mapWidth - 1)
+            for (y in 0..MapHelper.mapHeight - 1) {
                 Global.map!![x][y].deleteItems()
                 Global.map!![x][y].mIsDiscovered = false
                 Global.map!![x][y].mCurrentlyVisible = false
@@ -255,8 +256,8 @@ class MapGenerator {
         var down: Boolean
         var left: Boolean
         var right: Boolean
-        lx = rnd.nextInt(Global.game.mapWidth / 2) + 16
-        ly = rnd.nextInt(Global.game.mapHeight / 2) + 16
+        lx = rnd.nextInt(MapHelper.mapWidth / 2) + 16
+        ly = rnd.nextInt(MapHelper.mapHeight / 2) + 16
         Global.mapview.camx = lx - 2
         Global.mapview.camy = ly - 2
         Global.hero!!.mx = lx + 2
@@ -475,13 +476,13 @@ class MapGenerator {
                         if (x2 < xl) xl = x2 - 1
                         if (x2 + lx > xr) xr = x2 + lx + 1
                         if (xl < 2) xl = 2
-                        if (xr > Global.game.mapWidth - 2)
-                            xr = Global.game.mapWidth - 2
+                        if (xr > MapHelper.mapWidth - 2)
+                            xr = MapHelper.mapWidth - 2
                         if (y2 < yl) yl = y2 - 1
                         if (y2 + ly > yr) yr = y2 + ly + 1
                         if (yl < 2) yl = 2
-                        if (yr > Global.game.mapHeight - 2)
-                            yr = Global.game.mapHeight - 2
+                        if (yr > MapHelper.mapHeight - 2)
+                            yr = MapHelper.mapHeight - 2
                         room1[rc] = RoomDBClass(x2, y2, lx, ly)
                         if (rnd.nextInt(2) == 0) {
                             if (up) {
@@ -526,8 +527,8 @@ class MapGenerator {
         var y4: Int
         for (x in 0..30 + Game.curLvls * 7 - 1) {
             do {
-                x4 = rnd.nextInt(Global.game.mapWidth)
-                y4 = rnd.nextInt(Global.game.mapHeight)
+                x4 = rnd.nextInt(MapHelper.mapWidth)
+                y4 = rnd.nextInt(MapHelper.mapHeight)
             } while (!Global.map!![x4][y4].mIsPassable || Global.map!![x4][y4].mCurrentlyVisible || Global.map!![x4][y4].hasMob())
             val en = rnd.nextInt(Global.game.maxMobs - Game.curLvls - 1) + Game.curLvls
             if (en < 3 && rnd.nextInt(3) == 0) {
@@ -540,8 +541,8 @@ class MapGenerator {
         }
         if (Game.curLvls < Global.game.maxLvl - 1) {
             while (true) {
-                x4 = rnd.nextInt(Global.game.mapWidth)
-                y4 = rnd.nextInt(Global.game.mapHeight)
+                x4 = rnd.nextInt(MapHelper.mapWidth)
+                y4 = rnd.nextInt(MapHelper.mapHeight)
                 if (Global.map!![x4][y4].mObjectID == 0 && !Global.map!![x4][y4].mCurrentlyVisible) {
                     Global.map!![x4][y4].mObjectID = 40
                     m = x4 - 2
