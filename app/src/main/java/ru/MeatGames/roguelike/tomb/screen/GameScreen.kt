@@ -430,12 +430,12 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun afterProgressBar(result: Int) {
         when (result) {
             4 -> {
-                Global.game.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 6)
+                MapHelper.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 6)
                 Global.mapview.addLine(context.getString(R.string.search_chest_message))
                 Global.game.createItem(Global.hero!!.mx + mx, Global.hero!!.my + my)
             }
             7 -> {
-                Global.game.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 8)
+                MapHelper.fillArea(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, Game.getFloor(Global.hero!!.mx + mx, Global.hero!!.my + my), 8)
                 addLine(context.getString(R.string.search_bookshelf_message))
                 if (Global.game.mRandom.nextInt(3) != 0) {
                     addLine(context.getString(R.string.experience_earned_message))

@@ -24,7 +24,7 @@ object Global {
     lateinit var mmview: MainMenu
 
     // temporary most of the tiles is null, use carefully
-    lateinit var tiles: Array<TileDB?>
+    lateinit var tiles: Array<TileDB>
     lateinit var objects: Array<ObjectDB> // 0 element is opaque
     lateinit var itemDB: Array<ItemDB>
     lateinit var mobDB: Array<MobDB>

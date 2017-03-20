@@ -182,27 +182,12 @@ class MapGenerator {
         return true
     }
 
-    fun fillArea(sx: Int, sy: Int, lx1: Int, ly1: Int, f: Int) {
-        for (y in sy..sy + ly1 - 1)
-            for (x in sx..sx + lx1 - 1) {
-                Global.map!![x][y].mFloorID = f / 1000
-                Global.map!![x][y].mObjectID = f % 1000
-                modifyTile(x, y, f / 1000, f % 1000)
-            }
-    }
-
-    fun modifyTile(px: Int, py: Int, f: Int, o: Int) {
-        Global.map!![px][py].mIsPassable = Global.objects[o]!!.mIsPassable
-        Global.map!![px][py].mIsTransparent = Global.objects[o]!!.mIsTransparent
-        Global.map!![px][py].mIsUsable = Global.objects[o]!!.mIsUsable
-    }
-
     fun deleteObjects(x: Int, y: Int, lx: Int, ly: Int) {
         for (x1 in 0..lx - 1)
             for (y1 in 0..ly - 1)
                 if (!Global.map!![x + x1][y + y1].isWall) {
                     Global.map!![x + x1][y + y1].mObjectID = 0
-                    modifyTile(x + x1, y + y1, Global.map!![x + x1][y + y1].mFloorID, 0)
+                    MapHelper.modifyTile(x + x1, y + y1, Global.map!![x + x1][y + y1].mFloorID, 0)
                 }
     }
 
@@ -253,7 +238,7 @@ class MapGenerator {
         rc = 0
         var lx: Int
         var ly: Int
-        fillArea(0, 0, MapHelper.mapWidth, MapHelper.mapHeight, 4001)
+        MapHelper.fillArea(0, 0, MapHelper.mapWidth, MapHelper.mapHeight, 4001)
         for (i in 0..rc - 1)
             room1[i] = null
         for (x in 0..MapHelper.mapWidth - 1)
@@ -279,8 +264,8 @@ class MapGenerator {
         Global.mapview.camy = ly - 2
         Global.hero!!.mx = lx + 2
         Global.hero!!.my = ly + 2
-        fillArea(lx, ly, 5, 5, 4000)
-        fillArea(lx + 2, ly + 2, 1, 1, 4010)
+        MapHelper.fillArea(lx, ly, 5, 5, 4000)
+        MapHelper.fillArea(lx + 2, ly + 2, 1, 1, 4010)
         room1[rc] = RoomDBClass(x2, y2, lx, ly)
         xl = lx - 1
         xr = lx + 5
@@ -482,15 +467,15 @@ class MapGenerator {
                                     val v = zone!![x][y]
                                     Global.map!![x2 + x][y2 + y].mFloorID = v / 1000
                                     Global.map!![x2 + x][y2 + y].mObjectID = v % 1000
-                                    modifyTile(x2 + x, y2 + y, v / 1000, v % 1000)
+                                    MapHelper.modifyTile(x2 + x, y2 + y, v / 1000, v % 1000)
                                 }
                             if (up) deleteObjects(z, z1 - 1, 1, 1)
                             if (down) deleteObjects(z, z1 + 1, 1, 1)
                             if (right) deleteObjects(z + 1, z1, 1, 1)
                             if (left) deleteObjects(z - 1, z1, 1, 1)
                         } else
-                            fillArea(x2, y2, lx, ly, 4000)
-                        fillArea(z, z1, 1, 1, 4002)
+                            MapHelper.fillArea(x2, y2, lx, ly, 4000)
+                        MapHelper.fillArea(z, z1, 1, 1, 4002)
                         if (x2 < xl) xl = x2 - 1
                         if (x2 + lx > xr) xr = x2 + lx + 1
                         if (xl < 2) xl = 2
@@ -508,28 +493,28 @@ class MapGenerator {
                                 for (x in 0..lx - 1)
                                     if (getRoom(x2 + x, z1 + 1) == r && !Global.map!![x2 + x][z1 + 1].isWall && !Global.map!![x2 + x][z1 - 1].isWall)
                                         if (Global.map!![x2 + x][z1 + 1].mFloorID == Global.map!![x2 + x][z1 - 1].mFloorID)
-                                            Global.game.fillArea(x2 + x, z1, 1, 1, Global.map!![x2 + x][z1 + 1].mFloorID, 0)
+                                            MapHelper.fillArea(x2 + x, z1, 1, 1, Global.map!![x2 + x][z1 + 1].mFloorID, 0)
                             }
                             if (down) {
                                 val r = getRoom(z, z1 - 1)
                                 for (x in 0..lx - 1)
                                     if (getRoom(x2 + x, z1 - 1) == r && !Global.map!![x2 + x][z1 + 1].isWall && !Global.map!![x2 + x][z1 - 1].isWall)
                                         if (Global.map!![x2 + x][z1 + 1].mFloorID == Global.map!![x2 + x][z1 - 1].mFloorID)
-                                            Global.game.fillArea(x2 + x, z1, 1, 1, Global.map!![x2 + x][z1 + 1].mFloorID, 0)
+                                            MapHelper.fillArea(x2 + x, z1, 1, 1, Global.map!![x2 + x][z1 + 1].mFloorID, 0)
                             }
                             if (right) {
                                 val r = getRoom(z - 1, z1)
                                 for (y in 0..ly - 1)
                                     if (getRoom(z - 1, y2 + y) == r && !Global.map!![z + 1][y2 + y].isWall && !Global.map!![z - 1][y2 + y].isWall)
                                         if (Global.map!![z + 1][y2 + y].mFloorID == Global.map!![z - 1][y2 + y].mFloorID)
-                                            Global.game.fillArea(z, y2 + y, 1, 1, Global.map!![z + 1][y2 + y].mFloorID, 0)
+                                            MapHelper.fillArea(z, y2 + y, 1, 1, Global.map!![z + 1][y2 + y].mFloorID, 0)
                             }
                             if (left) {
                                 val r = getRoom(z + 1, z1)
                                 for (y in 0..ly - 1)
                                     if (getRoom(z + 1, y2 + y) == r && !Global.map!![z + 1][y2 + y].isWall && !Global.map!![z - 1][y2 + y].isWall)
                                         if (Global.map!![z + 1][y2 + y].mFloorID == Global.map!![z - 1][y2 + y].mFloorID)
-                                            Global.game.fillArea(z, y2 + y, 1, 1, Global.map!![z + 1][y2 + y].mFloorID, 0)
+                                            MapHelper.fillArea(z, y2 + y, 1, 1, Global.map!![z + 1][y2 + y].mFloorID, 0)
                             }
                         }
                     }
@@ -614,9 +599,9 @@ class MapGenerator {
                                 val v = zone!![x][y]
                                 Global.map!![x2 + x][y2 + y].mFloorID = v / 1000
                                 Global.map!![x2 + x][y2 + y].mObjectID = v % 1000
-                                modifyTile(x2 + x, y2 + y, v / 1000, v % 1000)
+                                MapHelper.modifyTile(x2 + x, y2 + y, v / 1000, v % 1000)
                             }
-                        fillArea(z, z1, 1, 1, 4002)
+                        MapHelper.fillArea(z, z1, 1, 1, 4002)
                         Global.game.createMob(x2 + 3, y2 + 3, 5)
                         Global.game.createMob(x2 + 4, y2 + 3, 4)
                         Global.game.createMob(x2 + 2, y2 + 3, 4)

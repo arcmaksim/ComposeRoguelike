@@ -205,14 +205,6 @@ public class Game extends Activity {
         return item;
     }
 
-    public void createMob(int x, int y) {
-        MobList temp = new MobList(mRandom.nextInt(4));
-        temp.x = x;
-        temp.y = y;
-        Global.INSTANCE.getMap()[x][y].addMob(temp);
-        addInQueue(temp);
-    }
-
     public void createMob(int x, int y, int t) {
         MobList temp = new MobList(t);
         temp.x = x;
@@ -258,11 +250,11 @@ public class Game extends Activity {
             if (mapCell.mIsUsable) {
                 switch (Game.getObject(mx, my)) {
                     case 2:
-                        fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 3);
+                        MapHelper.fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 3);
                         Global.INSTANCE.getMapview().addLine(getString(R.string.door_opened_message));
                         break;
                     case 4:
-                        fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 5);
+                        MapHelper.fillArea(mx, my, 1, 1, Game.getFloor(mx, my), 5);
                         Global.INSTANCE.getMapview().setMDrawLog(false);
                         Global.INSTANCE.getMapview().initProgressBar(4, 159);
                         break;
@@ -281,7 +273,7 @@ public class Game extends Activity {
             if (mapCell.mIsPassable) {
                 mIsPlayerTurn = false;
                 mIsPlayerMoved = true; // ?
-                if (Game.getObject(mx, my) == 15) {
+                if (mapCell.mObjectID == 15) {
                     Global.INSTANCE.getHero().modifyStat(5, mRandom.nextInt(3) + 1, -1);
                     Global.INSTANCE.getMapview().addLine(getString(R.string.trap_message));
                     if (Global.INSTANCE.getHero().getStat(5) < 1) {
@@ -451,25 +443,6 @@ public class Game extends Activity {
     public void createItem(int x4, int y4, int t) {
         Item item = createItem(t);
         Global.INSTANCE.getMap()[x4][y4].addItem(item);
-    }
-
-    public void modifyTile(int px, int py, int f, int o) {
-        Global.INSTANCE.getMap()[px][py].mIsPassable = Global.INSTANCE.getTiles()[f].getMIsPassable();
-        Global.INSTANCE.getMap()[px][py].mIsTransparent = Global.INSTANCE.getTiles()[f].getMIsTransparent();
-        Global.INSTANCE.getMap()[px][py].mIsUsable = Global.INSTANCE.getTiles()[f].getMIsUsable();
-        Global.INSTANCE.getMap()[px][py].mIsPassable = Global.INSTANCE.getObjects()[o].getMIsPassable();
-        Global.INSTANCE.getMap()[px][py].mIsTransparent = Global.INSTANCE.getObjects()[o].getMIsTransparent();
-        Global.INSTANCE.getMap()[px][py].mIsUsable = Global.INSTANCE.getObjects()[o].getMIsUsable();
-    }
-
-    public void fillArea(int sx, int sy, int lx1, int ly1, int f, int o) {
-        for (int y = sy; y < sy + ly1; y++) {
-            for (int x = sx; x < sx + lx1; x++) {
-                Global.INSTANCE.getMap()[x][y].mFloorID = f;
-                Global.INSTANCE.getMap()[x][y].mObjectID = o;
-                modifyTile(x, y, f, o);
-            }
-        }
     }
 
     public void mobTurn(MobList mob) {
