@@ -5,7 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.view.TextButton
@@ -35,19 +36,19 @@ class CharacterScreen(context: Context) : BasicScreen(context) {
 
     override fun drawScreen(canvas: Canvas?) {
         drawBackground(canvas!!)
-        canvas.drawText("Уровень ${Global.hero!!.getStat(31)}", mTextOffsetX, mScreenHeight * 0.15F, mTextPaint)
-        canvas.drawText("Сила ${Global.hero!!.getStat(0)}", mTextOffsetX, mScreenHeight * 0.2F, mTextPaint)
-        canvas.drawText("Ловкость ${Global.hero!!.getStat(1)}", mTextOffsetX, mScreenHeight * 0.2375F, mTextPaint)
-        canvas.drawText("Интеллект ${Global.hero!!.getStat(2)}", mTextOffsetX, mScreenHeight * 0.275F, mTextPaint)
-        canvas.drawText("Выносливость ${Global.hero!!.getStat(3)}", mTextOffsetX, mScreenHeight * 0.3125F, mTextPaint)
-        canvas.drawText("Восприятие ${Global.hero!!.getStat(4)}", mTextOffsetX, mScreenHeight * 0.35F, mTextPaint)
-        canvas.drawText("Здоровье ${Global.hero!!.getStat(5)} / ${Global.hero!!.getStat(6)}", mTextOffsetX, mScreenHeight * 0.4F, mTextPaint)
-        canvas.drawText("Мана ${Global.hero!!.getStat(7)} / ${Global.hero!!.getStat(8)}", mTextOffsetX, mScreenHeight * 0.4375F, mTextPaint)
-        canvas.drawText("Запас сил ${Global.hero!!.getStat(9)} / ${Global.hero!!.getStat(10)}", mTextOffsetX, mScreenHeight * 0.475F, mTextPaint)
-        canvas.drawText("Атака +${Global.hero!!.getStat(11)}", mTextOffsetX, mScreenHeight * 0.525F, mTextPaint)
-        canvas.drawText("Урон ${Global.hero!!.getStat(12)} - ${Global.hero!!.getStat(13)}", mTextOffsetX, mScreenHeight * 0.5625F, mTextPaint)
-        canvas.drawText("Защита ${Global.hero!!.getStat(19)}", mTextOffsetX, mScreenHeight * 0.6F, mTextPaint)
-        canvas.drawText("Броня ${Global.hero!!.getStat(22)}", mTextOffsetX, mScreenHeight * 0.6375F, mTextPaint)
+        canvas.drawText("Уровень ${Assets.hero!!.getStat(31)}", mTextOffsetX, mScreenHeight * 0.15F, mTextPaint)
+        canvas.drawText("Сила ${Assets.hero!!.getStat(0)}", mTextOffsetX, mScreenHeight * 0.2F, mTextPaint)
+        canvas.drawText("Ловкость ${Assets.hero!!.getStat(1)}", mTextOffsetX, mScreenHeight * 0.2375F, mTextPaint)
+        canvas.drawText("Интеллект ${Assets.hero!!.getStat(2)}", mTextOffsetX, mScreenHeight * 0.275F, mTextPaint)
+        canvas.drawText("Выносливость ${Assets.hero!!.getStat(3)}", mTextOffsetX, mScreenHeight * 0.3125F, mTextPaint)
+        canvas.drawText("Восприятие ${Assets.hero!!.getStat(4)}", mTextOffsetX, mScreenHeight * 0.35F, mTextPaint)
+        canvas.drawText("Здоровье ${Assets.hero!!.getStat(5)} / ${Assets.hero!!.getStat(6)}", mTextOffsetX, mScreenHeight * 0.4F, mTextPaint)
+        canvas.drawText("Мана ${Assets.hero!!.getStat(7)} / ${Assets.hero!!.getStat(8)}", mTextOffsetX, mScreenHeight * 0.4375F, mTextPaint)
+        canvas.drawText("Запас сил ${Assets.hero!!.getStat(9)} / ${Assets.hero!!.getStat(10)}", mTextOffsetX, mScreenHeight * 0.475F, mTextPaint)
+        canvas.drawText("Атака +${Assets.hero!!.getStat(11)}", mTextOffsetX, mScreenHeight * 0.525F, mTextPaint)
+        canvas.drawText("Урон ${Assets.hero!!.getStat(12)} - ${Assets.hero!!.getStat(13)}", mTextOffsetX, mScreenHeight * 0.5625F, mTextPaint)
+        canvas.drawText("Защита ${Assets.hero!!.getStat(19)}", mTextOffsetX, mScreenHeight * 0.6F, mTextPaint)
+        canvas.drawText("Броня ${Assets.hero!!.getStat(22)}", mTextOffsetX, mScreenHeight * 0.6375F, mTextPaint)
 
         mBackButton.draw(canvas)
 
@@ -60,7 +61,7 @@ class CharacterScreen(context: Context) : BasicScreen(context) {
                 val touchX = event.x.toInt()
                 val touchY = event.y.toInt()
                 if (mBackButton.isPressed(touchX, touchY)) {
-                    Global.game.changeScreen(Screens.GAME_SCREEN)
+                    GameController.changeScreen(Screens.GAME_SCREEN)
                 }
             }
         }

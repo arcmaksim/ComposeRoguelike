@@ -5,8 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Game
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.UnitConverter
 import ru.MeatGames.roguelike.tomb.view.TextButton
@@ -20,8 +19,6 @@ class MainMenu(mContext: Context) : BasicScreen(mContext) {
     private val mExitGameButton: TextButton
 
     init {
-        Global.game = mContext as Game
-
         mTitleTextPaint = ScreenHelper.getDefaultTextPaint(mContext)
         mTitleTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
 
@@ -61,10 +58,10 @@ class MainMenu(mContext: Context) : BasicScreen(mContext) {
                 val touchX = event.x.toInt()
                 val touchY = event.y.toInt()
                 if (mNewGameButton.isPressed(touchX, touchY)) {
-                    Global.game.newGame()
+                    GameController.startNewGame()
                 }
                 if (mExitGameButton.isPressed(touchX, touchY)) {
-                    Global.game.exitGame()
+                    GameController.exitGame()
                 }
             }
         }

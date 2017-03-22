@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
-import ru.MeatGames.roguelike.tomb.Game
+import ru.MeatGames.roguelike.tomb.MainActivity
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.FPSLogger
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
@@ -26,7 +26,7 @@ abstract class BasicScreen(context: Context) : View(context) {
         isFocusable = true
         isFocusableInTouchMode = true
 
-        val screenSize = ScreenHelper.getScreenSize((context as Game).windowManager)
+        val screenSize = ScreenHelper.getScreenSize((context as MainActivity).windowManager)
         mScreenWidth = screenSize.x
         mScreenHeight = screenSize.y
 

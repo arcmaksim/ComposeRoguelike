@@ -2,7 +2,7 @@ package ru.MeatGames.roguelike.tomb.model;
 
 import android.graphics.Bitmap;
 
-import ru.MeatGames.roguelike.tomb.Global;
+import ru.MeatGames.roguelike.tomb.Assets;
 
 public class Item {
 
@@ -26,13 +26,13 @@ public class Item {
         mValue1 = mValue2 = mValue3 = -10000;
         mProperty = false;
         this.id = id;
-        this.mTitle = Global.INSTANCE.getItemDB()[id].mTitle;
-        this.mTitleEnding = Global.INSTANCE.getItemDB()[id].mTitleEnding;
-        this.mType = Global.INSTANCE.getItemDB()[id].mType;
-        this.mValue1 = Global.INSTANCE.getItemDB()[id].mValue1;
-        this.mValue2 = Global.INSTANCE.getItemDB()[id].mValue2;
-        this.mValue3 = Global.INSTANCE.getItemDB()[id].mValue3;
-        this.mProperty = Global.INSTANCE.getItemDB()[id].mProperty;
+        this.mTitle = Assets.INSTANCE.getItemDB()[id].mTitle;
+        this.mTitleEnding = Assets.INSTANCE.getItemDB()[id].mTitleEnding;
+        this.mType = Assets.INSTANCE.getItemDB()[id].mType;
+        this.mValue1 = Assets.INSTANCE.getItemDB()[id].mValue1;
+        this.mValue2 = Assets.INSTANCE.getItemDB()[id].mValue2;
+        this.mValue3 = Assets.INSTANCE.getItemDB()[id].mValue3;
+        this.mProperty = Assets.INSTANCE.getItemDB()[id].mProperty;
     }
 
     public Item(int type, String title, String titleEndings,
@@ -67,7 +67,7 @@ public class Item {
     }
 
     public Bitmap getImage() {
-        return Global.INSTANCE.getItemDB()[id].getImg();
+        return Assets.INSTANCE.getItemDB()[id].getImg();
     }
 
 }

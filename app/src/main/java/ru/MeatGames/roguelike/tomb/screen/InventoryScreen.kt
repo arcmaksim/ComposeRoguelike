@@ -3,7 +3,8 @@ package ru.MeatGames.roguelike.tomb.screen
 import android.content.Context
 import android.graphics.*
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.InventoryFilterType
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.model.Item
@@ -73,7 +74,7 @@ class InventoryScreen(context: Context,
         mFilterPanelBorder = mScreenHeight * 0.075F
         mFilterButtonsWidth = mScreenWidth * 0.2F
 
-        val assetHelper = Global.mAssetHelper
+        val assetHelper = Assets.mAssetHelper
         mFilterIcons = listOf(Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("weapons_icon_outline"), 30, 30, false),
                 Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("weapons_icon_filling"), 30, 30, false),
                 Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("shield_icon_outline"), 32, 36, false),
@@ -149,7 +150,7 @@ class InventoryScreen(context: Context,
     fun populateItemList() {
         mItemList = LinkedList()
 
-        Global.hero!!.mInventory?.let {
+        Assets.hero!!.mInventory?.let {
             it
                     .filter { isAllowed(it) }
                     .forEach { mItemList.add(it) }
@@ -184,7 +185,7 @@ class InventoryScreen(context: Context,
                 if (q >= u) {
                     val top = mItemListRect.top + (q - u) * (mSpaceBetweenItemPanels + mItemPanelHeight) - offset
                     val bottom = top + mItemPanelHeight
-                    val itemPanelBackground = if (!it!!.isConsumable && Global.hero!!.isEquipped(it)) {
+                    val itemPanelBackground = if (!it!!.isConsumable && Assets.hero!!.isEquipped(it)) {
                         mEquippedItemBackgroundPaint
                     } else {
                         mBackgroundPaint
@@ -242,18 +243,18 @@ class InventoryScreen(context: Context,
         }
 
         if (mLeftSoftButton.isPressed(sx, sy)) {
-            Global.game.changeScreen(Screens.GEAR_SCREEN)
+            GameController.changeScreen(Screens.GEAR_SCREEN)
         }
 
         if (mBackButton.isPressed(sx, sy)) {
-            Global.game.changeScreen(Screens.GAME_SCREEN)
+            GameController.changeScreen(Screens.GAME_SCREEN)
         }
 
         if (mItemListRect.contains(sx, sy)) {
             val possibleItem = (sy - mItemListRect.top - mSavedScroll) / mItemPanelCombinedHeight
             findItem(possibleItem)?.let {
-                Global.game.selectedItem = it
-                Global.game.changeScreen(Screens.DETAILED_ITEM_SCREEN)
+                GameController.selectedItem = it
+                GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
             }
         }
     }

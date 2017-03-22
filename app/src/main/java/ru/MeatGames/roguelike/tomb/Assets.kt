@@ -1,7 +1,6 @@
 package ru.MeatGames.roguelike.tomb
 
 import android.graphics.Bitmap
-import android.os.Vibrator
 import org.xmlpull.v1.XmlPullParser
 import ru.MeatGames.roguelike.tomb.db.*
 import ru.MeatGames.roguelike.tomb.model.HeroClass
@@ -9,14 +8,11 @@ import ru.MeatGames.roguelike.tomb.model.MapClass
 import ru.MeatGames.roguelike.tomb.screen.GameScreen
 import ru.MeatGames.roguelike.tomb.screen.MainMenu
 import ru.MeatGames.roguelike.tomb.util.AssetHelper
-import ru.MeatGames.roguelike.tomb.util.MapHelper
-import ru.MeatGames.roguelike.tomb.util.array2d
+import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 
-object Global {
+object Assets {
 
-    lateinit var game: Game
-    var mapWidth: Int = 96
-    var mapHeight: Int = 96
+    private lateinit var mMainActivity: MainActivity
 
     var hero: HeroClass? = null
     var map: Array<Array<MapClass>>? = null
@@ -33,43 +29,45 @@ object Global {
     lateinit var walls: Array<Bitmap>
     lateinit var heroSprites: Array<Bitmap>
 
+    lateinit var mCharacterIcon: Bitmap
+    lateinit var mInventoryIcon: Bitmap
+    lateinit var mBackIcon: Bitmap
+    lateinit var d: Bitmap
+    lateinit var mSkipTurnIcon: Bitmap
+    lateinit var lastAttack: Bitmap
+    lateinit var bag: Bitmap
+
     lateinit var mAssetHelper: AssetHelper
-
-    lateinit var mVibrator: Vibrator
-
-    var mIsInitialDataCreated: Boolean = false
 
     val maxTiles = 12
     val maxObjects = 17
     val maxItems = 17
     val maxStats = 35
 
-    private val mOriginalTileSize = 24
+    val mOriginalTileSize = 24
+    var mScaleAmount: Float = 0.toFloat()
+    var mActualTileSize: Float = 0.toFloat()
 
     @JvmStatic
-    fun vibrate() {
-        mVibrator.vibrate(30)
+    fun init(game: MainActivity) {
+        mMainActivity = game
+
+        init()
+
+        calculateTileSize()
+        loadAssets()
     }
 
-    @JvmStatic
-    fun initGame(game: Game) {
-        this.game = game
-        MapHelper.mapWidth = mapWidth
-        MapHelper.mapHeight = mapHeight
+    private fun init() {
+        mAssetHelper = AssetHelper(mMainActivity.assets)
+
+        mmview = MainMenu(mMainActivity)
     }
 
-    @JvmStatic
-    fun initInitialData() {
-        if (!mIsInitialDataCreated) {
-            loadAssets()
-
-            hero = HeroClass()
-            mapview = GameScreen(game)
-
-            map = array2d(mapWidth, mapHeight, { MapClass() })
-
-            mIsInitialDataCreated = true
-        }
+    private fun calculateTileSize() {
+        val screenSize = ScreenHelper.getScreenSize(mMainActivity.windowManager)
+        mScaleAmount = screenSize.x / (mOriginalTileSize * 10f)
+        mActualTileSize = mOriginalTileSize * mScaleAmount
     }
 
     fun loadAssets() {
@@ -90,12 +88,12 @@ object Global {
                     mOriginalTileSize)
         }
 
-        game.bag = mAssetHelper.getBitmapFromAsset("bag")
-        game.mCharacterIcon = mAssetHelper.getBitmapFromAsset("character_icon")
-        game.mInventoryIcon = mAssetHelper.getBitmapFromAsset("inventory_icon")
-        game.mBackIcon = mAssetHelper.getBitmapFromAsset("back_icon")
-        game.d = mAssetHelper.getBitmapFromAsset("ery")
-        game.mSkipTurnIcon = mAssetHelper.getBitmapFromAsset("skip_turn_icon")
+        bag = mAssetHelper.getBitmapFromAsset("bag")
+        mCharacterIcon = mAssetHelper.getBitmapFromAsset("character_icon")
+        mInventoryIcon = mAssetHelper.getBitmapFromAsset("inventory_icon")
+        mBackIcon = mAssetHelper.getBitmapFromAsset("back_icon")
+        d = mAssetHelper.getBitmapFromAsset("ery")
+        mSkipTurnIcon = mAssetHelper.getBitmapFromAsset("skip_turn_icon")
 
         temp = mAssetHelper.getBitmapFromAsset("floor_tileset")
         for (i in 0..maxTiles - 1) {
@@ -125,7 +123,7 @@ object Global {
         }
 
         temp = mAssetHelper.getBitmapFromAsset("mobs_sheet")
-        for (x in 0..game.maxMobs - 1) {
+        for (x in 0..GameController.maxMobs - 1) {
             mobDB[x].img[0] = Bitmap.createBitmap(temp,
                     x * mOriginalTileSize,
                     0,
@@ -143,7 +141,7 @@ object Global {
     }
 
     private fun loadStats() {
-        val parser = game.resources.getXml(R.xml.stats)
+        val parser = mMainActivity.resources.getXml(R.xml.stats)
         stats = Array(maxStats) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "stat") {
@@ -160,7 +158,7 @@ object Global {
     }
 
     private fun loadTiles() {
-        val parser = game.resources.getXml(R.xml.tiles)
+        val parser = mMainActivity.resources.getXml(R.xml.tiles)
         tiles = Array(maxTiles) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "tile") {
@@ -177,7 +175,7 @@ object Global {
     }
 
     private fun loadObjects() {
-        val parser = game.resources.getXml(R.xml.objects)
+        val parser = mMainActivity.resources.getXml(R.xml.objects)
         objects = Array(maxObjects) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "object") {
@@ -195,7 +193,7 @@ object Global {
     }
 
     private fun loadItems() {
-        val parser = game.resources.getXml(R.xml.items)
+        val parser = mMainActivity.resources.getXml(R.xml.items)
         itemDB = Array(maxItems) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG &&
@@ -233,8 +231,8 @@ object Global {
     }
 
     private fun loadMobs() {
-        val parser = game.resources.getXml(R.xml.mobs)
-        mobDB = Array(Global.game.maxMobs) {
+        val parser = mMainActivity.resources.getXml(R.xml.mobs)
+        mobDB = Array(GameController.maxMobs) {
             while (parser.eventType != XmlPullParser.END_DOCUMENT) {
                 if (parser.eventType == XmlPullParser.START_TAG && parser.name == "mob") {
                     break
@@ -252,11 +250,6 @@ object Global {
             parser.next()
             MobDB(name, health, attack, defense, armor, speed, damage)
         }
-    }
-
-    @JvmStatic
-    fun newHero() {
-        hero = HeroClass()
     }
 
     @JvmStatic

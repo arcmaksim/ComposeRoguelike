@@ -5,7 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.InventoryFilterType
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
@@ -56,7 +57,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
         mBodyRect = Rect(mScreenWidth - cardWidth - margin, margin, mScreenWidth - margin, cardHeight + margin)
         mGearRect = Rect(margin, cardHeight + 2 * margin, mScreenWidth - margin, (mScreenHeight * 0.9F).toInt() - margin)
 
-        mIsTwoHandedWeaponEquipped = Global.hero!!.equipmentList[0]?.mProperty ?: false
+        mIsTwoHandedWeaponEquipped = Assets.hero!!.equipmentList[0]?.mProperty ?: false
     }
 
     override fun drawScreen(canvas: Canvas?) {
@@ -68,7 +69,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
     }
 
     private fun drawGear(canvas: Canvas) {
-        Global.hero!!.equipmentList[0]?.let {
+        Assets.hero!!.equipmentList[0]?.let {
             if (mIsTwoHandedWeaponEquipped) {
                 canvas.drawRect(mPrimaryArmAltRect, mBackgroundPaint)
                 canvas.drawBitmap(it.image, mPrimaryArmAltRect.exactCenterX() - it.image.width / 2, mPrimaryArmAltRect.exactCenterY() - it.image.height / 2, null)
@@ -83,7 +84,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
 
         if (!mIsTwoHandedWeaponEquipped) {
             canvas.drawRect(mSecondaryArmRect, mBackgroundPaint)
-            Global.hero!!.equipmentList[1]?.let {
+            Assets.hero!!.equipmentList[1]?.let {
                 canvas.drawBitmap(it.image, mSecondaryArmRect.exactCenterX() - it.image.width / 2, mSecondaryArmRect.exactCenterY() - it.image.width / 2, null)
             } ?: let {
                 canvas.drawText(context.getString(R.string.empty_label), mSecondaryArmRect.exactCenterX(), mSecondaryArmRect.exactCenterY(), mTextPaint)
@@ -91,7 +92,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
         }
 
         canvas.drawRect(mBodyRect, mBackgroundPaint)
-        Global.hero!!.equipmentList[2]?.let {
+        Assets.hero!!.equipmentList[2]?.let {
             canvas.drawBitmap(it.image, mBodyRect.exactCenterX() - it.image.width / 2, mBodyRect.exactCenterY() - it.image.width / 2, null)
         } ?: let {
             canvas.drawText(context.getString(R.string.empty_label), mBodyRect.exactCenterX(), mBodyRect.exactCenterY(), mTextPaint)
@@ -116,45 +117,45 @@ class GearScreen(context: Context) : BasicScreen(context) {
         // TODO: temporal solution
         if (mIsTwoHandedWeaponEquipped) {
             if (mPrimaryArmAltRect.contains(sx, sy)) {
-                Global.game.selectedItem = Global.hero!!.equipmentList[0]
-                Global.game.changeScreen(Screens.DETAILED_ITEM_SCREEN)
+                //GameController.selectedItem = Assets.hero!!.equipmentList[0]
+                GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
             }
         } else {
             if (mPrimaryArmRect.contains(sx, sy)) {
-                Global.hero!!.equipmentList[0]?.let {
-                    Global.game.selectedItem = it
-                    Global.game.changeScreen(Screens.DETAILED_ITEM_SCREEN)
+                Assets.hero!!.equipmentList[0]?.let {
+                    GameController.selectedItem = it
+                    GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
                 } ?: let {
-                    Global.game.showInventoryWithFilters(InventoryFilterType.WEAPONS)
+                    GameController.showInventoryWithFilters(InventoryFilterType.WEAPONS)
                 }
             }
 
             if (mSecondaryArmRect.contains(sx, sy)) {
-                Global.hero!!.equipmentList[1]?.let {
-                    Global.game.selectedItem = it
-                    Global.game.changeScreen(Screens.DETAILED_ITEM_SCREEN)
+                Assets.hero!!.equipmentList[1]?.let {
+                    GameController.selectedItem = it
+                    GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
                 } ?: let {
-                    Global.game.showInventoryWithFilters(InventoryFilterType.SHIELDS)
+                    GameController.showInventoryWithFilters(InventoryFilterType.SHIELDS)
                 }
             }
         }
 
 
         if (mBodyRect.contains(sx, sy)) {
-            Global.hero!!.equipmentList[2]?.let {
-                Global.game.selectedItem = it
-                Global.game.changeScreen(Screens.DETAILED_ITEM_SCREEN)
+            Assets.hero!!.equipmentList[2]?.let {
+                GameController.selectedItem = it
+                GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
             } ?: let {
-                Global.game.showInventoryWithFilters(InventoryFilterType.ARMOR)
+                GameController.showInventoryWithFilters(InventoryFilterType.ARMOR)
             }
         }
 
         if (mLeftSoftButton.isPressed(sx, sy)) {
-            Global.game.changeScreen(Screens.INVENTORY_SCREEN)
+            GameController.changeScreen(Screens.INVENTORY_SCREEN)
         }
 
         if (mBackButton.isPressed(sx, sy)) {
-            Global.game.changeScreen(Screens.GAME_SCREEN)
+            GameController.changeScreen(Screens.GAME_SCREEN)
         }
     }
 

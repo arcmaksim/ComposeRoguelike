@@ -1,6 +1,7 @@
 package ru.MeatGames.roguelike.tomb.model
 
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import java.util.*
 
 class HeroClass {
@@ -29,42 +30,42 @@ class HeroClass {
         mInventory = null
         mInventory = LinkedList<Item>()
         equipmentList = arrayOfNulls<Item>(3)
-        Global.stats[0].value = 10
-        Global.stats[1].value = 10
-        Global.stats[2].value = 10
-        Global.stats[3].value = 10
-        Global.stats[4].value = 10
-        Global.stats[5].value = 18
-        Global.stats[6].value = 18
-        Global.stats[7].value = 10
-        Global.stats[8].value = 10
-        Global.stats[9].value = 10
-        Global.stats[10].value = 10
-        Global.stats[11].value = 2
-        Global.stats[12].value = 1
-        Global.stats[13].value = 3
-        Global.stats[14].value = 10
-        Global.stats[16].value = 10
-        Global.stats[18].value = 1000
-        Global.stats[19].value = 10
-        Global.stats[20].value = 0
-        Global.stats[21].value = 32
-        Global.stats[22].value = 1
-        Global.stats[25].value = 10
-        Global.stats[27].value = 1000
-        Global.stats[28].value = 10
-        Global.stats[29].value = 1
-        Global.stats[31].value = 1
+        Assets.stats[0].value = 10
+        Assets.stats[1].value = 10
+        Assets.stats[2].value = 10
+        Assets.stats[3].value = 10
+        Assets.stats[4].value = 10
+        Assets.stats[5].value = 18
+        Assets.stats[6].value = 18
+        Assets.stats[7].value = 10
+        Assets.stats[8].value = 10
+        Assets.stats[9].value = 10
+        Assets.stats[10].value = 10
+        Assets.stats[11].value = 2
+        Assets.stats[12].value = 1
+        Assets.stats[13].value = 3
+        Assets.stats[14].value = 10
+        Assets.stats[16].value = 10
+        Assets.stats[18].value = 1000
+        Assets.stats[19].value = 10
+        Assets.stats[20].value = 0
+        Assets.stats[21].value = 32
+        Assets.stats[22].value = 1
+        Assets.stats[25].value = 10
+        Assets.stats[27].value = 1000
+        Assets.stats[28].value = 10
+        Assets.stats[29].value = 1
+        Assets.stats[31].value = 1
         regen = 16
         cregen = regen
-        addItem(Global.game.createItem(1))
-        addItem(Global.game.createItem(4))
-        addItem(Global.game.createItem(7))
-        addItem(Global.game.createItem(10))
-        addItem(Global.game.createItem(10))
-        addItem(Global.game.createItem(10))
+        addItem(GameController.createItem(1))
+        addItem(GameController.createItem(4))
+        addItem(GameController.createItem(7))
+        addItem(GameController.createItem(10))
+        addItem(GameController.createItem(10))
+        addItem(GameController.createItem(10))
         for (i in 0..29) {
-            addItem(Global.game.createItem(i % 11))
+            addItem(GameController.createItem(i % 11))
         }
         preequipItem(mInventory!![0])
         preequipItem(mInventory!![1])
@@ -72,12 +73,12 @@ class HeroClass {
     }
 
     fun getStat(id: Int) =
-            Global.stats[id].value
+            Assets.stats[id].value
 
     fun modifyStat(id: Int, value: Int, m: Int) {
-        Global.stats[id].value = Global.stats[id].value + m * value
-        if (Global.stats[id].mIsMaximum && Global.stats[id].value > Global.stats[id + 1].value)
-            Global.stats[id].value = Global.stats[id + 1].value
+        Assets.stats[id].value = Assets.stats[id].value + m * value
+        if (Assets.stats[id].mIsMaximum && Assets.stats[id].value > Assets.stats[id + 1].value)
+            Assets.stats[id].value = Assets.stats[id + 1].value
         if (id == 20) isLevelUp()
     }
 
@@ -86,27 +87,27 @@ class HeroClass {
             modifyStat(20, getStat(21), -1)
             modifyStat(21, getStat(21), 1)
             modifyStat(31, 1, 1)
-            Global.mapview.addLine("Уровень повышен!")
-            val u = Global.game.mRandom.nextInt(3) + 2
-            modifyStat(6, u, 1)
-            modifyStat(5, u, 1)
-            Global.mapview.addLine("Здоровье увеличено")
+            Assets.mapview.addLine("Уровень повышен!")
+            val healthIncreaseAmount = Random().nextInt(3) + 2
+            modifyStat(6, healthIncreaseAmount, 1)
+            modifyStat(5, healthIncreaseAmount, 1)
+            Assets.mapview.addLine("Здоровье увеличено")
             if (getStat(31) % 4 == 0) {
                 modifyStat(12, 1, 1)
-                Global.mapview.addLine("Минимальный урон увеличен")
+                Assets.mapview.addLine("Минимальный урон увеличен")
             }
             if (getStat(31) % 5 == 0) {
                 regen--
                 if (regen < cregen) cregen = regen
-                Global.mapview.addLine("Скорость регенерации увеличена")
+                Assets.mapview.addLine("Скорость регенерации увеличена")
             }
             if (getStat(31) % 2 == 0) {
                 modifyStat(13, 1, 1)
-                Global.mapview.addLine("Максиммальный урон увеличен")
+                Assets.mapview.addLine("Максиммальный урон увеличен")
             }
             if (getStat(31) % 3 == 0) {
                 modifyStat(19, 1, 1)
-                Global.mapview.addLine("Защита увеличена")
+                Assets.mapview.addLine("Защита увеличена")
             }
         }
     }
@@ -122,9 +123,9 @@ class HeroClass {
             takeOffItem(item)
         }
         mInventory!!.remove(item)
-        Global.map!![mx][my].addItem(item)
-        Global.mapview.addLine(item.mTitle + " выброшен" + item.mTitleEnding)
-        Global.game.skipTurn()
+        Assets.map!![mx][my].addItem(item)
+        Assets.mapview.addLine(item.mTitle + " выброшен" + item.mTitleEnding)
+        GameController.skipTurn()
     }
 
     fun deleteItem(item: Item) =
@@ -176,8 +177,8 @@ class HeroClass {
                 modifyStat(22, item.mValue2, 1)
             }
         }
-        Global.mapview.addLine(item.mTitle + " надет" + item.mTitleEnding)
-        Global.game.skipTurn()
+        Assets.mapview.addLine(item.mTitle + " надет" + item.mTitleEnding)
+        GameController.skipTurn()
     }
 
     fun takeOffItem(item: Item) {
@@ -196,9 +197,9 @@ class HeroClass {
                 modifyStat(22, item.mValue2, -1)
             }
         }
-        Global.hero!!.equipmentList[item.mType - 1] = null
-        Global.mapview.addLine(item.mTitle + " снят" + item.mTitleEnding)
-        Global.game.skipTurn()
+        Assets.hero!!.equipmentList[item.mType - 1] = null
+        Assets.mapview.addLine(item.mTitle + " снят" + item.mTitleEnding)
+        GameController.skipTurn()
     }
 
     fun takeOffItem(i: Int) =
@@ -208,7 +209,7 @@ class HeroClass {
     fun startResting(loudBroadcast: Boolean = true) {
         mIsResting = true
         if (loudBroadcast) {
-            Global.mapview.addLine("Отдых начат")
+            Assets.mapview.addLine("Отдых начат")
         }
     }
 
@@ -217,7 +218,7 @@ class HeroClass {
         if (mIsResting) {
             mIsResting = false
             if (loudBroadcast) {
-                Global.mapview.addLine("Отдых прерван!")
+                Assets.mapview.addLine("Отдых прерван!")
             }
         }
     }
@@ -227,7 +228,7 @@ class HeroClass {
         if (mIsResting) {
             mIsResting = false
             if (loudBroadcast) {
-                Global.mapview.addLine("Отдых завершен!")
+                Assets.mapview.addLine("Отдых завершен!")
             }
         }
     }

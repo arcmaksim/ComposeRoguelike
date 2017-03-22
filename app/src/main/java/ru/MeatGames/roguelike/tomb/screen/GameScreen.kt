@@ -5,8 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.Log
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Game
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.MapHelper
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
@@ -16,7 +16,7 @@ import java.util.*
 
 class GameScreen(context: Context) : BasicScreen(context) {
 
-    override val TAG: String = "Game Screen"
+    override val TAG: String = "MainActivity Screen"
 
     // visible cells dimensions
     private val mMapViewportWidth = 9
@@ -52,8 +52,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     var mActionCount: Int = 0 // currently not used
 
-    val mTileSize = Global.game.actualTileSize
-    val mScaleAmount = Global.game.scaleAmount
+    val mTileSize = Assets.mActualTileSize
+    val mScaleAmount = Assets.mScaleAmount
     val mBitmapPaint = Paint()
 
     private val mMapOffsetX: Float
@@ -230,20 +230,20 @@ class GameScreen(context: Context) : BasicScreen(context) {
             canvas.scale(mScaleAmount, mScaleAmount)
 
             drawMap(canvas, animationFrame)
-            if (!Global.hero!!.mIsFacingLeft) {
+            if (!Assets.hero!!.mIsFacingLeft) {
                 animationFrame += 2
             }
-            canvas.drawBitmap(Global.getHeroSprite(animationFrame), mHeroX, mHeroY, mBitmapPaint)
+            canvas.drawBitmap(Assets.getHeroSprite(animationFrame), mHeroX, mHeroY, mBitmapPaint)
 
             canvas.restore()
 
             drawHUD(canvas)
 
-            if (Global.game.mDrawInputAreas) drawLines(canvas)
+            if (GameController.mDrawInputAreas) drawLines(canvas)
             if (mDrawActionsMenu) drawActionsMenu(canvas, mActionCount)
             if (mDrawExitDialog) drawExitDialog(canvas)
 
-            val currentXP = Global.hero!!.getStat(20).toFloat() / Global.hero!!.getStat(21)
+            val currentXP = Assets.hero!!.getStat(20).toFloat() / Assets.hero!!.getStat(21)
             canvas.drawRect(4F, mScreenHeight - 11F, Math.round(mScreenWidth * 0.99F * currentXP).toFloat(), mScreenHeight - 4F, mDarkBluePaint)
 
             canvas.save()
@@ -266,32 +266,32 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         for (x in camx..camx + 9 - 1) {
             val cx = x - camx
-            val currentPixelXtoDraw = (Global.game.mTileSize * cx + mMapOffsetX)
-            val leftDrawBorder = (Global.game.mTileSize * (cx + 1) + mMapOffsetX)
+            val currentPixelXtoDraw = (mTileSize * cx + mMapOffsetX)
+            val leftDrawBorder = (mTileSize * (cx + 1) + mMapOffsetX)
 
             for (y in camy..camy + 9 - 1) {
                 val cy = y - camy
-                val currentPixelYtoDraw = (Global.game.mTileSize * cy + mMapOffsetY)
-                val rightDrawBorder = (Global.game.mTileSize * (cy + 1) + mMapOffsetY)
+                val currentPixelYtoDraw = (mTileSize * cy + mMapOffsetY)
+                val rightDrawBorder = (mTileSize * (cy + 1) + mMapOffsetY)
 
                 currentMapBufferCell = mMapBuffer[cx + 1][cy + 1]
 
                 if (currentMapBufferCell.mIsVisible) {
-                    canvas.drawBitmap(Global.map!![x][y].floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    canvas.drawBitmap(Assets.map!![x][y].floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
 
                     if (currentMapBufferCell.mWallBitmap != -1) {
-                        canvas.drawBitmap(Global.walls[currentMapBufferCell.mWallBitmap], currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(Assets.walls[currentMapBufferCell.mWallBitmap], currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     } else {
-                        canvas.drawBitmap(Global.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(Assets.map!![x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
                     if (currentMapBufferCell.mHasItem) {
-                        canvas.drawBitmap(Global.map!![x][y].itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(Assets.map!![x][y].itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
                     //if (currentMapBufferCell.mHasEnemy) {
-                    if (Global.map!![x][y].hasMob()) {
-                        canvas.drawBitmap(Global.map!![x][y].mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    if (Assets.map!![x][y].hasMob()) {
+                        canvas.drawBitmap(Assets.map!![x][y].mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
                     currentMapBufferCell.mShadowPaint?.let {
@@ -306,21 +306,21 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun drawHUD(canvas: Canvas) {
         mTextPaint.textAlign = Paint.Align.CENTER
 
-        canvas.drawBitmap(Global.game.mInventoryIcon,
-                (mScreenWidth / 8 - Global.game.mInventoryIcon.width / 2).toFloat(),
-                mScreenHeight * 0.9F + (mScreenHeight * 0.1F - Global.game.mInventoryIcon.height) / 2,
+        canvas.drawBitmap(Assets.mInventoryIcon,
+                (mScreenWidth / 8 - Assets.mInventoryIcon.width / 2).toFloat(),
+                mScreenHeight * 0.9F + (mScreenHeight * 0.1F - Assets.mInventoryIcon.height) / 2,
                 null)
-        canvas.drawText("HP  ${Global.hero!!.getStat(5)} / ${Global.hero!!.getStat(6)}",
+        canvas.drawText("HP  ${Assets.hero!!.getStat(5)} / ${Assets.hero!!.getStat(6)}",
                 mScreenWidth * 0.5F,
                 mScreenHeight * 0.94F,
                 mTextPaint)
-        canvas.drawText("MP  ${Global.hero!!.getStat(7)} / ${Global.hero!!.getStat(8)}",
+        canvas.drawText("MP  ${Assets.hero!!.getStat(7)} / ${Assets.hero!!.getStat(8)}",
                 mScreenWidth * 0.5F,
                 mScreenHeight * 0.965F,
                 mTextPaint)
-        canvas.drawBitmap(Global.game.mSkipTurnIcon,
-                (mScreenWidth / 8 * 7 - Global.game.mSkipTurnIcon.width / 2).toFloat(),
-                mScreenHeight * 0.9F + (mScreenHeight * 0.1F - Global.game.mSkipTurnIcon.height) / 2,
+        canvas.drawBitmap(Assets.mSkipTurnIcon,
+                (mScreenWidth / 8 * 7 - Assets.mSkipTurnIcon.width / 2).toFloat(),
+                mScreenHeight * 0.9F + (mScreenHeight * 0.1F - Assets.mSkipTurnIcon.height) / 2,
                 null)
         mTextPaint.textAlign = Paint.Align.LEFT
     }
@@ -423,16 +423,16 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun afterProgressBar(result: Int) {
         when (result) {
             4 -> {
-                MapHelper.changeAreaObjects(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, 6)
-                Global.mapview.addLine(context.getString(R.string.search_chest_message))
-                Global.game.createItem(Global.hero!!.mx + mx, Global.hero!!.my + my)
+                MapHelper.changeAreaObjects(Assets.hero!!.mx + mx, Assets.hero!!.my + my, 1, 1, 6)
+                Assets.mapview.addLine(context.getString(R.string.search_chest_message))
+                GameController.createItem(Assets.hero!!.mx + mx, Assets.hero!!.my + my)
             }
             7 -> {
-                MapHelper.changeAreaObjects(Global.hero!!.mx + mx, Global.hero!!.my + my, 1, 1, 8)
+                MapHelper.changeAreaObjects(Assets.hero!!.mx + mx, Assets.hero!!.my + my, 1, 1, 8)
                 addLine(context.getString(R.string.search_bookshelf_message))
-                if (Global.game.mRandom.nextInt(3) != 0) {
+                if (Random().nextInt(3) != 0) {
                     addLine(context.getString(R.string.experience_earned_message))
-                    Global.hero!!.modifyStat(20, Global.game.mRandom.nextInt(4) + 2, 1)
+                    Assets.hero!!.modifyStat(20, Random().nextInt(4) + 2, 1)
                 } else {
                     addLine(context.getString(R.string.nothing_interesting_message))
                 }
@@ -481,7 +481,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         x = xstart
         y = ystart
         err = el / 2
-        Global.map!![x][y].mCurrentlyVisible = true
+        Assets.map!![x][y].mCurrentlyVisible = true
         for (t in 0..el - 1) {
             err -= es
             if (err < 0) {
@@ -493,13 +493,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 y += pdy
             }
             if (MapHelper.horizontal(x) && MapHelper.vertical(y)) {
-                if (!Global.map!![x][y].mCurrentlyVisible) {
-                    Global.map!![x][y].mCurrentlyVisible = v
+                if (!Assets.map!![x][y].mCurrentlyVisible) {
+                    Assets.map!![x][y].mCurrentlyVisible = v
                 }
                 if (v) {
-                    Global.map!![x][y].mIsDiscovered = true
+                    Assets.map!![x][y].mIsDiscovered = true
                 }
-                if (!Global.map!![x][y].mIsTransparent) {
+                if (!Assets.map!![x][y].mIsTransparent) {
                     v = false
                 }
             }
@@ -511,10 +511,10 @@ class GameScreen(context: Context) : BasicScreen(context) {
         val cm1 = if (camy < 0) 0 else camy
         for (c in cm..(if (cm + 9 >= MapHelper.mapWidth) MapHelper.mapWidth else cm + 9) - 1)
             for (c1 in cm1..(if (cm1 + 9 >= MapHelper.mapWidth) MapHelper.mapWidth else cm1 + 9) - 1)
-                Global.map!![c][c1].mCurrentlyVisible = false
+                Assets.map!![c][c1].mCurrentlyVisible = false
         for (c in x - 1..x + 2 - 1)
             for (c1 in y - 1..y + 2 - 1)
-                Global.map!![c][c1].mCurrentlyVisible = true
+                Assets.map!![c][c1].mCurrentlyVisible = true
         for (c in -1..1) {
             line(x, y, x + c, y - 4)
             line(x, y, x + c, y + 4)
@@ -539,11 +539,11 @@ class GameScreen(context: Context) : BasicScreen(context) {
         clearLog()
 
         if (touchY < mScreenWidth * 0.1F && touchX > mScreenWidth * 0.5F) {
-            Global.game.changeScreen(Screens.MAP_SCREEN)
+            GameController.changeScreen(Screens.MAP_SCREEN)
         }
 
         if (touchY < mScreenWidth * 0.1F && touchX < mScreenWidth * 0.5F) {
-            Global.game.mDrawInputAreas = !Global.game.mDrawInputAreas
+            GameController.mDrawInputAreas = !GameController.mDrawInputAreas
         }
 
         val temp = (mScreenHeight - (mScreenHeight + mScreenWidth) * 0.1F) / 3
@@ -554,49 +554,49 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
             if (x == 0 && y == 0) {
                 if (MapHelper.getObjectId(x, y) == 11) {
-                    Game.curLvls++
-                    Global.game.generateNewMap()
-                    Global.mapview.updateMapBuffer()
-                    Global.game.skipTurn()
+                    GameController.curLvls++
+                    GameController.generateNewMap()
+                    Assets.mapview.updateMapBuffer()
+                    GameController.skipTurn()
                 }
-                MapHelper.getItem(Global.hero!!.mx, Global.hero!!.my)?.let {
+                MapHelper.getItem(Assets.hero!!.mx, Assets.hero!!.my)?.let {
                     val item = it
-                    Global.hero!!.addItem(item)
+                    Assets.hero!!.addItem(item)
                     addLine("${item.mTitle} подобран${item.mTitleEnding}")
-                    Global.vibrate()
-                    Global.game.skipTurn()
+                    GameController.vibrate()
+                    GameController.skipTurn()
                 }
             } else {
-                Global.game.move(x, y)
+                GameController.move(x, y)
             }
         }
 
         if (touchY > mScreenHeight * 0.9F) {
 
             if (touchX < mScreenWidth * 0.25F) {
-                Global.game.changeScreen(Screens.INVENTORY_SCREEN)
+                GameController.changeScreen(Screens.INVENTORY_SCREEN)
             }
 
             if (touchX > mScreenWidth * 0.25F && touchX < mScreenWidth * 0.75F) {
-                Global.game.changeScreen(Screens.CHARACTER_SCREEN)
+                GameController.changeScreen(Screens.CHARACTER_SCREEN)
             }
 
             // TODO: refactor
             if (touchX > mScreenWidth * 0.75F) {
-                if (Global.hero!!.mIsResting) {
-                    Global.hero!!.interruptResting()
+                if (Assets.hero!!.mIsResting) {
+                    Assets.hero!!.interruptResting()
                 } else {
                     if (mIsLongPress) {
-                        if (Global.hero!!.isFullyHealed()) {
-                            Global.mapview.addLine("Герой полностью здоров")
+                        if (Assets.hero!!.isFullyHealed()) {
+                            Assets.mapview.addLine("Герой полностью здоров")
                         } else {
-                            Global.hero!!.startResting()
-                            Global.game.skipTurn()
+                            Assets.hero!!.startResting()
+                            GameController.skipTurn()
                         }
-                        Global.vibrate()
+                        GameController.vibrate()
                     } else {
-                        Global.mapview.addLine(context.getString(R.string.turn_passed_message))
-                        Global.game.skipTurn()
+                        Assets.mapview.addLine(context.getString(R.string.turn_passed_message))
+                        GameController.skipTurn()
                     }
                 }
             }
@@ -606,7 +606,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun onTouchExitDialog(touchX: Int, touchY: Int) {
         if (touchY > mScreenHeight * 0.48F && touchY < mScreenHeight * 0.59F && touchX > mScreenWidth * 0.05F && touchX < mScreenWidth * 0.95F)
             if (touchX < mScreenWidth * 0.5F) {
-                Global.game.exitGame()
+                GameController.exitGame()
             } else {
                 mDrawExitDialog = false
             }
@@ -615,7 +615,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun onTouchFinal(touchX: Int, touchY: Int) {
         if (touchY > mScreenHeight * 0.9F) {
             mDrawWinScreen = false
-            Global.game.newGame()
+            GameController.startNewGame()
         }
     }
 
@@ -635,7 +635,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         when (event.action) {
             MotionEvent.ACTION_UP -> {
                 if (!mInputLock) {
-                    if (Global.game.mAcceptPlayerInput) {
+                    if (GameController.mAcceptPlayerInput) {
                         val touchX = event.x.toInt()
                         val touchY = event.y.toInt()
                         processTouchEvent(touchX, touchY)

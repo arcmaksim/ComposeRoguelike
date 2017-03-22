@@ -16,16 +16,16 @@ public class MobList {
 	public int y;
 
     public Bitmap getImg(int time) {
-        return Global.INSTANCE.getMobDB()[t].getImg()[time];
+        return Assets.INSTANCE.getMobDB()[t].getImg()[time];
     }
 
     public MobList(int t) {
         this.t = t;
         mob = new MobClass();
-        mob.setMHealth(Global.INSTANCE.getMobDB()[t].getMob().getMHealth());
-        mob.setName(Global.INSTANCE.getMobDB()[t].getMob().getName());
-        mob.setMDefense(Global.INSTANCE.getMobDB()[t].getMob().getMDefense());
-        mob.setMArmor(Global.INSTANCE.getMobDB()[t].getMob().getMDefense());
-        mob.setMSpeed(Global.INSTANCE.getMobDB()[t].getMob().getMSpeed());
+        mob.setMHealth(Assets.INSTANCE.getMobDB()[t].getMob().getMHealth());
+        mob.setName(Assets.INSTANCE.getMobDB()[t].getMob().getName());
+        mob.setMDefense(Assets.INSTANCE.getMobDB()[t].getMob().getMDefense());
+        mob.setMArmor(Assets.INSTANCE.getMobDB()[t].getMob().getMDefense());
+        mob.setMSpeed(Assets.INSTANCE.getMobDB()[t].getMob().getMSpeed());
     }
 }

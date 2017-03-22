@@ -10,42 +10,42 @@ class MainGameLoop : Runnable {
 
     override fun run() {
         while (isRunning) {
-            if (--Global.hero!!.init == 0) {
-                if (--Global.hero!!.cregen == 0) {
-                    Global.hero!!.cregen = Global.hero!!.regen
-                    if (Global.hero!!.getStat(5) != Global.hero!!.getStat(6)) {
-                        Global.hero!!.modifyStat(5, 1, 1)
+            if (--Assets.hero!!.init == 0) {
+                if (--Assets.hero!!.cregen == 0) {
+                    Assets.hero!!.cregen = Assets.hero!!.regen
+                    if (Assets.hero!!.getStat(5) != Assets.hero!!.getStat(6)) {
+                        Assets.hero!!.modifyStat(5, 1, 1)
                     }
-                    if (Global.hero!!.isFullyHealed()) {
-                        Global.hero!!.finishResting()
+                    if (Assets.hero!!.isFullyHealed()) {
+                        Assets.hero!!.finishResting()
                     }
                 }
-                Global.game.updateHeroTurnCount(Global.hero!!.mIsResting)
-                Global.game.mIsPlayerTurn = true
-                Global.game.mIsPlayerMoved = false
-                Global.game.mAcceptPlayerInput = true
-                while (Global.game.mIsPlayerTurn) {
-                    if (Global.hero!!.mIsResting) {
+                //Assets.game.updateHeroTurnCount(Assets.hero!!.mIsResting)
+                GameController.mIsPlayerTurn = true
+                GameController.mIsPlayerMoved = false
+                GameController.mAcceptPlayerInput = true
+                while (GameController.mIsPlayerTurn) {
+                    if (Assets.hero!!.mIsResting) {
                         Thread.sleep(100)
-                        if (Global.hero!!.mIsResting) {
-                            Global.game.skipTurn()
+                        if (Assets.hero!!.mIsResting) {
+                            GameController.skipTurn()
                         } else {
-                            Global.hero!!.interruptResting()
+                            Assets.hero!!.interruptResting()
                         }
                     }
                 }
             }
-            Global.game.firstMob?.let {
-                while (Global.game.firstMob.turnCount <= Global.game.turnCount) {
-                    val temp = Global.game.firstMob
-                    Global.game.firstMob = Global.game.firstMob.next
-                    if (Math.abs(temp.x - Global.hero!!.mx) < 5 && Math.abs(temp.y - Global.hero!!.my) < 5) {
-                        Global.game.mobTurn(temp)
+            /*Assets.game.firstMob?.let {
+                while (Assets.game.firstMob.turnCount <= Assets.game.turnCount) {
+                    val temp = Assets.game.firstMob
+                    Assets.game.firstMob = Assets.game.firstMob.next
+                    if (Math.abs(temp.x - Assets.hero!!.mx) < 5 && Math.abs(temp.y - Assets.hero!!.my) < 5) {
+                        Assets.game.mobTurn(temp)
                     }
-                    Global.game.addInQueue(temp)
+                    Assets.game.addInQueue(temp)
                 }
-            }
-            Global.game.turnCount++
+            }*/
+            //Assets.game.turnCount++
         }
     }
 }

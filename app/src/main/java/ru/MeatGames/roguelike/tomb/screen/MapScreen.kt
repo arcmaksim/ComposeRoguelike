@@ -5,7 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.MapHelper
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
@@ -49,8 +50,8 @@ class MapScreen(context: Context) : BasicScreen(context) {
         drawBackground(canvas!!)
         for (x in 0..MapHelper.mapWidth - 1)
             for (y in 0..MapHelper.mapHeight - 1) {
-                if (Global.map!![x][y].mIsDiscovered) {
-                    when (Global.map!![x][y].mObjectID) {
+                if (Assets.map!![x][y].mIsDiscovered) {
+                    when (Assets.map!![x][y].mObjectID) {
                         0 -> canvas.drawRect(x * mMarkerSize,
                                 (y + 1) * mMarkerSize,
                                 (x + 1) * mMarkerSize,
@@ -67,14 +68,14 @@ class MapScreen(context: Context) : BasicScreen(context) {
                                 (y + 2) * mMarkerSize,
                                 mExitMarkerPaint)
                     }
-                    /*if(Global.map[x][y].hasMob())
+                    /*if(Assets.map[x][y].hasMob())
                         canvas.drawRect(x*5,5+5*y,x*5+5,10+5*y,blue);*/
                 }
             }
-        canvas.drawRect(Global.hero!!.mx * mMarkerSize,
-                (Global.hero!!.my + 1) * mMarkerSize,
-                (Global.hero!!.mx + 1) * mMarkerSize,
-                (Global.hero!!.my + 2) * mMarkerSize,
+        canvas.drawRect(Assets.hero!!.mx * mMarkerSize,
+                (Assets.hero!!.my + 1) * mMarkerSize,
+                (Assets.hero!!.mx + 1) * mMarkerSize,
+                (Assets.hero!!.my + 2) * mMarkerSize,
                 mHeroMarkerPaint)
         mBackButton.draw(canvas)
         postInvalidate()
@@ -86,7 +87,7 @@ class MapScreen(context: Context) : BasicScreen(context) {
                 val touchX = event.x.toInt()
                 val touchY = event.y.toInt()
                 if(mBackButton.isPressed(touchX, touchY)) {
-                    Global.game.changeScreen(Screens.GAME_SCREEN)
+                    GameController.changeScreen(Screens.GAME_SCREEN)
                 }
             }
         }

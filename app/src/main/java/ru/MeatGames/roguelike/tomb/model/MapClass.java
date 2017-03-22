@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 import java.util.LinkedList;
 
-import ru.MeatGames.roguelike.tomb.Global;
+import ru.MeatGames.roguelike.tomb.Assets;
 import ru.MeatGames.roguelike.tomb.MobList;
 
 public class MapClass {
@@ -57,19 +57,19 @@ public class MapClass {
     }
 
     public boolean isWall() {
-        return Global.INSTANCE.getObjects()[mObjectID].getMIsWall();
+        return Assets.INSTANCE.getObjects()[mObjectID].getMIsWall();
     }
 
     public Bitmap getFloorImg() {
-        return Global.INSTANCE.getTiles()[mFloorID].getImg();
+        return Assets.INSTANCE.getTiles()[mFloorID].getImg();
     }
 
     public Bitmap getObjectImg() {
-        return Global.INSTANCE.getObjects()[mObjectID].getImg();
+        return Assets.INSTANCE.getObjects()[mObjectID].getImg();
     }
 
     public Bitmap getItemImg() {
-        return (mItems.size() > 1) ? Global.INSTANCE.getGame().bag : Global.INSTANCE.getItemDB()[mItems.get(0).id].getImg();
+        return (mItems.size() > 1) ? Assets.INSTANCE.getBag() : Assets.INSTANCE.getItemDB()[mItems.get(0).id].getImg();
     }
 
 }

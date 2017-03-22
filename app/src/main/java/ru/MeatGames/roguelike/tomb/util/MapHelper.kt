@@ -1,6 +1,6 @@
 package ru.MeatGames.roguelike.tomb.util
 
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.model.Item
 import ru.MeatGames.roguelike.tomb.model.MapClass
 
@@ -13,24 +13,24 @@ object MapHelper {
     fun left(coordX: Int) = coordX > -1
 
     @JvmStatic
-    fun right(coordX: Int) = coordX < Global.mapWidth
+    fun right(coordX: Int) = coordX < mapWidth
 
     @JvmStatic
     fun top(coordY: Int) = coordY > -1
 
     @JvmStatic
-    fun bottom(coordY: Int) = coordY < Global.mapHeight
+    fun bottom(coordY: Int) = coordY < mapHeight
 
     @JvmStatic
-    fun horizontal(coordX: Int) = coordX > -1 && coordX < Global.mapWidth
+    fun horizontal(coordX: Int) = coordX > -1 && coordX < mapWidth
 
     @JvmStatic
-    fun vertical(coordY: Int) = coordY > -1 && coordY < Global.mapHeight
+    fun vertical(coordY: Int) = coordY > -1 && coordY < mapHeight
 
     @JvmStatic
     fun getMapCell(coordX: Int, coordY: Int): MapClass? {
         if (horizontal(coordX) && vertical(coordY)) {
-            return Global.map!![coordX][coordY]
+            return Assets.map!![coordX][coordY]
         } else {
             return null
         }
@@ -57,17 +57,17 @@ object MapHelper {
 
     @JvmStatic
     fun changeTile(mapX: Int, mapY: Int, floorId: Int, objectId: Int) {
-        Global.map!![mapX][mapY].mFloorID = floorId
+        Assets.map!![mapX][mapY].mFloorID = floorId
         changeObject(mapX, mapY, objectId)
     }
 
     @JvmStatic
     fun changeObject(mapX: Int, mapY: Int, objectId: Int) {
-        Global.map!![mapX][mapY].mObjectID = objectId
+        Assets.map!![mapX][mapY].mObjectID = objectId
 
-        Global.map!![mapX][mapY].mIsPassable = Global.objects[objectId].mIsPassable
-        Global.map!![mapX][mapY].mIsTransparent = Global.objects[objectId].mIsTransparent
-        Global.map!![mapX][mapY].mIsUsable = Global.objects[objectId].mIsUsable
+        Assets.map!![mapX][mapY].mIsPassable = Assets.objects[objectId].mIsPassable
+        Assets.map!![mapX][mapY].mIsTransparent = Assets.objects[objectId].mIsTransparent
+        Assets.map!![mapX][mapY].mIsUsable = Assets.objects[objectId].mIsUsable
     }
 
     @JvmStatic
@@ -80,15 +80,15 @@ object MapHelper {
     }
 
     @JvmStatic
-    fun getFloorId(mapX: Int, mapY: Int) = Global.map!![mapX][mapY].mFloorID
+    fun getFloorId(mapX: Int, mapY: Int) = Assets.map!![mapX][mapY].mFloorID
 
     @JvmStatic
-    fun getObjectId(mapX: Int, mapY: Int) = Global.map!![mapX][mapY].mObjectID
+    fun getObjectId(mapX: Int, mapY: Int) = Assets.map!![mapX][mapY].mObjectID
 
     @JvmStatic
     fun getItem(mapX: Int, mapY: Int): Item? {
-        if (Global.map!![mapX][mapY].mItems.size != 0) {
-            return Global.map!![mapX][mapY].mItems[0]
+        if (Assets.map!![mapX][mapY].mItems.size != 0) {
+            return Assets.map!![mapX][mapY].mItems[0]
         } else {
             return null
         }

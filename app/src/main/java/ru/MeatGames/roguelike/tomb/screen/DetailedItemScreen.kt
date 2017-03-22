@@ -6,7 +6,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.model.Item
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
@@ -63,7 +64,7 @@ class DetailedItemScreen(context: Context,
                 mScreenWidth,
                 mScreenHeight)
 
-        mItemBitmapSize = mItemBitmapScale * Global.game.mTileSize
+        mItemBitmapSize = mItemBitmapScale * Assets.mOriginalTileSize
         mSelectedItemBitmap = Bitmap.createScaledBitmap(mSelectedItem.image, mItemBitmapSize, mItemBitmapSize, false)
         mItemBitmapHorizontalPadding = (mScreenWidth - mSelectedItemBitmap.width) * 0.5F
 
@@ -74,7 +75,7 @@ class DetailedItemScreen(context: Context,
             mLeftSoftButton.mLabel = context.getString(R.string.use_label)
         } else {
 
-            Global.hero!!.equipmentList[mSelectedItem.mType - 1]?.let {
+            Assets.hero!!.equipmentList[mSelectedItem.mType - 1]?.let {
                 mLeftSoftButton.mLabel = if (mSelectedItem == it) {
                     context.getString(R.string.take_off_item_label)
                 } else {
@@ -114,7 +115,7 @@ class DetailedItemScreen(context: Context,
                 canvas.drawText("Защита ${mSelectedItem.mValue1}", mScreenWidth * 0.5F, mTextTopPadding + mTextLinePadding * q++, mSecondaryTextPaint)
                 canvas.drawText("Броня ${mSelectedItem.mValue2}", mScreenWidth * 0.5F, mTextTopPadding + mTextLinePadding * q, mSecondaryTextPaint)
             }
-            5 -> canvas.drawText("${Global.stats[mSelectedItem.mValue1].mTitle} +${mSelectedItem.mValue2}", mScreenWidth * 0.5F, mTextTopPadding + mTextLinePadding, mSecondaryTextPaint)
+            5 -> canvas.drawText("${Assets.stats[mSelectedItem.mValue1].mTitle} +${mSelectedItem.mValue2}", mScreenWidth * 0.5F, mTextTopPadding + mTextLinePadding, mSecondaryTextPaint)
         }
     }
 
@@ -132,32 +133,32 @@ class DetailedItemScreen(context: Context,
     fun onTouchItem(sx: Int, sy: Int) {
         if (mLeftSoftButton.isPressed(sx, sy)) {
             if (mSelectedItem.isConsumable) {
-                Global.hero!!.modifyStat(mSelectedItem.mValue1, mSelectedItem.mValue2, 1)
-                Global.mapview.addLine("${mSelectedItem.mTitle} использован${mSelectedItem.mTitleEnding}")
-                Global.hero!!.deleteItem(mSelectedItem)
+                Assets.hero!!.modifyStat(mSelectedItem.mValue1, mSelectedItem.mValue2, 1)
+                Assets.mapview.addLine("${mSelectedItem.mTitle} использован${mSelectedItem.mTitleEnding}")
+                Assets.hero!!.deleteItem(mSelectedItem)
             } else {
-                Global.hero!!.equipmentList[mSelectedItem.mType - 1]?.let {
+                Assets.hero!!.equipmentList[mSelectedItem.mType - 1]?.let {
                     if (mSelectedItem == it) {
-                        Global.hero!!.takeOffItem(it)
+                        Assets.hero!!.takeOffItem(it)
                     } else {
-                        Global.hero!!.takeOffItem(it.mType - 1)
-                        Global.hero!!.equipItem(mSelectedItem)
+                        Assets.hero!!.takeOffItem(it.mType - 1)
+                        Assets.hero!!.equipItem(mSelectedItem)
                     }
                 } ?: let {
-                    Global.hero!!.equipItem(mSelectedItem)
+                    Assets.hero!!.equipItem(mSelectedItem)
                 }
             }
-            Global.game.changeScreen(Screens.GAME_SCREEN)
+            GameController.changeScreen(Screens.GAME_SCREEN)
         }
 
         if (mMiddleSoftButton.isPressed(sx, sy)) {
-            Global.hero!!.dropItem(mSelectedItem)
-            Global.vibrate()
-            Global.game.changeScreen(Screens.GAME_SCREEN)
+            Assets.hero!!.dropItem(mSelectedItem)
+            GameController.vibrate()
+            GameController.changeScreen(Screens.GAME_SCREEN)
         }
 
         if (mBackButton.isPressed(sx, sy)) {
-            Global.game.changeToLastScreen()
+            GameController.changeToLastScreen()
         }
     }
 

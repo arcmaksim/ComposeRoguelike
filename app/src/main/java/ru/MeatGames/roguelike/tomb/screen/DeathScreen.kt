@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.view.TextButton
@@ -32,7 +32,7 @@ class DeathScreen(context: Context) : BasicScreen(context) {
         drawBackground(canvas!!)
 
         canvas.drawText(context.getString(R.string.death_from_label), mScreenWidth * 0.5F, mScreenHeight * 0.4F, mTextPaint)
-        canvas.drawBitmap(Global.game.lastAttack, (mScreenWidth - Global.game.lastAttack.width) * 0.5F, mScreenHeight * 0.425F, null)
+        canvas.drawBitmap(GameController.lastAttack, (mScreenWidth - GameController.lastAttack.width) * 0.5F, mScreenHeight * 0.425F, null)
 
         mMainMenuButton.draw(canvas)
         postInvalidate()
@@ -44,7 +44,7 @@ class DeathScreen(context: Context) : BasicScreen(context) {
                 val touchX = event.x.toInt()
                 val touchY = event.y.toInt()
                 if (mMainMenuButton.isPressed(touchX, touchY)) {
-                    Global.game.gameOver()
+                    GameController.gameOver()
                 }
             }
         }
