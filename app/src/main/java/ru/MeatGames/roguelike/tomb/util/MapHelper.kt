@@ -1,6 +1,7 @@
 package ru.MeatGames.roguelike.tomb.util
 
 import ru.MeatGames.roguelike.tomb.Global
+import ru.MeatGames.roguelike.tomb.model.Item
 import ru.MeatGames.roguelike.tomb.model.MapClass
 
 object MapHelper {
@@ -75,6 +76,21 @@ object MapHelper {
             for (x in startX..startX + width - 1) {
                 changeTile(x, y, objectId)
             }
+        }
+    }
+
+    @JvmStatic
+    fun getFloorId(mapX: Int, mapY: Int) = Global.map!![mapX][mapY].mFloorID
+
+    @JvmStatic
+    fun getObjectId(mapX: Int, mapY: Int) = Global.map!![mapX][mapY].mObjectID
+
+    @JvmStatic
+    fun getItem(mapX: Int, mapY: Int): Item? {
+        if (Global.map!![mapX][mapY].mItems.size != 0) {
+            return Global.map!![mapX][mapY].mItems[0]
+        } else {
+            return null
         }
     }
 

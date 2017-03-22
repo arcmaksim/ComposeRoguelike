@@ -63,14 +63,6 @@ public class Game extends Activity {
 
     public boolean mDrawInputAreas = false;
 
-    public static int getFloor(int x, int y) {
-        return Global.INSTANCE.getMap()[x][y].mFloorID;
-    }
-
-    public static int getObject(int x, int y) {
-        return Global.INSTANCE.getMap()[x][y].mObjectID;
-    }
-
     protected void onCreate(Bundle w) {
         super.onCreate(w);
         Global.initGame(this);
@@ -248,7 +240,7 @@ public class Game extends Activity {
         MapClass mapCell = MapHelper.getMapCell(mx, my);
         if (mapCell != null) {
             if (mapCell.mIsUsable) {
-                switch (Game.getObject(mx, my)) {
+                switch (MapHelper.getObjectId(mx, my)) {
                     case 2:
                         MapHelper.changeObject(mx, my, 3);
                         Global.INSTANCE.getMapview().addLine(getString(R.string.door_opened_message));

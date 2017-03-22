@@ -3,12 +3,14 @@ package ru.MeatGames.roguelike.tomb.screen
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.util.Log
 import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Game
 import ru.MeatGames.roguelike.tomb.Global
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.MapHelper
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
+import ru.MeatGames.roguelike.tomb.util.array2d
 import ru.MeatGames.roguelike.tomb.util.fillFrame
 import java.util.*
 
@@ -17,19 +19,22 @@ class GameScreen(context: Context) : BasicScreen(context) {
     override val TAG: String = "Game Screen"
 
     // visible cells dimensions
-    val mMapViewportWidth = 9
-    val mMapViewportHeight = 9
+    private val mMapViewportWidth = 9
+    private val mMapViewportHeight = 9
 
-    val mMaxLogLines = 8
+    private val mMapBufferWidth = mMapViewportWidth + 2
+    private val mMapBufferHeight = mMapViewportHeight + 2
+
+    private val mMaxLogLines = 8
     var mGameEventsLog: LinkedList<String>
 
-    val mLightBluePaint = Paint()
-    val mDarkBluePaint = Paint()
-    val mSemiTransparentBackgroundPaint = Paint()
-    var mLightShadowPaint = Paint()
-    var mDarkShadowPaint = Paint()
-    val mMenuBackgroundPaint = Paint()
-    val mTextPaint: Paint
+    private val mLightBluePaint = Paint()
+    private val mDarkBluePaint = Paint()
+    private val mSemiTransparentBackgroundPaint = Paint()
+    private var mLightShadowPaint = Paint()
+    private var mDarkShadowPaint = Paint()
+    private val mMenuBackgroundPaint = Paint()
+    private val mTextPaint: Paint
 
     var mObjectId: Int = 0 // tile id for ProgressBar
     var mProgressBarDuration: Int = 0
@@ -51,8 +56,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     val mScaleAmount = Global.game.scaleAmount
     val mBitmapPaint = Paint()
 
-    val mMapOffsetX: Float
-    val mMapOffsetY: Float
+    private val mMapOffsetX: Float
+    private val mMapOffsetY: Float
 
     // hero'single mIsPlayerMoved directions
     var mx: Int = 0
@@ -65,10 +70,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
     val mLongPressTimeThreshold = 500 // in milliseconds
     var mIsLongPress = false
 
-    val mMapBuffer: Array<Array<MapBufferCell>> = array2d(mMapViewportWidth, mMapViewportHeight) { MapBufferCell() }
-
-    inline fun <reified INNER> array2d(sizeOuter: Int, sizeInner: Int, noinline innerInit: (Int)->INNER): Array<Array<INNER>>
-            = Array(sizeOuter) { Array<INNER>(sizeInner, innerInit) }
+    val mMapBuffer = array2d(mMapBufferWidth, mMapBufferHeight) { MapBufferCell() }
 
     init {
         mGameEventsLog = LinkedList()
@@ -103,32 +105,21 @@ class GameScreen(context: Context) : BasicScreen(context) {
     }
 
     fun updateMapBuffer() {
-        var mapX: Int
-        var mapY: Int
-        for (bufferX in 0..mMapViewportWidth - 1) {
-            mapX = bufferX + camx
-            for (bufferY in 0..mMapViewportHeight - 1) {
-                mapY = bufferY + camy
+        for (bufferX in 0..mMapBufferWidth - 1) {
+            for (bufferY in 0..mMapBufferHeight - 1) {
 
-                val mapCell = MapHelper.getMapCell(mapX, mapY)
+                MapHelper.getMapCell(bufferX + camx - 1, bufferY + camy - 1)?.let {
 
-                mMapBuffer[bufferX][bufferY].mIsVisible = mapCell?.mCurrentlyVisible ?: false
+                    mMapBuffer[bufferX][bufferY].mIsVisible = it.mCurrentlyVisible
 
-                if (mMapBuffer[bufferX][bufferY].mIsVisible) {
-                    mMapBuffer[bufferX][bufferY].mFloorID = mapCell!!.mFloorID
-                    mMapBuffer[bufferX][bufferY].mObjectID = mapCell.mObjectID
+                    mMapBuffer[bufferX][bufferY].mFloorID = it.mFloorID
+                    mMapBuffer[bufferX][bufferY].mObjectID = it.mObjectID
 
-                    if (mMapBuffer[bufferX][bufferY].mObjectID == 1) {
-                        mMapBuffer[bufferX][bufferY].mWallBitmap = 0
-                    } else {
-                        mMapBuffer[bufferX][bufferY].mWallBitmap = -1
-                    }
+                    mMapBuffer[bufferX][bufferY].mHasItem = it.hasItem()
+                    mMapBuffer[bufferX][bufferY].mHasEnemy = it.hasMob()
 
-                    mMapBuffer[bufferX][bufferY].mHasItem = mapCell.hasItem()
-                    mMapBuffer[bufferX][bufferY].mHasEnemy = mapCell.hasMob()
-
-                    val shadowX = bufferX - 4
-                    val shadowY = bufferY - 4
+                    val shadowX = bufferX - 5
+                    val shadowY = bufferY - 5
                     val shadowSum = Math.abs(shadowX) + Math.abs(shadowY)
 
                     if ((shadowX == 0 || shadowY == 0) && shadowSum == 3 || shadowX != 0 && shadowY != 0 && shadowSum == 4) {
@@ -137,87 +128,89 @@ class GameScreen(context: Context) : BasicScreen(context) {
                             && shadowSum == 5 || Math.abs(shadowX) == Math.abs(shadowY) && Math.abs(shadowX) == 3) {
                         mMapBuffer[bufferX][bufferY].mShadowPaint = mDarkShadowPaint
                     }
-                } else {
-                    mMapBuffer[bufferX][bufferY].init()
+
+                } ?: mMapBuffer[bufferX][bufferY].init()
+
+            }
+        }
+
+        val floodedBuffer = floodBuffer()
+        val markedWalls = markWalls(floodedBuffer)
+        correctWalls(markedWalls)
+    }
+
+    private fun floodBuffer(): Array<Array<Int>> {
+        val mapBufferFloodFill = array2d(mMapBufferWidth, mMapBufferHeight) { 0 }
+        mapBufferFloodFill[mMapBufferWidth / 2][mMapBufferHeight / 2] = 1
+
+        for (i in 1..mMapBufferWidth / 2) {
+            // we don't need to check edge cells
+            for (bufferX in 1..mMapBufferWidth - 2) {
+                for (bufferY in 1..mMapBufferHeight - 2) {
+
+                    if (mapBufferFloodFill[bufferX][bufferY] == i && mMapBuffer[bufferX][bufferY].mIsVisible) {
+                        for (ii in 0..8) {
+                            if (mapBufferFloodFill[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1] == 0
+                                    && mMapBuffer[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1].mObjectID != 1) {
+                                mapBufferFloodFill[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1] = i + 1
+                            }
+                        }
+                    }
+
                 }
             }
         }
 
-        correctWalls()
-        correctCorners()
+        for (bufferX in 0..mMapBufferWidth - 1) {
+            var line = ""
+            for (bufferY in 0..mMapBufferHeight - 1) {
+                line += mapBufferFloodFill[bufferX][bufferY].toString() + " "
+            }
+            Log.d("Buffer", line)
+        }
+
+        return mapBufferFloodFill
     }
 
-    private fun correctWalls() {
-        for (x in 0..mMapViewportWidth - 1) {
-            for (y in 0..mMapViewportHeight - 1) {
-                if (mMapBuffer[x][y].mWallBitmap == 0) {
-                    val isConnectedToTheTop = (camy + y - 1 > -1 && Global.map!![camx + x][camy + y - 1].mObjectID == 1)
-                    val isConnectedToTheRight = (camx + x + 1 < MapHelper.mapWidth && Global.map!![camx + x + 1][camy + y].mObjectID == 1)
-                    val isConnectedToTheBottom = (camy + y + 1 < MapHelper.mapHeight && Global.map!![camx + x][camy + y + 1].mObjectID == 1)
-                    val isConnectedToTheLeft = (camx + x - 1 > -1 && Global.map!![camx + x - 1][camy + y].mObjectID == 1)
+    private fun markWalls(floodedBuffer: Array<Array<Int>>): MutableSet<Int> {
+        val markedWalls = mutableSetOf<Int>()
 
-                    val horizontalWall = (isConnectedToTheLeft && isConnectedToTheRight)
-                    val verticalWall = (isConnectedToTheTop && isConnectedToTheBottom)
+        for (bufferX in 0..mMapBufferWidth - 1) {
+            for (bufferY in 0..mMapBufferHeight - 1) {
 
-                    if (horizontalWall) {
-                        mMapBuffer[x][y].mWallBitmap = 10
-                    } else if (verticalWall) {
-                        mMapBuffer[x][y].mWallBitmap = 5
+                if (mMapBuffer[bufferX][bufferY].mObjectID == 1) {
+                    for (ii in 0..8) {
+                        if (bufferX + ii % 3 - 1 > -1
+                                && bufferX + ii % 3 - 1 < mMapBufferWidth
+                                && bufferY + ii / 3 - 1> -1
+                                && bufferY + ii / 3 - 1< mMapViewportHeight
+                                && floodedBuffer[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1] != 0) {
+                            markedWalls.add(bufferX * 1000 + bufferY)
+                            break
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return markedWalls
+    }
+
+    private fun correctWalls(markedWalls: MutableSet<Int>) {
+        for (i in 1..mMapBufferWidth / 2) {
+            // we don't need to check edge cells
+            for (bufferX in 1..mMapBufferWidth - 2) {
+                for (bufferY in 1..mMapBufferHeight - 2) {
+
+                    if (mMapBuffer[bufferX][bufferY].mIsVisible && mMapBuffer[bufferX][bufferY].mObjectID == 1) {
+                        mMapBuffer[bufferX][bufferY].mWallBitmap = 0
+                        if (markedWalls.contains(bufferX * 1000 + bufferY - 1)) mMapBuffer[bufferX][bufferY].mWallBitmap += 1
+                        if (markedWalls.contains((bufferX + 1) * 1000 + bufferY)) mMapBuffer[bufferX][bufferY].mWallBitmap += 2
+                        if (markedWalls.contains(bufferX * 1000 + bufferY + 1)) mMapBuffer[bufferX][bufferY].mWallBitmap += 4
+                        if (markedWalls.contains((bufferX - 1) * 1000 + bufferY)) mMapBuffer[bufferX][bufferY].mWallBitmap += 8
                     } else {
-                        if (isConnectedToTheTop) mMapBuffer[x][y].mWallBitmap += 1
-                        if (isConnectedToTheRight) mMapBuffer[x][y].mWallBitmap += 2
-                        if (isConnectedToTheBottom) mMapBuffer[x][y].mWallBitmap += 4
-                        if (isConnectedToTheLeft) mMapBuffer[x][y].mWallBitmap += 8
-                    }
-                }
-            }
-        }
-    }
-
-    private fun correctCorners() {
-        for (x in 0..mMapViewportWidth - 1) {
-            for (y in 0..mMapViewportHeight - 1) {
-                if (mMapBuffer[x][y].mWallBitmap % 3 == 0
-                        && mMapBuffer[x][y].mWallBitmap % 3 == 0) {
-
-                    if (mMapBuffer[x][y].mWallBitmap % 2 == 1) {
-                        if (MapHelper.top(y - 1) && mMapBuffer[x][y - 1].mIsVisible) {
-                            if (MapHelper.left(x - 1) && mMapBuffer[x - 1][y - 1].mIsVisible) {
-                                mMapBuffer[x][y - 1].mWallBitmap = 12
-                            } else if (MapHelper.right(x + 1) && mMapBuffer[x + 1][y - 1].mIsVisible) {
-                                mMapBuffer[x][y - 1].mWallBitmap = 6
-                            }
-                        }
-                    }
-
-                    if (mMapBuffer[x][y].mWallBitmap and 0x2 == 1) {
-                        if (MapHelper.right(x + 1) && mMapBuffer[x + 1][y].mIsVisible) {
-                            if (MapHelper.top(y - 1) && mMapBuffer[x + 1][y - 1].mIsVisible) {
-                                mMapBuffer[x + 1][y].mWallBitmap = 9
-                            } else if (MapHelper.bottom(y + 1) && mMapBuffer[x + 1][y + 1].mIsVisible) {
-                                mMapBuffer[x + 1][y].mWallBitmap = 12
-                            }
-                        }
-                    }
-
-                    if (mMapBuffer[x][y].mWallBitmap and 0x4 == 1) {
-                        if (MapHelper.bottom(y + 1) && mMapBuffer[x][y + 1].mIsVisible) {
-                            if (MapHelper.left(x - 1) && mMapBuffer[x - 1][y + 1].mIsVisible) {
-                                mMapBuffer[x][y - 1].mWallBitmap = 9
-                            } else if (MapHelper.right(x + 1) && mMapBuffer[x + 1][y + 1].mIsVisible) {
-                                mMapBuffer[x][y - 1].mWallBitmap = 3
-                            }
-                        }
-                    }
-
-                    if (mMapBuffer[x][y].mWallBitmap and 0x8 == 1) {
-                        if (MapHelper.left(x - 1) && mMapBuffer[x - 1][y].mIsVisible) {
-                            if (MapHelper.top(y - 1) && mMapBuffer[x - 1][y - 1].mIsVisible) {
-                                mMapBuffer[x - 1][y].mWallBitmap = 3
-                            } else if (MapHelper.bottom(y + 1) && mMapBuffer[x - 1][y + 1].mIsVisible) {
-                                mMapBuffer[x - 1][y].mWallBitmap = 6
-                            }
-                        }
+                        mMapBuffer[bufferX][bufferY].mWallBitmap = -1
                     }
 
                 }
@@ -281,7 +274,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 val currentPixelYtoDraw = (Global.game.mTileSize * cy + mMapOffsetY)
                 val rightDrawBorder = (Global.game.mTileSize * (cy + 1) + mMapOffsetY)
 
-                currentMapBufferCell = mMapBuffer[cx][cy]
+                currentMapBufferCell = mMapBuffer[cx + 1][cy + 1]
 
                 if (currentMapBufferCell.mIsVisible) {
                     canvas.drawBitmap(Global.map!![x][y].floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
@@ -560,14 +553,14 @@ class GameScreen(context: Context) : BasicScreen(context) {
             val y = ((touchY - mScreenWidth * 0.1F) / temp).toInt() - 1
 
             if (x == 0 && y == 0) {
-                if (Global.map!![Global.hero!!.mx][Global.hero!!.my].mObjectID == 11) {
+                if (MapHelper.getObjectId(x, y) == 11) {
                     Game.curLvls++
                     Global.game.generateNewMap()
                     Global.mapview.updateMapBuffer()
                     Global.game.skipTurn()
                 }
-                if (Global.map!![Global.hero!!.mx][Global.hero!!.my].hasItem()) {
-                    val item = Global.map!![Global.hero!!.mx][Global.hero!!.my].item
+                MapHelper.getItem(Global.hero!!.mx, Global.hero!!.my)?.let {
+                    val item = it
                     Global.hero!!.addItem(item)
                     addLine("${item.mTitle} подобран${item.mTitleEnding}")
                     Global.vibrate()

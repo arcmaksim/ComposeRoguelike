@@ -10,6 +10,7 @@ import ru.MeatGames.roguelike.tomb.screen.GameScreen
 import ru.MeatGames.roguelike.tomb.screen.MainMenu
 import ru.MeatGames.roguelike.tomb.util.AssetHelper
 import ru.MeatGames.roguelike.tomb.util.MapHelper
+import ru.MeatGames.roguelike.tomb.util.array2d
 
 object Global {
 
@@ -44,9 +45,6 @@ object Global {
     val maxStats = 35
 
     private val mOriginalTileSize = 24
-
-    inline fun <reified INNER> array2d(sizeOuter: Int, sizeInner: Int, noinline innerInit: (Int) -> INNER): Array<Array<INNER>>
-            = Array(sizeOuter) { Array<INNER>(sizeInner, innerInit) }
 
     @JvmStatic
     fun vibrate() {
