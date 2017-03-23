@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 
     public void onBackPressed() {
         if (!Assets.INSTANCE.getMapview().getMDrawProgressBar()) {
-            Assets.INSTANCE.getHero().interruptAllActions();
+            GameController.mHero.interruptAllActions();
             Assets.INSTANCE.getMapview().setMDrawExitDialog(!Assets.INSTANCE.getMapview().getMDrawExitDialog());
         }
     }
@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         MobList temp = new MobList(t);
         temp.x = x;
         temp.y = y;
-        Assets.INSTANCE.getMap()[x][y].addMob(temp);
+        GameController.mMap[x][y].addMob(temp);
         addInQueue(temp);
     }
 

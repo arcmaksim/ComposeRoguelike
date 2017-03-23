@@ -150,7 +150,7 @@ class InventoryScreen(context: Context,
     fun populateItemList() {
         mItemList = LinkedList()
 
-        Assets.hero!!.mInventory?.let {
+        GameController.mHero.mInventory?.let {
             it
                     .filter { isAllowed(it) }
                     .forEach { mItemList.add(it) }
@@ -185,7 +185,7 @@ class InventoryScreen(context: Context,
                 if (q >= u) {
                     val top = mItemListRect.top + (q - u) * (mSpaceBetweenItemPanels + mItemPanelHeight) - offset
                     val bottom = top + mItemPanelHeight
-                    val itemPanelBackground = if (!it!!.isConsumable && Assets.hero!!.isEquipped(it)) {
+                    val itemPanelBackground = if (!it!!.isConsumable && GameController.mHero.isEquipped(it)) {
                         mEquippedItemBackgroundPaint
                     } else {
                         mBackgroundPaint

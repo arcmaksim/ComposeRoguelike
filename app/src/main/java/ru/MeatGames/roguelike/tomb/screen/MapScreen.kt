@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.MapHelper
@@ -50,8 +49,8 @@ class MapScreen(context: Context) : BasicScreen(context) {
         drawBackground(canvas!!)
         for (x in 0..MapHelper.mapWidth - 1)
             for (y in 0..MapHelper.mapHeight - 1) {
-                if (Assets.map!![x][y].mIsDiscovered) {
-                    when (Assets.map!![x][y].mObjectID) {
+                if (GameController.mMap[x][y].mIsDiscovered) {
+                    when (GameController.mMap[x][y].mObjectID) {
                         0 -> canvas.drawRect(x * mMarkerSize,
                                 (y + 1) * mMarkerSize,
                                 (x + 1) * mMarkerSize,
@@ -72,10 +71,10 @@ class MapScreen(context: Context) : BasicScreen(context) {
                         canvas.drawRect(x*5,5+5*y,x*5+5,10+5*y,blue);*/
                 }
             }
-        canvas.drawRect(Assets.hero!!.mx * mMarkerSize,
-                (Assets.hero!!.my + 1) * mMarkerSize,
-                (Assets.hero!!.mx + 1) * mMarkerSize,
-                (Assets.hero!!.my + 2) * mMarkerSize,
+        canvas.drawRect(GameController.mHero.mx * mMarkerSize,
+                (GameController.mHero.my + 1) * mMarkerSize,
+                (GameController.mHero.mx + 1) * mMarkerSize,
+                (GameController.mHero.my + 2) * mMarkerSize,
                 mHeroMarkerPaint)
         mBackButton.draw(canvas)
         postInvalidate()

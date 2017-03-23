@@ -3,8 +3,6 @@ package ru.MeatGames.roguelike.tomb
 import android.graphics.Bitmap
 import org.xmlpull.v1.XmlPullParser
 import ru.MeatGames.roguelike.tomb.db.*
-import ru.MeatGames.roguelike.tomb.model.HeroClass
-import ru.MeatGames.roguelike.tomb.model.MapClass
 import ru.MeatGames.roguelike.tomb.screen.GameScreen
 import ru.MeatGames.roguelike.tomb.screen.MainMenu
 import ru.MeatGames.roguelike.tomb.util.AssetHelper
@@ -13,9 +11,6 @@ import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 object Assets {
 
     private lateinit var mMainActivity: MainActivity
-
-    var hero: HeroClass? = null
-    var map: Array<Array<MapClass>>? = null
 
     lateinit var mapview: GameScreen
     lateinit var mmview: MainMenu
@@ -97,7 +92,7 @@ object Assets {
 
         temp = mAssetHelper.getBitmapFromAsset("floor_tileset")
         for (i in 0..maxTiles - 1) {
-            tiles[i]?.img = Bitmap.createBitmap(temp,
+            tiles[i].img = Bitmap.createBitmap(temp,
                     i % 5 * mOriginalTileSize,
                     i / 5 * mOriginalTileSize,
                     mOriginalTileSize,

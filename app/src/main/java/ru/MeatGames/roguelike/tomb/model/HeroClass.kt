@@ -123,7 +123,7 @@ class HeroClass {
             takeOffItem(item)
         }
         mInventory!!.remove(item)
-        Assets.map!![mx][my].addItem(item)
+        GameController.mMap[mx][my].addItem(item)
         Assets.mapview.addLine(item.mTitle + " выброшен" + item.mTitleEnding)
         GameController.skipTurn()
     }
@@ -197,7 +197,7 @@ class HeroClass {
                 modifyStat(22, item.mValue2, -1)
             }
         }
-        Assets.hero!!.equipmentList[item.mType - 1] = null
+        GameController.mHero.equipmentList[item.mType - 1] = null
         Assets.mapview.addLine(item.mTitle + " снят" + item.mTitleEnding)
         GameController.skipTurn()
     }

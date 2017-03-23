@@ -10,27 +10,27 @@ class MainGameLoop : Runnable {
 
     override fun run() {
         while (isRunning) {
-            if (--Assets.hero!!.init == 0) {
-                if (--Assets.hero!!.cregen == 0) {
-                    Assets.hero!!.cregen = Assets.hero!!.regen
-                    if (Assets.hero!!.getStat(5) != Assets.hero!!.getStat(6)) {
-                        Assets.hero!!.modifyStat(5, 1, 1)
+            if (--GameController.mHero.init == 0) {
+                if (--GameController.mHero.cregen == 0) {
+                    GameController.mHero.cregen = GameController.mHero.regen
+                    if (GameController.mHero.getStat(5) != GameController.mHero.getStat(6)) {
+                        GameController.mHero.modifyStat(5, 1, 1)
                     }
-                    if (Assets.hero!!.isFullyHealed()) {
-                        Assets.hero!!.finishResting()
+                    if (GameController.mHero.isFullyHealed()) {
+                        GameController.mHero.finishResting()
                     }
                 }
-                //Assets.game.updateHeroTurnCount(Assets.hero!!.mIsResting)
+                //Assets.game.updateHeroTurnCount(GameController.mHero.mIsResting)
                 GameController.mIsPlayerTurn = true
                 GameController.mIsPlayerMoved = false
                 GameController.mAcceptPlayerInput = true
                 while (GameController.mIsPlayerTurn) {
-                    if (Assets.hero!!.mIsResting) {
+                    if (GameController.mHero.mIsResting) {
                         Thread.sleep(100)
-                        if (Assets.hero!!.mIsResting) {
+                        if (GameController.mHero.mIsResting) {
                             GameController.skipTurn()
                         } else {
-                            Assets.hero!!.interruptResting()
+                            GameController.mHero.interruptResting()
                         }
                     }
                 }
@@ -39,7 +39,7 @@ class MainGameLoop : Runnable {
                 while (Assets.game.firstMob.turnCount <= Assets.game.turnCount) {
                     val temp = Assets.game.firstMob
                     Assets.game.firstMob = Assets.game.firstMob.next
-                    if (Math.abs(temp.x - Assets.hero!!.mx) < 5 && Math.abs(temp.y - Assets.hero!!.my) < 5) {
+                    if (Math.abs(temp.x - GameController.mHero.mx) < 5 && Math.abs(temp.y - GameController.mHero.my) < 5) {
                         Assets.game.mobTurn(temp)
                     }
                     Assets.game.addInQueue(temp)

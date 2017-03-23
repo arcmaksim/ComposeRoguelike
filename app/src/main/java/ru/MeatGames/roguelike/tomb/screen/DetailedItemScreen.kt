@@ -75,7 +75,7 @@ class DetailedItemScreen(context: Context,
             mLeftSoftButton.mLabel = context.getString(R.string.use_label)
         } else {
 
-            Assets.hero!!.equipmentList[mSelectedItem.mType - 1]?.let {
+            GameController.mHero.equipmentList[mSelectedItem.mType - 1]?.let {
                 mLeftSoftButton.mLabel = if (mSelectedItem == it) {
                     context.getString(R.string.take_off_item_label)
                 } else {
@@ -133,26 +133,26 @@ class DetailedItemScreen(context: Context,
     fun onTouchItem(sx: Int, sy: Int) {
         if (mLeftSoftButton.isPressed(sx, sy)) {
             if (mSelectedItem.isConsumable) {
-                Assets.hero!!.modifyStat(mSelectedItem.mValue1, mSelectedItem.mValue2, 1)
+                GameController.mHero.modifyStat(mSelectedItem.mValue1, mSelectedItem.mValue2, 1)
                 Assets.mapview.addLine("${mSelectedItem.mTitle} использован${mSelectedItem.mTitleEnding}")
-                Assets.hero!!.deleteItem(mSelectedItem)
+                GameController.mHero.deleteItem(mSelectedItem)
             } else {
-                Assets.hero!!.equipmentList[mSelectedItem.mType - 1]?.let {
+                GameController.mHero.equipmentList[mSelectedItem.mType - 1]?.let {
                     if (mSelectedItem == it) {
-                        Assets.hero!!.takeOffItem(it)
+                        GameController.mHero.takeOffItem(it)
                     } else {
-                        Assets.hero!!.takeOffItem(it.mType - 1)
-                        Assets.hero!!.equipItem(mSelectedItem)
+                        GameController.mHero.takeOffItem(it.mType - 1)
+                        GameController.mHero.equipItem(mSelectedItem)
                     }
                 } ?: let {
-                    Assets.hero!!.equipItem(mSelectedItem)
+                    GameController.mHero.equipItem(mSelectedItem)
                 }
             }
             GameController.changeScreen(Screens.GAME_SCREEN)
         }
 
         if (mMiddleSoftButton.isPressed(sx, sy)) {
-            Assets.hero!!.dropItem(mSelectedItem)
+            GameController.mHero.dropItem(mSelectedItem)
             GameController.vibrate()
             GameController.changeScreen(Screens.GAME_SCREEN)
         }

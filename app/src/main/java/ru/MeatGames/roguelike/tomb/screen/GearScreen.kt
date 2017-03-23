@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.MotionEvent
-import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.InventoryFilterType
 import ru.MeatGames.roguelike.tomb.R
@@ -57,7 +56,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
         mBodyRect = Rect(mScreenWidth - cardWidth - margin, margin, mScreenWidth - margin, cardHeight + margin)
         mGearRect = Rect(margin, cardHeight + 2 * margin, mScreenWidth - margin, (mScreenHeight * 0.9F).toInt() - margin)
 
-        mIsTwoHandedWeaponEquipped = Assets.hero!!.equipmentList[0]?.mProperty ?: false
+        mIsTwoHandedWeaponEquipped = GameController.mHero.equipmentList[0]?.mProperty ?: false
     }
 
     override fun drawScreen(canvas: Canvas?) {
@@ -69,7 +68,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
     }
 
     private fun drawGear(canvas: Canvas) {
-        Assets.hero!!.equipmentList[0]?.let {
+        GameController.mHero.equipmentList[0]?.let {
             if (mIsTwoHandedWeaponEquipped) {
                 canvas.drawRect(mPrimaryArmAltRect, mBackgroundPaint)
                 canvas.drawBitmap(it.image, mPrimaryArmAltRect.exactCenterX() - it.image.width / 2, mPrimaryArmAltRect.exactCenterY() - it.image.height / 2, null)
@@ -84,7 +83,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
 
         if (!mIsTwoHandedWeaponEquipped) {
             canvas.drawRect(mSecondaryArmRect, mBackgroundPaint)
-            Assets.hero!!.equipmentList[1]?.let {
+            GameController.mHero.equipmentList[1]?.let {
                 canvas.drawBitmap(it.image, mSecondaryArmRect.exactCenterX() - it.image.width / 2, mSecondaryArmRect.exactCenterY() - it.image.width / 2, null)
             } ?: let {
                 canvas.drawText(context.getString(R.string.empty_label), mSecondaryArmRect.exactCenterX(), mSecondaryArmRect.exactCenterY(), mTextPaint)
@@ -92,7 +91,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
         }
 
         canvas.drawRect(mBodyRect, mBackgroundPaint)
-        Assets.hero!!.equipmentList[2]?.let {
+        GameController.mHero.equipmentList[2]?.let {
             canvas.drawBitmap(it.image, mBodyRect.exactCenterX() - it.image.width / 2, mBodyRect.exactCenterY() - it.image.width / 2, null)
         } ?: let {
             canvas.drawText(context.getString(R.string.empty_label), mBodyRect.exactCenterX(), mBodyRect.exactCenterY(), mTextPaint)
@@ -117,12 +116,12 @@ class GearScreen(context: Context) : BasicScreen(context) {
         // TODO: temporal solution
         if (mIsTwoHandedWeaponEquipped) {
             if (mPrimaryArmAltRect.contains(sx, sy)) {
-                //GameController.selectedItem = Assets.hero!!.equipmentList[0]
+                //GameController.selectedItem = GameController.mHero.equipmentList[0]
                 GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
             }
         } else {
             if (mPrimaryArmRect.contains(sx, sy)) {
-                Assets.hero!!.equipmentList[0]?.let {
+                GameController.mHero.equipmentList[0]?.let {
                     GameController.selectedItem = it
                     GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
                 } ?: let {
@@ -131,7 +130,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
             }
 
             if (mSecondaryArmRect.contains(sx, sy)) {
-                Assets.hero!!.equipmentList[1]?.let {
+                GameController.mHero.equipmentList[1]?.let {
                     GameController.selectedItem = it
                     GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
                 } ?: let {
@@ -142,7 +141,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
 
 
         if (mBodyRect.contains(sx, sy)) {
-            Assets.hero!!.equipmentList[2]?.let {
+            GameController.mHero.equipmentList[2]?.let {
                 GameController.selectedItem = it
                 GameController.changeScreen(Screens.DETAILED_ITEM_SCREEN)
             } ?: let {

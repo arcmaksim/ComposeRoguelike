@@ -20,11 +20,11 @@ object GameController {
 
     private lateinit var mScreenController: ScreenController
 
-    private lateinit var mHero: HeroClass
+    lateinit var mHero: HeroClass
 
     private var mMapWidth: Int = 96
     private var mMapHeight: Int = 96
-    private lateinit var mMap: Array<Array<MapClass>>
+    lateinit var mMap: Array<Array<MapClass>>
 
     var mIsPlayerTurn = true
     var mIsPlayerMoved = false
@@ -129,7 +129,7 @@ object GameController {
 
     fun createItem(x4: Int, y4: Int) {
         val item = createItem()
-        Assets.map!![x4][y4].addItem(item)
+        mMap[x4][y4].addItem(item)
     }
 
     fun skipTurn() {
@@ -142,8 +142,8 @@ object GameController {
         for (i in i1 - 1..i1 + 2 - 1)
             for (j in j1 - 1..j1 + 2 - 1)
                 if (zone[i][j] == zoneDefaultValue
-                        && Assets.map!![Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].mIsPassable
-                        && !Assets.map!![Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].hasMob())
+                        && mMap[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].mIsPassable
+                        && !mMap[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].hasMob())
                     zone[i][j] = c
     }
 
@@ -207,9 +207,9 @@ object GameController {
                 mIsPlayerTurn = false
                 mIsPlayerMoved = true // ?
                 if (mapCell.mObjectID == 15) {
-                    Assets.hero!!.modifyStat(5, Random().nextInt(3) + 1, -1)
+                    mHero.modifyStat(5, Random().nextInt(3) + 1, -1)
                     Assets.mapview.addLine(mMainActivity.getString(R.string.trap_message))
-                    if (Assets.hero!!.getStat(5) < 1) {
+                    if (mHero.getStat(5) < 1) {
                         lastAttack = Bitmap.createScaledBitmap(Assets.objects[15].img, 72, 72, false)
                         changeScreen(Screens.DEATH_SCREEN)
                     }
@@ -260,24 +260,24 @@ object GameController {
     }
 
     fun move(mx: Int, my: Int) {
-        Assets.hero!!.interruptResting()
+        mHero.interruptResting()
         Assets.mapview.mx = mx
         Assets.mapview.my = my
-        isCollision(Assets.hero!!.mx + mx, Assets.hero!!.my + my)
+        isCollision(mHero.mx + mx, mHero.my + my)
         if (mIsPlayerMoved) {
-            Assets.hero!!.mx = Assets.hero!!.mx + mx
-            Assets.hero!!.my = Assets.hero!!.my + my
+            mHero.mx = mHero.mx + mx
+            mHero.my = mHero.my + my
             Assets.mapview.camx = Assets.mapview.camx + mx
             Assets.mapview.camy = Assets.mapview.camy + my
         }
-        Assets.mapview.calculateLineOfSight(Assets.hero!!.mx, Assets.hero!!.my)
-        if (mx == 1) Assets.hero!!.mIsFacingLeft = false
-        if (mx == -1) Assets.hero!!.mIsFacingLeft = true
-        if ((mx != 0 || my != 0) && Assets.map!![Assets.hero!!.mx][Assets.hero!!.my].hasItem()) {
-            if (Assets.map!![Assets.hero!!.mx][Assets.hero!!.my].mItems.size > 1) {
+        Assets.mapview.calculateLineOfSight(mHero.mx, mHero.my)
+        if (mx == 1) mHero.mIsFacingLeft = false
+        if (mx == -1) mHero.mIsFacingLeft = true
+        if ((mx != 0 || my != 0) && mMap[mHero.mx][mHero.my].hasItem()) {
+            if (mMap[mHero.mx][mHero.my].mItems.size > 1) {
                 Assets.mapview.addLine(mMainActivity.getString(R.string.several_items_lying_on_the_ground_message))
             } else {
-                Assets.mapview.addLine(Assets.map!![Assets.hero!!.mx][Assets.hero!!.my].mItems[0].mTitle
+                Assets.mapview.addLine(mMap[mHero.mx][mHero.my].mItems[0].mTitle
                         + mMainActivity.getString(R.string.lying_on_the_ground_message))
             }
         }

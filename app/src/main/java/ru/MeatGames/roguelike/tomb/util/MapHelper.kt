@@ -1,6 +1,7 @@
 package ru.MeatGames.roguelike.tomb.util
 
 import ru.MeatGames.roguelike.tomb.Assets
+import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.model.Item
 import ru.MeatGames.roguelike.tomb.model.MapClass
 
@@ -30,7 +31,7 @@ object MapHelper {
     @JvmStatic
     fun getMapCell(coordX: Int, coordY: Int): MapClass? {
         if (horizontal(coordX) && vertical(coordY)) {
-            return Assets.map!![coordX][coordY]
+            return GameController.mMap[coordX][coordY]
         } else {
             return null
         }
@@ -57,17 +58,17 @@ object MapHelper {
 
     @JvmStatic
     fun changeTile(mapX: Int, mapY: Int, floorId: Int, objectId: Int) {
-        Assets.map!![mapX][mapY].mFloorID = floorId
+        GameController.mMap[mapX][mapY].mFloorID = floorId
         changeObject(mapX, mapY, objectId)
     }
 
     @JvmStatic
     fun changeObject(mapX: Int, mapY: Int, objectId: Int) {
-        Assets.map!![mapX][mapY].mObjectID = objectId
+        GameController.mMap[mapX][mapY].mObjectID = objectId
 
-        Assets.map!![mapX][mapY].mIsPassable = Assets.objects[objectId].mIsPassable
-        Assets.map!![mapX][mapY].mIsTransparent = Assets.objects[objectId].mIsTransparent
-        Assets.map!![mapX][mapY].mIsUsable = Assets.objects[objectId].mIsUsable
+        GameController.mMap[mapX][mapY].mIsPassable = Assets.objects[objectId].mIsPassable
+        GameController.mMap[mapX][mapY].mIsTransparent = Assets.objects[objectId].mIsTransparent
+        GameController.mMap[mapX][mapY].mIsUsable = Assets.objects[objectId].mIsUsable
     }
 
     @JvmStatic
@@ -80,15 +81,15 @@ object MapHelper {
     }
 
     @JvmStatic
-    fun getFloorId(mapX: Int, mapY: Int) = Assets.map!![mapX][mapY].mFloorID
+    fun getFloorId(mapX: Int, mapY: Int) = GameController.mMap[mapX][mapY].mFloorID
 
     @JvmStatic
-    fun getObjectId(mapX: Int, mapY: Int) = Assets.map!![mapX][mapY].mObjectID
+    fun getObjectId(mapX: Int, mapY: Int) = GameController.mMap[mapX][mapY].mObjectID
 
     @JvmStatic
     fun getItem(mapX: Int, mapY: Int): Item? {
-        if (Assets.map!![mapX][mapY].mItems.size != 0) {
-            return Assets.map!![mapX][mapY].mItems[0]
+        if (GameController.mMap[mapX][mapY].mItems.size != 0) {
+            return GameController.mMap[mapX][mapY].mItems[0]
         } else {
             return null
         }

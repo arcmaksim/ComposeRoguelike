@@ -61,9 +61,7 @@ class ScreenController {
         }
 
         // TODO: temporal solution
-        if (Assets.hero != null) {
-            Assets.hero!!.interruptAllActions()
-        }
+        //GameController.mHero.interruptAllActions()
         mMainActivity.setContentView(view)
         view.requestFocus()
     }
