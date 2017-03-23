@@ -3,11 +3,11 @@ package ru.MeatGames.roguelike.tomb
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Vibrator
-import android.view.View
 import ru.MeatGames.roguelike.tomb.model.HeroClass
 import ru.MeatGames.roguelike.tomb.model.Item
 import ru.MeatGames.roguelike.tomb.model.MapClass
-import ru.MeatGames.roguelike.tomb.screen.*
+import ru.MeatGames.roguelike.tomb.screen.ScreenController
+import ru.MeatGames.roguelike.tomb.screen.Screens
 import ru.MeatGames.roguelike.tomb.util.MapHelper
 import ru.MeatGames.roguelike.tomb.util.array2d
 import java.util.*
@@ -17,6 +17,8 @@ object GameController {
     private lateinit var mMainActivity: MainActivity
     private lateinit var mState: GameState
     private lateinit var mVibrator: Vibrator
+
+    private lateinit var mScreenController: ScreenController
 
     private lateinit var mHero: HeroClass
 
@@ -33,7 +35,6 @@ object GameController {
 
     // TODO: temporal solution
     lateinit var selectedItem: Item
-    private lateinit var lastScreen: Screens
     lateinit var lastAttack: Bitmap
 
     private var mMainGameThread: Thread? = null
@@ -54,6 +55,7 @@ object GameController {
     }
 
     private fun init() {
+        mScreenController = ScreenController(mMainActivity)
         zone = array2d(11, 11) { 0 }
     }
 
@@ -65,9 +67,12 @@ object GameController {
     }
 
     @JvmStatic
-    fun vibrate(vibratePeriod: Long = 30L) {
-        mVibrator.vibrate(vibratePeriod)
+    fun setState(state: GameState) {
+        mState = state
     }
+
+    @JvmStatic
+    fun vibrate(vibratePeriod: Long = 30L) = mVibrator.vibrate(vibratePeriod)
 
     @JvmStatic
     fun startNewGame() {
@@ -83,62 +88,11 @@ object GameController {
         mMap = array2d(mMapWidth, mMapHeight) { MapClass() }
     }
 
-    fun changeScreen(screen: Screens) {
-        val view: View
-        when (screen) {
-            Screens.GAME_SCREEN -> {
-                mState = GameState.MAIN_GAME
-                view = Assets.mapview
-                view.updateMapBuffer()
-            }
-            Screens.INVENTORY_SCREEN -> {
-                mState = GameState.INVENTORY_SCREEN
-                lastScreen = Screens.INVENTORY_SCREEN
-                view = InventoryScreen(mMainActivity.applicationContext, null)
-            }
-            Screens.CHARACTER_SCREEN -> {
-                mState = GameState.STATS_SCREEN
-                view = CharacterScreen(mMainActivity.applicationContext)
-            }
-            Screens.MAP_SCREEN -> {
-                mState = GameState.MAP_SCREEN
-                view = MapScreen(mMainActivity.applicationContext)
-            }
-            Screens.GEAR_SCREEN -> {
-                lastScreen = Screens.GEAR_SCREEN
-                view = GearScreen(mMainActivity.applicationContext)
-            }
-            Screens.DETAILED_ITEM_SCREEN -> {
-                mState = GameState.DETAILED_ITEM_SCREEN
-                view = DetailedItemScreen(mMainActivity.applicationContext, selectedItem)
-            }
-            Screens.DEATH_SCREEN -> {
-                mState = GameState.DEATH_SCREEN
-                view = DeathScreen(mMainActivity.applicationContext)
-            }
-            Screens.MAIN_MENU -> {
-                mState = GameState.MAIN_MENU
-                view = Assets.mmview
-            }
-        }
+    fun changeScreen(screen: Screens) = mScreenController.changeScreen(screen)
 
-        // TODO: temporal solution
-        if (Assets.hero != null) {
-            Assets.hero!!.interruptAllActions()
-        }
-        mMainActivity.setContentView(view)
-        view.requestFocus()
-    }
+    fun changeToLastScreen() = mScreenController.changeToLastScreen()
 
-    fun changeToLastScreen() {
-        changeScreen(lastScreen)
-    }
-
-    fun showInventoryWithFilters(filter: InventoryFilterType) {
-        val inventoryScreen = InventoryScreen(mMainActivity.applicationContext, filter)
-        mMainActivity.setContentView(inventoryScreen)
-        inventoryScreen.requestFocus()
-    }
+    fun showInventoryWithFilters(filter: InventoryFilterType) = mScreenController.showInventoryWithFilters(filter)
 
     @JvmStatic
     fun exitGame() {
