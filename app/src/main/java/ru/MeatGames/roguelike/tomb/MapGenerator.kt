@@ -1,6 +1,7 @@
 package ru.MeatGames.roguelike.tomb
 
 import ru.MeatGames.roguelike.tomb.db.RoomDBClass
+import ru.MeatGames.roguelike.tomb.model.MapClass
 import ru.MeatGames.roguelike.tomb.model.RoomClass
 import ru.MeatGames.roguelike.tomb.util.MapHelper
 import java.util.*
@@ -168,15 +169,15 @@ class MapGenerator {
     }
 
     fun correctPlace(x: Int, y: Int): Boolean {
-        return GameController.mMap[x][y].isWall
-                &&!GameController.mMap[x][y - 1].isWall xor !GameController.mMap[x][y + 1].isWall xor (!GameController.mMap[x - 1][y].isWall xor !GameController.mMap[x + 1][y].isWall)
+        return MapHelper.isWall(x, y)
+                &&!MapHelper.isWall(x, y - 1) xor !MapHelper.isWall(x, y + 1) xor (!MapHelper.isWall(x - 1, y) xor !MapHelper.isWall(x + 1, y))
     }
 
     fun checkZone(n: Int, m: Int, ln: Int, lm: Int): Boolean {
-        if (n + ln > MapHelper.mapWidth - 3 || m + lm > MapHelper.mapHeight - 3 || n < 2 || m < 2) return false
+        if (n + ln > MapHelper.mMapWidth - 3 || m + lm > MapHelper.mMapHeight - 3 || n < 2 || m < 2) return false
         for (n1 in n..n + ln + 1 - 1) {
             for (m1 in m..m + lm + 1 - 1) {
-                if (!GameController.mMap[n1][m1].isWall) return false
+                if (!MapHelper.isWall(n1, m1)) return false
             }
         }
         return true
@@ -185,7 +186,7 @@ class MapGenerator {
     fun deleteObjects(startMapX: Int, startMapY: Int, width: Int, height: Int) {
         for (x1 in 0..width - 1) {
             for (y1 in 0..height - 1) {
-                if (!GameController.mMap[startMapX + x1][startMapY + y1].isWall) {
+                if (!MapHelper.isWall(startMapX + x1, startMapY + y1)) {
                     MapHelper.changeObject(startMapX + x1, startMapY + y1, 0)
                 }
             }
@@ -247,17 +248,19 @@ class MapGenerator {
         rc = 0
         var lx: Int
         var ly: Int
-        MapHelper.fillArea(0, 0, MapHelper.mapWidth, MapHelper.mapHeight, 4001)
+        MapHelper.fillArea(0, 0, MapHelper.mMapWidth, MapHelper.mMapHeight, 4001)
 
         for (i in 0..rc - 1) {
             room1[i] = null
         }
 
-        for (x in 0..MapHelper.mapWidth - 1) {
-            for (y in 0..MapHelper.mapHeight - 1) {
-                GameController.mMap[x][y].deleteItems()
-                GameController.mMap[x][y].mIsDiscovered = false
-                GameController.mMap[x][y].mCurrentlyVisible = false
+        var mapTile: MapClass
+        for (x in 0..MapHelper.mMapWidth - 1) {
+            for (y in 0..MapHelper.mMapHeight - 1) {
+                mapTile = MapHelper.getMapTile(x, y) as MapClass
+                mapTile.deleteItems()
+                mapTile.mIsDiscovered = false
+                mapTile.mCurrentlyVisible = false
             }
         }
 
@@ -273,8 +276,8 @@ class MapGenerator {
         var down: Boolean
         var left: Boolean
         var right: Boolean
-        lx = rnd.nextInt(MapHelper.mapWidth / 2) + 16
-        ly = rnd.nextInt(MapHelper.mapHeight / 2) + 16
+        lx = rnd.nextInt(MapHelper.mMapWidth / 2) + 16
+        ly = rnd.nextInt(MapHelper.mMapHeight / 2) + 16
         Assets.mapview.camx = lx - 2
         Assets.mapview.camy = ly - 2
         GameController.mHero.mx = lx + 2
@@ -289,10 +292,10 @@ class MapGenerator {
 
         while (rc < mr - 1) {
             if (findCell()) {
-                right = GameController.mMap[z - 1][z1].mIsPassable
-                left = GameController.mMap[z + 1][z1].mIsPassable
-                down = GameController.mMap[z][z1 - 1].mIsPassable
-                up = GameController.mMap[z][z1 + 1].mIsPassable
+                right = MapHelper.getMapTile(z - 1, z1)!!.mIsPassable
+                left = MapHelper.getMapTile(z + 1, z1)!!.mIsPassable
+                down = MapHelper.getMapTile(z, z1 - 1)!!.mIsPassable
+                up = MapHelper.getMapTile(z, z1 + 1)!!.mIsPassable
 
                 if (right xor left xor (down xor up)) {
                     var n = 0
@@ -502,14 +505,14 @@ class MapGenerator {
                         if (x2 < xl) xl = x2 - 1
                         if (x2 + lx > xr) xr = x2 + lx + 1
                         if (xl < 2) xl = 2
-                        if (xr > MapHelper.mapWidth - 2) {
-                            xr = MapHelper.mapWidth - 2
+                        if (xr > MapHelper.mMapWidth - 2) {
+                            xr = MapHelper.mMapWidth - 2
                         }
                         if (y2 < yl) yl = y2 - 1
                         if (y2 + ly > yr) yr = y2 + ly + 1
                         if (yl < 2) yl = 2
-                        if (yr > MapHelper.mapHeight - 2) {
-                            yr = MapHelper.mapHeight - 2
+                        if (yr > MapHelper.mMapHeight - 2) {
+                            yr = MapHelper.mMapHeight - 2
                         }
 
                         room1[rc] = RoomDBClass(x2, y2, lx, ly)
@@ -517,30 +520,30 @@ class MapGenerator {
                             if (up) {
                                 val r = getRoom(z, z1 + 1)
                                 for (x in 0..lx - 1)
-                                    if (getRoom(x2 + x, z1 + 1) == r && !GameController.mMap[x2 + x][z1 + 1].isWall && !GameController.mMap[x2 + x][z1 - 1].isWall)
-                                        if (GameController.mMap[x2 + x][z1 + 1].mFloorID == GameController.mMap[x2 + x][z1 - 1].mFloorID)
-                                            MapHelper.fillArea(x2 + x, z1, 1, 1, GameController.mMap[x2 + x][z1 + 1].mFloorID, 0)
+                                    if (getRoom(x2 + x, z1 + 1) == r && !MapHelper.isWall(x2 + x, z1 + 1) && !MapHelper.isWall(x2 + x, z1 - 1))
+                                        if (MapHelper.getFloorId(x2 + x, z1 + 1) == MapHelper.getFloorId(x2 + x, z1 - 1))
+                                            MapHelper.changeObject(x2 + x, z1, 0)
                             }
                             if (down) {
                                 val r = getRoom(z, z1 - 1)
                                 for (x in 0..lx - 1)
-                                    if (getRoom(x2 + x, z1 - 1) == r && !GameController.mMap[x2 + x][z1 + 1].isWall && !GameController.mMap[x2 + x][z1 - 1].isWall)
-                                        if (GameController.mMap[x2 + x][z1 + 1].mFloorID == GameController.mMap[x2 + x][z1 - 1].mFloorID)
-                                            MapHelper.fillArea(x2 + x, z1, 1, 1, GameController.mMap[x2 + x][z1 + 1].mFloorID, 0)
+                                    if (getRoom(x2 + x, z1 - 1) == r && !MapHelper.isWall(x2 + x, z1 + 1) && !MapHelper.isWall(x2 + x, z1 - 1))
+                                        if (MapHelper.getFloorId(x2 + x, z1 + 1) == MapHelper.getFloorId(x2 + x, z1 - 1))
+                                            MapHelper.changeObject(x2 + x, z1, 0)
                             }
                             if (right) {
                                 val r = getRoom(z - 1, z1)
                                 for (y in 0..ly - 1)
-                                    if (getRoom(z - 1, y2 + y) == r && !GameController.mMap[z + 1][y2 + y].isWall && !GameController.mMap[z - 1][y2 + y].isWall)
-                                        if (GameController.mMap[z + 1][y2 + y].mFloorID == GameController.mMap[z - 1][y2 + y].mFloorID)
-                                            MapHelper.fillArea(z, y2 + y, 1, 1, GameController.mMap[z + 1][y2 + y].mFloorID, 0)
+                                    if (getRoom(z - 1, y2 + y) == r && !MapHelper.isWall(z + 1, y2 + y) && !MapHelper.isWall(z - 1, y2 + y))
+                                        if (MapHelper.getFloorId(z + 1, y2 + y) == MapHelper.getFloorId(z - 1, y2 + y))
+                                            MapHelper.changeObject(z, y2 + y, 0)
                             }
                             if (left) {
                                 val r = getRoom(z + 1, z1)
                                 for (y in 0..ly - 1)
-                                    if (getRoom(z + 1, y2 + y) == r && !GameController.mMap[z + 1][y2 + y].isWall && !GameController.mMap[z - 1][y2 + y].isWall)
-                                        if (GameController.mMap[z + 1][y2 + y].mFloorID == GameController.mMap[z - 1][y2 + y].mFloorID)
-                                            MapHelper.fillArea(z, y2 + y, 1, 1, GameController.mMap[z + 1][y2 + y].mFloorID, 0)
+                                    if (getRoom(z + 1, y2 + y) == r && !MapHelper.isWall(z + 1, y2 + y) && !MapHelper.isWall(z - 1, y2 + y))
+                                        if (MapHelper.getFloorId(z + 1, y2 + y) == MapHelper.getFloorId(z - 1, y2 + y))
+                                            MapHelper.changeObject(z, y2 + y, 0)
                             }
                         }
                     }
@@ -556,16 +559,20 @@ class MapGenerator {
         var x4: Int
         var y4: Int
         for (x in 0..30 + GameController.curLvls * 7 - 1) {
+
             do {
-                x4 = rnd.nextInt(MapHelper.mapWidth)
-                y4 = rnd.nextInt(MapHelper.mapHeight)
-            } while (!GameController.mMap[x4][y4].mIsPassable || GameController.mMap[x4][y4].mCurrentlyVisible || GameController.mMap[x4][y4].hasMob())
+                x4 = rnd.nextInt(MapHelper.mMapWidth)
+                y4 = rnd.nextInt(MapHelper.mMapHeight)
+            } while (!MapHelper.getMapTile(x4, y4)!!.mIsPassable
+                    || MapHelper.getMapTile(x4, y4)!!.mCurrentlyVisible
+                    || MapHelper.getMapTile(x4, y4)!!.hasMob())
+
             val en = rnd.nextInt(GameController.maxMobs - GameController.curLvls - 1) + GameController.curLvls
             if (en < 3 && rnd.nextInt(3) == 0) {
-                if (GameController.mMap[x4 - 1][y4].mIsPassable && !GameController.mMap[x4 - 1][y4].hasItem()) {
+                if (MapHelper.getMapTile(x4 - 1, y4)!!.mIsPassable && !MapHelper.getMapTile(x4 - 1, y4)!!.hasItem()) {
                     //GameController.createMob(x4 - 1, y4, en)
                 }
-                if (GameController.mMap[x4 + 1][y4].mIsPassable && !GameController.mMap[x4 + 1][y4].hasItem()) {
+                if (MapHelper.getMapTile(x4 + 1, y4)!!.mIsPassable && !MapHelper.getMapTile(x4 + 1, y4)!!.hasItem()) {
                     //GameController.createMob(x4 + 1, y4, en)
                 }
             }
@@ -574,10 +581,10 @@ class MapGenerator {
 
         if (GameController.curLvls < GameController.maxLvl - 1) {
             while (true) {
-                x4 = rnd.nextInt(MapHelper.mapWidth)
-                y4 = rnd.nextInt(MapHelper.mapHeight)
-                if (GameController.mMap[x4][y4].mObjectID == 0 && !GameController.mMap[x4][y4].mCurrentlyVisible) {
-                    GameController.mMap[x4][y4].mObjectID = 11
+                x4 = rnd.nextInt(MapHelper.mMapWidth)
+                y4 = rnd.nextInt(MapHelper.mMapHeight)
+                if (MapHelper.getObjectId(x4, y4)!! == 0 && !MapHelper.getMapTile(x4, y4)!!.mCurrentlyVisible) {
+                    MapHelper.changeObject(x4, y4, 11)
                     m = x4 - 2
                     n = y4 - 2
                     break
@@ -599,10 +606,10 @@ class MapGenerator {
         newZone(lx, ly, n)
         while (true) {
             if (findCell()) {
-                right = GameController.mMap[z - 1][z1].mIsPassable
-                left = GameController.mMap[z + 1][z1].mIsPassable
-                down = GameController.mMap[z][z1 - 1].mIsPassable
-                up = GameController.mMap[z][z1 + 1].mIsPassable
+                right = MapHelper.getMapTile(z - 1, z1)!!.mIsPassable
+                left = MapHelper.getMapTile(z + 1, z1)!!.mIsPassable
+                down = MapHelper.getMapTile(z, z1 - 1)!!.mIsPassable
+                up = MapHelper.getMapTile(z, z1 + 1)!!.mIsPassable
                 if (right xor left xor (down xor up)) {
                     if (up) {
                         y2 = z1 - ly

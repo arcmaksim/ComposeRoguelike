@@ -7,31 +7,37 @@ import ru.MeatGames.roguelike.tomb.model.MapClass
 
 object MapHelper {
 
-    var mapWidth: Int = 0
-    var mapHeight: Int = 0
+    var mMapWidth: Int = 0
+    var mMapHeight: Int = 0
+
+    @JvmStatic
+    fun init(mapWidth: Int, mapHeight: Int) {
+        mMapWidth = mapWidth
+        mMapHeight = mapHeight
+    }
 
     @JvmStatic
     fun left(coordX: Int) = coordX > -1
 
     @JvmStatic
-    fun right(coordX: Int) = coordX < mapWidth
+    fun right(coordX: Int) = coordX < mMapWidth
 
     @JvmStatic
     fun top(coordY: Int) = coordY > -1
 
     @JvmStatic
-    fun bottom(coordY: Int) = coordY < mapHeight
+    fun bottom(coordY: Int) = coordY < mMapHeight
 
     @JvmStatic
-    fun horizontal(coordX: Int) = coordX > -1 && coordX < mapWidth
+    fun horizontal(coordX: Int) = coordX > -1 && coordX < mMapWidth
 
     @JvmStatic
-    fun vertical(coordY: Int) = coordY > -1 && coordY < mapHeight
+    fun vertical(coordY: Int) = coordY > -1 && coordY < mMapHeight
 
     @JvmStatic
-    fun getMapCell(coordX: Int, coordY: Int): MapClass? {
+    fun getMapTile(coordX: Int, coordY: Int): MapClass? {
         if (horizontal(coordX) && vertical(coordY)) {
-            return GameController.mMap[coordX][coordY]
+            return GameController.getMap()[coordX][coordY]
         } else {
             return null
         }
@@ -58,17 +64,19 @@ object MapHelper {
 
     @JvmStatic
     fun changeTile(mapX: Int, mapY: Int, floorId: Int, objectId: Int) {
-        GameController.mMap[mapX][mapY].mFloorID = floorId
+        GameController.getMap()[mapX][mapY].mFloorID = floorId
         changeObject(mapX, mapY, objectId)
     }
 
     @JvmStatic
     fun changeObject(mapX: Int, mapY: Int, objectId: Int) {
-        GameController.mMap[mapX][mapY].mObjectID = objectId
+        val map = GameController.getMap()
 
-        GameController.mMap[mapX][mapY].mIsPassable = Assets.objects[objectId].mIsPassable
-        GameController.mMap[mapX][mapY].mIsTransparent = Assets.objects[objectId].mIsTransparent
-        GameController.mMap[mapX][mapY].mIsUsable = Assets.objects[objectId].mIsUsable
+        map[mapX][mapY].mObjectID = objectId
+
+        map[mapX][mapY].mIsPassable = Assets.objects[objectId].mIsPassable
+        map[mapX][mapY].mIsTransparent = Assets.objects[objectId].mIsTransparent
+        map[mapX][mapY].mIsUsable = Assets.objects[objectId].mIsUsable
     }
 
     @JvmStatic
@@ -81,18 +89,21 @@ object MapHelper {
     }
 
     @JvmStatic
-    fun getFloorId(mapX: Int, mapY: Int) = GameController.mMap[mapX][mapY].mFloorID
+    fun getFloorId(mapX: Int, mapY: Int) = GameController.getMap()[mapX][mapY].mFloorID
 
     @JvmStatic
-    fun getObjectId(mapX: Int, mapY: Int) = GameController.mMap[mapX][mapY].mObjectID
+    fun getObjectId(mapX: Int, mapY: Int) = GameController.getMap()[mapX][mapY].mObjectID
 
     @JvmStatic
     fun getItem(mapX: Int, mapY: Int): Item? {
-        if (GameController.mMap[mapX][mapY].mItems.size != 0) {
-            return GameController.mMap[mapX][mapY].mItems[0]
+        if (GameController.getMap()[mapX][mapY].mItems.size != 0) {
+            return GameController.getMap()[mapX][mapY].mItems[0]
         } else {
             return null
         }
     }
+
+    @JvmStatic
+    fun isWall(mapX: Int, mapY: Int) = (horizontal(mapX) && vertical(mapY) && GameController.getMap()[mapX][mapY].isWall)
 
 }

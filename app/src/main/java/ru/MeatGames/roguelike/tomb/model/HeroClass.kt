@@ -2,6 +2,7 @@ package ru.MeatGames.roguelike.tomb.model
 
 import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.GameController
+import ru.MeatGames.roguelike.tomb.util.MapHelper
 import java.util.*
 
 class HeroClass {
@@ -123,7 +124,7 @@ class HeroClass {
             takeOffItem(item)
         }
         mInventory!!.remove(item)
-        GameController.mMap[mx][my].addItem(item)
+        MapHelper.getMapTile(mx, my)!!.addItem(item)
         Assets.mapview.addLine(item.mTitle + " выброшен" + item.mTitleEnding)
         GameController.skipTurn()
     }

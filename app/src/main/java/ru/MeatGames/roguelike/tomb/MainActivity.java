@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         MobList temp = new MobList(t);
         temp.x = x;
         temp.y = y;
-        GameController.mMap[x][y].addMob(temp);
+        GameController.getMap()[x][y].addMob(temp);
         addInQueue(temp);
     }
 

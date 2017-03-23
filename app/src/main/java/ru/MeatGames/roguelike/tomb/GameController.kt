@@ -19,12 +19,9 @@ object GameController {
     private lateinit var mVibrator: Vibrator
 
     private lateinit var mScreenController: ScreenController
+    private lateinit var mMapController: MapController
 
     lateinit var mHero: HeroClass
-
-    private var mMapWidth: Int = 96
-    private var mMapHeight: Int = 96
-    lateinit var mMap: Array<Array<MapClass>>
 
     var mIsPlayerTurn = true
     var mIsPlayerMoved = false
@@ -56,6 +53,7 @@ object GameController {
 
     private fun init() {
         mScreenController = ScreenController(mMainActivity)
+        mMapController = MapController()
         zone = array2d(11, 11) { 0 }
     }
 
@@ -82,11 +80,10 @@ object GameController {
     }
 
     @JvmStatic
-    fun generateNewMap() {
-        MapHelper.mapWidth = mMapWidth
-        MapHelper.mapHeight = mMapHeight
-        mMap = array2d(mMapWidth, mMapHeight) { MapClass() }
-    }
+    fun getMap(): Array<Array<MapClass>> = mMapController.getMap()
+
+    @JvmStatic
+    fun generateNewMap() = mMapController.generateNewMap()
 
     fun changeScreen(screen: Screens) = mScreenController.changeScreen(screen)
 
@@ -129,7 +126,7 @@ object GameController {
 
     fun createItem(x4: Int, y4: Int) {
         val item = createItem()
-        mMap[x4][y4].addItem(item)
+        mMapController.getMap()[x4][y4].addItem(item)
     }
 
     fun skipTurn() {
@@ -142,8 +139,8 @@ object GameController {
         for (i in i1 - 1..i1 + 2 - 1)
             for (j in j1 - 1..j1 + 2 - 1)
                 if (zone[i][j] == zoneDefaultValue
-                        && mMap[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].mIsPassable
-                        && !mMap[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].hasMob())
+                        && mMapController.getMap()[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].mIsPassable
+                        && !mMapController.getMap()[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].hasMob())
                     zone[i][j] = c
     }
 
@@ -162,12 +159,12 @@ object GameController {
         val yr: Int
         xl = if (Assets.mapview.camx - 1 < 1) 1 else Assets.mapview.camx - 1
         yl = if (Assets.mapview.camy - 1 < 1) 1 else Assets.mapview.camy - 1
-        xr = if (Assets.mapview.camx + 10 > MapHelper.mapWidth - 2)
-            MapHelper.mapHeight - 2
+        xr = if (Assets.mapview.camx + 10 > MapHelper.mMapWidth - 2)
+            MapHelper.mMapHeight - 2
         else
             Assets.mapview.camx + 10
-        yr = if (Assets.mapview.camy + 10 > MapHelper.mapWidth - 2)
-            MapHelper.mapHeight - 2
+        yr = if (Assets.mapview.camy + 10 > MapHelper.mMapWidth - 2)
+            MapHelper.mMapHeight - 2
         else
             Assets.mapview.camy + 10
         for (c in 0..4)
@@ -178,7 +175,7 @@ object GameController {
     }
 
     fun isCollision(mx: Int, my: Int) {
-        val mapCell = MapHelper.getMapCell(mx, my)
+        val mapCell = MapHelper.getMapTile(mx, my)
         if (mapCell != null) {
             if (mapCell.mIsUsable) {
                 when (MapHelper.getObjectId(mx, my)) {
@@ -241,8 +238,8 @@ object GameController {
                 var x4: Int
                 var y4: Int
                 do {
-                    x4 = random.nextInt(MapHelper.mapWidth)
-                    y4 = random.nextInt(MapHelper.mapHeight)
+                    x4 = random.nextInt(MapHelper.mMapWidth)
+                    y4 = random.nextInt(MapHelper.mMapHeight)
                 } while (!Assets.map!![x4][y4].mIsPassable || Assets.map!![x4][y4].mCurrentlyVisible || Assets.map!![x4][y4].hasMob())
                 val en = random.nextInt(Assets.getGame().maxMobs - curLvls - 1) + curLvls
                 if (en < 3 && random.nextInt(3) == 0) {
@@ -273,11 +270,11 @@ object GameController {
         Assets.mapview.calculateLineOfSight(mHero.mx, mHero.my)
         if (mx == 1) mHero.mIsFacingLeft = false
         if (mx == -1) mHero.mIsFacingLeft = true
-        if ((mx != 0 || my != 0) && mMap[mHero.mx][mHero.my].hasItem()) {
-            if (mMap[mHero.mx][mHero.my].mItems.size > 1) {
+        if ((mx != 0 || my != 0) && mMapController.getMap()[mHero.mx][mHero.my].hasItem()) {
+            if (mMapController.getMap()[mHero.mx][mHero.my].mItems.size > 1) {
                 Assets.mapview.addLine(mMainActivity.getString(R.string.several_items_lying_on_the_ground_message))
             } else {
-                Assets.mapview.addLine(mMap[mHero.mx][mHero.my].mItems[0].mTitle
+                Assets.mapview.addLine(mMapController.getMap()[mHero.mx][mHero.my].mItems[0].mTitle
                         + mMainActivity.getString(R.string.lying_on_the_ground_message))
             }
         }

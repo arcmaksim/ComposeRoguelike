@@ -108,7 +108,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         for (bufferX in 0..mMapBufferWidth - 1) {
             for (bufferY in 0..mMapBufferHeight - 1) {
 
-                MapHelper.getMapCell(bufferX + camx - 1, bufferY + camy - 1)?.let {
+                MapHelper.getMapTile(bufferX + camx - 1, bufferY + camy - 1)?.let {
 
                     mMapBuffer[bufferX][bufferY].mIsVisible = it.mCurrentlyVisible
 
@@ -277,21 +277,21 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 currentMapBufferCell = mMapBuffer[cx + 1][cy + 1]
 
                 if (currentMapBufferCell.mIsVisible) {
-                    canvas.drawBitmap(GameController.mMap[x][y].floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
 
                     if (currentMapBufferCell.mWallBitmap != -1) {
                         canvas.drawBitmap(Assets.walls[currentMapBufferCell.mWallBitmap], currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     } else {
-                        canvas.drawBitmap(GameController.mMap[x][y].objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
                     if (currentMapBufferCell.mHasItem) {
-                        canvas.drawBitmap(GameController.mMap[x][y].itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
                     //if (currentMapBufferCell.mHasEnemy) {
-                    if (GameController.mMap[x][y].hasMob()) {
-                        canvas.drawBitmap(GameController.mMap[x][y].mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    if (MapHelper.getMapTile(x, y)!!.hasMob()) {
+                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
                     }
 
                     currentMapBufferCell.mShadowPaint?.let {
@@ -481,7 +481,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         x = xstart
         y = ystart
         err = el / 2
-        GameController.mMap[x][y].mCurrentlyVisible = true
+        MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = true
         for (t in 0..el - 1) {
             err -= es
             if (err < 0) {
@@ -493,13 +493,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 y += pdy
             }
             if (MapHelper.horizontal(x) && MapHelper.vertical(y)) {
-                if (!GameController.mMap[x][y].mCurrentlyVisible) {
-                    GameController.mMap[x][y].mCurrentlyVisible = v
+                if (!MapHelper.getMapTile(x, y)!!.mCurrentlyVisible) {
+                    MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = v
                 }
                 if (v) {
-                    GameController.mMap[x][y].mIsDiscovered = true
+                    MapHelper.getMapTile(x, y)!!.mIsDiscovered = true
                 }
-                if (!GameController.mMap[x][y].mIsTransparent) {
+                if (!MapHelper.getMapTile(x, y)!!.mIsTransparent) {
                     v = false
                 }
             }
@@ -509,12 +509,12 @@ class GameScreen(context: Context) : BasicScreen(context) {
     fun calculateLineOfSight(x: Int, y: Int) {
         val cm = if (camx < 0) 0 else camx
         val cm1 = if (camy < 0) 0 else camy
-        for (c in cm..(if (cm + 9 >= MapHelper.mapWidth) MapHelper.mapWidth else cm + 9) - 1)
-            for (c1 in cm1..(if (cm1 + 9 >= MapHelper.mapWidth) MapHelper.mapWidth else cm1 + 9) - 1)
-                GameController.mMap[c][c1].mCurrentlyVisible = false
+        for (c in cm..(if (cm + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm + 9) - 1)
+            for (c1 in cm1..(if (cm1 + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm1 + 9) - 1)
+                MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = false
         for (c in x - 1..x + 2 - 1)
             for (c1 in y - 1..y + 2 - 1)
-                GameController.mMap[c][c1].mCurrentlyVisible = true
+                MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = true
         for (c in -1..1) {
             line(x, y, x + c, y - 4)
             line(x, y, x + c, y + 4)

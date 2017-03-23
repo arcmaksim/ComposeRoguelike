@@ -42,15 +42,16 @@ class MapScreen(context: Context) : BasicScreen(context) {
                 mScreenWidth,
                 mScreenHeight)
 
-        mMarkerSize = (mScreenWidth / MapHelper.mapWidth).toFloat()
+        mMarkerSize = (mScreenWidth / MapHelper.mMapWidth).toFloat()
     }
 
     override fun drawScreen(canvas: Canvas?) {
         drawBackground(canvas!!)
-        for (x in 0..MapHelper.mapWidth - 1)
-            for (y in 0..MapHelper.mapHeight - 1) {
-                if (GameController.mMap[x][y].mIsDiscovered) {
-                    when (GameController.mMap[x][y].mObjectID) {
+
+        for (x in 0..MapHelper.mMapWidth - 1)
+            for (y in 0..MapHelper.mMapHeight - 1) {
+                if (MapHelper.getMapTile(x, y)!!.mIsDiscovered) {
+                    when (MapHelper.getMapTile(x ,y)!!.mObjectID) {
                         0 -> canvas.drawRect(x * mMarkerSize,
                                 (y + 1) * mMarkerSize,
                                 (x + 1) * mMarkerSize,
