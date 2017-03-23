@@ -18,28 +18,15 @@ public class MainActivity extends Activity {
     }
 
     public void onBackPressed() {
-        if (!Assets.INSTANCE.getMapview().getMDrawProgressBar()) {
+        /*if (!Assets.INSTANCE.getMapview().getMDrawProgressBar()) {
             GameController.mHero.interruptAllActions();
             Assets.INSTANCE.getMapview().setMDrawExitDialog(!Assets.INSTANCE.getMapview().getMDrawExitDialog());
-        }
+        }*/
+        GameController.showExitDialog();
     }
 
     public void exitGame() {
         finish();
-    }
-
-    public void newGame() {
-        /*Assets.initInitialData();
-        Assets.newHero();*/
-        generateNewMap();
-        Assets.INSTANCE.getMapview().clearLog();
-        //newGameLoop();
-        //changeScreen(Screens.GAME_SCREEN);
-    }
-
-    public void generateNewMap() {
-        MapGenerator mapGenerator = new MapGenerator();
-        mapGenerator.generateMap();
     }
 
     public void createMob(int x, int y, int t) {
@@ -103,10 +90,10 @@ public class MainActivity extends Activity {
             boolean u, d, l, r;
             u = d = l = r = false;
             for (int c = -1; c < 2; c++) {
-                if (zone[x + c][y - 1] == a) u = true;
-                if (zone[x + c][y + 1] == a) d = true;
-                if (zone[x - 1][y + c] == a) l = true;
-                if (zone[x + 1][y + c] == a) r = true;
+                if (currentRoom[x + c][y - 1] == a) u = true;
+                if (currentRoom[x + c][y + 1] == a) d = true;
+                if (currentRoom[x - 1][y + c] == a) l = true;
+                if (currentRoom[x + 1][y + c] == a) r = true;
             }
             if (l ^ r) {
                 if (l) x4 = -1;
@@ -137,8 +124,8 @@ public class MainActivity extends Activity {
         int a = defValue;
         for (int x1 = -1; x1 < 2; x1++)
             for (int y1 = -1; y1 < 2; y1++)
-                if (zone[mob.x - Assets.INSTANCE.getHero().getMx() + 5 + x1][mob.y - Assets.INSTANCE.getHero().getMy() + 5 + y1] < a)
-                    a = zone[mob.x - Assets.INSTANCE.getHero().getMx() + 5 + x1][mob.y - Assets.INSTANCE.getHero().getMy() + 5 + y1];
+                if (currentRoom[mob.x - Assets.INSTANCE.getHero().getMx() + 5 + x1][mob.y - Assets.INSTANCE.getHero().getMy() + 5 + y1] < a)
+                    a = currentRoom[mob.x - Assets.INSTANCE.getHero().getMx() + 5 + x1][mob.y - Assets.INSTANCE.getHero().getMy() + 5 + y1];
         return a;
     }*/
 

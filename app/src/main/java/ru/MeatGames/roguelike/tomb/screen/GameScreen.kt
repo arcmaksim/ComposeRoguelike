@@ -424,7 +424,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         when (result) {
             4 -> {
                 MapHelper.changeAreaObjects(GameController.mHero.mx + mx, GameController.mHero.my + my, 1, 1, 6)
-                Assets.mapview.addLine(context.getString(R.string.search_chest_message))
+                GameController.updateLog(context.getString(R.string.search_chest_message))
                 GameController.createItem(GameController.mHero.mx + mx, GameController.mHero.my + my)
             }
             7 -> {
@@ -556,7 +556,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 if (MapHelper.getObjectId(x, y) == 11) {
                     GameController.curLvls++
                     GameController.generateNewMap()
-                    Assets.mapview.updateMapBuffer()
+                    GameController.updateMapBuffer()
                     GameController.skipTurn()
                 }
                 MapHelper.getItem(GameController.mHero.mx, GameController.mHero.my)?.let {
@@ -588,14 +588,14 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 } else {
                     if (mIsLongPress) {
                         if (GameController.mHero.isFullyHealed()) {
-                            Assets.mapview.addLine("Герой полностью здоров")
+                            GameController.updateLog("Герой полностью здоров")
                         } else {
                             GameController.mHero.startResting()
                             GameController.skipTurn()
                         }
                         GameController.vibrate()
                     } else {
-                        Assets.mapview.addLine(context.getString(R.string.turn_passed_message))
+                        GameController.updateLog(context.getString(R.string.turn_passed_message))
                         GameController.skipTurn()
                     }
                 }

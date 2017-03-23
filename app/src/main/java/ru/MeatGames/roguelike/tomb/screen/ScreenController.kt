@@ -1,23 +1,34 @@
 package ru.MeatGames.roguelike.tomb.screen
 
 import android.view.View
-import ru.MeatGames.roguelike.tomb.*
+import ru.MeatGames.roguelike.tomb.GameController
+import ru.MeatGames.roguelike.tomb.GameState
+import ru.MeatGames.roguelike.tomb.InventoryFilterType
+import ru.MeatGames.roguelike.tomb.MainActivity
 
 class ScreenController {
 
     private var mMainActivity: MainActivity
 
-    lateinit var mapview: GameScreen
-    lateinit var mmview: MainMenu
+    lateinit var mGameScreen: GameScreen
+    lateinit var mMainMenuScreen: MainMenu
 
     private lateinit var lastScreen: Screens
 
     constructor(mainActivity: MainActivity) {
         mMainActivity = mainActivity
+
+        init()
     }
 
-    init {
+    private fun init() {
+        mMainMenuScreen = MainMenu(mMainActivity)
+        mGameScreen = GameScreen(mMainActivity)
+    }
 
+    fun initGameScreen(camX: Int, camY: Int) {
+        mGameScreen.camx = camX
+        mGameScreen.camy = camY
     }
 
     fun changeScreen(screen: Screens) {
@@ -25,7 +36,7 @@ class ScreenController {
         when (screen) {
             Screens.GAME_SCREEN -> {
                 GameController.setState(GameState.MAIN_GAME)
-                view = Assets.mapview
+                view = mGameScreen
                 view.updateMapBuffer()
             }
             Screens.INVENTORY_SCREEN -> {
@@ -56,7 +67,7 @@ class ScreenController {
             }
             Screens.MAIN_MENU -> {
                 GameController.setState(GameState.MAIN_MENU)
-                view = Assets.mmview
+                view = mMainMenuScreen
             }
         }
 
@@ -66,9 +77,7 @@ class ScreenController {
         view.requestFocus()
     }
 
-    fun changeToLastScreen() {
-        changeScreen(lastScreen)
-    }
+    fun changeToLastScreen() = changeScreen(lastScreen)
 
     fun showInventoryWithFilters(filter: InventoryFilterType) {
         val inventoryScreen = InventoryScreen(mMainActivity, filter)

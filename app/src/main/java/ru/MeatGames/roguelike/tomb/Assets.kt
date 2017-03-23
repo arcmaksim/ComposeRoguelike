@@ -3,8 +3,6 @@ package ru.MeatGames.roguelike.tomb
 import android.graphics.Bitmap
 import org.xmlpull.v1.XmlPullParser
 import ru.MeatGames.roguelike.tomb.db.*
-import ru.MeatGames.roguelike.tomb.screen.GameScreen
-import ru.MeatGames.roguelike.tomb.screen.MainMenu
 import ru.MeatGames.roguelike.tomb.util.AssetHelper
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 
@@ -12,10 +10,6 @@ object Assets {
 
     private lateinit var mMainActivity: MainActivity
 
-    lateinit var mapview: GameScreen
-    lateinit var mmview: MainMenu
-
-    // temporary most of the tiles is null, use carefully
     lateinit var tiles: Array<TileDB>
     lateinit var objects: Array<ObjectDB> // 0 element is opaque
     lateinit var itemDB: Array<ItemDB>
@@ -55,8 +49,6 @@ object Assets {
 
     private fun init() {
         mAssetHelper = AssetHelper(mMainActivity.assets)
-
-        mmview = MainMenu(mMainActivity)
     }
 
     private fun calculateTileSize() {

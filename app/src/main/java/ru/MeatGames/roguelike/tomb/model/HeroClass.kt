@@ -88,27 +88,27 @@ class HeroClass {
             modifyStat(20, getStat(21), -1)
             modifyStat(21, getStat(21), 1)
             modifyStat(31, 1, 1)
-            Assets.mapview.addLine("Уровень повышен!")
+            GameController.updateLog("Уровень повышен!")
             val healthIncreaseAmount = Random().nextInt(3) + 2
             modifyStat(6, healthIncreaseAmount, 1)
             modifyStat(5, healthIncreaseAmount, 1)
-            Assets.mapview.addLine("Здоровье увеличено")
+            GameController.updateLog("Здоровье увеличено")
             if (getStat(31) % 4 == 0) {
                 modifyStat(12, 1, 1)
-                Assets.mapview.addLine("Минимальный урон увеличен")
+                GameController.updateLog("Минимальный урон увеличен")
             }
             if (getStat(31) % 5 == 0) {
                 regen--
                 if (regen < cregen) cregen = regen
-                Assets.mapview.addLine("Скорость регенерации увеличена")
+                GameController.updateLog("Скорость регенерации увеличена")
             }
             if (getStat(31) % 2 == 0) {
                 modifyStat(13, 1, 1)
-                Assets.mapview.addLine("Максиммальный урон увеличен")
+                GameController.updateLog("Максиммальный урон увеличен")
             }
             if (getStat(31) % 3 == 0) {
                 modifyStat(19, 1, 1)
-                Assets.mapview.addLine("Защита увеличена")
+                GameController.updateLog("Защита увеличена")
             }
         }
     }
@@ -125,7 +125,7 @@ class HeroClass {
         }
         mInventory!!.remove(item)
         MapHelper.getMapTile(mx, my)!!.addItem(item)
-        Assets.mapview.addLine(item.mTitle + " выброшен" + item.mTitleEnding)
+        GameController.updateLog(item.mTitle + " выброшен" + item.mTitleEnding)
         GameController.skipTurn()
     }
 
@@ -178,7 +178,7 @@ class HeroClass {
                 modifyStat(22, item.mValue2, 1)
             }
         }
-        Assets.mapview.addLine(item.mTitle + " надет" + item.mTitleEnding)
+        GameController.updateLog(item.mTitle + " надет" + item.mTitleEnding)
         GameController.skipTurn()
     }
 
@@ -199,7 +199,7 @@ class HeroClass {
             }
         }
         GameController.mHero.equipmentList[item.mType - 1] = null
-        Assets.mapview.addLine(item.mTitle + " снят" + item.mTitleEnding)
+        GameController.updateLog(item.mTitle + " снят" + item.mTitleEnding)
         GameController.skipTurn()
     }
 
@@ -210,7 +210,7 @@ class HeroClass {
     fun startResting(loudBroadcast: Boolean = true) {
         mIsResting = true
         if (loudBroadcast) {
-            Assets.mapview.addLine("Отдых начат")
+            GameController.updateLog("Отдых начат")
         }
     }
 
@@ -219,7 +219,7 @@ class HeroClass {
         if (mIsResting) {
             mIsResting = false
             if (loudBroadcast) {
-                Assets.mapview.addLine("Отдых прерван!")
+                GameController.updateLog("Отдых прерван!")
             }
         }
     }
@@ -229,7 +229,7 @@ class HeroClass {
         if (mIsResting) {
             mIsResting = false
             if (loudBroadcast) {
-                Assets.mapview.addLine("Отдых завершен!")
+                GameController.updateLog("Отдых завершен!")
             }
         }
     }
@@ -239,8 +239,6 @@ class HeroClass {
 
     // used for proper handling all ongoing hero actions
     // for example when changing screens
-    fun interruptAllActions() {
-        interruptResting(false)
-    }
+    fun interruptAllActions() = interruptResting(false)
 
 }

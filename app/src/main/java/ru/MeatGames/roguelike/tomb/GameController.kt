@@ -72,11 +72,30 @@ object GameController {
     @JvmStatic
     fun vibrate(vibratePeriod: Long = 30L) = mVibrator.vibrate(vibratePeriod)
 
+    fun updateLOS(x: Int = mHero.mx, y: Int = mHero.my) = mScreenController.mGameScreen.calculateLineOfSight(x, y)
+
+    fun updateLog(message: String) = mScreenController.mGameScreen.addLine(message)
+
+    fun updateMapBuffer() = mScreenController.mGameScreen.updateMapBuffer()
+
+    @JvmStatic
+    fun showExitDialog() {
+        mScreenController.mGameScreen.mDrawExitDialog = true
+    }
+
     @JvmStatic
     fun startNewGame() {
         mHero = HeroClass()
         generateNewMap()
         changeScreen(Screens.GAME_SCREEN)
+        mMainGameThread!!.start()
+    }
+
+    @JvmStatic
+    fun initNewGame(mapX: Int, mapY: Int) {
+        mScreenController.initGameScreen(mapX - 2, mapY - 2)
+        mHero.mx = mapX + 2
+        mHero.my = mapY + 2
     }
 
     @JvmStatic
@@ -92,9 +111,7 @@ object GameController {
     fun showInventoryWithFilters(filter: InventoryFilterType) = mScreenController.showInventoryWithFilters(filter)
 
     @JvmStatic
-    fun exitGame() {
-        mMainActivity.exitGame()
-    }
+    fun exitGame() = mMainActivity.exitGame()
 
     @JvmStatic
     fun createItem(): Item {
@@ -139,8 +156,8 @@ object GameController {
         for (i in i1 - 1..i1 + 2 - 1)
             for (j in j1 - 1..j1 + 2 - 1)
                 if (zone[i][j] == zoneDefaultValue
-                        && mMapController.getMap()[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].mIsPassable
-                        && !mMapController.getMap()[Assets.mapview.camx - 1 + i][Assets.mapview.camy - 1 + j].hasMob())
+                        && mMapController.getMap()[mScreenController.mGameScreen.camx - 1 + i][mScreenController.mGameScreen.camy - 1 + j].mIsPassable
+                        && !mMapController.getMap()[mScreenController.mGameScreen.camx - 1 + i][mScreenController.mGameScreen.camy - 1 + j].hasMob())
                     zone[i][j] = c
     }
 
@@ -157,16 +174,16 @@ object GameController {
         val xr: Int
         val yl: Int
         val yr: Int
-        xl = if (Assets.mapview.camx - 1 < 1) 1 else Assets.mapview.camx - 1
-        yl = if (Assets.mapview.camy - 1 < 1) 1 else Assets.mapview.camy - 1
-        xr = if (Assets.mapview.camx + 10 > MapHelper.mMapWidth - 2)
+        xl = if (mScreenController.mGameScreen.camx - 1 < 1) 1 else mScreenController.mGameScreen.camx - 1
+        yl = if (mScreenController.mGameScreen.camy - 1 < 1) 1 else mScreenController.mGameScreen.camy - 1
+        xr = if (mScreenController.mGameScreen.camx + 10 > MapHelper.mMapWidth - 2)
             MapHelper.mMapHeight - 2
         else
-            Assets.mapview.camx + 10
-        yr = if (Assets.mapview.camy + 10 > MapHelper.mMapWidth - 2)
+            mScreenController.mGameScreen.camx + 10
+        yr = if (mScreenController.mGameScreen.camy + 10 > MapHelper.mMapWidth - 2)
             MapHelper.mMapHeight - 2
         else
-            Assets.mapview.camy + 10
+            mScreenController.mGameScreen.camy + 10
         for (c in 0..4)
             for (i in xl..xr - 1)
                 for (j in yl..yr - 1)
@@ -181,16 +198,16 @@ object GameController {
                 when (MapHelper.getObjectId(mx, my)) {
                     2 -> {
                         MapHelper.changeObject(mx, my, 3)
-                        Assets.mapview.addLine(mMainActivity.getString(R.string.door_opened_message))
+                        mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.door_opened_message))
                     }
                     4 -> {
                         MapHelper.changeObject(mx, my, 5)
-                        Assets.mapview.mDrawLog = false
-                        Assets.mapview.initProgressBar(4, 159)
+                        mScreenController.mGameScreen.mDrawLog = false
+                        mScreenController.mGameScreen.initProgressBar(4, 159)
                     }
                     7 -> {
-                        Assets.mapview.mDrawLog = false
-                        Assets.mapview.initProgressBar(7, 259)
+                        mScreenController.mGameScreen.mDrawLog = false
+                        mScreenController.mGameScreen.initProgressBar(7, 259)
                     }
                 }
                 mIsPlayerTurn = false
@@ -205,14 +222,14 @@ object GameController {
                 mIsPlayerMoved = true // ?
                 if (mapCell.mObjectID == 15) {
                     mHero.modifyStat(5, Random().nextInt(3) + 1, -1)
-                    Assets.mapview.addLine(mMainActivity.getString(R.string.trap_message))
+                    mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.trap_message))
                     if (mHero.getStat(5) < 1) {
                         lastAttack = Bitmap.createScaledBitmap(Assets.objects[15].img, 72, 72, false)
                         changeScreen(Screens.DEATH_SCREEN)
                     }
                 }
             } else {
-                Assets.mapview.addLine(mMainActivity.getString(R.string.path_is_blocked_message))
+                mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.path_is_blocked_message))
                 vibrate()
             }
         }
@@ -228,12 +245,12 @@ object GameController {
                 u = 1
             }
             map.mob.mob.mHealth = map.mob.mob.mHealth - u
-            Assets.mapview.addLine(map.mob.mob.name + getString(R.string.is_receiving_damage_message))
+            Assets.mGameScreen.addLine(map.mob.mob.name + getString(R.string.is_receiving_damage_message))
             if (map.mob.mob.mHealth < 1) {
-                Assets.mapview.addLine(map.mob.mob.name + getString(R.string.is_dying_message))
+                Assets.mGameScreen.addLine(map.mob.mob.name + getString(R.string.is_dying_message))
                 Assets.hero!!.modifyStat(20, map.mob.t, 1)
                 if (map.mob.t == maxMobs - 1)
-                    Assets.mapview.mDrawWinScreen = true
+                    Assets.mGameScreen.mDrawWinScreen = true
                 deleteMob(map)
                 var x4: Int
                 var y4: Int
@@ -251,35 +268,35 @@ object GameController {
                 Assets.getGame().createMob(x4, y4, en)
             }
         } else {
-            Assets.mapview.addLine(getString(R.string.attack_missed_message))
+            Assets.mGameScreen.addLine(getString(R.string.attack_missed_message))
         }
         mIsPlayerTurn = false*/
     }
 
     fun move(mx: Int, my: Int) {
         mHero.interruptResting()
-        Assets.mapview.mx = mx
-        Assets.mapview.my = my
+        mScreenController.mGameScreen.mx = mx
+        mScreenController.mGameScreen.my = my
         isCollision(mHero.mx + mx, mHero.my + my)
         if (mIsPlayerMoved) {
             mHero.mx = mHero.mx + mx
             mHero.my = mHero.my + my
-            Assets.mapview.camx = Assets.mapview.camx + mx
-            Assets.mapview.camy = Assets.mapview.camy + my
+            mScreenController.mGameScreen.camx = mScreenController.mGameScreen.camx + mx
+            mScreenController.mGameScreen.camy = mScreenController.mGameScreen.camy + my
         }
-        Assets.mapview.calculateLineOfSight(mHero.mx, mHero.my)
+        mScreenController.mGameScreen.calculateLineOfSight(mHero.mx, mHero.my)
         if (mx == 1) mHero.mIsFacingLeft = false
         if (mx == -1) mHero.mIsFacingLeft = true
         if ((mx != 0 || my != 0) && mMapController.getMap()[mHero.mx][mHero.my].hasItem()) {
             if (mMapController.getMap()[mHero.mx][mHero.my].mItems.size > 1) {
-                Assets.mapview.addLine(mMainActivity.getString(R.string.several_items_lying_on_the_ground_message))
+                mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.several_items_lying_on_the_ground_message))
             } else {
-                Assets.mapview.addLine(mMapController.getMap()[mHero.mx][mHero.my].mItems[0].mTitle
+                mScreenController.mGameScreen.addLine(mMapController.getMap()[mHero.mx][mHero.my].mItems[0].mTitle
                         + mMainActivity.getString(R.string.lying_on_the_ground_message))
             }
         }
         updateZone()
-        Assets.mapview.updateMapBuffer()
+        mScreenController.mGameScreen.updateMapBuffer()
     }
 
     fun deleteMob(map: MapClass) {
@@ -308,9 +325,9 @@ object GameController {
                 u = 1
             }
             Assets.hero!!.modifyStat(5, u, -1)
-            Assets.mapview.addLine(mob.mob.name + getString(R.string.is_dealing_damage_message))
+            Assets.mGameScreen.addLine(mob.mob.name + getString(R.string.is_dealing_damage_message))
         } else {
-            Assets.mapview.addLine(mob.mob.name + getString(R.string.is_missing_attack_message))
+            Assets.mGameScreen.addLine(mob.mob.name + getString(R.string.is_missing_attack_message))
         }
         if (Assets.hero!!.getStat(5) < 1) {
             Assets.hero!!.modifyStat(5, Assets.hero!!.getStat(5), -1)
@@ -328,8 +345,10 @@ object GameController {
     }
 
     fun newGameLoop() {
-        mMainGameLoop = MainGameLoop()
-        mMainGameThread = Thread(mMainGameLoop)
+        if (mMainGameLoop == null) {
+            mMainGameLoop = MainGameLoop()
+            mMainGameThread = Thread(mMainGameLoop)
+        }
         //(mMainGameThread as Thread).start()
     }
 

@@ -134,7 +134,7 @@ class DetailedItemScreen(context: Context,
         if (mLeftSoftButton.isPressed(sx, sy)) {
             if (mSelectedItem.isConsumable) {
                 GameController.mHero.modifyStat(mSelectedItem.mValue1, mSelectedItem.mValue2, 1)
-                Assets.mapview.addLine("${mSelectedItem.mTitle} использован${mSelectedItem.mTitleEnding}")
+                GameController.updateLog("${mSelectedItem.mTitle} использован${mSelectedItem.mTitleEnding}")
                 GameController.mHero.deleteItem(mSelectedItem)
             } else {
                 GameController.mHero.equipmentList[mSelectedItem.mType - 1]?.let {
