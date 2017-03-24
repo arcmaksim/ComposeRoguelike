@@ -52,7 +52,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     var mActionCount: Int = 0 // currently not used
 
-    val mTileSize = Assets.mOriginalTileSize
+    val mActualTileSize = Assets.mActualTileSize
+    val mOriginalTileSize = Assets.mOriginalTileSize
     val mScaleAmount = Assets.mScaleAmount
     val mBitmapPaint = Paint()
 
@@ -88,13 +89,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
         black = Paint()
         black.color = resources.getColor(R.color.black)
 
-        mHeroX = (mScreenWidth - Assets.mActualTileSize) / 2 / mScaleAmount
-        mHeroY = (mScreenHeight - Assets.mActualTileSize) / 2 / mScaleAmount
+        mHeroX = (mScreenWidth - mActualTileSize) / 2 / mScaleAmount
+        mHeroY = (mScreenHeight - mActualTileSize) / 2 / mScaleAmount
 
         mBitmapPaint.isFilterBitmap = false
 
-        mMapOffsetX = (mScreenWidth - Assets.mActualTileSize * 9) / 2 / mScaleAmount
-        mMapOffsetY = (mScreenHeight - Assets.mActualTileSize * 9) / 2 / mScaleAmount
+        mMapOffsetX = (mScreenWidth - mActualTileSize * 9) / 2 / mScaleAmount
+        mMapOffsetY = (mScreenHeight - mActualTileSize * 9) / 2 / mScaleAmount
     }
 
     fun initProgressBar(objectId: Int, duration: Int) {
@@ -264,13 +265,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         for (x in camx..camx + 9 - 1) {
             val cx = x - camx
-            val currentPixelXtoDraw = (mTileSize * cx + mMapOffsetX)
-            val leftDrawBorder = (mTileSize * (cx + 1) + mMapOffsetX)
+            val currentPixelXtoDraw = (mOriginalTileSize * cx + mMapOffsetX)
+            val leftDrawBorder = (mOriginalTileSize * (cx + 1) + mMapOffsetX)
 
             for (y in camy..camy + 9 - 1) {
                 val cy = y - camy
-                val currentPixelYtoDraw = (mTileSize * cy + mMapOffsetY)
-                val rightDrawBorder = (mTileSize * (cy + 1) + mMapOffsetY)
+                val currentPixelYtoDraw = (mOriginalTileSize * cy + mMapOffsetY)
+                val rightDrawBorder = (mOriginalTileSize * (cy + 1) + mMapOffsetY)
 
                 currentMapBufferCell = mMapBuffer[cx + 1][cy + 1]
 
@@ -389,21 +390,22 @@ class GameScreen(context: Context) : BasicScreen(context) {
             afterProgressBar(mObjectId)
             return
         }
-        val offsetX = mHeroX - mTileSize / mScaleAmount
+
+        val offsetX = mHeroX - mActualTileSize / mScaleAmount
         canvas.drawRect(offsetX,
-                mHeroY - mTileSize * 0.75F / mScaleAmount,
-                offsetX + mTileSize * 3 / mScaleAmount,
-                mHeroY - mTileSize * 0.25F / mScaleAmount,
+                mHeroY - mActualTileSize * 0.75F / mScaleAmount,
+                offsetX + mActualTileSize * 3 / mScaleAmount,
+                mHeroY - mActualTileSize * 0.25F / mScaleAmount,
                 mTextPaint)
         canvas.drawRect(offsetX,
-                mHeroY - mTileSize * 0.75F / mScaleAmount,
-                offsetX + (Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime) * (mTileSize * 3F / mProgressBarDuration) / mScaleAmount,
-                mHeroY - mTileSize * 0.25F / mScaleAmount,
+                mHeroY - mActualTileSize * 0.75F / mScaleAmount,
+                offsetX + (Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime) * (mActualTileSize * 3F / mProgressBarDuration) / mScaleAmount,
+                mHeroY - mActualTileSize * 0.25F / mScaleAmount,
                 mLightBluePaint)
 
         mTextPaint.textAlign = Paint.Align.CENTER
         mTextPaint.textSize /= mScaleAmount
-        canvas.drawText(context.getString(R.string.searching_label), mScreenWidth * 0.5F / mScaleAmount, mHeroY - mTileSize * 0.35F / mScaleAmount, mTextPaint)
+        canvas.drawText(context.getString(R.string.searching_label), mScreenWidth * 0.5F / mScaleAmount, mHeroY - mActualTileSize * 0.35F / mScaleAmount, mTextPaint)
         mTextPaint.textSize *= mScaleAmount
     }
 

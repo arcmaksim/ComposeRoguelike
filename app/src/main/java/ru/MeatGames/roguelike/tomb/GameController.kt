@@ -199,15 +199,18 @@ object GameController {
                     2 -> {
                         MapHelper.changeObject(mx, my, 3)
                         mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.door_opened_message))
+                        mIsPlayerMoved = false
                     }
                     4 -> {
                         MapHelper.changeObject(mx, my, 5)
                         mScreenController.mGameScreen.mDrawLog = false
                         mScreenController.mGameScreen.initProgressBar(4, 159)
+                        mIsPlayerMoved = false
                     }
                     7 -> {
                         mScreenController.mGameScreen.mDrawLog = false
                         mScreenController.mGameScreen.initProgressBar(7, 259)
+                        mIsPlayerMoved = false
                     }
                 }
                 mIsPlayerTurn = false
@@ -231,6 +234,7 @@ object GameController {
             } else {
                 mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.path_is_blocked_message))
                 vibrate()
+                mIsPlayerMoved = false
             }
         }
     }
