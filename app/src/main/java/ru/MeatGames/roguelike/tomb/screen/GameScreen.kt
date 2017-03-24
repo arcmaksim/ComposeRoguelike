@@ -52,7 +52,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     var mActionCount: Int = 0 // currently not used
 
-    val mTileSize = Assets.mActualTileSize
+    val mTileSize = Assets.mOriginalTileSize
     val mScaleAmount = Assets.mScaleAmount
     val mBitmapPaint = Paint()
 
@@ -88,13 +88,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
         black = Paint()
         black.color = resources.getColor(R.color.black)
 
-        mHeroX = (mScreenWidth - mTileSize) / 2 / mScaleAmount
-        mHeroY = (mScreenHeight - mTileSize) / 2 / mScaleAmount
+        mHeroX = (mScreenWidth - Assets.mActualTileSize) / 2 / mScaleAmount
+        mHeroY = (mScreenHeight - Assets.mActualTileSize) / 2 / mScaleAmount
 
         mBitmapPaint.isFilterBitmap = false
 
-        mMapOffsetX = (mScreenWidth - mTileSize * 9) / 2 / mScaleAmount
-        mMapOffsetY = (mScreenHeight - mTileSize * 9) / 2 / mScaleAmount
+        mMapOffsetX = (mScreenWidth - Assets.mActualTileSize * 9) / 2 / mScaleAmount
+        mMapOffsetY = (mScreenHeight - Assets.mActualTileSize * 9) / 2 / mScaleAmount
     }
 
     fun initProgressBar(objectId: Int, duration: Int) {
@@ -230,9 +230,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
             canvas.scale(mScaleAmount, mScaleAmount)
 
             drawMap(canvas, animationFrame)
-            if (!GameController.mHero.mIsFacingLeft) {
-                animationFrame += 2
-            }
+            if (!GameController.mHero.mIsFacingLeft) animationFrame += 2
             canvas.drawBitmap(Assets.getHeroSprite(animationFrame), mHeroX, mHeroY, mBitmapPaint)
 
             canvas.restore()
