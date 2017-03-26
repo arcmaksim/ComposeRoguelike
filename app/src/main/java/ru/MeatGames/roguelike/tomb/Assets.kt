@@ -20,8 +20,6 @@ object Assets {
 
     lateinit var mCharacterIcon: Bitmap
     lateinit var mInventoryIcon: Bitmap
-    lateinit var mBackIcon: Bitmap
-    lateinit var d: Bitmap
     lateinit var mSkipTurnIcon: Bitmap
     lateinit var lastAttack: Bitmap
     lateinit var bag: Bitmap
@@ -78,8 +76,6 @@ object Assets {
         bag = mAssetHelper.getBitmapFromAsset("bag")
         mCharacterIcon = mAssetHelper.getBitmapFromAsset("character_icon")
         mInventoryIcon = mAssetHelper.getBitmapFromAsset("inventory_icon")
-        mBackIcon = mAssetHelper.getBitmapFromAsset("back_icon")
-        d = mAssetHelper.getBitmapFromAsset("ery")
         mSkipTurnIcon = mAssetHelper.getBitmapFromAsset("skip_turn_icon")
 
         temp = mAssetHelper.getBitmapFromAsset("floor_tileset")
