@@ -9,14 +9,14 @@ import java.io.InputStream
 class AssetHelper(val assetManager: AssetManager) {
 
     fun getBitmapFromAsset(bitmapName: String): Bitmap {
-        var istr: InputStream? = null
+        var inputStream: InputStream? = null
         try {
-            istr = assetManager.open("images/$bitmapName.png")
+            inputStream = assetManager.open("images/$bitmapName.png")
         } catch (e: IOException) {
             e.printStackTrace()
         }
 
-        return BitmapFactory.decodeStream(istr)
+        return BitmapFactory.decodeStream(inputStream)
     }
 
 }

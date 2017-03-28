@@ -72,6 +72,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
     var mIsLongPress = false
 
     val mMapBuffer = array2d(mMapBufferWidth, mMapBufferHeight) { MapBufferCell() }
+    var mFloodedBuffer = array2d(mMapBufferWidth, mMapBufferHeight) { 0 }
 
     init {
         mGameEventsLog = LinkedList()
@@ -136,23 +137,26 @@ class GameScreen(context: Context) : BasicScreen(context) {
         }
 
         val floodedBuffer = floodBuffer()
-        val markedWalls = markWalls(floodedBuffer)
-        correctWalls(markedWalls)
+        correctWalls(floodedBuffer)
     }
 
     private fun floodBuffer(): Array<Array<Int>> {
         val mapBufferFloodFill = array2d(mMapBufferWidth, mMapBufferHeight) { 0 }
         mapBufferFloodFill[mMapBufferWidth / 2][mMapBufferHeight / 2] = 1
 
-        for (i in 1..mMapBufferWidth / 2) {
+        for (i in 1..mMapBufferWidth) {
+
             // we don't need to check edge cells
             for (bufferX in 1..mMapBufferWidth - 2) {
                 for (bufferY in 1..mMapBufferHeight - 2) {
 
-                    if (mapBufferFloodFill[bufferX][bufferY] == i && mMapBuffer[bufferX][bufferY].mIsVisible) {
+                    if (mapBufferFloodFill[bufferX][bufferY] == i && mMapBuffer[bufferX][bufferY].mObjectID != 1) {
                         for (ii in 0..8) {
-                            if (mapBufferFloodFill[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1] == 0
-                                    && mMapBuffer[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1].mObjectID != 1) {
+                            if (bufferX + ii % 3 - 1 > -1
+                                    && bufferX + ii % 3 - 1 < mMapBufferWidth - 1
+                                    && bufferX + ii / 3 - 1 > -1
+                                    && bufferX + ii / 3 - 1 < mMapBufferHeight - 1
+                                    && mapBufferFloodFill[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1] == 0) {
                                 mapBufferFloodFill[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1] = i + 1
                             }
                         }
@@ -160,6 +164,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
                 }
             }
+
         }
 
         for (bufferX in 0..mMapBufferWidth - 1) {
@@ -173,49 +178,56 @@ class GameScreen(context: Context) : BasicScreen(context) {
         return mapBufferFloodFill
     }
 
-    private fun markWalls(floodedBuffer: Array<Array<Int>>): MutableSet<Int> {
-        val markedWalls = mutableSetOf<Int>()
+    private fun correctWalls(floodedBuffer: Array<Array<Int>>) {
 
-        for (bufferX in 0..mMapBufferWidth - 1) {
-            for (bufferY in 0..mMapBufferHeight - 1) {
+        //drawMapInTheLog()
+        mFloodedBuffer = floodedBuffer
 
-                if (mMapBuffer[bufferX][bufferY].mObjectID == 1) {
-                    for (ii in 0..8) {
-                        if (bufferX + ii % 3 - 1 > -1
-                                && bufferX + ii % 3 - 1 < mMapBufferWidth
-                                && bufferY + ii / 3 - 1> -1
-                                && bufferY + ii / 3 - 1< mMapViewportHeight
-                                && floodedBuffer[bufferX + ii % 3 - 1][bufferY + ii / 3 - 1] != 0) {
-                            markedWalls.add(bufferX * 1000 + bufferY)
-                            break
-                        }
-                    }
-                }
-
-            }
-        }
-
-        return markedWalls
-    }
-
-    private fun correctWalls(markedWalls: MutableSet<Int>) {
         for (i in 1..mMapBufferWidth / 2) {
             // we don't need to check edge cells
             for (bufferX in 1..mMapBufferWidth - 2) {
                 for (bufferY in 1..mMapBufferHeight - 2) {
 
                     if (mMapBuffer[bufferX][bufferY].mIsVisible && mMapBuffer[bufferX][bufferY].mObjectID == 1) {
+                        val floodIndex = floodedBuffer[bufferX][bufferY]
                         mMapBuffer[bufferX][bufferY].mWallBitmap = 0
-                        if (markedWalls.contains(bufferX * 1000 + bufferY - 1)) mMapBuffer[bufferX][bufferY].mWallBitmap += 1
-                        if (markedWalls.contains((bufferX + 1) * 1000 + bufferY)) mMapBuffer[bufferX][bufferY].mWallBitmap += 2
-                        if (markedWalls.contains(bufferX * 1000 + bufferY + 1)) mMapBuffer[bufferX][bufferY].mWallBitmap += 4
-                        if (markedWalls.contains((bufferX - 1) * 1000 + bufferY)) mMapBuffer[bufferX][bufferY].mWallBitmap += 8
+
+                        if (mMapBuffer[bufferX][bufferY - 1].mObjectID == 1
+                                && Math.abs(floodedBuffer[bufferX][bufferY - 1] - floodIndex) < 2)
+                                mMapBuffer[bufferX][bufferY].mWallBitmap += 1
+
+                        if (mMapBuffer[bufferX + 1][bufferY].mObjectID == 1
+                                && Math.abs(floodedBuffer[bufferX + 1][bufferY] - floodIndex) < 2)
+                                mMapBuffer[bufferX][bufferY].mWallBitmap += 2
+
+                        if (mMapBuffer[bufferX][bufferY + 1].mObjectID == 1
+                                && Math.abs(floodedBuffer[bufferX][bufferY + 1] - floodIndex) < 2)
+                                mMapBuffer[bufferX][bufferY].mWallBitmap += 4
+
+                        if (mMapBuffer[bufferX - 1][bufferY].mObjectID == 1
+                                && Math.abs(floodedBuffer[bufferX - 1][bufferY] - floodIndex) < 2)
+                                mMapBuffer[bufferX][bufferY].mWallBitmap += 8
+
                     } else {
                         mMapBuffer[bufferX][bufferY].mWallBitmap = -1
                     }
 
                 }
             }
+        }
+    }
+
+    private fun drawMapInTheLog() {
+        for (bufferX in 0..mMapBufferWidth - 1) {
+            var line = ""
+            for (bufferY in 0..mMapBufferHeight - 1) {
+                if (mMapBuffer[bufferX][bufferY].mObjectID == 1) {
+                    line += "#"
+                } else {
+                    line += "."
+                }
+            }
+            Log.d("MAP", line)
         }
     }
 
@@ -297,6 +309,10 @@ class GameScreen(context: Context) : BasicScreen(context) {
                         canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, currentMapBufferCell.mShadowPaint)
                     }
                 }
+
+                /*if (currentMapBufferCell.mObjectID == 1) {
+                    canvas.drawText((mFloodedBuffer[cx + 1][cy + 1]).toString(), currentPixelXtoDraw + 16, currentPixelYtoDraw + 24, mTextPaint)
+                }*/
             }
         }
 
@@ -423,12 +439,12 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun afterProgressBar(result: Int) {
         when (result) {
             4 -> {
-                MapHelper.changeAreaObjects(GameController.mHero.mx + mx, GameController.mHero.my + my, 1, 1, 6)
+                MapHelper.changeObject(GameController.mHero.mx + mx, GameController.mHero.my + my, 6)
                 GameController.updateLog(context.getString(R.string.search_chest_message))
                 GameController.createItem(GameController.mHero.mx + mx, GameController.mHero.my + my)
             }
             7 -> {
-                MapHelper.changeAreaObjects(GameController.mHero.mx + mx, GameController.mHero.my + my, 1, 1, 8)
+                MapHelper.changeObject(GameController.mHero.mx + mx, GameController.mHero.my + my, 8)
                 addLine(context.getString(R.string.search_bookshelf_message))
                 if (Random().nextInt(3) != 0) {
                     addLine(context.getString(R.string.experience_earned_message))
