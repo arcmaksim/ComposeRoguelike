@@ -15,8 +15,8 @@ object Assets {
     lateinit var itemDB: Array<ItemDB>
     lateinit var mobDB: Array<MobDB>
     lateinit var stats: Array<StatsDB>
-    lateinit var walls: Array<Bitmap>
-    lateinit var heroSprites: Array<Bitmap>
+    private lateinit var walls: Array<Bitmap>
+    private lateinit var heroSprites: Array<Bitmap>
 
     lateinit var mCharacterIcon: Bitmap
     lateinit var mInventoryIcon: Bitmap
@@ -31,9 +31,9 @@ object Assets {
     val maxItems = 17
     val maxStats = 35
 
-    val mOriginalTileSize = 24
-    var mScaleAmount: Float = 0.toFloat()
-    var mActualTileSize: Float = 0.toFloat()
+    val mOriginalTileSize: Int = 24
+    var mScaleAmount: Int = 0
+    var mActualTileSize: Int = 0
 
     @JvmStatic
     fun init(game: MainActivity) {
@@ -51,7 +51,7 @@ object Assets {
 
     private fun calculateTileSize() {
         val screenSize = ScreenHelper.getScreenSize(mMainActivity.windowManager)
-        mScaleAmount = screenSize.x / (mOriginalTileSize * 10f)
+        mScaleAmount = (screenSize.x / (mOriginalTileSize * 10f)).toInt()
         mActualTileSize = mOriginalTileSize * mScaleAmount
     }
 
@@ -237,5 +237,15 @@ object Assets {
 
     @JvmStatic
     fun getHeroSprite(frame: Int): Bitmap = heroSprites[frame]
+
+    fun getFloorImage(floorId: Int) = tiles[floorId].img!!
+
+    fun getObjectImage(objectId: Int) = objects[objectId].img!!
+
+    fun getWallImage(wallId: Int) = walls[wallId]
+
+    fun getItemImage(itemId: Int) = itemDB[itemId].image!!
+
+    fun getCreatureImage(creatureId: Int) = mobDB[creatureId].img
 
 }

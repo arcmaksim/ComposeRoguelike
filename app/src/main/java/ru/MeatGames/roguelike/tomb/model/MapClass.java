@@ -1,7 +1,5 @@
 package ru.MeatGames.roguelike.tomb.model;
 
-import android.graphics.Bitmap;
-
 import java.util.LinkedList;
 
 import ru.MeatGames.roguelike.tomb.Assets;
@@ -58,18 +56,6 @@ public class MapClass {
 
     public boolean isWall() {
         return Assets.INSTANCE.getObjects()[mObjectID].getMIsWall();
-    }
-
-    public Bitmap getFloorImg() {
-        return Assets.INSTANCE.getTiles()[mFloorID].getImg();
-    }
-
-    public Bitmap getObjectImg() {
-        return Assets.INSTANCE.getObjects()[mObjectID].getImg();
-    }
-
-    public Bitmap getItemImg() {
-        return (mItems.size() > 1) ? Assets.INSTANCE.getBag() : Assets.INSTANCE.getItemDB()[mItems.get(0).id].getImg();
     }
 
 }

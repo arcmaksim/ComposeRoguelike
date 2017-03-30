@@ -3,6 +3,8 @@ package ru.MeatGames.roguelike.tomb.screen
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Assets
@@ -40,8 +42,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     var mProgressBarDuration: Int = 0
     var mProgressBarStartingTime: Long = 0
 
-    var mHeroX: Float = 0f
-    var mHeroY: Float = 0f
+    var mHeroX: Int = 0
+    var mHeroY: Int = 0
     var camx: Int = 0
     var camy: Int = 0
     var mDrawExitDialog = false
@@ -53,12 +55,11 @@ class GameScreen(context: Context) : BasicScreen(context) {
     var mActionCount: Int = 0 // currently not used
 
     val mActualTileSize = Assets.mActualTileSize
-    val mOriginalTileSize = Assets.mOriginalTileSize
     val mScaleAmount = Assets.mScaleAmount
     val mBitmapPaint = Paint()
 
-    private val mMapOffsetX: Float
-    private val mMapOffsetY: Float
+    private val mMapOffsetX: Int
+    private val mMapOffsetY: Int
 
     // hero'single mIsPlayerMoved directions
     var mx: Int = 0
@@ -73,16 +74,19 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     val mMapBuffer = array2d(mMapBufferWidth, mMapBufferHeight) { MapBufferCell() }
     var mFloodedBuffer = array2d(mMapBufferWidth, mMapBufferHeight) { 0 }
+    val mTileBuffer: Array<Array<Rect?>> = array2d(mMapViewportWidth, mMapViewportHeight) { null }
+    val mHeroRect: Rect
+    val mProgressBarRect: Rect
 
     init {
         mGameEventsLog = LinkedList()
 
-        mLightBluePaint.color = resources.getColor(R.color.lightBlue)
-        mDarkBluePaint.color = resources.getColor(R.color.darkBlue)
-        mSemiTransparentBackgroundPaint.color = resources.getColor(R.color.semiTransparentBackground)
-        mLightShadowPaint.color = resources.getColor(R.color.lightShadow)
-        mDarkShadowPaint.color = resources.getColor(R.color.darkShadow)
-        mMenuBackgroundPaint.color = resources.getColor(R.color.menuBackground)
+        mLightBluePaint.color = ContextCompat.getColor(getContext(), R.color.lightBlue)
+        mDarkBluePaint.color = ContextCompat.getColor(getContext(), R.color.darkBlue)
+        mSemiTransparentBackgroundPaint.color = ContextCompat.getColor(getContext(), R.color.semiTransparentBackground)
+        mLightShadowPaint.color = ContextCompat.getColor(getContext(), R.color.lightShadow)
+        mDarkShadowPaint.color = ContextCompat.getColor(getContext(), R.color.darkShadow)
+        mMenuBackgroundPaint.color = ContextCompat.getColor(getContext(), R.color.menuBackground)
 
         mTextPaint = ScreenHelper.getDefaultTextPaint(context)
         mTextPaint.textAlign = Paint.Align.LEFT
@@ -90,13 +94,33 @@ class GameScreen(context: Context) : BasicScreen(context) {
         black = Paint()
         black.color = resources.getColor(R.color.black)
 
-        mHeroX = (mScreenWidth - mActualTileSize) / 2 / mScaleAmount
-        mHeroY = (mScreenHeight - mActualTileSize) / 2 / mScaleAmount
+        mHeroX = (mScreenWidth - mActualTileSize).div(2)
+        mHeroY = (mScreenHeight - mActualTileSize).div(2)
 
         mBitmapPaint.isFilterBitmap = false
+        mBitmapPaint.isAntiAlias = false
 
-        mMapOffsetX = (mScreenWidth - mActualTileSize * 9) / 2 / mScaleAmount
-        mMapOffsetY = (mScreenHeight - mActualTileSize * 9) / 2 / mScaleAmount
+        mMapOffsetX = (mScreenWidth - mActualTileSize * 9).div(2)
+        mMapOffsetY = (mScreenHeight - mActualTileSize * 9).div(2)
+
+        for (x in 0..mMapViewportWidth - 1) {
+            for (y in 0..mMapViewportHeight - 1) {
+                mTileBuffer[x][y] = Rect(x * mActualTileSize + mMapOffsetX,
+                        y * mActualTileSize + mMapOffsetY,
+                        (x + 1) * mActualTileSize + mMapOffsetX,
+                        (y + 1) * mActualTileSize + mMapOffsetY)
+            }
+        }
+
+        mHeroRect = Rect((mMapViewportWidth / 2) * mActualTileSize + mMapOffsetX,
+                (mMapViewportHeight / 2) * mActualTileSize + mMapOffsetY,
+                (mMapViewportWidth / 2 + 1) * mActualTileSize + mMapOffsetX,
+                (mMapViewportHeight / 2 + 1) * mActualTileSize + mMapOffsetY)
+
+        mProgressBarRect = Rect(mTileBuffer[mMapViewportWidth / 2 - 1][mMapViewportHeight / 2 - 1]!!.left,
+                mTileBuffer[mMapViewportWidth / 2 - 1][mMapViewportHeight / 2 - 1]!!.top,
+                mTileBuffer[mMapViewportWidth / 2 + 1][mMapViewportHeight / 2 - 1]!!.right,
+                mTileBuffer[mMapViewportWidth / 2 + 1][mMapViewportHeight / 2 - 1]!!.bottom)
     }
 
     fun initProgressBar(objectId: Int, duration: Int) {
@@ -239,14 +263,9 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
             var animationFrame = (Math.abs(System.currentTimeMillis()) / 600 % 2).toInt()
 
-            canvas.save()
-            canvas.scale(mScaleAmount, mScaleAmount)
-
             drawMap(canvas, animationFrame)
             if (!GameController.mHero.mIsFacingLeft) animationFrame += 2
-            canvas.drawBitmap(Assets.getHeroSprite(animationFrame), mHeroX, mHeroY, mBitmapPaint)
-
-            canvas.restore()
+            canvas.drawBitmap(Assets.getHeroSprite(animationFrame), null, mHeroRect, mBitmapPaint)
 
             drawHUD(canvas)
 
@@ -257,10 +276,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
             val currentXP = GameController.mHero.getStat(20).toFloat() / GameController.mHero.getStat(21)
             canvas.drawRect(4F, mScreenHeight - 11F, Math.round(mScreenWidth * 0.99F * currentXP).toFloat(), mScreenHeight - 4F, mDarkBluePaint)
 
-            canvas.save()
-            canvas.scale(mScaleAmount, mScaleAmount)
             if (mDrawProgressBar) drawProgressBar(canvas)
-            canvas.restore()
 
         } else {
             drawFinalScreen(canvas)
@@ -275,45 +291,41 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         var currentMapBufferCell: MapBufferCell
 
-        for (x in camx..camx + 9 - 1) {
-            val cx = x - camx
-            val currentPixelXtoDraw = (mOriginalTileSize * cx + mMapOffsetX)
-            val leftDrawBorder = (mOriginalTileSize * (cx + 1) + mMapOffsetX)
+        for (x in 1..mMapBufferWidth - 2) {
 
-            for (y in camy..camy + 9 - 1) {
-                val cy = y - camy
-                val currentPixelYtoDraw = (mOriginalTileSize * cy + mMapOffsetY)
-                val rightDrawBorder = (mOriginalTileSize * (cy + 1) + mMapOffsetY)
+            for (y in 1..mMapBufferHeight - 2) {
 
-                currentMapBufferCell = mMapBuffer[cx + 1][cy + 1]
+                currentMapBufferCell = mMapBuffer[x][y]
 
                 if (currentMapBufferCell.mIsVisible) {
-                    canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.floorImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                    canvas.drawBitmap(Assets.getFloorImage(currentMapBufferCell.mFloorID), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
 
                     if (currentMapBufferCell.mWallBitmap != -1) {
-                        canvas.drawBitmap(Assets.walls[currentMapBufferCell.mWallBitmap], currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(Assets.getWallImage(currentMapBufferCell.mWallBitmap), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
                     } else {
-                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.objectImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(Assets.getObjectImage(currentMapBufferCell.mObjectID), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
                     }
 
-                    if (currentMapBufferCell.mHasItem) {
-                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.itemImg, currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
-                    }
+                    /*if (currentMapBufferCell.mHasItem) {
+                        canvas.drawBitmap(Assets.getItemImage(currentMapBufferCell.mI), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
+                    }*/
 
                     //if (currentMapBufferCell.mHasEnemy) {
                     if (MapHelper.getMapTile(x, y)!!.hasMob()) {
-                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.mob.getImg(animationFrame), currentPixelXtoDraw, currentPixelYtoDraw, mBitmapPaint)
+                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.mob.getImg(animationFrame), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
                     }
 
-                    currentMapBufferCell.mShadowPaint?.let {
-                        canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, currentMapBufferCell.mShadowPaint)
-                    }
+                    /*currentMapBufferCell.mShadowPaint?.let {
+                        canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, it)
+                    }*/
                 }
 
                 /*if (currentMapBufferCell.mObjectID == 1) {
                     canvas.drawText((mFloodedBuffer[cx + 1][cy + 1]).toString(), currentPixelXtoDraw + 16, currentPixelYtoDraw + 24, mTextPaint)
                 }*/
+
             }
+
         }
 
     }
@@ -407,22 +419,16 @@ class GameScreen(context: Context) : BasicScreen(context) {
             return
         }
 
-        val offsetX = mHeroX - mActualTileSize / mScaleAmount
-        canvas.drawRect(offsetX,
-                mHeroY - mActualTileSize * 0.75F / mScaleAmount,
-                offsetX + mActualTileSize * 3 / mScaleAmount,
-                mHeroY - mActualTileSize * 0.25F / mScaleAmount,
-                mTextPaint)
-        canvas.drawRect(offsetX,
-                mHeroY - mActualTileSize * 0.75F / mScaleAmount,
-                offsetX + (Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime) * (mActualTileSize * 3F / mProgressBarDuration) / mScaleAmount,
-                mHeroY - mActualTileSize * 0.25F / mScaleAmount,
-                mLightBluePaint)
+        val progressBarTempRect = Rect(mProgressBarRect.left,
+                mProgressBarRect.top,
+                (mProgressBarRect.left + Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime * (mProgressBarRect.width() / mProgressBarDuration)).toInt(),
+                mProgressBarRect.bottom)
+
+        canvas.drawRect(mProgressBarRect, mTextPaint)
+        canvas.drawRect(progressBarTempRect, mLightBluePaint)
 
         mTextPaint.textAlign = Paint.Align.CENTER
-        mTextPaint.textSize /= mScaleAmount
-        canvas.drawText(context.getString(R.string.searching_label), mScreenWidth * 0.5F / mScaleAmount, mHeroY - mActualTileSize * 0.35F / mScaleAmount, mTextPaint)
-        mTextPaint.textSize *= mScaleAmount
+        canvas.drawText(context.getString(R.string.searching_label), mProgressBarRect.exactCenterX(), mProgressBarRect.exactCenterY(), mTextPaint)
     }
 
     private fun drawFinalScreen(canvas: Canvas) {
@@ -475,14 +481,15 @@ class GameScreen(context: Context) : BasicScreen(context) {
         val el: Int
         var err: Int
         var v = true
+
         dx = xend - xstart
         dy = yend - ystart
         incx = sign(dx)
         incy = sign(dy)
-        if (dx < 0)
-            dx = -dx
-        if (dy < 0)
-            dy = -dy
+
+        if (dx < 0) dx = -dx
+        if (dy < 0) dy = -dy
+
         if (dx > dy) {
             pdx = incx
             pdy = 0
@@ -494,10 +501,12 @@ class GameScreen(context: Context) : BasicScreen(context) {
             es = dx
             el = dy
         }
+
         x = xstart
         y = ystart
         err = el / 2
         MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = true
+
         for (t in 0..el - 1) {
             err -= es
             if (err < 0) {
@@ -508,16 +517,11 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 x += pdx
                 y += pdy
             }
+
             if (MapHelper.horizontal(x) && MapHelper.vertical(y)) {
-                if (!MapHelper.getMapTile(x, y)!!.mCurrentlyVisible) {
-                    MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = v
-                }
-                if (v) {
-                    MapHelper.getMapTile(x, y)!!.mIsDiscovered = true
-                }
-                if (!MapHelper.getMapTile(x, y)!!.mIsTransparent) {
-                    v = false
-                }
+                if (!MapHelper.getMapTile(x, y)!!.mCurrentlyVisible) MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = v
+                if (v) MapHelper.getMapTile(x, y)!!.mIsDiscovered = true
+                if (!MapHelper.getMapTile(x, y)!!.mIsTransparent) v = false
             }
         }
     }
@@ -528,25 +532,30 @@ class GameScreen(context: Context) : BasicScreen(context) {
         for (c in cm..(if (cm + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm + 9) - 1)
             for (c1 in cm1..(if (cm1 + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm1 + 9) - 1)
                 MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = false
+
         for (c in x - 1..x + 2 - 1)
             for (c1 in y - 1..y + 2 - 1)
                 MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = true
+
         for (c in -1..1) {
             line(x, y, x + c, y - 4)
             line(x, y, x + c, y + 4)
         }
+
         for (c in -3..3) {
             line(x, y, x + c, y - 3)
             line(x, y, x + c, y + 3)
             line(x, y, x + c, y - 2)
             line(x, y, x + c, y + 2)
         }
+
         for (c in -4..-1 - 1) {
             line(x, y, x + c, y - 1)
             line(x, y, x + c, y + 1)
             line(x, y, x + Math.abs(c), y - 1)
             line(x, y, x + Math.abs(c), y + 1)
         }
+
         line(x, y, x - 4, y)
         line(x, y, x + 4, y)
     }
@@ -680,6 +689,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         var mFloorID: Int = 0
         var mObjectID: Int = 0
+        /*var mItemId: Int = 0
+        var mCreatureId: Int = 0*/
         var mWallBitmap: Int = -1
         var mIsVisible: Boolean = false
         var mShadowPaint: Paint? = null
@@ -693,6 +704,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
         fun init() {
             mFloorID = 0
             mObjectID = 0
+            /*mItemId = -1
+            mCreatureId = -1*/
             mWallBitmap = -1
             mIsVisible = false
             mShadowPaint = null
