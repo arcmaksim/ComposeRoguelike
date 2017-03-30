@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
+import android.support.v4.content.ContextCompat
 import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
@@ -27,10 +28,10 @@ class MapScreen(context: Context) : BasicScreen(context) {
     private val mMarkerSize: Float
 
     init {
-        mDoorMarkerPaint.color = resources.getColor(R.color.hud)
-        mRoomBackgroundPaint.color = resources.getColor(R.color.white)
-        mHeroMarkerPaint.color = resources.getColor(R.color.fredl)
-        mExitMarkerPaint.color = resources.getColor(R.color.grs)
+        mDoorMarkerPaint.color = ContextCompat.getColor(getContext(), R.color.hud)
+        mRoomBackgroundPaint.color = ContextCompat.getColor(getContext(), R.color.white)
+        mHeroMarkerPaint.color = ContextCompat.getColor(getContext(), R.color.fredl)
+        mExitMarkerPaint.color = ContextCompat.getColor(getContext(), R.color.grs)
 
         mTextPaint = ScreenHelper.getDefaultTextPaint(context)
         mTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
@@ -93,4 +94,5 @@ class MapScreen(context: Context) : BasicScreen(context) {
         }
         return true
     }
+
 }

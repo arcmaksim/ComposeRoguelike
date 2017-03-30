@@ -16,7 +16,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
 
     override val TAG: String = "Gear Screen"
 
-    private val mTextPaint: Paint
+    private val mTextPaint: Paint = ScreenHelper.getDefaultTextPaint(context)
 
     private val mPrimaryArmRect: Rect
     private val mSecondaryArmRect: Rect
@@ -30,8 +30,6 @@ class GearScreen(context: Context) : BasicScreen(context) {
     private val mIsTwoHandedWeaponEquipped: Boolean
 
     init {
-        mTextPaint = ScreenHelper.getDefaultTextPaint(context)
-
         mLeftSoftButton = TextButton(context, resources.getString(R.string.inventory_label))
         mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
         mLeftSoftButton.mDimensions = Rect(0,
@@ -67,14 +65,15 @@ class GearScreen(context: Context) : BasicScreen(context) {
         postInvalidate()
     }
 
+    // TODO: refactor comments
     private fun drawGear(canvas: Canvas) {
         GameController.mHero.equipmentList[0]?.let {
             if (mIsTwoHandedWeaponEquipped) {
                 canvas.drawRect(mPrimaryArmAltRect, mBackgroundPaint)
-                canvas.drawBitmap(it.image, mPrimaryArmAltRect.exactCenterX() - it.image.width / 2, mPrimaryArmAltRect.exactCenterY() - it.image.height / 2, null)
+                //canvas.drawBitmap(it.image, mPrimaryArmAltRect.exactCenterX() - it.image.width / 2, mPrimaryArmAltRect.exactCenterY() - it.image.height / 2, null)
             } else {
                 canvas.drawRect(mPrimaryArmRect, mBackgroundPaint)
-                canvas.drawBitmap(it.image, mPrimaryArmRect.exactCenterX() - it.image.width / 2, mPrimaryArmRect.exactCenterY() - it.image.height / 2, null)
+                //canvas.drawBitmap(it.image, mPrimaryArmRect.exactCenterX() - it.image.width / 2, mPrimaryArmRect.exactCenterY() - it.image.height / 2, null)
             }
         } ?: let {
             canvas.drawRect(mPrimaryArmRect, mBackgroundPaint)
@@ -84,7 +83,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
         if (!mIsTwoHandedWeaponEquipped) {
             canvas.drawRect(mSecondaryArmRect, mBackgroundPaint)
             GameController.mHero.equipmentList[1]?.let {
-                canvas.drawBitmap(it.image, mSecondaryArmRect.exactCenterX() - it.image.width / 2, mSecondaryArmRect.exactCenterY() - it.image.width / 2, null)
+                //canvas.drawBitmap(it.image, mSecondaryArmRect.exactCenterX() - it.image.width / 2, mSecondaryArmRect.exactCenterY() - it.image.width / 2, null)
             } ?: let {
                 canvas.drawText(context.getString(R.string.empty_label), mSecondaryArmRect.exactCenterX(), mSecondaryArmRect.exactCenterY(), mTextPaint)
             }
@@ -92,7 +91,7 @@ class GearScreen(context: Context) : BasicScreen(context) {
 
         canvas.drawRect(mBodyRect, mBackgroundPaint)
         GameController.mHero.equipmentList[2]?.let {
-            canvas.drawBitmap(it.image, mBodyRect.exactCenterX() - it.image.width / 2, mBodyRect.exactCenterY() - it.image.width / 2, null)
+            //canvas.drawBitmap(it.image, mBodyRect.exactCenterX() - it.image.width / 2, mBodyRect.exactCenterY() - it.image.width / 2, null)
         } ?: let {
             canvas.drawText(context.getString(R.string.empty_label), mBodyRect.exactCenterX(), mBodyRect.exactCenterY(), mTextPaint)
         }

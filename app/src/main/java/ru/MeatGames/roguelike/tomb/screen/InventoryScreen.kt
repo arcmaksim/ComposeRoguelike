@@ -191,7 +191,8 @@ class InventoryScreen(context: Context,
                         mBackgroundPaint
                     }
                     canvas.drawRect(mItemListRect.left.toFloat(), top, mItemListRect.right.toFloat(), bottom, itemPanelBackground)
-                    canvas.drawBitmap(it.image, mItemListRect.left + (mItemPanelHeight - it.image.width) * 0.5F, top + (mItemPanelHeight - it.image.height) / 2, null)
+                    // TODO: refactor
+                    //canvas.drawBitmap(it.image, mItemListRect.left + (mItemPanelHeight - it.image.width) * 0.5F, top + (mItemPanelHeight - it.image.height) / 2, null)
                     canvas.drawText(it.mTitle, mItemListRect.left + mItemPanelHeight + mTextHorizontalPadding, top + mItemPanelHeight * 0.5F + mTextVerticalPadding, mSecondaryTextPaint)
                 }
                 q++

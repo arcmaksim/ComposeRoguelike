@@ -66,4 +66,5 @@ class CharacterScreen(context: Context) : BasicScreen(context) {
         }
         return true
     }
+
 }

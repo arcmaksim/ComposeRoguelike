@@ -1,7 +1,6 @@
 package ru.MeatGames.roguelike.tomb.screen
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
@@ -19,30 +18,23 @@ class DetailedItemScreen(context: Context,
 
     override val TAG: String = "Detailed Item Screen"
 
-    private val mMainTextPaint: Paint
-    private val mSecondaryTextPaint: Paint
+    private val mMainTextPaint = ScreenHelper.getDefaultTextPaint(context)
+    private val mSecondaryTextPaint = ScreenHelper.getDefaultTextPaint(context)
 
     private val mLeftSoftButton: TextButton
     private val mMiddleSoftButton: TextButton
     private val mBackButton: TextButton
 
-    private var mSelectedItem: Item
-    private var mSelectedItemBitmap: Bitmap
-    private val mItemBitmapVerticalPadding = UnitConverter.convertDpToPixels(100F, context)
-    private val mItemBitmapHorizontalPadding: Float
-    private val mItemBitmapSize: Int
-    private val mItemBitmapScale = 3
+    private var mSelectedItem: Item = selectedItem
+    private var mSelectedItemRect: Rect
+    private val mItemBitmapVerticalPadding = UnitConverter.convertDpToPixels(100F, context).toInt()
+    private val mItemBitmapScale = 4
 
     private val mTextTopPadding: Float
     private val mTextLinePadding: Float
 
     init {
-        mSelectedItem = selectedItem
-
-        mMainTextPaint = ScreenHelper.getDefaultTextPaint(context)
         mMainTextPaint.textSize = 24f
-
-        mSecondaryTextPaint = ScreenHelper.getDefaultTextPaint(context)
 
         mLeftSoftButton = TextButton(context, "")
         mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
@@ -64,11 +56,14 @@ class DetailedItemScreen(context: Context,
                 mScreenWidth,
                 mScreenHeight)
 
-        mItemBitmapSize = mItemBitmapScale * Assets.mOriginalTileSize
-        mSelectedItemBitmap = Bitmap.createScaledBitmap(mSelectedItem.image, mItemBitmapSize, mItemBitmapSize, false)
-        mItemBitmapHorizontalPadding = (mScreenWidth - mSelectedItemBitmap.width) * 0.5F
+        val selectedItemSize = Assets.mActualTileSize * mItemBitmapScale
+        val itemBitmapHorizontalPadding = (mScreenWidth - selectedItemSize) / 2
+        mSelectedItemRect = Rect(itemBitmapHorizontalPadding,
+                mItemBitmapVerticalPadding,
+                itemBitmapHorizontalPadding + selectedItemSize,
+                mItemBitmapVerticalPadding + selectedItemSize)
 
-        mTextTopPadding = mItemBitmapVerticalPadding + mItemBitmapSize + mMainTextPaint.textSize * 2
+        mTextTopPadding = mSelectedItemRect.bottom + mMainTextPaint.textSize * 2
         mTextLinePadding = mSecondaryTextPaint.textSize * 1.5F
 
         if (mSelectedItem.isConsumable) {
@@ -98,7 +93,7 @@ class DetailedItemScreen(context: Context,
     }
 
     private fun drawItem(canvas: Canvas) {
-        canvas.drawBitmap(mSelectedItemBitmap, mItemBitmapHorizontalPadding, mItemBitmapVerticalPadding, null)
+        canvas.drawBitmap(Assets.getItemImage(), mSelectedItem.image, mSelectedItemRect, mBitmapPaint)
         canvas.drawText(mSelectedItem.mTitle, mScreenWidth * 0.5F, mTextTopPadding, mMainTextPaint)
         var q = 1
         when (mSelectedItem.mType) {

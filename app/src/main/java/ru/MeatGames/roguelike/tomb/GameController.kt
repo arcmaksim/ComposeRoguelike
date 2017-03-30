@@ -227,7 +227,8 @@ object GameController {
                     mHero.modifyStat(5, Random().nextInt(3) + 1, -1)
                     mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.trap_message))
                     if (mHero.getStat(5) < 1) {
-                        lastAttack = Bitmap.createScaledBitmap(Assets.objects[15].img, 72, 72, false)
+                        // TODO: refactor
+                        //lastAttack = Bitmap.createScaledBitmap(Assets.objects[15].img, 72, 72, false)
                         changeScreen(Screens.DEATH_SCREEN)
                     }
                 }

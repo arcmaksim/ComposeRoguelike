@@ -1,6 +1,6 @@
 package ru.MeatGames.roguelike.tomb.model;
 
-import android.graphics.Bitmap;
+import android.graphics.Rect;
 
 import ru.MeatGames.roguelike.tomb.Assets;
 
@@ -11,7 +11,7 @@ public class Item {
     public int mWeight; //Weight
     public int mValue; //Value
     public int mType; //mType
-    public int id; //something with itemDB
+    private int id; //something with itemDB
     public int mValue1;
     public int mValue2;
     public int mValue3;
@@ -66,8 +66,8 @@ public class Item {
         return mType == 5;
     }
 
-    public Bitmap getImage() {
-        return Assets.INSTANCE.getItemDB()[id].getImg();
+    public Rect getImage() {
+        return Assets.INSTANCE.getAssetRect(id);
     }
 
 }

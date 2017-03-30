@@ -1,10 +1,13 @@
 package ru.MeatGames.roguelike.tomb
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Rect
 import org.xmlpull.v1.XmlPullParser
 import ru.MeatGames.roguelike.tomb.db.*
-import ru.MeatGames.roguelike.tomb.util.AssetHelper
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
+import java.io.IOException
+import java.io.InputStream
 
 object Assets {
 
@@ -18,13 +21,20 @@ object Assets {
     private lateinit var walls: Array<Bitmap>
     private lateinit var heroSprites: Array<Bitmap>
 
+    lateinit var mImageRects: Array<Rect>
+
     lateinit var mCharacterIcon: Bitmap
     lateinit var mInventoryIcon: Bitmap
     lateinit var mSkipTurnIcon: Bitmap
     lateinit var lastAttack: Bitmap
     lateinit var bag: Bitmap
 
-    lateinit var mAssetHelper: AssetHelper
+    private lateinit var mFloorTileset: Bitmap
+    private lateinit var mObjectTileset: Bitmap
+    private lateinit var mItemsSheet: Bitmap
+    // creatures have 2 frames
+    private lateinit var mCreaturesSheetDefault: Bitmap
+    private lateinit var mCreaturesSheetAlternative: Bitmap
 
     val maxTiles = 12
     val maxObjects = 17
@@ -46,7 +56,7 @@ object Assets {
     }
 
     private fun init() {
-        mAssetHelper = AssetHelper(mMainActivity.assets)
+        // empty
     }
 
     private fun calculateTileSize() {
@@ -62,8 +72,15 @@ object Assets {
         loadItems()
         loadMobs()
 
+        mImageRects = Array(100) { i ->
+            Rect(i % 5 * mOriginalTileSize,
+                    i / 5 * mOriginalTileSize,
+                    i % 5 * mOriginalTileSize + mOriginalTileSize,
+                    i / 5 * mOriginalTileSize + mOriginalTileSize)
+        }
+
         // loadAssets images
-        var temp = mAssetHelper.getBitmapFromAsset("character_animation_sheet")
+        var temp = getBitmapFromAsset("character_animation_sheet")
 
         heroSprites = Array(4) { i ->
             Bitmap.createBitmap(temp,
@@ -73,53 +90,18 @@ object Assets {
                     mOriginalTileSize)
         }
 
-        bag = mAssetHelper.getBitmapFromAsset("bag")
-        mCharacterIcon = mAssetHelper.getBitmapFromAsset("character_icon")
-        mInventoryIcon = mAssetHelper.getBitmapFromAsset("inventory_icon")
-        mSkipTurnIcon = mAssetHelper.getBitmapFromAsset("skip_turn_icon")
+        bag = getBitmapFromAsset("bag")
+        mCharacterIcon = getBitmapFromAsset("character_icon")
+        mInventoryIcon = getBitmapFromAsset("inventory_icon")
+        mSkipTurnIcon = getBitmapFromAsset("skip_turn_icon")
 
-        temp = mAssetHelper.getBitmapFromAsset("floor_tileset")
-        for (i in 0..maxTiles - 1) {
-            tiles[i].img = Bitmap.createBitmap(temp,
-                    i % 5 * mOriginalTileSize,
-                    i / 5 * mOriginalTileSize,
-                    mOriginalTileSize,
-                    mOriginalTileSize)
-        }
+        mFloorTileset = getBitmapFromAsset("floor_tileset")
+        mObjectTileset = getBitmapFromAsset("objects_tileset")
+        mItemsSheet = getBitmapFromAsset("items_sheet")
+        mCreaturesSheetDefault = getBitmapFromAsset("creatures_sheet")
+        mCreaturesSheetAlternative = getBitmapFromAsset("creatures_sheet_alt")
 
-        temp = mAssetHelper.getBitmapFromAsset("objects_tileset")
-        for (i in 0..maxObjects - 1) {
-            objects[i].img = Bitmap.createBitmap(temp,
-                    i % 5 * mOriginalTileSize,
-                    i / 5 * mOriginalTileSize,
-                    mOriginalTileSize,
-                    mOriginalTileSize)
-        }
-
-        temp = mAssetHelper.getBitmapFromAsset("items_sheet")
-        for (i in 0..maxItems - 1) {
-            itemDB[i].img = Bitmap.createBitmap(temp,
-                    i % 5 * mOriginalTileSize,
-                    i / 5 * mOriginalTileSize,
-                    mOriginalTileSize,
-                    mOriginalTileSize)
-        }
-
-        temp = mAssetHelper.getBitmapFromAsset("mobs_sheet")
-        for (x in 0..GameController.maxMobs - 1) {
-            mobDB[x].img[0] = Bitmap.createBitmap(temp,
-                    x * mOriginalTileSize,
-                    0,
-                    mOriginalTileSize,
-                    mOriginalTileSize)
-            mobDB[x].img[1] = Bitmap.createBitmap(temp,
-                    x * mOriginalTileSize,
-                    mOriginalTileSize,
-                    mOriginalTileSize,
-                    mOriginalTileSize)
-        }
-
-        temp = mAssetHelper.getBitmapFromAsset("walls_tileset")
+        temp = getBitmapFromAsset("walls_tileset")
         walls = Array<Bitmap>(16) { i -> Bitmap.createBitmap(temp, i % 4 * mOriginalTileSize, i / 4 * mOriginalTileSize, mOriginalTileSize, mOriginalTileSize) }
     }
 
@@ -235,17 +217,36 @@ object Assets {
         }
     }
 
+    private fun getBitmapFromAsset(bitmapName: String): Bitmap {
+        var inputStream: InputStream? = null
+        try {
+            inputStream = mMainActivity.assets.open("images/$bitmapName.png")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return BitmapFactory.decodeStream(inputStream)
+    }
+
     @JvmStatic
     fun getHeroSprite(frame: Int): Bitmap = heroSprites[frame]
 
-    fun getFloorImage(floorId: Int) = tiles[floorId].img!!
+    fun getFloorImage() = mFloorTileset
 
-    fun getObjectImage(objectId: Int) = objects[objectId].img!!
+    fun getObjectImage() = mObjectTileset
 
     fun getWallImage(wallId: Int) = walls[wallId]
 
-    fun getItemImage(itemId: Int) = itemDB[itemId].image!!
+    fun getItemImage() = mItemsSheet
 
-    fun getCreatureImage(creatureId: Int) = mobDB[creatureId].img
+    fun getCreatureImage(frame: Int): Bitmap {
+        if (frame == 0) {
+            return mCreaturesSheetDefault
+        } else {
+            return mCreaturesSheetAlternative
+        }
+    }
+
+    fun getAssetRect(id: Int) = mImageRects[id]
 
 }

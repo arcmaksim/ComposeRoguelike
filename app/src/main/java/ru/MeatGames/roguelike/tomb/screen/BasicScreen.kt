@@ -3,6 +3,7 @@ package ru.MeatGames.roguelike.tomb.screen
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.support.v4.content.ContextCompat
 import android.view.View
 import ru.MeatGames.roguelike.tomb.MainActivity
 import ru.MeatGames.roguelike.tomb.R
@@ -19,6 +20,7 @@ abstract class BasicScreen(context: Context) : View(context) {
     protected val mScreenHeight: Int
 
     protected val mBackgroundPaint = Paint()
+    protected val mBitmapPaint = Paint()
 
     private var mPreviousFrameTime: Long = System.nanoTime()
 
@@ -30,7 +32,9 @@ abstract class BasicScreen(context: Context) : View(context) {
         mScreenWidth = screenSize.x
         mScreenHeight = screenSize.y
 
-        mBackgroundPaint.color = resources.getColor(R.color.mainBackground)
+        mBackgroundPaint.color = ContextCompat.getColor(getContext(), R.color.mainBackground)
+        mBitmapPaint.isAntiAlias = false
+        mBitmapPaint.isFilterBitmap = false
     }
 
     override fun onDraw(canvas: Canvas?) {

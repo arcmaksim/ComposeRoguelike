@@ -1,13 +1,12 @@
 package ru.MeatGames.roguelike.tomb.db
 
-import android.graphics.Bitmap
-
+import android.graphics.Rect
 import ru.MeatGames.roguelike.tomb.model.MobClass
 
 class MobDB {
 
     var mob: MobClass
-    var img: Array<Bitmap?>
+    var img: Array<Rect?>
 
     constructor(name: String, health: Int, attack: Int,
                 defence: Int, armor: Int, speed: Int, damage: Int) {
@@ -21,7 +20,7 @@ class MobDB {
     }
 
     init {
-        img = arrayOfNulls<Bitmap>(2)
+        img = arrayOfNulls<Rect>(2)
     }
 
 }

@@ -56,7 +56,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     val mActualTileSize = Assets.mActualTileSize
     val mScaleAmount = Assets.mScaleAmount
-    val mBitmapPaint = Paint()
 
     private val mMapOffsetX: Int
     private val mMapOffsetY: Int
@@ -96,9 +95,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         mHeroX = (mScreenWidth - mActualTileSize).div(2)
         mHeroY = (mScreenHeight - mActualTileSize).div(2)
-
-        mBitmapPaint.isFilterBitmap = false
-        mBitmapPaint.isAntiAlias = false
 
         mMapOffsetX = (mScreenWidth - mActualTileSize * 9).div(2)
         mMapOffsetY = (mScreenHeight - mActualTileSize * 9).div(2)
@@ -291,29 +287,39 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         var currentMapBufferCell: MapBufferCell
 
-        for (x in 1..mMapBufferWidth - 2) {
+        for (x in 0..mMapViewportWidth - 1) {
+            for (y in 0..mMapViewportHeight - 1) {
 
-            for (y in 1..mMapBufferHeight - 2) {
-
-                currentMapBufferCell = mMapBuffer[x][y]
+                // map buffer wider and higher than map viewport by 2
+                currentMapBufferCell = mMapBuffer[x + 1][y + 1]
 
                 if (currentMapBufferCell.mIsVisible) {
-                    canvas.drawBitmap(Assets.getFloorImage(currentMapBufferCell.mFloorID), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
+
+                    canvas.drawBitmap(Assets.getFloorImage(),
+                            Assets.getAssetRect(currentMapBufferCell.mFloorID),
+                            mTileBuffer[x][y],
+                            mBitmapPaint)
 
                     if (currentMapBufferCell.mWallBitmap != -1) {
-                        canvas.drawBitmap(Assets.getWallImage(currentMapBufferCell.mWallBitmap), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
+                        canvas.drawBitmap(Assets.getWallImage(currentMapBufferCell.mWallBitmap),
+                                null,
+                                mTileBuffer[x][y],
+                                mBitmapPaint)
                     } else {
-                        canvas.drawBitmap(Assets.getObjectImage(currentMapBufferCell.mObjectID), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
+                        canvas.drawBitmap(Assets.getObjectImage(),
+                                Assets.getAssetRect(currentMapBufferCell.mObjectID),
+                                mTileBuffer[x][y],
+                                mBitmapPaint)
                     }
 
                     /*if (currentMapBufferCell.mHasItem) {
-                        canvas.drawBitmap(Assets.getItemImage(currentMapBufferCell.mI), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
+                        canvas.drawBitmap(Assets.getItemImage(currentMapBufferCell.mI), null, mTileBuffer[x][y], mBitmapPaint)
                     }*/
 
                     //if (currentMapBufferCell.mHasEnemy) {
-                    if (MapHelper.getMapTile(x, y)!!.hasMob()) {
-                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.mob.getImg(animationFrame), null, mTileBuffer[x - 1][y - 1], mBitmapPaint)
-                    }
+                    /*if (MapHelper.getMapTile(x, y)!!.hasMob()) {
+                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.mob.getImg(animationFrame), null, mTileBuffer[x][y], mBitmapPaint)
+                    }*/
 
                     /*currentMapBufferCell.mShadowPaint?.let {
                         canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, it)
@@ -325,7 +331,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 }*/
 
             }
-
         }
 
     }

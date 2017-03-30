@@ -1,6 +1,6 @@
 package ru.MeatGames.roguelike.tomb;
 
-import android.graphics.Bitmap;
+import android.graphics.Rect;
 
 import ru.MeatGames.roguelike.tomb.model.MapClass;
 import ru.MeatGames.roguelike.tomb.model.MobClass;
@@ -15,8 +15,8 @@ public class MobList {
 	public int x;
 	public int y;
 
-    public Bitmap getImg(int time) {
-        return Assets.INSTANCE.getMobDB()[t].getImg()[time];
+    public Rect getImg(int time) {
+        return Assets.INSTANCE.getAssetRect(t);
     }
 
     public MobList(int t) {

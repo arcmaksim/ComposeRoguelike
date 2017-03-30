@@ -1,11 +1,11 @@
 package ru.MeatGames.roguelike.tomb.db
 
-import android.graphics.Bitmap
+import android.graphics.Rect
 
 class TileDB(var mIsPassable: Boolean,
              var mIsTransparent: Boolean,
              var mIsUsable: Boolean) {
 
-    var img: Bitmap? = null
+    var img: Rect? = null
 
 }
