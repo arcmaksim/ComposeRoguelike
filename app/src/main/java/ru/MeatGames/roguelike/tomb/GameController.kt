@@ -9,6 +9,7 @@ import ru.MeatGames.roguelike.tomb.model.MapClass
 import ru.MeatGames.roguelike.tomb.screen.ScreenController
 import ru.MeatGames.roguelike.tomb.screen.Screens
 import ru.MeatGames.roguelike.tomb.util.MapHelper
+import ru.MeatGames.roguelike.tomb.util.ObjectHelper
 import ru.MeatGames.roguelike.tomb.util.array2d
 import java.util.*
 
@@ -196,20 +197,20 @@ object GameController {
         if (mapCell != null) {
             if (mapCell.mIsUsable) {
                 when (MapHelper.getObjectId(mx, my)) {
-                    2 -> {
-                        MapHelper.changeObject(mx, my, 3)
+                    ObjectHelper.DOOR_CLOSED -> {
+                        MapHelper.changeObject(mx, my, ObjectHelper.DOOR_OPENED)
                         mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.door_opened_message))
                         mIsPlayerMoved = false
                     }
-                    4 -> {
-                        MapHelper.changeObject(mx, my, 5)
+                    ObjectHelper.CHEST_CLOSED -> {
+                        MapHelper.changeObject(mx, my, ObjectHelper.CHEST_OPENED)
                         mScreenController.mGameScreen.mDrawLog = false
-                        mScreenController.mGameScreen.initProgressBar(4, 159)
+                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.CHEST_OPENED, 159)
                         mIsPlayerMoved = false
                     }
-                    7 -> {
+                    ObjectHelper.BOOKSHELF_FULL -> {
                         mScreenController.mGameScreen.mDrawLog = false
-                        mScreenController.mGameScreen.initProgressBar(7, 259)
+                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.BOOKSHELF_EMPTY, 259)
                         mIsPlayerMoved = false
                     }
                 }

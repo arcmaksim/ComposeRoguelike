@@ -1,7 +1,10 @@
 package ru.MeatGames.roguelike.tomb.screen
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Region
 import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.GameController
@@ -58,7 +61,6 @@ class InventoryScreen(context: Context,
     private val mFilterPanelBorder: Float
     private val mFilterButtonsWidth: Float
     private val mFilterStates: BooleanArray = BooleanArray(5, { true })
-    private val mFilterIcons: List<Bitmap>
 
     init {
         mEquippedItemBackgroundPaint.color = resources.getColor(R.color.framegrn)
@@ -73,18 +75,6 @@ class InventoryScreen(context: Context,
 
         mFilterPanelBorder = mScreenHeight * 0.075F
         mFilterButtonsWidth = mScreenWidth * 0.2F
-
-        val assetHelper = Assets.mAssetHelper
-        mFilterIcons = listOf(Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("weapons_icon_outline"), 30, 30, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("weapons_icon_filling"), 30, 30, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("shield_icon_outline"), 32, 36, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("shield_icon_filling"), 32, 36, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("armor_icon_outline"), 38, 34, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("armor_icon_filling"), 38, 34, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("gear_icon_outline"), 32, 28, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("gear_icon_filling"), 32, 28, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("consumables_icon_outline"), 24, 34, false),
-                Bitmap.createScaledBitmap(assetHelper.getBitmapFromAsset("consumables_icon_filling"), 24, 34, false))
 
         mLeftSoftButton = TextButton(context, resources.getString(R.string.gear_label))
         mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
@@ -132,7 +122,7 @@ class InventoryScreen(context: Context,
     }
 
     private fun setFilters(filter: InventoryFilterType) {
-        when(filter) {
+        when (filter) {
             InventoryFilterType.WEAPONS -> setFilters(true, false, false, false, false)
             InventoryFilterType.SHIELDS -> setFilters(false, true, false, false, false)
             InventoryFilterType.ARMOR -> setFilters(false, false, true, false, false)
@@ -166,7 +156,12 @@ class InventoryScreen(context: Context,
 
     private fun drawFlags(canvas: Canvas) {
         for (i in 0..4) {
-            val iconBitmap = if (!mFilterStates[i]) mFilterIcons[i * 2] else mFilterIcons[i * 2 + 1]
+
+            val iconBitmap = if (!mFilterStates[i])
+                Assets.getInventoryFilterIcon(i * 2)
+            else
+                Assets.getInventoryFilterIcon(i * 2 + 1)
+
             canvas.drawBitmap(iconBitmap,
                     mFilterButtonsWidth * i + (mFilterButtonsWidth - iconBitmap.width) / 2,
                     (mFilterPanelBorder - iconBitmap.height) / 2,

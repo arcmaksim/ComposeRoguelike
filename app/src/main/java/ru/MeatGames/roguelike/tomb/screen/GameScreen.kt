@@ -10,10 +10,7 @@ import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
-import ru.MeatGames.roguelike.tomb.util.MapHelper
-import ru.MeatGames.roguelike.tomb.util.ScreenHelper
-import ru.MeatGames.roguelike.tomb.util.array2d
-import ru.MeatGames.roguelike.tomb.util.fillFrame
+import ru.MeatGames.roguelike.tomb.util.*
 import java.util.*
 
 class GameScreen(context: Context) : BasicScreen(context) {
@@ -237,20 +234,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
         }
     }
 
-    private fun drawMapInTheLog() {
-        for (bufferX in 0..mMapBufferWidth - 1) {
-            var line = ""
-            for (bufferY in 0..mMapBufferHeight - 1) {
-                if (mMapBuffer[bufferX][bufferY].mObjectID == 1) {
-                    line += "#"
-                } else {
-                    line += "."
-                }
-            }
-            Log.d("MAP", line)
-        }
-    }
-
     override fun drawScreen(canvas: Canvas?) {
 
         drawBackground(canvas!!)
@@ -449,13 +432,13 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     private fun afterProgressBar(result: Int) {
         when (result) {
-            4 -> {
-                MapHelper.changeObject(GameController.mHero.mx + mx, GameController.mHero.my + my, 6)
+            ObjectHelper.CHEST_OPENED -> {
+                MapHelper.changeObject(GameController.mHero.mx + mx, GameController.mHero.my + my, ObjectHelper.CHEST_EMPTY)
                 GameController.updateLog(context.getString(R.string.search_chest_message))
                 GameController.createItem(GameController.mHero.mx + mx, GameController.mHero.my + my)
             }
-            7 -> {
-                MapHelper.changeObject(GameController.mHero.mx + mx, GameController.mHero.my + my, 8)
+            ObjectHelper.BOOKSHELF_FULL -> {
+                MapHelper.changeObject(GameController.mHero.mx + mx, GameController.mHero.my + my, ObjectHelper.BOOKSHELF_EMPTY)
                 addLine(context.getString(R.string.search_bookshelf_message))
                 if (Random().nextInt(3) != 0) {
                     addLine(context.getString(R.string.experience_earned_message))

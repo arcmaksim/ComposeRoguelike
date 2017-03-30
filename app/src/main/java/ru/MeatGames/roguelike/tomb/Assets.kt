@@ -28,6 +28,7 @@ object Assets {
     lateinit var mSkipTurnIcon: Bitmap
     lateinit var lastAttack: Bitmap
     lateinit var bag: Bitmap
+    lateinit var mFilterIcons: Array<Bitmap>
 
     private lateinit var mFloorTileset: Bitmap
     private lateinit var mObjectTileset: Bitmap
@@ -79,9 +80,7 @@ object Assets {
                     i / 5 * mOriginalTileSize + mOriginalTileSize)
         }
 
-        // loadAssets images
         var temp = getBitmapFromAsset("character_animation_sheet")
-
         heroSprites = Array(4) { i ->
             Bitmap.createBitmap(temp,
                     i * mOriginalTileSize,
@@ -103,6 +102,17 @@ object Assets {
 
         temp = getBitmapFromAsset("walls_tileset")
         walls = Array<Bitmap>(16) { i -> Bitmap.createBitmap(temp, i % 4 * mOriginalTileSize, i / 4 * mOriginalTileSize, mOriginalTileSize, mOriginalTileSize) }
+
+        mFilterIcons = arrayOf(Bitmap.createScaledBitmap(getBitmapFromAsset("weapons_icon_outline"), 30, 30, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("weapons_icon_filling"), 30, 30, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("shield_icon_outline"), 32, 36, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("shield_icon_filling"), 32, 36, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("armor_icon_outline"), 38, 34, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("armor_icon_filling"), 38, 34, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("gear_icon_outline"), 32, 28, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("gear_icon_filling"), 32, 28, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("consumables_icon_outline"), 24, 34, false),
+                Bitmap.createScaledBitmap(getBitmapFromAsset("consumables_icon_filling"), 24, 34, false))
     }
 
     private fun loadStats() {
@@ -248,5 +258,7 @@ object Assets {
     }
 
     fun getAssetRect(id: Int) = mImageRects[id]
+
+    fun getInventoryFilterIcon(id: Int) = mFilterIcons[id]
 
 }
