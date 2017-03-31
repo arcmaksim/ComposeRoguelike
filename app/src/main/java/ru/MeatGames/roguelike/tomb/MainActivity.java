@@ -1,20 +1,61 @@
 package ru.MeatGames.roguelike.tomb;
 
-import android.app.Activity;
-import android.os.Bundle;
 
-public class MainActivity extends Activity {
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+
+public class MainActivity extends AppCompatActivity {
 
     public int turnCount = 0;
     public MobList firstMob;
 
-    protected void onCreate(Bundle w) {
-        super.onCreate(w);
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setupFullScreenMode();
 
         Assets.init(this);
         GameController.init(this);
 
         GameController.start();
+    }
+
+    private void setupFullScreenMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        } else {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        /** TODO: saving game
+         *  1. Save map
+         *  1.1 Save items
+         *  1.2. Save creatures
+         *  2. Save hero
+         *  2.1. Save map position and stats
+         *  2.2. Save inventory content and it's state
+         *  3. Save game state and current game screen state
+         */
+
     }
 
     public void onBackPressed() {

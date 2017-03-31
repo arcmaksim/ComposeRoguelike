@@ -205,12 +205,12 @@ object GameController {
                     ObjectHelper.CHEST_CLOSED -> {
                         MapHelper.changeObject(mx, my, ObjectHelper.CHEST_OPENED)
                         mScreenController.mGameScreen.mDrawLog = false
-                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.CHEST_OPENED, 159)
+                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.CHEST_OPENED, 1590)
                         mIsPlayerMoved = false
                     }
                     ObjectHelper.BOOKSHELF_FULL -> {
                         mScreenController.mGameScreen.mDrawLog = false
-                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.BOOKSHELF_EMPTY, 259)
+                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.BOOKSHELF_FULL, 2590)
                         mIsPlayerMoved = false
                     }
                 }

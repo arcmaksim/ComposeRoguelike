@@ -8,28 +8,28 @@ import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.UnitConverter
-import ru.MeatGames.roguelike.tomb.view.TextButton
+import ru.MeatGames.roguelike.tomb.view.Button
 
 class MainMenu(mContext: Context) : BasicScreen(mContext) {
 
     override val TAG: String = "Main Menu"
 
     private val mTitleTextPaint: Paint
-    private val mNewGameButton: TextButton
-    private val mExitGameButton: TextButton
+    private val mNewGameButton: Button
+    private val mExitGameButton: Button
 
     init {
         mTitleTextPaint = ScreenHelper.getDefaultTextPaint(mContext)
         mTitleTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
 
-        mNewGameButton = TextButton(context, "Новая игра")
+        mNewGameButton = Button(context, "Новая игра")
         mNewGameButton.mTextPaint.textAlign = Paint.Align.LEFT
         mNewGameButton.mDimensions = Rect(0,
                 mScreenHeight - mScreenHeight / 10,
                 mScreenWidth / 3,
                 mScreenHeight)
 
-        mExitGameButton = TextButton(context, "Выход")
+        mExitGameButton = Button(context, "Выход")
         mExitGameButton.mTextPaint.textAlign = Paint.Align.RIGHT
         mExitGameButton.mDimensions = Rect(mScreenWidth / 3 * 2,
                 mScreenHeight - mScreenHeight / 10,
@@ -49,7 +49,6 @@ class MainMenu(mContext: Context) : BasicScreen(mContext) {
                 mTitleTextPaint)
         mNewGameButton.draw(canvas)
         mExitGameButton.draw(canvas)
-        //postInvalidate()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {

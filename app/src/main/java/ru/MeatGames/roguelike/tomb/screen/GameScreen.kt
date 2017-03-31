@@ -118,7 +118,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     fun initProgressBar(objectId: Int, duration: Int) {
         mProgressBarDuration = duration
-        mProgressBarStartingTime = Math.abs(System.currentTimeMillis()) / 10
+        mProgressBarStartingTime = mCurrentFrameTime
         mObjectId = objectId
         mDrawProgressBar = true
     }
@@ -400,7 +400,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     // needs to be directly above the hero
     private fun drawProgressBar(canvas: Canvas) {
-        if (Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime > mProgressBarDuration) {
+        if (mCurrentFrameTime - mProgressBarStartingTime > mProgressBarDuration) {
             mDrawProgressBar = false
             mDrawLog = true
             afterProgressBar(mObjectId)
@@ -409,7 +409,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         val progressBarTempRect = Rect(mProgressBarRect.left,
                 mProgressBarRect.top,
-                (mProgressBarRect.left + Math.abs(System.currentTimeMillis()) / 10 - mProgressBarStartingTime * (mProgressBarRect.width() / mProgressBarDuration)).toInt(),
+                (mProgressBarRect.left + (mCurrentFrameTime - mProgressBarStartingTime) * (mProgressBarRect.width() / mProgressBarDuration)).toInt(),
                 mProgressBarRect.bottom)
 
         canvas.drawRect(mProgressBarRect, mTextPaint)
@@ -448,6 +448,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 }
             }
         }
+        updateMapBuffer()
     }
 
     fun clearLog() = mGameEventsLog.clear()

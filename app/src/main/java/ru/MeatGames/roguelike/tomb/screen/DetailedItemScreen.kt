@@ -11,7 +11,7 @@ import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.model.Item
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.UnitConverter
-import ru.MeatGames.roguelike.tomb.view.TextButton
+import ru.MeatGames.roguelike.tomb.view.Button
 
 class DetailedItemScreen(context: Context,
                          selectedItem: Item) : BasicScreen(context) {
@@ -21,9 +21,9 @@ class DetailedItemScreen(context: Context,
     private val mMainTextPaint = ScreenHelper.getDefaultTextPaint(context)
     private val mSecondaryTextPaint = ScreenHelper.getDefaultTextPaint(context)
 
-    private val mLeftSoftButton: TextButton
-    private val mMiddleSoftButton: TextButton
-    private val mBackButton: TextButton
+    private val mLeftSoftButton: Button
+    private val mMiddleSoftButton: Button
+    private val mBackButton: Button
 
     private var mSelectedItem: Item = selectedItem
     private var mSelectedItemRect: Rect
@@ -36,20 +36,20 @@ class DetailedItemScreen(context: Context,
     init {
         mMainTextPaint.textSize = 24f
 
-        mLeftSoftButton = TextButton(context, "")
+        mLeftSoftButton = Button(context, "")
         mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
         mLeftSoftButton.mDimensions = Rect(0,
                 (mScreenHeight * 0.9F).toInt(),
                 mScreenWidth / 3,
                 mScreenHeight)
 
-        mMiddleSoftButton = TextButton(context, resources.getString(R.string.drop_item_label))
+        mMiddleSoftButton = Button(context, resources.getString(R.string.drop_item_label))
         mMiddleSoftButton.mDimensions = Rect(mScreenWidth / 3,
                 (mScreenHeight * 0.9F).toInt(),
                 mScreenWidth / 3 * 2,
                 mScreenHeight)
 
-        mBackButton = TextButton(context, resources.getString(R.string.back_label))
+        mBackButton = Button(context, resources.getString(R.string.back_label))
         mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
         mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
                 (mScreenHeight * 0.9F).toInt(),

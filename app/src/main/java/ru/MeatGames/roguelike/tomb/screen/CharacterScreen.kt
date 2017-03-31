@@ -8,14 +8,14 @@ import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
-import ru.MeatGames.roguelike.tomb.view.TextButton
+import ru.MeatGames.roguelike.tomb.view.Button
 
 class CharacterScreen(context: Context) : BasicScreen(context) {
 
     override val TAG: String = "Character Screen"
 
     private val mTextPaint: Paint
-    private val mBackButton: TextButton
+    private val mBackButton: Button
     private val mTextOffsetX: Float
 
     init {
@@ -23,7 +23,7 @@ class CharacterScreen(context: Context) : BasicScreen(context) {
         mTextPaint.textSize = 24f
         mTextPaint.textAlign = Paint.Align.LEFT
 
-        mBackButton = TextButton(context, resources.getString(R.string.back_label))
+        mBackButton = Button(context, resources.getString(R.string.back_label))
         mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
         mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
                 mScreenHeight - mScreenHeight / 10,

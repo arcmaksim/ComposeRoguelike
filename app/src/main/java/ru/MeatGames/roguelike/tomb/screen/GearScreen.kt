@@ -10,7 +10,7 @@ import ru.MeatGames.roguelike.tomb.InventoryFilterType
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.UnitConverter
-import ru.MeatGames.roguelike.tomb.view.TextButton
+import ru.MeatGames.roguelike.tomb.view.Button
 
 class GearScreen(context: Context) : BasicScreen(context) {
 
@@ -24,20 +24,20 @@ class GearScreen(context: Context) : BasicScreen(context) {
     private val mBodyRect: Rect
     private val mGearRect: Rect
 
-    private val mLeftSoftButton: TextButton
-    private val mBackButton: TextButton
+    private val mLeftSoftButton: Button
+    private val mBackButton: Button
 
     private val mIsTwoHandedWeaponEquipped: Boolean
 
     init {
-        mLeftSoftButton = TextButton(context, resources.getString(R.string.inventory_label))
+        mLeftSoftButton = Button(context, resources.getString(R.string.inventory_label))
         mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
         mLeftSoftButton.mDimensions = Rect(0,
                 (mScreenHeight * 0.9F).toInt(),
                 mScreenWidth / 3,
                 mScreenHeight)
 
-        mBackButton = TextButton(context, resources.getString(R.string.back_label))
+        mBackButton = Button(context, resources.getString(R.string.back_label))
         mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
         mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
                 (mScreenHeight * 0.9F).toInt(),

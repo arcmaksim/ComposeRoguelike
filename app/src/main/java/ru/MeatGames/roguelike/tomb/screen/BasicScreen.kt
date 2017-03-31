@@ -13,16 +13,26 @@ import ru.MeatGames.roguelike.tomb.util.fillFrame
 
 abstract class BasicScreen(context: Context) : View(context) {
 
+    companion object {
+        @JvmStatic protected var mCurrentFrameNanoTime: Long = 0L
+        @JvmStatic protected var mPreviousFrameNanoTime: Long = System.nanoTime()
+        @JvmStatic protected var mCurrentFrameTime: Long = 0L
+        @JvmStatic protected var mFrameDeltaTime: Long = 0L
+
+        @JvmStatic protected val mBackgroundPaint = Paint()
+        @JvmStatic protected val mBitmapPaint = Paint()
+
+        init {
+            mBitmapPaint.isAntiAlias = false
+            mBitmapPaint.isFilterBitmap = false
+        }
+    }
+
     abstract protected val TAG: String
     protected var mRecordFPS: Boolean = true
 
     protected val mScreenWidth: Int
     protected val mScreenHeight: Int
-
-    protected val mBackgroundPaint = Paint()
-    protected val mBitmapPaint = Paint()
-
-    private var mPreviousFrameTime: Long = System.nanoTime()
 
     init {
         isFocusable = true
@@ -32,18 +42,19 @@ abstract class BasicScreen(context: Context) : View(context) {
         mScreenWidth = screenSize.x
         mScreenHeight = screenSize.y
 
+        // TODO: move init to static init
         mBackgroundPaint.color = ContextCompat.getColor(getContext(), R.color.mainBackground)
-        mBitmapPaint.isAntiAlias = false
-        mBitmapPaint.isFilterBitmap = false
     }
 
     override fun onDraw(canvas: Canvas?) {
-        val currentFrameTime = System.nanoTime()
-        val frameTime = currentFrameTime - mPreviousFrameTime
-        mPreviousFrameTime = currentFrameTime
+        if (isFocused) {
+            mCurrentFrameNanoTime = System.nanoTime()
+            mCurrentFrameTime = System.currentTimeMillis()
 
-        if (mRecordFPS) {
-            FPSLogger.addEntry(frameTime)
+            mFrameDeltaTime = mCurrentFrameNanoTime - mPreviousFrameNanoTime
+            mPreviousFrameNanoTime = mCurrentFrameNanoTime
+
+            if (mRecordFPS) FPSLogger.addEntry(mFrameDeltaTime)
         }
 
         drawScreen(canvas)

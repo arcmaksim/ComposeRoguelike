@@ -10,6 +10,7 @@ class MainGameLoop : Runnable {
 
     override fun run() {
         while (isRunning) {
+
             if (--GameController.mHero.init == 0) {
                 if (--GameController.mHero.cregen == 0) {
                     GameController.mHero.cregen = GameController.mHero.regen

@@ -11,7 +11,7 @@ import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.MapHelper
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.UnitConverter
-import ru.MeatGames.roguelike.tomb.view.TextButton
+import ru.MeatGames.roguelike.tomb.view.Button
 
 // displays explored map
 class MapScreen(context: Context) : BasicScreen(context) {
@@ -24,7 +24,7 @@ class MapScreen(context: Context) : BasicScreen(context) {
     private val mExitMarkerPaint = Paint()
     private val mTextPaint: Paint
 
-    private val mBackButton: TextButton
+    private val mBackButton: Button
     private val mMarkerSize: Float
 
     init {
@@ -36,7 +36,7 @@ class MapScreen(context: Context) : BasicScreen(context) {
         mTextPaint = ScreenHelper.getDefaultTextPaint(context)
         mTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
 
-        mBackButton = TextButton(context, resources.getString(R.string.back_label))
+        mBackButton = Button(context, resources.getString(R.string.back_label))
         mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
         mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
                 mScreenHeight - mScreenHeight / 10,

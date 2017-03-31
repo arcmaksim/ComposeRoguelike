@@ -8,17 +8,17 @@ import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
-import ru.MeatGames.roguelike.tomb.view.TextButton
+import ru.MeatGames.roguelike.tomb.view.Button
 
 class DeathScreen(context: Context) : BasicScreen(context) {
 
     override val TAG: String = "Death Screen"
 
     private val mTextPaint: Paint
-    private val mMainMenuButton: TextButton
+    private val mMainMenuButton: Button
 
     init {
-        mMainMenuButton = TextButton(context, "В меню")
+        mMainMenuButton = Button(context, "В меню")
         mMainMenuButton.mDimensions = Rect(0,
                 mScreenHeight - mScreenHeight / 10,
                 mScreenWidth,

@@ -13,7 +13,7 @@ import ru.MeatGames.roguelike.tomb.R
 import ru.MeatGames.roguelike.tomb.model.Item
 import ru.MeatGames.roguelike.tomb.util.ScreenHelper
 import ru.MeatGames.roguelike.tomb.util.UnitConverter
-import ru.MeatGames.roguelike.tomb.view.TextButton
+import ru.MeatGames.roguelike.tomb.view.Button
 import java.util.*
 
 class InventoryScreen(context: Context,
@@ -54,8 +54,8 @@ class InventoryScreen(context: Context,
     private val mScreenRect: Rect
     private val mItemListRect: Rect
 
-    private val mBackButton: TextButton
-    private val mLeftSoftButton: TextButton // needs proper name
+    private val mBackButton: Button
+    private val mLeftSoftButton: Button // needs proper name
 
     // vars for touch input and drawing filter buttons
     private val mFilterPanelBorder: Float
@@ -76,14 +76,14 @@ class InventoryScreen(context: Context,
         mFilterPanelBorder = mScreenHeight * 0.075F
         mFilterButtonsWidth = mScreenWidth * 0.2F
 
-        mLeftSoftButton = TextButton(context, resources.getString(R.string.gear_label))
+        mLeftSoftButton = Button(context, resources.getString(R.string.gear_label))
         mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
         mLeftSoftButton.mDimensions = Rect(0,
                 (mScreenHeight * 0.9F).toInt(),
                 mScreenWidth / 3,
                 mScreenHeight)
 
-        mBackButton = TextButton(context, resources.getString(R.string.back_label))
+        mBackButton = Button(context, resources.getString(R.string.back_label))
         mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
         mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
                 (mScreenHeight * 0.9F).toInt(),
