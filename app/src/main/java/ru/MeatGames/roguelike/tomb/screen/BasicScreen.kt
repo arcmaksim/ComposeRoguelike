@@ -14,10 +14,10 @@ import ru.MeatGames.roguelike.tomb.util.fillFrame
 abstract class BasicScreen(context: Context) : View(context) {
 
     companion object {
-        @JvmStatic protected var mCurrentFrameNanoTime: Long = 0L
-        @JvmStatic protected var mPreviousFrameNanoTime: Long = System.nanoTime()
-        @JvmStatic protected var mCurrentFrameTime: Long = 0L
-        @JvmStatic protected var mFrameDeltaTime: Long = 0L
+        @JvmStatic private var mCurrentFrameNanoTime: Long = 0L
+        @JvmStatic private var mPreviousFrameNanoTime: Long = System.nanoTime()
+        @JvmStatic private var mCurrentFrameTime: Long = 0L
+        @JvmStatic private var mFrameDeltaTime: Long = 0L
 
         @JvmStatic protected val mBackgroundPaint = Paint()
         @JvmStatic protected val mBitmapPaint = Paint()
@@ -66,5 +66,9 @@ abstract class BasicScreen(context: Context) : View(context) {
     protected fun drawBackground(canvas: Canvas, backgroundPaint: Paint = mBackgroundPaint) {
         canvas.fillFrame(mScreenWidth, mScreenHeight, backgroundPaint)
     }
+
+    fun getCurrentTime() = mCurrentFrameTime
+
+    fun getCurrentNanoTime() = mCurrentFrameNanoTime
 
 }

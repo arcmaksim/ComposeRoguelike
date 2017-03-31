@@ -111,14 +111,14 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 (mMapViewportHeight / 2 + 1) * mActualTileSize + mMapOffsetY)
 
         mProgressBarRect = Rect(mTileBuffer[mMapViewportWidth / 2 - 1][mMapViewportHeight / 2 - 1]!!.left,
-                mTileBuffer[mMapViewportWidth / 2 - 1][mMapViewportHeight / 2 - 1]!!.top,
+                mTileBuffer[mMapViewportWidth / 2 - 1][mMapViewportHeight / 2 - 1]!!.top + mActualTileSize / 4,
                 mTileBuffer[mMapViewportWidth / 2 + 1][mMapViewportHeight / 2 - 1]!!.right,
-                mTileBuffer[mMapViewportWidth / 2 + 1][mMapViewportHeight / 2 - 1]!!.bottom)
+                mTileBuffer[mMapViewportWidth / 2 + 1][mMapViewportHeight / 2 - 1]!!.bottom - mActualTileSize / 4)
     }
 
     fun initProgressBar(objectId: Int, duration: Int) {
         mProgressBarDuration = duration
-        mProgressBarStartingTime = mCurrentFrameTime
+        mProgressBarStartingTime = getCurrentTime()
         mObjectId = objectId
         mDrawProgressBar = true
     }
@@ -400,23 +400,25 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     // needs to be directly above the hero
     private fun drawProgressBar(canvas: Canvas) {
-        if (mCurrentFrameTime - mProgressBarStartingTime > mProgressBarDuration) {
+        if (getCurrentTime() - mProgressBarStartingTime > mProgressBarDuration) {
             mDrawProgressBar = false
             mDrawLog = true
             afterProgressBar(mObjectId)
             return
         }
 
-        val progressBarTempRect = Rect(mProgressBarRect.left,
-                mProgressBarRect.top,
-                (mProgressBarRect.left + (mCurrentFrameTime - mProgressBarStartingTime) * (mProgressBarRect.width() / mProgressBarDuration)).toInt(),
-                mProgressBarRect.bottom)
-
         canvas.drawRect(mProgressBarRect, mTextPaint)
-        canvas.drawRect(progressBarTempRect, mLightBluePaint)
+        canvas.drawRect(mProgressBarRect.left.toFloat(),
+                mProgressBarRect.top.toFloat(),
+                mProgressBarRect.left + (getCurrentTime() - mProgressBarStartingTime) * (mProgressBarRect.width() / mProgressBarDuration.toFloat()),
+                mProgressBarRect.bottom.toFloat(),
+                mLightBluePaint)
 
         mTextPaint.textAlign = Paint.Align.CENTER
-        canvas.drawText(context.getString(R.string.searching_label), mProgressBarRect.exactCenterX(), mProgressBarRect.exactCenterY(), mTextPaint)
+        canvas.drawText(context.getString(R.string.searching_label),
+                mProgressBarRect.exactCenterX(),
+                mProgressBarRect.exactCenterY() + mTextPaint.textSize / 2,
+                mTextPaint)
     }
 
     private fun drawFinalScreen(canvas: Canvas) {
