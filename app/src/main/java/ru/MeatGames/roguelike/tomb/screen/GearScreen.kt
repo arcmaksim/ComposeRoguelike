@@ -1,10 +1,9 @@
 package ru.MeatGames.roguelike.tomb.screen
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.view.MotionEvent
+import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.GameController
 import ru.MeatGames.roguelike.tomb.InventoryFilterType
 import ru.MeatGames.roguelike.tomb.R
@@ -17,12 +16,18 @@ class GearScreen(context: Context) : BasicScreen(context) {
     override val TAG: String = "Gear Screen"
 
     private val mTextPaint: Paint = ScreenHelper.getDefaultTextPaint(context)
+    private val gearPanelBackgroundPaint: Paint = Paint().apply {
+        color = Color.parseColor("#90424242")
+    }
+    private val itemsPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private val mPrimaryArmRect: Rect
     private val mSecondaryArmRect: Rect
     private val mPrimaryArmAltRect: Rect
     private val mBodyRect: Rect
     private val mGearRect: Rect
+
+    private val itemRect: RectF = RectF()
 
     private val mLeftSoftButton: Button
     private val mBackButton: Button
@@ -68,35 +73,54 @@ class GearScreen(context: Context) : BasicScreen(context) {
     // TODO: refactor comments
     private fun drawGear(canvas: Canvas) {
         GameController.mHero.equipmentList[0]?.let {
+            itemRect.left = mPrimaryArmRect.left.toFloat()
+            itemRect.right = mPrimaryArmRect.right.toFloat()
+            itemRect.top = mPrimaryArmRect.top + (mPrimaryArmRect.height() - mPrimaryArmRect.width()) * .5F
+            itemRect.bottom = itemRect.top + mPrimaryArmRect.width()
+
             if (mIsTwoHandedWeaponEquipped) {
-                canvas.drawRect(mPrimaryArmAltRect, mBackgroundPaint)
-                //canvas.drawBitmap(it.image, mPrimaryArmAltRect.exactCenterX() - it.image.width / 2, mPrimaryArmAltRect.exactCenterY() - it.image.height / 2, null)
+                canvas.drawRect(mPrimaryArmAltRect, gearPanelBackgroundPaint)
+                canvas.drawBitmap(Assets.getItemImage(), it.image, itemRect, itemsPaint)
+
+                itemRect.left = mSecondaryArmRect.left.toFloat()
+                itemRect.right = mSecondaryArmRect.right.toFloat()
+                canvas.drawBitmap(Assets.getItemImage(), it.image, itemRect, itemsPaint)
             } else {
-                canvas.drawRect(mPrimaryArmRect, mBackgroundPaint)
-                //canvas.drawBitmap(it.image, mPrimaryArmRect.exactCenterX() - it.image.width / 2, mPrimaryArmRect.exactCenterY() - it.image.height / 2, null)
+                canvas.drawRect(mPrimaryArmRect, gearPanelBackgroundPaint)
+                canvas.drawBitmap(Assets.getItemImage(), it.image, itemRect, itemsPaint)
             }
         } ?: let {
-            canvas.drawRect(mPrimaryArmRect, mBackgroundPaint)
+            canvas.drawRect(mPrimaryArmRect, gearPanelBackgroundPaint)
             canvas.drawText(context.getString(R.string.empty_label), mPrimaryArmRect.exactCenterX(), mPrimaryArmRect.exactCenterY(), mTextPaint)
         }
 
         if (!mIsTwoHandedWeaponEquipped) {
-            canvas.drawRect(mSecondaryArmRect, mBackgroundPaint)
+            canvas.drawRect(mSecondaryArmRect, gearPanelBackgroundPaint)
             GameController.mHero.equipmentList[1]?.let {
-                //canvas.drawBitmap(it.image, mSecondaryArmRect.exactCenterX() - it.image.width / 2, mSecondaryArmRect.exactCenterY() - it.image.width / 2, null)
+                itemRect.left = mSecondaryArmRect.left.toFloat()
+                itemRect.right = mSecondaryArmRect.right.toFloat()
+                itemRect.top = mSecondaryArmRect.top + (mSecondaryArmRect.height() - mSecondaryArmRect.width()) * .5F
+                itemRect.bottom = itemRect.top + mSecondaryArmRect.width()
+
+                canvas.drawBitmap(Assets.getItemImage(), it.image, itemRect, itemsPaint)
             } ?: let {
                 canvas.drawText(context.getString(R.string.empty_label), mSecondaryArmRect.exactCenterX(), mSecondaryArmRect.exactCenterY(), mTextPaint)
             }
         }
 
-        canvas.drawRect(mBodyRect, mBackgroundPaint)
+        canvas.drawRect(mBodyRect, gearPanelBackgroundPaint)
         GameController.mHero.equipmentList[2]?.let {
-            //canvas.drawBitmap(it.image, mBodyRect.exactCenterX() - it.image.width / 2, mBodyRect.exactCenterY() - it.image.width / 2, null)
+            itemRect.left = mBodyRect.left.toFloat()
+            itemRect.right = mBodyRect.right.toFloat()
+            itemRect.top = mBodyRect.top + (mBodyRect.height() - mBodyRect.width()) * .5F
+            itemRect.bottom = itemRect.top + mBodyRect.width()
+
+            canvas.drawBitmap(Assets.getItemImage(), it.image, itemRect, itemsPaint)
         } ?: let {
             canvas.drawText(context.getString(R.string.empty_label), mBodyRect.exactCenterX(), mBodyRect.exactCenterY(), mTextPaint)
         }
 
-        canvas.drawRect(mGearRect, mBackgroundPaint)
+        canvas.drawRect(mGearRect, gearPanelBackgroundPaint)
         canvas.drawText(context.getString(R.string.empty_label), mGearRect.exactCenterX(), mGearRect.exactCenterY(), mTextPaint)
     }
 

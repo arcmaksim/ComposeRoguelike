@@ -1,10 +1,7 @@
 package ru.MeatGames.roguelike.tomb.screen
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.Region
+import android.graphics.*
 import android.view.MotionEvent
 import ru.MeatGames.roguelike.tomb.Assets
 import ru.MeatGames.roguelike.tomb.GameController
@@ -16,14 +13,17 @@ import ru.MeatGames.roguelike.tomb.util.UnitConverter
 import ru.MeatGames.roguelike.tomb.view.Button
 import java.util.*
 
-class InventoryScreen(context: Context,
-                      filter: InventoryFilterType?) : BasicScreen(context) {
+class InventoryScreen(
+        context: Context,
+        filter: InventoryFilterType?
+) : BasicScreen(context) {
 
     override val TAG: String = "Inventory Screen"
 
     private val mEquippedItemBackgroundPaint = Paint()
     private val mMainTextPaint: Paint
     private val mSecondaryTextPaint: Paint
+    private val itemPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private var sx: Int = 0 //ACTION_DOWN
     private var sy: Int = 0
@@ -60,7 +60,9 @@ class InventoryScreen(context: Context,
     // vars for touch input and drawing filter buttons
     private val mFilterPanelBorder: Float
     private val mFilterButtonsWidth: Float
-    private val mFilterStates: BooleanArray = BooleanArray(5, { true })
+    private val mFilterStates: BooleanArray = BooleanArray(5) { true }
+
+    private val itemImageRect = RectF()
 
     init {
         mEquippedItemBackgroundPaint.color = resources.getColor(R.color.framegrn)
@@ -140,17 +142,15 @@ class InventoryScreen(context: Context,
     fun populateItemList() {
         mItemList = LinkedList()
 
-        GameController.mHero.mInventory?.let {
-            it
-                    .filter { isAllowed(it) }
-                    .forEach { mItemList.add(it) }
-        }
+        GameController.mHero
+                .mInventory
+                ?.filter { isAllowed(it) }
+                ?.forEach { mItemList.add(it) }
 
         mItemsOnScreen = mItemList.size
-        mMaxScroll = if (mItemsOnScreen > mMaxItemsOnScreen) {
-            -(mItemList.size * mItemPanelCombinedHeight - mItemListRect.height())
-        } else {
-            0
+        mMaxScroll = when (mItemsOnScreen > mMaxItemsOnScreen) {
+            true -> -(mItemList.size * mItemPanelCombinedHeight - mItemListRect.height())
+            else -> 0
         }
     }
 
@@ -180,6 +180,12 @@ class InventoryScreen(context: Context,
                 if (q >= u) {
                     val top = mItemListRect.top + (q - u) * (mSpaceBetweenItemPanels + mItemPanelHeight) - offset
                     val bottom = top + mItemPanelHeight
+
+                    itemImageRect.top = top
+                    itemImageRect.bottom = bottom
+                    itemImageRect.left = mItemListRect.left.toFloat()
+                    itemImageRect.right = itemImageRect.left + itemImageRect.height()
+
                     val itemPanelBackground = if (!it!!.isConsumable && GameController.mHero.isEquipped(it)) {
                         mEquippedItemBackgroundPaint
                     } else {
@@ -187,7 +193,7 @@ class InventoryScreen(context: Context,
                     }
                     canvas.drawRect(mItemListRect.left.toFloat(), top, mItemListRect.right.toFloat(), bottom, itemPanelBackground)
                     // TODO: refactor
-                    //canvas.drawBitmap(it.image, mItemListRect.left + (mItemPanelHeight - it.image.width) * 0.5F, top + (mItemPanelHeight - it.image.height) / 2, null)
+                    canvas.drawBitmap(Assets.getItemImage(), it.image, itemImageRect, itemPaint)
                     canvas.drawText(it.mTitle, mItemListRect.left + mItemPanelHeight + mTextHorizontalPadding, top + mItemPanelHeight * 0.5F + mTextVerticalPadding, mSecondaryTextPaint)
                 }
                 q++

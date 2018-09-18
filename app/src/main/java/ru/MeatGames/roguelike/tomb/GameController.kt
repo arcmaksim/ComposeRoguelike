@@ -154,8 +154,8 @@ object GameController {
     }
 
     fun spread(i1: Int, j1: Int, c: Int) {
-        for (i in i1 - 1..i1 + 2 - 1)
-            for (j in j1 - 1..j1 + 2 - 1)
+        for (i in i1 - 1 until i1 + 2)
+            for (j in j1 - 1 until j1 + 2)
                 if (zone[i][j] == zoneDefaultValue
                         && mMapController.getMap()[mScreenController.mGameScreen.camx - 1 + i][mScreenController.mGameScreen.camy - 1 + j].mIsPassable
                         && !mMapController.getMap()[mScreenController.mGameScreen.camx - 1 + i][mScreenController.mGameScreen.camy - 1 + j].hasMob())
@@ -186,8 +186,8 @@ object GameController {
         else
             mScreenController.mGameScreen.camy + 10
         for (c in 0..4)
-            for (i in xl..xr - 1)
-                for (j in yl..yr - 1)
+            for (i in xl until xr)
+                for (j in yl until yr)
                     if (zone[i - xl][j - yl] == c)
                         spread(i - xl, j - yl, c + 1)
     }

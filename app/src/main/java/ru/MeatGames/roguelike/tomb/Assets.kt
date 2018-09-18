@@ -101,7 +101,7 @@ object Assets {
         mCreaturesSheetAlternative = getBitmapFromAsset("creatures_sheet_alt")
 
         temp = getBitmapFromAsset("walls_tileset")
-        walls = Array<Bitmap>(16) { i -> Bitmap.createBitmap(temp, i % 4 * mOriginalTileSize, i / 4 * mOriginalTileSize, mOriginalTileSize, mOriginalTileSize) }
+        walls = Array(16) { i -> Bitmap.createBitmap(temp, i % 4 * mOriginalTileSize, i / 4 * mOriginalTileSize, mOriginalTileSize, mOriginalTileSize) }
 
         mFilterIcons = arrayOf(Bitmap.createScaledBitmap(getBitmapFromAsset("weapons_icon_outline"), 30, 30, false),
                 Bitmap.createScaledBitmap(getBitmapFromAsset("weapons_icon_filling"), 30, 30, false),
@@ -124,9 +124,9 @@ object Assets {
                 }
                 parser.next()
             }
-            val statTitle = parser.getAttributeValue(0)
-            val isSingle = parser.getAttributeValue(1) == "t"
-            val isMaximum = parser.getAttributeValue(2) == "t"
+            val statTitle = parser.getAttributeValue(1)
+            val isSingle = parser.getAttributeValue(2) == "t"
+            val isMaximum = parser.getAttributeValue(0) == "t"
             parser.next()
             StatsDB(statTitle, isSingle, isMaximum)
         }
@@ -158,10 +158,10 @@ object Assets {
                 }
                 parser.next()
             }
-            val isPassable = parser.getAttributeValue(0) == "t"
-            val isTransparent = parser.getAttributeValue(1) == "t"
-            val isUsable = parser.getAttributeValue(2) == "t"
-            val isWall = parser.getAttributeValue(3) == "t"
+            val isPassable = parser.getAttributeValue(1) == "t"
+            val isTransparent = parser.getAttributeValue(2) == "t"
+            val isUsable = parser.getAttributeValue(3) == "t"
+            val isWall = parser.getAttributeValue(0) == "t"
             parser.next()
             ObjectDB(isPassable, isTransparent, isUsable, isWall)
         }
@@ -182,22 +182,44 @@ object Assets {
             }
 
             var type = 1
-            val title = parser.getAttributeValue(0)
-            val titleEnding = parser.getAttributeValue(1)
-            val value1 = Integer.parseInt(parser.getAttributeValue(2))
-            val value2 = Integer.parseInt(parser.getAttributeValue(3))
+            var title = ""
+            var titleEnding = ""
+            var value1 = 0
+            var value2 = 0
             var value3 = 0
             var property = false
 
             when (parser.name) {
                 "weapon" -> {
                     type = 1
-                    value3 = Integer.parseInt(parser.getAttributeValue(4))
-                    property = parser.getAttributeValue(5) == "t"
+                    title = parser.getAttributeValue(5)
+                    titleEnding = parser.getAttributeValue(2)
+                    value1 = Integer.parseInt(parser.getAttributeValue(0))
+                    value2 = Integer.parseInt(parser.getAttributeValue(4))
+                    value3 = Integer.parseInt(parser.getAttributeValue(3))
+                    property = parser.getAttributeValue(1) == "t"
                 }
-                "shield" -> type = 2
-                "armor" -> type = 3
-                "item" -> type = 5
+                "shield" -> {
+                    type = 2
+                    title = parser.getAttributeValue(3)
+                    titleEnding = parser.getAttributeValue(2)
+                    value1 = Integer.parseInt(parser.getAttributeValue(1))
+                    value2 = Integer.parseInt(parser.getAttributeValue(0))
+                }
+                "armor" -> {
+                    type = 3
+                    title = parser.getAttributeValue(3)
+                    titleEnding = parser.getAttributeValue(2)
+                    value1 = Integer.parseInt(parser.getAttributeValue(1))
+                    value2 = Integer.parseInt(parser.getAttributeValue(0))
+                }
+                "item" -> {
+                    type = 5
+                    title = parser.getAttributeValue(2)
+                    titleEnding = parser.getAttributeValue(0)
+                    value1 = Integer.parseInt(parser.getAttributeValue(1))
+                    value2 = Integer.parseInt(parser.getAttributeValue(3))
+                }
             }
 
             parser.next()
@@ -215,13 +237,13 @@ object Assets {
                 parser.next()
             }
 
-            val name = parser.getAttributeValue(0)
-            val health = Integer.parseInt(parser.getAttributeValue(1))
-            val attack = Integer.parseInt(parser.getAttributeValue(2))
+            val name = parser.getAttributeValue(5)
+            val health = Integer.parseInt(parser.getAttributeValue(4))
+            val attack = Integer.parseInt(parser.getAttributeValue(1))
             val defense = Integer.parseInt(parser.getAttributeValue(3))
-            val armor = Integer.parseInt(parser.getAttributeValue(4))
-            val speed = Integer.parseInt(parser.getAttributeValue(5))
-            val damage = Integer.parseInt(parser.getAttributeValue(6))
+            val armor = Integer.parseInt(parser.getAttributeValue(0))
+            val speed = Integer.parseInt(parser.getAttributeValue(6))
+            val damage = Integer.parseInt(parser.getAttributeValue(2))
             parser.next()
             MobDB(name, health, attack, defense, armor, speed, damage)
         }
@@ -250,11 +272,7 @@ object Assets {
     fun getItemImage() = mItemsSheet
 
     fun getCreatureImage(frame: Int): Bitmap {
-        if (frame == 0) {
-            return mCreaturesSheetDefault
-        } else {
-            return mCreaturesSheetAlternative
-        }
+        return if (frame == 0) mCreaturesSheetDefault else mCreaturesSheetAlternative
     }
 
     fun getAssetRect(id: Int) = mImageRects[id]

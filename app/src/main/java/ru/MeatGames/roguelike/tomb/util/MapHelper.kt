@@ -50,8 +50,8 @@ object MapHelper {
 
     @JvmStatic
     fun fillArea(startX: Int, startY: Int, width: Int, height: Int, floorId: Int, objectId: Int) {
-        for (y in startY..startY + height - 1) {
-            for (x in startX..startX + width - 1) {
+        for (y in startY until startY + height) {
+            for (x in startX until startX + width) {
                 changeTile(x, y, floorId, objectId)
             }
         }
@@ -81,8 +81,8 @@ object MapHelper {
 
     @JvmStatic
     fun changeAreaObjects(startX: Int, startY: Int, width: Int, height: Int, objectId: Int) {
-        for (y in startY..startY + height - 1) {
-            for (x in startX..startX + width - 1) {
+        for (y in startY until startY + height) {
+            for (x in startX until startX + width) {
                 changeTile(x, y, objectId)
             }
         }

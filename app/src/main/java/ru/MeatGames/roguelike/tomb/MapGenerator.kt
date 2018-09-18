@@ -8,17 +8,16 @@ import java.util.*
 
 class MapGenerator {
 
-    private var roomPrototypes: Array<RoomClass?>
+    private var roomPrototypes: Array<RoomClass?> = arrayOfNulls(16)
     private var placedRoomsData: Array<RoomDBClass?>
 
     var currentRoom: Array<IntArray>? = null
-    var rnd: Random
+    val rnd: Random = Random()
     var m: Int = 0
     var n: Int = 0
 
     var possibleNextRoomX = 0
     var possibleNextRoomY = 0
-    //var rc: Int = 0
     private val mMaxRooms = 70
     var xl: Int = 0
     var xr: Int = 0
@@ -26,9 +25,7 @@ class MapGenerator {
     var yr: Int = 0
 
     init {
-        rnd = Random()
-        roomPrototypes = arrayOfNulls(16)
-        placedRoomsData = arrayOfNulls<RoomDBClass>(mMaxRooms)
+        placedRoomsData = arrayOfNulls(mMaxRooms)
         loadingRooms()
     }
 
@@ -164,7 +161,7 @@ class MapGenerator {
     fun findCell(): Boolean {
         for (z2 in 0..19) {
             possibleNextRoomX = rnd.nextInt(xr - xl + 1) + xl
-            possibleNextRoomY = rnd.nextInt(yr - yl - 1) + yl
+            possibleNextRoomY = rnd.nextInt(yr - yl + 1) + yl
             if (correctPlace(possibleNextRoomX, possibleNextRoomY)) return true
         }
         return false
@@ -177,8 +174,8 @@ class MapGenerator {
 
     fun checkZone(n: Int, m: Int, ln: Int, lm: Int): Boolean {
         if (n + ln > MapHelper.mMapWidth - 3 || m + lm > MapHelper.mMapHeight - 3 || n < 2 || m < 2) return false
-        for (n1 in n..n + ln + 1 - 1) {
-            for (m1 in m..m + lm + 1 - 1) {
+        for (n1 in n until n + ln + 1) {
+            for (m1 in m until m + lm + 1) {
                 if (!MapHelper.isWall(n1, m1)) return false
             }
         }
@@ -186,8 +183,8 @@ class MapGenerator {
     }
 
     fun deleteObjects(startMapX: Int, startMapY: Int, width: Int, height: Int) {
-        for (x1 in 0..width - 1) {
-            for (y1 in 0..height - 1) {
+        for (x1 in 0 until width) {
+            for (y1 in 0 until height) {
                 if (!MapHelper.isWall(startMapX + x1, startMapY + y1)) {
                     MapHelper.changeObject(startMapX + x1, startMapY + y1, 0)
                 }
@@ -197,8 +194,8 @@ class MapGenerator {
 
     fun horizontalMirror(width: Int, height: Int) {
         var temp: Int
-        for (y in 0..height / 2 - 1) {
-            for (x in 0..width - 1) {
+        for (y in 0 until height / 2) {
+            for (x in 0 until width) {
                 temp = currentRoom!![x][y]
                 currentRoom!![x][y] = currentRoom!![x][height - 1 - y]
                 currentRoom!![x][height - 1 - y] = temp
@@ -208,8 +205,8 @@ class MapGenerator {
 
     fun verticalMirror(width: Int, height: Int) {
         var temp: Int
-        for (x in 0..width / 2 - 1) {
-            for (y in 0..height - 1) {
+        for (x in 0 until width / 2) {
+            for (y in 0 until height) {
                 temp = currentRoom!![x][y]
                 currentRoom!![x][y] = currentRoom!![width - 1 - x][y]
                 currentRoom!![width - 1 - x][y] = temp
@@ -225,8 +222,8 @@ class MapGenerator {
     fun newRotateZone(width: Int, height: Int, roomIndex: Int) {
         currentRoom = Array(height) { IntArray(width) }
         val temp: Array<IntArray> = roomPrototypes[roomIndex]!!.map.clone()
-        for (x in 0..width - 1) {
-            for (y in 0..height - 1) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
                 currentRoom!![y][x] = temp[x][y]
             }
         }
@@ -251,13 +248,13 @@ class MapGenerator {
 
         MapHelper.fillArea(0, 0, MapHelper.mMapWidth, MapHelper.mMapHeight, 4001)
 
-        for (i in 0..roomCount - 1) {
+        for (i in 0 until roomCount) {
             placedRoomsData[i] = null
         }
 
         var mapTile: MapClass
-        for (x in 0..MapHelper.mMapWidth - 1) {
-            for (y in 0..MapHelper.mMapHeight - 1) {
+        for (x in 0 until MapHelper.mMapWidth) {
+            for (y in 0 until MapHelper.mMapHeight) {
                 mapTile = MapHelper.getMapTile(x, y) as MapClass
                 mapTile.deleteItems()
                 mapTile.mIsDiscovered = false
@@ -290,8 +287,8 @@ class MapGenerator {
         yl = y2 - 1
         yr = y2 + 5
 
-        var lx = 0
-        var ly = 0
+        var lx: Int
+        var ly: Int
 
         while (roomCount < mMaxRooms - 1) {
             if (findCell()) {
@@ -301,100 +298,30 @@ class MapGenerator {
                 up = MapHelper.getMapTile(possibleNextRoomX, possibleNextRoomY + 1)!!.mIsPassable
 
                 if (right xor left xor (down xor up)) {
-                    var n = 0
-
-                    when (rnd.nextInt(100)) {
-                        in 0..6 -> {
-                            lx = 4
-                            ly = 3
-                            n = 0
-                        }
-                        in 7..11 -> {
-                            ly = 5
-                            lx = ly
-                            n = 1
-                        }
-                        in 12..15 -> {
-                            lx = 8
-                            ly = 6
-                            n = 2
-                        }
-                        in 16..18 -> {
-                            ly = 5
-                            lx = ly
-                            n = 3
-                        }
-                        in 19..21 -> {
-                            ly = 5
-                            lx = ly
-                            n = 4
-                        }
-                        in 22..25 -> {
-                            ly = 4
-                            lx = ly
-                            n = 5
-                        }
-                        in 26..29 -> {
-                            ly = 9
-                            lx = ly
-                            n = 6
-                        }
-                        in 30..34 -> {
-                            lx = 9
-                            ly = 5
-                            n = 7
-                        }
-                        in 35..40 -> {
-                            ly = 5
-                            lx = ly
-                            n = 7
-                        }
-                        in 41..46 -> {
-                            ly = 4
-                            lx = ly
-                            n = 8
-                        }
-                        in 47..51 -> {
-                            ly = 7
-                            lx = ly
-                            n = 8
-                        }
-                        in 52..60 -> {
-                            lx = 6
-                            ly = 9
-                            n = 9
-                        }
-                        in 61..69 -> {
-                            ly = 5
-                            lx = ly
-                            n = 10
-                        }
-                        in 70..77 -> {
-                            lx = 12
-                            ly = 16
-                            n = 11
-                        }
-                        in 78..85 -> {
-                            n = 12
-                            ly = n
-                            lx = ly
-                        }
-                        in 86..91 -> {
-                            lx = 7
-                            ly = 5
-                            n = 13
-                        }
-                        in 92..95 -> {
-                            lx = 5
-                            ly = 4
-                            n = 14
-                        }
-                        in 96..99 -> {
-                            lx = rnd.nextInt(8) + 3
-                            ly = rnd.nextInt(8) + 3
-                            n = 100
-                        }
+                    val (n, tempLx, tempLy) = when (rnd.nextInt(100)) {
+                        in 0..6 -> Triple(0, 4, 3)
+                        in 7..11 -> Triple(1, 5, 5)
+                        in 12..15 -> Triple(2, 8, 6)
+                        in 16..18 -> Triple(3, 5, 5)
+                        in 19..21 -> Triple(4, 5, 5)
+                        in 22..25 -> Triple(5, 4, 4)
+                        in 26..29 -> Triple(6, 9, 9)
+                        in 30..34 -> Triple(7, 9, 5)
+                        in 35..40 -> Triple(7, 5, 5)
+                        in 41..46 -> Triple(8, 4, 4)
+                        in 47..51 -> Triple(8, 7, 7)
+                        in 52..60 -> Triple(9, 6, 9)
+                        in 61..69 -> Triple(10, 5, 5)
+                        in 70..77 -> Triple(11, 12, 16)
+                        in 78..85 -> Triple(12, 12, 12)
+                        in 86..91 -> Triple(13, 7, 5)
+                        in 92..95 -> Triple(14, 5, 4)
+                        in 96..99 -> Triple(100, rnd.nextInt(8) + 3, rnd.nextInt(8) + 3)
+                        else -> Triple(0, 0, 0)
                     }
+
+                    lx = tempLx
+                    ly = tempLy
 
                     if (n != 100) {
                         val tmp: Int
@@ -491,8 +418,8 @@ class MapGenerator {
                     if (checkZone(x2 - 1, y2 - 1, lx + 1, ly + 1)) {
                         roomCount++
                         if (n != 100) {
-                            for (x in 0..lx - 1) {
-                                for (y in 0..ly - 1) {
+                            for (x in 0 until lx) {
+                                for (y in 0 until ly) {
                                     MapHelper.changeTile(x2 + x, y2 + y, currentRoom!![x][y])
                                 }
                             }
@@ -522,28 +449,28 @@ class MapGenerator {
                         if (rnd.nextInt(2) == 0) {
                             if (up) {
                                 val r = getRoom(possibleNextRoomX, possibleNextRoomY + 1)
-                                for (x in 0..lx - 1)
+                                for (x in 0 until lx)
                                     if (getRoom(x2 + x, possibleNextRoomY + 1) == r && !MapHelper.isWall(x2 + x, possibleNextRoomY + 1) && !MapHelper.isWall(x2 + x, possibleNextRoomY - 1))
                                         if (MapHelper.getFloorId(x2 + x, possibleNextRoomY + 1) == MapHelper.getFloorId(x2 + x, possibleNextRoomY - 1))
                                             MapHelper.changeObject(x2 + x, possibleNextRoomY, 0)
                             }
                             if (down) {
                                 val r = getRoom(possibleNextRoomX, possibleNextRoomY - 1)
-                                for (x in 0..lx - 1)
+                                for (x in 0 until lx)
                                     if (getRoom(x2 + x, possibleNextRoomY - 1) == r && !MapHelper.isWall(x2 + x, possibleNextRoomY + 1) && !MapHelper.isWall(x2 + x, possibleNextRoomY - 1))
                                         if (MapHelper.getFloorId(x2 + x, possibleNextRoomY + 1) == MapHelper.getFloorId(x2 + x, possibleNextRoomY - 1))
                                             MapHelper.changeObject(x2 + x, possibleNextRoomY, 0)
                             }
                             if (right) {
                                 val r = getRoom(possibleNextRoomX - 1, possibleNextRoomY)
-                                for (y in 0..ly - 1)
+                                for (y in 0 until ly)
                                     if (getRoom(possibleNextRoomX - 1, y2 + y) == r && !MapHelper.isWall(possibleNextRoomX + 1, y2 + y) && !MapHelper.isWall(possibleNextRoomX - 1, y2 + y))
                                         if (MapHelper.getFloorId(possibleNextRoomX + 1, y2 + y) == MapHelper.getFloorId(possibleNextRoomX - 1, y2 + y))
                                             MapHelper.changeObject(possibleNextRoomX, y2 + y, 0)
                             }
                             if (left) {
                                 val r = getRoom(possibleNextRoomX + 1, possibleNextRoomY)
-                                for (y in 0..ly - 1)
+                                for (y in 0 until ly)
                                     if (getRoom(possibleNextRoomX + 1, y2 + y) == r && !MapHelper.isWall(possibleNextRoomX + 1, y2 + y) && !MapHelper.isWall(possibleNextRoomX - 1, y2 + y))
                                         if (MapHelper.getFloorId(possibleNextRoomX + 1, y2 + y) == MapHelper.getFloorId(possibleNextRoomX - 1, y2 + y))
                                             MapHelper.changeObject(possibleNextRoomX, y2 + y, 0)
@@ -560,7 +487,7 @@ class MapGenerator {
         GameController.updateLOS()
         GameController.updateZone()
 
-        for (x in 0..30 + GameController.curLvls * 7 - 1) {
+        for (x in 0 until 30 + GameController.curLvls * 7) {
 
             do {
                 x2 = rnd.nextInt(MapHelper.mMapWidth)
@@ -630,8 +557,8 @@ class MapGenerator {
                         y2 = possibleNextRoomY - rnd.nextInt(ly)
                     }
                     if (checkZone(x2 - 1, y2 - 1, lx + 1, ly + 1)) {
-                        for (x in 0..lx - 1) {
-                            for (y in 0..ly - 1) {
+                        for (x in 0 until lx) {
+                            for (y in 0 until ly) {
                                 MapHelper.changeTile(x2 + x, y2 + y, currentRoom!![x][y])
                             }
                         }

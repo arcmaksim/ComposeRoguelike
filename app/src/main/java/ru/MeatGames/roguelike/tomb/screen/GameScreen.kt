@@ -96,8 +96,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
         mMapOffsetX = (mScreenWidth - mActualTileSize * 9).div(2)
         mMapOffsetY = (mScreenHeight - mActualTileSize * 9).div(2)
 
-        for (x in 0..mMapViewportWidth - 1) {
-            for (y in 0..mMapViewportHeight - 1) {
+        for (x in 0 until mMapViewportWidth) {
+            for (y in 0 until mMapViewportHeight) {
                 mTileBuffer[x][y] = Rect(x * mActualTileSize + mMapOffsetX,
                         y * mActualTileSize + mMapOffsetY,
                         (x + 1) * mActualTileSize + mMapOffsetX,
@@ -124,8 +124,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     }
 
     fun updateMapBuffer() {
-        for (bufferX in 0..mMapBufferWidth - 1) {
-            for (bufferY in 0..mMapBufferHeight - 1) {
+        for (bufferX in 0 until mMapBufferWidth) {
+            for (bufferY in 0 until mMapBufferHeight) {
 
                 MapHelper.getMapTile(bufferX + camx - 1, bufferY + camy - 1)?.let {
 
@@ -184,9 +184,9 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         }
 
-        for (bufferX in 0..mMapBufferWidth - 1) {
+        for (bufferX in 0 until mMapBufferWidth) {
             var line = ""
-            for (bufferY in 0..mMapBufferHeight - 1) {
+            for (bufferY in 0 until mMapBufferHeight) {
                 line += mapBufferFloodFill[bufferX][bufferY].toString() + " "
             }
             Log.d("Buffer", line)
@@ -270,8 +270,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
         var currentMapBufferCell: MapBufferCell
 
-        for (x in 0..mMapViewportWidth - 1) {
-            for (y in 0..mMapViewportHeight - 1) {
+        for (x in 0 until mMapViewportWidth) {
+            for (y in 0 until mMapViewportHeight) {
 
                 // map buffer wider and higher than map viewport by 2
                 currentMapBufferCell = mMapBuffer[x + 1][y + 1]
@@ -304,9 +304,9 @@ class GameScreen(context: Context) : BasicScreen(context) {
                         canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.mob.getImg(animationFrame), null, mTileBuffer[x][y], mBitmapPaint)
                     }*/
 
-                    /*currentMapBufferCell.mShadowPaint?.let {
-                        canvas.drawRect(currentPixelXtoDraw, currentPixelYtoDraw, leftDrawBorder, rightDrawBorder, it)
-                    }*/
+                    currentMapBufferCell.mShadowPaint?.let {
+                        canvas.drawRect(mTileBuffer[x][y]!!.left.toFloat(), mTileBuffer[x][y]!!.top.toFloat(), mTileBuffer[x][y]!!.right.toFloat(), mTileBuffer[x][y]!!.bottom.toFloat(), it)
+                    }
                 }
 
                 /*if (currentMapBufferCell.mObjectID == 1) {
@@ -498,7 +498,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         err = el / 2
         MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = true
 
-        for (t in 0..el - 1) {
+        for (t in 0 until el) {
             err -= es
             if (err < 0) {
                 err += el
@@ -520,12 +520,12 @@ class GameScreen(context: Context) : BasicScreen(context) {
     fun calculateLineOfSight(x: Int, y: Int) {
         val cm = if (camx < 0) 0 else camx
         val cm1 = if (camy < 0) 0 else camy
-        for (c in cm..(if (cm + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm + 9) - 1)
-            for (c1 in cm1..(if (cm1 + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm1 + 9) - 1)
+        for (c in cm until (if (cm + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm + 9))
+            for (c1 in cm1 until (if (cm1 + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm1 + 9))
                 MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = false
 
-        for (c in x - 1..x + 2 - 1)
-            for (c1 in y - 1..y + 2 - 1)
+        for (c in x - 1 until x + 2)
+            for (c1 in y - 1 until y + 2)
                 MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = true
 
         for (c in -1..1) {
@@ -540,7 +540,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
             line(x, y, x + c, y + 2)
         }
 
-        for (c in -4..-1 - 1) {
+        for (c in -4 until -1) {
             line(x, y, x + c, y - 1)
             line(x, y, x + c, y + 1)
             line(x, y, x + Math.abs(c), y - 1)

@@ -14,12 +14,11 @@ class MainMenu(mContext: Context) : BasicScreen(mContext) {
 
     override val TAG: String = "Main Menu"
 
-    private val mTitleTextPaint: Paint
+    private val mTitleTextPaint: Paint = ScreenHelper.getDefaultTextPaint(mContext)
     private val mNewGameButton: Button
     private val mExitGameButton: Button
 
     init {
-        mTitleTextPaint = ScreenHelper.getDefaultTextPaint(mContext)
         mTitleTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
 
         mNewGameButton = Button(context, "Новая игра")

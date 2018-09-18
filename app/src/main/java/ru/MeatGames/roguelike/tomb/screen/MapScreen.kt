@@ -49,8 +49,8 @@ class MapScreen(context: Context) : BasicScreen(context) {
     override fun drawScreen(canvas: Canvas?) {
         drawBackground(canvas!!)
 
-        for (x in 0..MapHelper.mMapWidth - 1)
-            for (y in 0..MapHelper.mMapHeight - 1) {
+        for (x in 0 until MapHelper.mMapWidth)
+            for (y in 0 until MapHelper.mMapHeight) {
                 if (MapHelper.getMapTile(x, y)!!.mIsDiscovered) {
                     when (MapHelper.getMapTile(x ,y)!!.mObjectID) {
                         0 -> canvas.drawRect(x * mMarkerSize,
