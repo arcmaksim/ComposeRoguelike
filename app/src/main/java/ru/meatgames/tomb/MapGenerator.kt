@@ -1,9 +1,9 @@
 package ru.meatgames.tomb
 
-import ru.MeatGames.tomb.util.MapHelper
 import ru.meatgames.tomb.db.RoomDBClass
 import ru.meatgames.tomb.model.MapClass
 import ru.meatgames.tomb.model.RoomClass
+import ru.meatgames.tomb.util.MapHelper
 import java.util.*
 
 class MapGenerator {

@@ -1,4 +1,4 @@
-package ru.MeatGames.tomb.util
+package ru.meatgames.tomb.util
 
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController

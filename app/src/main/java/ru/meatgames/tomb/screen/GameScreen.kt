@@ -7,14 +7,10 @@ import android.graphics.Rect
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.MotionEvent
-import ru.MeatGames.tomb.util.MapHelper
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.util.ObjectHelper
-import ru.meatgames.tomb.util.ScreenHelper
-import ru.meatgames.tomb.util.array2d
-import ru.meatgames.tomb.util.fillFrame
+import ru.meatgames.tomb.util.*
 import java.util.*
 
 class GameScreen(context: Context) : BasicScreen(context) {

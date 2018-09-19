@@ -1,8 +1,8 @@
 package ru.meatgames.tomb.model
 
-import ru.MeatGames.tomb.util.MapHelper
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
+import ru.meatgames.tomb.util.MapHelper
 import java.util.*
 
 class HeroClass {

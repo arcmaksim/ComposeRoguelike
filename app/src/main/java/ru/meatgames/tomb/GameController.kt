@@ -3,12 +3,12 @@ package ru.meatgames.tomb
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Vibrator
-import ru.MeatGames.tomb.util.MapHelper
 import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
 import ru.meatgames.tomb.model.MapClass
 import ru.meatgames.tomb.screen.ScreenController
 import ru.meatgames.tomb.screen.Screens
+import ru.meatgames.tomb.util.MapHelper
 import ru.meatgames.tomb.util.ObjectHelper
 import ru.meatgames.tomb.util.array2d
 import java.util.*

@@ -6,9 +6,9 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.support.v4.content.ContextCompat
 import android.view.MotionEvent
-import ru.MeatGames.tomb.util.MapHelper
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.util.MapHelper
 import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
 import ru.meatgames.tomb.view.Button

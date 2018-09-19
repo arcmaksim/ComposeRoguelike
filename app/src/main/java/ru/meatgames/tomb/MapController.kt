@@ -1,7 +1,7 @@
 package ru.meatgames.tomb
 
-import ru.MeatGames.tomb.util.MapHelper
 import ru.meatgames.tomb.model.MapClass
+import ru.meatgames.tomb.util.MapHelper
 import ru.meatgames.tomb.util.array2d
 
 class MapController {
