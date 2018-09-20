@@ -2,7 +2,7 @@ package ru.meatgames.tomb.model
 
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
-import ru.meatgames.tomb.util.MapHelper
+import ru.meatgames.tomb.new_models.item.InventoryItem
 import java.util.*
 
 class HeroClass {
@@ -12,7 +12,7 @@ class HeroClass {
     var y: Float = 0.toFloat()
     var mx: Int = 0
     var my: Int = 0
-    lateinit var equipmentList: Array<Item?>
+    lateinit var equipmentList: Array<InventoryItem?>
     var mIsFacingLeft: Boolean = true
     var mIsResting = false
         private set
@@ -21,16 +21,15 @@ class HeroClass {
     var regen: Int = 0
     var cregen: Int = 0
     var init = 10
-    var mInventory: LinkedList<Item>? = null
+    var mInventory: MutableList<InventoryItem> = mutableListOf()
 
     init {
         init()
     }
 
     fun init() {
-        mInventory = null
-        mInventory = LinkedList<Item>()
-        equipmentList = arrayOfNulls<Item>(3)
+        mInventory.clear()
+        equipmentList = arrayOfNulls(3)
         Assets.stats[0].value = 10
         Assets.stats[1].value = 10
         Assets.stats[2].value = 10
@@ -59,18 +58,10 @@ class HeroClass {
         Assets.stats[31].value = 1
         regen = 16
         cregen = regen
-        addItem(GameController.createItem(1))
-        addItem(GameController.createItem(4))
-        addItem(GameController.createItem(7))
-        addItem(GameController.createItem(10))
-        addItem(GameController.createItem(10))
-        addItem(GameController.createItem(10))
-        for (i in 0..29) {
-            addItem(GameController.createItem(i % 11))
-        }
-        preequipItem(mInventory!![0])
-        preequipItem(mInventory!![1])
-        preequipItem(mInventory!![2])
+        addItem(GameController.createItem())
+        addItem(GameController.createItem())
+        addItem(GameController.createItem())
+        addItem(GameController.createItem())
     }
 
     fun getStat(id: Int) =
@@ -113,98 +104,9 @@ class HeroClass {
         }
     }
 
-    fun addItem(item: Item) =
-            mInventory!!.add(item)
+    fun addItem(item: InventoryItem) = mInventory.add(item)
 
-    fun isEquipped(item: Item) =
-            equipmentList[item.mType - 1] == item
-
-    fun dropItem(item: Item) {
-        if (!item.isConsumable && isEquipped(item)) {
-            takeOffItem(item)
-        }
-        mInventory!!.remove(item)
-        MapHelper.getMapTile(mx, my)!!.addItem(item)
-        GameController.updateLog(item.mTitle + " выброшен" + item.mTitleEnding)
-        GameController.skipTurn()
-    }
-
-    fun deleteItem(item: Item) =
-            mInventory!!.remove(item)
-
-    fun preequipItem(item: Item) {
-        when (item.mType) {
-            1 -> {
-                equipmentList[0] = item
-                modifyStat(11, item.mValue1, 1)
-                modifyStat(12, item.mValue2, 1)
-                modifyStat(13, item.mValue3, 1)
-            }
-            2 -> {
-                equipmentList[1] = item
-                modifyStat(19, item.mValue1, 1)
-                modifyStat(22, item.mValue2, 1)
-            }
-            3 -> {
-                equipmentList[2] = item
-                modifyStat(19, item.mValue1, 1)
-                modifyStat(22, item.mValue2, 1)
-            }
-        }
-    }
-
-    fun equipItem(item: Item) {
-        when (item.mType) {
-            1 -> {
-                equipmentList[0] = item
-                if (item.mProperty && equipmentList[1] != null) {
-                    takeOffItem(1)
-                }
-                modifyStat(11, item.mValue1, 1)
-                modifyStat(12, item.mValue2, 1)
-                modifyStat(13, item.mValue3, 1)
-            }
-            2 -> {
-                if (equipmentList[0] != null && equipmentList[0]!!.mProperty) {
-                    takeOffItem(0)
-                }
-                equipmentList[1] = item
-                modifyStat(19, item.mValue1, 1)
-                modifyStat(22, item.mValue2, 1)
-            }
-            3 -> {
-                equipmentList[2] = item
-                modifyStat(19, item.mValue1, 1)
-                modifyStat(22, item.mValue2, 1)
-            }
-        }
-        GameController.updateLog(item.mTitle + " надет" + item.mTitleEnding)
-        GameController.skipTurn()
-    }
-
-    fun takeOffItem(item: Item) {
-        when (item.mType) {
-            1 -> {
-                modifyStat(11, item.mValue1, -1)
-                modifyStat(12, item.mValue2, -1)
-                modifyStat(13, item.mValue3, -1)
-            }
-            2 -> {
-                modifyStat(19, item.mValue1, -1)
-                modifyStat(22, item.mValue2, -1)
-            }
-            3 -> {
-                modifyStat(19, item.mValue1, -1)
-                modifyStat(22, item.mValue2, -1)
-            }
-        }
-        GameController.mHero.equipmentList[item.mType - 1] = null
-        GameController.updateLog(item.mTitle + " снят" + item.mTitleEnding)
-        GameController.skipTurn()
-    }
-
-    fun takeOffItem(i: Int) =
-            takeOffItem(equipmentList[i]!!)
+    fun isEquipped(item: InventoryItem) = equipmentList.contains(item)
 
     @JvmOverloads
     fun startResting(loudBroadcast: Boolean = true) {

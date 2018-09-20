@@ -1,10 +1,11 @@
 package ru.meatgames.tomb;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import ru.meatgames.tomb.new_models.provider.GameDataProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,24 +18,18 @@ public class MainActivity extends AppCompatActivity {
         setupFullScreenMode();
 
         Assets.init(this);
+        GameDataProvider.INSTANCE.init(this);
         GameController.init(this);
 
         GameController.start();
     }
 
     private void setupFullScreenMode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        }
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
     }
 
     @Override
@@ -43,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         /** TODO: saving game
          *  1. Save map
-         *  1.1 Save items
+         *  1.1 Save consumables
          *  1.2. Save creatures
          *  2. Save hero
          *  2.1. Save map position and stats
@@ -102,18 +97,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    // currently not used
-    /*public void pickupItem() {
-        Assets.vibrate();
-        skipTurn();
-    }*/
-
-    // currently not used
-    public void createItem(int x4, int y4, int t) {
-        //Item item = createItem(t);
-        //Assets.INSTANCE.getMap()[x4][y4].addItem(item);
     }
 
     /*public void mobTurn(MobList mob) {

@@ -575,13 +575,14 @@ class GameScreen(context: Context) : BasicScreen(context) {
                     GameController.updateMapBuffer()
                     GameController.skipTurn()
                 }
-                MapHelper.getItem(GameController.mHero.mx, GameController.mHero.my)?.let {
+                // Item pickup
+                /*MapHelper.getItem(GameController.mHero.mx, GameController.mHero.my)?.let {
                     val item = it
                     GameController.mHero.addItem(item)
                     addLine("${item.mTitle} подобран${item.mTitleEnding}")
                     GameController.vibrate()
                     GameController.skipTurn()
-                }
+                }*/
             } else {
                 GameController.move(x, y)
             }

@@ -2,9 +2,12 @@ package ru.meatgames.tomb.new_models.item
 
 import com.bluelinelabs.logansquare.annotation.JsonField
 import com.bluelinelabs.logansquare.annotation.JsonObject
+import ru.meatgames.tomb.new_models.provider.GameDataProvider
+import ru.meatgames.tomb.new_models.stat.Stat
+import ru.meatgames.tomb.util.formatNumber
 
 @JsonObject
-class Weapon {
+class Weapon : InventoryItem() {
 
 	companion object {
 		const val KNIFE: Int = 0
@@ -13,10 +16,36 @@ class Weapon {
 		const val GREATSWORD: Int = 3
 	}
 
-	@JsonField(name = ["id"]) var id: Int = 0
-	@JsonField(name = ["title"]) var title: String = ""
-	@JsonField(name = ["ending"]) var ending: String = ""
 	@JsonField(name = ["isTwoHanded"]) var twoHanded: Boolean = false
-	@JsonField(name = ["statModifiers"]) var statModifiers: List<StatModifier> = emptyList()
+
+
+	override fun getStatsDescription(): List<String> {
+		val statsModifiersList = arrayListOf<String>()
+		val tempModifiers = statModifiers.toMutableList()
+
+		statsModifiersList.add(if (twoHanded) "Двуручное оружие" else "Одноручное оружие")
+
+		tempModifiers.firstOrNull { it.id == Stat.ATTACK }?.let {
+			statsModifiersList.add("${it.modifier.formatNumber()} ${GameDataProvider.stats.getStat(it.id).title}")
+			tempModifiers.remove(it)
+		}
+
+		run {
+			val minimumDamageModifier = tempModifiers.firstOrNull { it.id == Stat.MINIMUM_DAMAGE }
+			val maximumDamageModifier = tempModifiers.firstOrNull { it.id == Stat.MAXIMUM_DAMAGE }
+
+			if (minimumDamageModifier != null || maximumDamageModifier != null) {
+				val minimumDamage = minimumDamageModifier?.modifier ?: 0
+				val maximumDamage = maximumDamageModifier?.modifier ?: minimumDamage
+				statsModifiersList.add("+ $minimumDamage - $maximumDamage Урон")
+			}
+		}
+
+		tempModifiers.forEach {
+			"${it.modifier.formatNumber()} ${GameDataProvider.stats.getStat(it.id).title}"
+		}
+
+		return statsModifiersList.toList()
+	}
 
 }

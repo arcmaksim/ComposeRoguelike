@@ -6,6 +6,8 @@ import android.os.Vibrator
 import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
 import ru.meatgames.tomb.model.MapClass
+import ru.meatgames.tomb.new_models.item.InventoryItem
+import ru.meatgames.tomb.new_models.provider.GameDataProvider
 import ru.meatgames.tomb.screen.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper
@@ -32,7 +34,7 @@ object GameController {
     private val zoneDefaultValue = 99
 
     // TODO: temporal solution
-    lateinit var selectedItem: Item
+    lateinit var selectedItem: InventoryItem
     lateinit var lastAttack: Bitmap
 
     private var mMainGameThread: Thread? = null
@@ -115,17 +117,8 @@ object GameController {
     fun exitGame() = mMainActivity.exitGame()
 
     @JvmStatic
-    fun createItem(): Item {
-        val item = Item(Random().nextInt(13))
-        /*item.id = mRandom.nextInt(13);
-        item.title = Assets.itemDB[item.id].title;
-        item.mTitleEnding = Assets.itemDB[item.id].mTitleEnding;
-        item.mType = Assets.itemDB[item.id].mType;
-        item.mValue1 = Assets.itemDB[item.id].mValue1;
-        item.mValue2 = Assets.itemDB[item.id].mValue2;
-        item.mValue3 = Assets.itemDB[item.id].mValue3;
-        item.mProperty = Assets.itemDB[item.id].mProperty;*/
-        return item
+    fun createItem(): InventoryItem {
+        return GameDataProvider.weapons.weapons[Random().nextInt(GameDataProvider.weapons.weapons.size)]
     }
 
     @JvmStatic
@@ -143,8 +136,9 @@ object GameController {
     }
 
     fun createItem(x4: Int, y4: Int) {
-        val item = createItem()
-        mMapController.getMap()[x4][y4].addItem(item)
+        // Item creation
+        //val item = createItem()
+        //mMapController.getMap()[x4][y4].addItem(item)
     }
 
     fun skipTurn() {

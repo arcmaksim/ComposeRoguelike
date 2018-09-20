@@ -10,7 +10,6 @@ class MapController {
     private var mMapHeight: Int = 96
     private lateinit var mMap: Array<Array<MapClass>>
 
-    init {}
 
     fun getMap(): Array<Array<MapClass>> = mMap
 

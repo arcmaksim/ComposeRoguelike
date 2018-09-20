@@ -7,6 +7,7 @@ import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.InventoryFilterType
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.new_models.item.Weapon
 import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
 import ru.meatgames.tomb.view.Button
@@ -59,7 +60,8 @@ class GearScreen(context: Context) : BasicScreen(context) {
         mBodyRect = Rect(mScreenWidth - cardWidth - margin, margin, mScreenWidth - margin, cardHeight + margin)
         mGearRect = Rect(margin, cardHeight + 2 * margin, mScreenWidth - margin, (mScreenHeight * 0.9F).toInt() - margin)
 
-        mIsTwoHandedWeaponEquipped = GameController.mHero.equipmentList[0]?.mProperty ?: false
+        mIsTwoHandedWeaponEquipped = GameController.mHero.equipmentList[0] is Weapon &&
+                (GameController.mHero.equipmentList[0] as Weapon).twoHanded
     }
 
     override fun drawScreen(canvas: Canvas?) {
