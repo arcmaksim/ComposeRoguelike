@@ -6,6 +6,7 @@ import ru.meatgames.tomb.new_models.repo.*
 
 object GameDataProvider {
 
+	lateinit var tiles: TileRepo
 	lateinit var stats: StatRepo
 	lateinit var armor: ArmorRepo
 	lateinit var weapons: WeaponRepo
@@ -14,11 +15,12 @@ object GameDataProvider {
 
 
 	fun init(context: Context) {
-		stats = LoganSquare.parse(context.assets.open("raw/stats.json"), StatRepo::class.java)
-		armor = LoganSquare.parse(context.assets.open("raw/armor.json"), ArmorRepo::class.java)
-		weapons = LoganSquare.parse(context.assets.open("raw/weapons.json"), WeaponRepo::class.java)
-		shields = LoganSquare.parse(context.assets.open("raw/shields.json"), ShieldRepo::class.java)
-		consumables = LoganSquare.parse(context.assets.open("raw/consumables.json"), ConsumableRepo::class.java)
+		tiles = TileRepo(context)
+		stats = LoganSquare.parse(context.assets.open("data/stats.json"), StatRepo::class.java)
+		armor = LoganSquare.parse(context.assets.open("data/armor.json"), ArmorRepo::class.java)
+		weapons = LoganSquare.parse(context.assets.open("data/weapons.json"), WeaponRepo::class.java)
+		shields = LoganSquare.parse(context.assets.open("data/shields.json"), ShieldRepo::class.java)
+		consumables = LoganSquare.parse(context.assets.open("data/consumables.json"), ConsumableRepo::class.java)
 	}
 
 }
