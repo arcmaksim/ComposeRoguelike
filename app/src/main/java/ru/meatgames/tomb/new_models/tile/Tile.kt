@@ -2,11 +2,18 @@ package ru.meatgames.tomb.new_models.tile
 
 import android.graphics.Rect
 
-class Tile(tileData: TilePropertyJsonModel, tileImageRect: Rect) {
+class Tile(
+		private val tileData: TilePropertyJsonModel,
+		val image: Rect
+) {
 
-	val passable: Boolean = tileData.passable
-	val transparent: Boolean = tileData.transparent
-	val usable: Boolean = tileData.usable
-	val image: Rect = tileImageRect
+	val name: String
+		get() = tileData.name
+	val passable: Boolean
+		get() = tileData.passable
+	val transparent: Boolean
+		get() = tileData.transparent
+	val usable: Boolean
+		get() = tileData.usable
 
 }

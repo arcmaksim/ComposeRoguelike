@@ -43,6 +43,12 @@
       "usable": true
     },
     {
+      "name": "door_opened",
+      "passable": true,
+      "transparent": true,
+      "usable": false
+    },
+    {
       "name": "floor_0",
       "passable": true,
       "transparent": true,

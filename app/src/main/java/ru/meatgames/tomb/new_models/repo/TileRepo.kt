@@ -17,7 +17,7 @@ class TileRepo(context: Context) {
 
 		tiles = List(tileData.tiles.size) { index ->
 			val tile = tileData.tiles[index]
-			Tile(tile, textureAtlasTileData.tiles.first { it.name == tile.name }.frame)
+			Tile(tile, textureAtlasTileData.tiles.first { it.name == tile.name }.frame.toRect())
 		}
 	}
 

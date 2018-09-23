@@ -1,0 +1,38 @@
+{
+  "rooms": [
+    {
+      "width": 5,
+      "height": 5,
+      "floor": [
+        ".....",
+        ".....",
+        ".....",
+        ".....",
+        "....."
+      ],
+      "objects": [
+        "#####",
+        "#...#",
+        "#...#",
+        "#...#",
+        "#####"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        }
+      ]
+    }
+  ]
+}
