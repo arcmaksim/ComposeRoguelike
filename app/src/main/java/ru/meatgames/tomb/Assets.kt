@@ -30,6 +30,8 @@ object Assets {
     lateinit var bag: Bitmap
     lateinit var mFilterIcons: Array<Bitmap>
 
+    lateinit var tileset: Bitmap
+
     private lateinit var mFloorTileset: Bitmap
     private lateinit var mObjectTileset: Bitmap
     private lateinit var mItemsSheet: Bitmap
@@ -93,6 +95,8 @@ object Assets {
         mCharacterIcon = getBitmapFromAsset("character_icon")
         mInventoryIcon = getBitmapFromAsset("inventory_icon")
         mSkipTurnIcon = getBitmapFromAsset("skip_turn_icon")
+
+        tileset = getBitmapFromAsset("tiles")
 
         mFloorTileset = getBitmapFromAsset("floor_tileset")
         mObjectTileset = getBitmapFromAsset("objects_tileset")

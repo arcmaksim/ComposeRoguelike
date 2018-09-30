@@ -1,30 +1,17 @@
 package ru.meatgames.tomb.new_models.room
 
-import com.bluelinelabs.logansquare.annotation.JsonField
-import com.bluelinelabs.logansquare.annotation.JsonObject
-import ru.meatgames.tomb.new_models.tile.Tile
+import android.content.Context
+import com.bluelinelabs.logansquare.LoganSquare
 
-@JsonObject
-class RoomRepo {
+class RoomRepo(context: Context) {
 
-	@JsonField(name = ["rooms"]) lateinit var rooms: List<RoomJsonModel>
+	val rooms: List<Room> = LoganSquare.parse(
+			context.assets.open("data/rooms.json"),
+			RoomsDataJsonModel::class.java)
+			.getRooms()
 
-
-	@JsonObject
-	class RoomJsonModel {
-		@JsonField(name = ["width"]) var width: Int = 0
-		@JsonField(name = ["height"]) var height: Int = 0
-		@JsonField(name = ["floor"]) lateinit var floor: List<String>
-		@JsonField(name = ["objects"]) lateinit var objects: List<String>
-		@JsonField(name = ["floor_symbols"]) lateinit var floorSymbols: List<SymbolJsonModel>
-		@JsonField(name = ["object_symbols"]) lateinit var objectSymbols: List<SymbolJsonModel>
-
-		@JsonObject
-		class SymbolJsonModel {
-			@JsonField(name = ["symbol"]) lateinit var symbol: String
-			@JsonField(name = ["meaning"], typeConverter = SymbolMeaningConverter::class)
-			var meaning: Tile? = null
-		}
+	fun getRandomRoom(): Room {
+		return rooms.first()
 	}
 
 }

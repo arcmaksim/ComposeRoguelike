@@ -10,6 +10,8 @@ import android.view.MotionEvent
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.new_models.repo.TileRepo
+import ru.meatgames.tomb.new_models.tile.Tile
 import ru.meatgames.tomb.util.*
 import java.util.*
 
@@ -21,8 +23,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private val mMapViewportWidth = 9
     private val mMapViewportHeight = 9
 
-    private val mMapBufferWidth = mMapViewportWidth + 2
-    private val mMapBufferHeight = mMapViewportHeight + 2
+    val mMapBufferWidth = mMapViewportWidth + 2
+    val mMapBufferHeight = mMapViewportHeight + 2
 
     private val mMaxLogLines = 8
     var mGameEventsLog: LinkedList<String>
@@ -69,8 +71,10 @@ class GameScreen(context: Context) : BasicScreen(context) {
     var mIsLongPress = false
 
     val mMapBuffer = array2d(mMapBufferWidth, mMapBufferHeight) { MapBufferCell() }
+    val mMapBuffer2 = Array(mMapBufferWidth * mMapBufferHeight) { MapBufferCell2() }
     var mFloodedBuffer = array2d(mMapBufferWidth, mMapBufferHeight) { 0 }
     val mTileBuffer: Array<Array<Rect?>> = array2d(mMapViewportWidth, mMapViewportHeight) { null }
+    val mTileBuffer2: Array<Rect>
     val mHeroRect: Rect
     val mProgressBarRect: Rect
 
@@ -105,6 +109,15 @@ class GameScreen(context: Context) : BasicScreen(context) {
             }
         }
 
+        mTileBuffer2 = Array(mMapViewportWidth * mMapViewportHeight) {
+            val top = it / mMapViewportWidth * mActualTileSize + mMapOffsetY
+            val left = it % mMapViewportWidth * mActualTileSize + mMapOffsetX
+            Rect(left,
+                    top,
+                    left + mActualTileSize,
+                    top + mActualTileSize)
+        }
+
         mHeroRect = Rect((mMapViewportWidth / 2) * mActualTileSize + mMapOffsetX,
                 (mMapViewportHeight / 2) * mActualTileSize + mMapOffsetY,
                 (mMapViewportWidth / 2 + 1) * mActualTileSize + mMapOffsetX,
@@ -124,37 +137,26 @@ class GameScreen(context: Context) : BasicScreen(context) {
     }
 
     fun updateMapBuffer() {
-        for (bufferX in 0 until mMapBufferWidth) {
-            for (bufferY in 0 until mMapBufferHeight) {
+        for (i in 0 until mMapBufferWidth * mMapBufferHeight) {
+            GameController.getMapTile(i % mMapBufferWidth + camx - 1, i / mMapBufferWidth + camy - 1)?.let {
 
-                MapHelper.getMapTile(bufferX + camx - 1, bufferY + camy - 1)?.let {
+                mMapBuffer2[i].floorTile = it.floorTile
+                mMapBuffer2[i].objectTile = if (it.objectTile.name != TileRepo.emptyTile.name &&
+                        it.objectTile.name != TileRepo.voidTile.name) it.objectTile else null
 
-                    mMapBuffer[bufferX][bufferY].mIsVisible = it.mCurrentlyVisible
+                val shadowX = Math.abs(i % mMapBufferWidth - 5)
+                val shadowY = Math.abs(i / mMapBufferWidth - 5)
+                val shadowSum = shadowX + shadowY
 
-                    mMapBuffer[bufferX][bufferY].mFloorID = it.mFloorID
-                    mMapBuffer[bufferX][bufferY].mObjectID = it.mObjectID
-
-                    mMapBuffer[bufferX][bufferY].mHasItem = it.hasItem()
-                    mMapBuffer[bufferX][bufferY].mHasEnemy = it.hasMob()
-
-                    val shadowX = bufferX - 5
-                    val shadowY = bufferY - 5
-                    val shadowSum = Math.abs(shadowX) + Math.abs(shadowY)
-
-                    if ((shadowX == 0 || shadowY == 0) && shadowSum == 3 || shadowX != 0 && shadowY != 0 && shadowSum == 4) {
-                        mMapBuffer[bufferX][bufferY].mShadowPaint = mLightShadowPaint
-                    } else if ((shadowX == 0 || shadowY == 0) && shadowSum == 4 || (Math.abs(shadowX) != 0 || Math.abs(shadowY) != 0)
-                            && shadowSum == 5 || Math.abs(shadowX) == Math.abs(shadowY) && Math.abs(shadowX) == 3) {
-                        mMapBuffer[bufferX][bufferY].mShadowPaint = mDarkShadowPaint
-                    }
-
-                } ?: mMapBuffer[bufferX][bufferY].init()
-
-            }
+                if ((shadowX == 0 || shadowY == 0) && shadowSum == 3 || shadowX != 0 && shadowY != 0 && shadowSum == 4) {
+                    mMapBuffer2[i].mShadowPaint = mLightShadowPaint
+                } else if ((shadowX == 0 || shadowY == 0) && shadowSum == 4 || (shadowX != 0 || shadowY != 0)
+                        && shadowSum == 5 || shadowX == shadowY && shadowX == 3) {
+                    mMapBuffer2[i].mShadowPaint = mDarkShadowPaint
+                }
+            } ?: mMapBuffer2[i].init()
         }
-
-        val floodedBuffer = floodBuffer()
-        correctWalls(floodedBuffer)
+        GameController.updateLOS2()
     }
 
     private fun floodBuffer(): Array<Array<Int>> {
@@ -211,19 +213,19 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
                         if (mMapBuffer[bufferX][bufferY - 1].mObjectID == 1
                                 && Math.abs(floodedBuffer[bufferX][bufferY - 1] - floodIndex) < 2)
-                                mMapBuffer[bufferX][bufferY].mWallBitmap += 1
+                            mMapBuffer[bufferX][bufferY].mWallBitmap += 1
 
                         if (mMapBuffer[bufferX + 1][bufferY].mObjectID == 1
                                 && Math.abs(floodedBuffer[bufferX + 1][bufferY] - floodIndex) < 2)
-                                mMapBuffer[bufferX][bufferY].mWallBitmap += 2
+                            mMapBuffer[bufferX][bufferY].mWallBitmap += 2
 
                         if (mMapBuffer[bufferX][bufferY + 1].mObjectID == 1
                                 && Math.abs(floodedBuffer[bufferX][bufferY + 1] - floodIndex) < 2)
-                                mMapBuffer[bufferX][bufferY].mWallBitmap += 4
+                            mMapBuffer[bufferX][bufferY].mWallBitmap += 4
 
                         if (mMapBuffer[bufferX - 1][bufferY].mObjectID == 1
                                 && Math.abs(floodedBuffer[bufferX - 1][bufferY] - floodIndex) < 2)
-                                mMapBuffer[bufferX][bufferY].mWallBitmap += 8
+                            mMapBuffer[bufferX][bufferY].mWallBitmap += 8
 
                     } else {
                         mMapBuffer[bufferX][bufferY].mWallBitmap = -1
@@ -235,7 +237,6 @@ class GameScreen(context: Context) : BasicScreen(context) {
     }
 
     override fun drawScreen(canvas: Canvas?) {
-
         drawBackground(canvas!!)
 
         if (!mDrawWinScreen) {
@@ -262,60 +263,40 @@ class GameScreen(context: Context) : BasicScreen(context) {
         }
 
         if (mDrawLog) drawLog(canvas)
-
     }
 
 
     private fun drawMap(canvas: Canvas, animationFrame: Int) {
-
-        var currentMapBufferCell: MapBufferCell
-
         for (x in 0 until mMapViewportWidth) {
             for (y in 0 until mMapViewportHeight) {
-
+                val index = x + y * mMapViewportWidth
                 // map buffer wider and higher than map viewport by 2
-                currentMapBufferCell = mMapBuffer[x + 1][y + 1]
+                val currentMapBufferTile = mMapBuffer2[x + 1 + (y + 1) * mMapBufferWidth]
 
-                if (currentMapBufferCell.mIsVisible) {
-
-                    canvas.drawBitmap(Assets.getFloorImage(),
-                            Assets.getAssetRect(currentMapBufferCell.mFloorID),
-                            mTileBuffer[x][y],
-                            mBitmapPaint)
-
-                    if (currentMapBufferCell.mWallBitmap != -1) {
-                        canvas.drawBitmap(Assets.getWallImage(currentMapBufferCell.mWallBitmap),
-                                null,
-                                mTileBuffer[x][y],
-                                mBitmapPaint)
-                    } else {
-                        canvas.drawBitmap(Assets.getObjectImage(),
-                                Assets.getAssetRect(currentMapBufferCell.mObjectID),
-                                mTileBuffer[x][y],
+                if (currentMapBufferTile.mIsVisible) {
+                    currentMapBufferTile.floorTile?.let { floorTile ->
+                        canvas.drawBitmap(Assets.tileset,
+                                floorTile.image,
+                                mTileBuffer2[index],
                                 mBitmapPaint)
                     }
-
-                    /*if (currentMapBufferCell.mHasItem) {
-                        canvas.drawBitmap(Assets.getItemImage(currentMapBufferCell.mI), null, mTileBuffer[x][y], mBitmapPaint)
-                    }*/
-
-                    //if (currentMapBufferCell.mHasEnemy) {
-                    /*if (MapHelper.getMapTile(x, y)!!.hasMob()) {
-                        canvas.drawBitmap(MapHelper.getMapTile(x, y)!!.mob.getImg(animationFrame), null, mTileBuffer[x][y], mBitmapPaint)
-                    }*/
-
-                    currentMapBufferCell.mShadowPaint?.let {
-                        canvas.drawRect(mTileBuffer[x][y]!!.left.toFloat(), mTileBuffer[x][y]!!.top.toFloat(), mTileBuffer[x][y]!!.right.toFloat(), mTileBuffer[x][y]!!.bottom.toFloat(), it)
+                    currentMapBufferTile.objectTile?.let { objectTile ->
+                        canvas.drawBitmap(Assets.tileset,
+                                objectTile.image,
+                                mTileBuffer2[index],
+                                mBitmapPaint)
+                    }
+                    currentMapBufferTile.mShadowPaint?.let {
+                        canvas.drawRect(
+                                mTileBuffer2[index].left.toFloat(),
+                                mTileBuffer2[index].top.toFloat(),
+                                mTileBuffer2[index].right.toFloat(),
+                                mTileBuffer2[index].bottom.toFloat(),
+                                it)
                     }
                 }
-
-                /*if (currentMapBufferCell.mObjectID == 1) {
-                    canvas.drawText((mFloodedBuffer[cx + 1][cy + 1]).toString(), currentPixelXtoDraw + 16, currentPixelYtoDraw + 24, mTextPaint)
-                }*/
-
             }
         }
-
     }
 
     private fun drawHUD(canvas: Canvas) {
@@ -347,7 +328,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         var x: Int
         var y: Int
         canvas.fillFrame(mScreenWidth, mScreenHeight, mMenuBackgroundPaint)
-        for (c in 0..n - 1) {
+        for (c in 0 until n) {
             x = (r * Math.cos(Math.toRadians((270 + z * c).toDouble()))).toInt()
             y = (r * Math.sin(Math.toRadians((270 + z * c).toDouble()))).toInt()
             canvas.drawRect((240 + x - 36).toFloat(), (400 + y - 36).toFloat(), (240 + x + 36).toFloat(), (400 + y + 36).toFloat(), black)
@@ -459,9 +440,9 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
     private fun sign(x: Int) = if (x > 0) 1 else if (x < 0) -1 else 0
 
-    fun line(xstart: Int, ystart: Int, xend: Int, yend: Int) {
-        var x: Int
-        var y: Int
+    fun castRay(xstart: Int, ystart: Int, xend: Int, yend: Int) {
+        var x: Int = xstart
+        var y: Int = ystart
         var dx: Int
         var dy: Int
         val incx: Int
@@ -493,10 +474,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
             el = dy
         }
 
-        x = xstart
-        y = ystart
         err = el / 2
-        MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = true
+        mMapBuffer2[x + y * mMapBufferWidth].mIsVisible = true
 
         for (t in 0 until el) {
             err -= es
@@ -509,46 +488,49 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 y += pdy
             }
 
-            if (MapHelper.horizontal(x) && MapHelper.vertical(y)) {
-                if (!MapHelper.getMapTile(x, y)!!.mCurrentlyVisible) MapHelper.getMapTile(x, y)!!.mCurrentlyVisible = v
-                if (v) MapHelper.getMapTile(x, y)!!.mIsDiscovered = true
-                if (!MapHelper.getMapTile(x, y)!!.mIsTransparent) v = false
+            if (x in 0..mMapBufferWidth && y in 0..mMapBufferHeight) {
+                val currentTile = mMapBuffer2[x + y * mMapBufferWidth]
+                if (!currentTile.mIsVisible) currentTile.mIsVisible = v
+                if (currentTile.objectTile?.isTransparent == false) v = false
             }
         }
     }
 
     fun calculateLineOfSight(x: Int, y: Int) {
-        val cm = if (camx < 0) 0 else camx
-        val cm1 = if (camy < 0) 0 else camy
-        for (c in cm until (if (cm + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm + 9))
-            for (c1 in cm1 until (if (cm1 + 9 >= MapHelper.mMapWidth) MapHelper.mMapWidth else cm1 + 9))
-                MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = false
-
-        for (c in x - 1 until x + 2)
-            for (c1 in y - 1 until y + 2)
-                MapHelper.getMapTile(c, c1)!!.mCurrentlyVisible = true
+        for (i in 0 until mMapBufferWidth * mMapBufferHeight) {
+            mMapBuffer2[i].mIsVisible = false
+        }
 
         for (c in -1..1) {
-            line(x, y, x + c, y - 4)
-            line(x, y, x + c, y + 4)
+            for (c1 in -1..1) {
+                mMapBuffer2[c + mMapBufferWidth / 2 + (c1 + mMapBufferHeight / 2) * mMapBufferWidth].mIsVisible = true
+            }
+        }
+
+        val xx = mMapBufferWidth / 2
+        val yy = mMapBufferHeight / 2
+
+        for (c in -1..1) {
+            castRay(xx, yy, xx + c, yy - 4)
+            castRay(xx, yy, xx + c, yy + 4)
         }
 
         for (c in -3..3) {
-            line(x, y, x + c, y - 3)
-            line(x, y, x + c, y + 3)
-            line(x, y, x + c, y - 2)
-            line(x, y, x + c, y + 2)
+            castRay(xx, yy, xx + c, yy - 3)
+            castRay(xx, yy, xx + c, yy + 3)
+            castRay(xx, yy, xx + c, yy - 2)
+            castRay(xx, yy, xx + c, yy + 2)
         }
 
         for (c in -4 until -1) {
-            line(x, y, x + c, y - 1)
-            line(x, y, x + c, y + 1)
-            line(x, y, x + Math.abs(c), y - 1)
-            line(x, y, x + Math.abs(c), y + 1)
+            castRay(xx, yy, xx + c, yy - 1)
+            castRay(xx, yy, xx + c, yy + 1)
+            castRay(xx, yy, xx + Math.abs(c), yy - 1)
+            castRay(xx, yy, xx + Math.abs(c), yy + 1)
         }
 
-        line(x, y, x - 4, y)
-        line(x, y, x + 4, y)
+        castRay(xx, yy, xx - 4, yy)
+        castRay(xx, yy, xx + 4, yy)
     }
 
     private fun onTouchMain(touchX: Int, touchY: Int) {
@@ -696,6 +678,34 @@ class GameScreen(context: Context) : BasicScreen(context) {
         fun init() {
             mFloorID = 0
             mObjectID = 0
+            /*mItemId = -1
+            mCreatureId = -1*/
+            mWallBitmap = -1
+            mIsVisible = false
+            mShadowPaint = null
+            mHasItem = false
+            mHasEnemy = false
+        }
+
+    }
+
+    inner class MapBufferCell2 {
+
+        var floorTile: Tile? = null
+        var objectTile: Tile? = null
+        /*var mItemId: Int = 0
+        var mCreatureId: Int = 0*/
+        var mWallBitmap: Int = -1
+        var mIsVisible: Boolean = false
+        var mShadowPaint: Paint? = null
+        var mHasItem: Boolean = false
+        var mHasEnemy: Boolean = false
+
+        init {
+            init()
+        }
+
+        fun init() {
             /*mItemId = -1
             mCreatureId = -1*/
             mWallBitmap = -1

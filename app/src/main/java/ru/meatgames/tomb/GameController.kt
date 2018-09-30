@@ -7,7 +7,9 @@ import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
 import ru.meatgames.tomb.model.MapClass
 import ru.meatgames.tomb.new_models.item.InventoryItem
+import ru.meatgames.tomb.new_models.map.MapTile
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
+import ru.meatgames.tomb.new_models.tile.Tile
 import ru.meatgames.tomb.screen.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper
@@ -22,7 +24,7 @@ object GameController {
     private lateinit var mVibrator: Vibrator
 
     private lateinit var mScreenController: ScreenController
-    private lateinit var mMapController: MapController
+    private lateinit var mMapController: NewMapController
 
     lateinit var mHero: HeroClass
 
@@ -56,7 +58,7 @@ object GameController {
 
     private fun init() {
         mScreenController = ScreenController(mMainActivity)
-        mMapController = MapController()
+        mMapController = NewMapController()
         zone = array2d(11, 11) { 0 }
     }
 
@@ -76,6 +78,8 @@ object GameController {
     fun vibrate(vibratePeriod: Long = 30L) = mVibrator.vibrate(vibratePeriod)
 
     fun updateLOS(x: Int = mHero.mx, y: Int = mHero.my) = mScreenController.mGameScreen.calculateLineOfSight(x, y)
+
+    fun updateLOS2(x: Int = 5, y: Int = 5) = mScreenController.mGameScreen.calculateLineOfSight(x, y)
 
     fun updateLog(message: String) = mScreenController.mGameScreen.addLine(message)
 
@@ -102,10 +106,20 @@ object GameController {
     }
 
     @JvmStatic
-    fun getMap(): Array<Array<MapClass>> = mMapController.getMap()
+    fun getMap(): Array<MapTile> = mMapController.getMap()
+
+    // TODO: Temp solution
+    @JvmStatic
+    fun getMap2(): Array<Array<MapClass>> = MapController().getMap()
+
+    fun getMapTile(x: Int, y: Int): MapTile? = mMapController.getMapTile(x, y)
+
+    fun changeFloorTile(x: Int, y: Int, tile: Tile) = mMapController.changeFloorTile(x, y, tile)
+
+    fun changeObjectTile(x: Int, y: Int, tile: Tile) = mMapController.changeObjectTile(x, y, tile)
 
     @JvmStatic
-    fun generateNewMap() = mMapController.generateNewMap()
+    fun generateNewMap() = mMapController.generateNewMap(mMainActivity)
 
     fun changeScreen(screen: Screens) = mScreenController.changeScreen(screen)
 
@@ -151,39 +165,37 @@ object GameController {
         for (i in i1 - 1 until i1 + 2)
             for (j in j1 - 1 until j1 + 2)
                 if (zone[i][j] == zoneDefaultValue
-                        && mMapController.getMap()[mScreenController.mGameScreen.camx - 1 + i][mScreenController.mGameScreen.camy - 1 + j].mIsPassable
-                        && !mMapController.getMap()[mScreenController.mGameScreen.camx - 1 + i][mScreenController.mGameScreen.camy - 1 + j].hasMob())
+                        && mMapController.getMapTile(mScreenController.mGameScreen.camx - 1 + i, mScreenController.mGameScreen.camy - 1 + j)?.isPassable == true)
+                //&& !mMapController.getMapTile(mScreenController.mGameScreen.camx - 1 + i, mScreenController.mGameScreen.camy - 1 + j).hasMob())
                     zone[i][j] = c
     }
 
     fun clearZone() {
-        for (i in 0..10)
-            for (j in 0..10)
+        for (i in 0..10) {
+            for (j in 0..10) {
                 zone[i][j] = zoneDefaultValue
+            }
+        }
         zone[5][5] = 0
     }
 
     fun updateZone() {
         clearZone()
-        val xl: Int
-        val xr: Int
-        val yl: Int
-        val yr: Int
-        xl = if (mScreenController.mGameScreen.camx - 1 < 1) 1 else mScreenController.mGameScreen.camx - 1
-        yl = if (mScreenController.mGameScreen.camy - 1 < 1) 1 else mScreenController.mGameScreen.camy - 1
-        xr = if (mScreenController.mGameScreen.camx + 10 > MapHelper.mMapWidth - 2)
-            MapHelper.mMapHeight - 2
-        else
-            mScreenController.mGameScreen.camx + 10
-        yr = if (mScreenController.mGameScreen.camy + 10 > MapHelper.mMapWidth - 2)
-            MapHelper.mMapHeight - 2
-        else
-            mScreenController.mGameScreen.camy + 10
-        for (c in 0..4)
-            for (i in xl until xr)
-                for (j in yl until yr)
-                    if (zone[i - xl][j - yl] == c)
-                        spread(i - xl, j - yl, c + 1)
+        val xl: Int = if (mScreenController.mGameScreen.camx - 1 < 1) 1 else mScreenController.mGameScreen.camx - 1
+        val yl: Int = if (mScreenController.mGameScreen.camy - 1 < 1) 1 else mScreenController.mGameScreen.camy - 1
+        val xr: Int =
+                if (mScreenController.mGameScreen.camx + 10 > MapHelper.mMapWidth - 2) MapHelper.mMapHeight - 2
+                else mScreenController.mGameScreen.camx + 10
+        val yr: Int =
+                if (mScreenController.mGameScreen.camy + 10 > MapHelper.mMapWidth - 2) MapHelper.mMapHeight - 2
+                else mScreenController.mGameScreen.camy + 10
+        for (c in 0..4) {
+            for (i in xl until xr) {
+                for (j in yl until yr) {
+                    if (zone[i - xl][j - yl] == c) spread(i - xl, j - yl, c + 1)
+                }
+            }
+        }
     }
 
     fun isCollision(mx: Int, my: Int) {
@@ -235,6 +247,21 @@ object GameController {
         }
     }
 
+    fun checkCollisions(mx: Int, my: Int) {
+        val mapBuffer = mScreenController.mGameScreen.mMapBuffer2
+        val mapBufferWidth = mScreenController.mGameScreen.mMapBufferWidth
+        val mapBufferHeight = mScreenController.mGameScreen.mMapBufferHeight
+        val tile = mapBuffer[mapBufferWidth / 2 + mx + (mapBufferHeight / 2 + my) * mapBufferWidth]
+        if (tile.objectTile?.isPassable != false) {
+            mIsPlayerTurn = false
+            mIsPlayerMoved = true
+        } else {
+            mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.path_is_blocked_message))
+            vibrate()
+            mIsPlayerMoved = false
+        }
+    }
+
     fun attack(map: MapClass) {
         /*val random = Random()
 
@@ -277,7 +304,8 @@ object GameController {
         mHero.interruptResting()
         mScreenController.mGameScreen.mx = mx
         mScreenController.mGameScreen.my = my
-        isCollision(mHero.mx + mx, mHero.my + my)
+        //isCollision(mHero.mx + mx, mHero.my + my)
+        checkCollisions(mx, my)
         if (mIsPlayerMoved) {
             mHero.mx = mHero.mx + mx
             mHero.my = mHero.my + my
@@ -287,14 +315,15 @@ object GameController {
         mScreenController.mGameScreen.calculateLineOfSight(mHero.mx, mHero.my)
         if (mx == 1) mHero.mIsFacingLeft = false
         if (mx == -1) mHero.mIsFacingLeft = true
-        if ((mx != 0 || my != 0) && mMapController.getMap()[mHero.mx][mHero.my].hasItem()) {
+        // Notify about standing on an item
+        /*if ((mx != 0 || my != 0) && mMapController.getMapTile(mHero.mx, mHero.my).hasItem()) {
             if (mMapController.getMap()[mHero.mx][mHero.my].mItems.size > 1) {
                 mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.several_items_lying_on_the_ground_message))
             } else {
                 mScreenController.mGameScreen.addLine(mMapController.getMap()[mHero.mx][mHero.my].mItems[0].mTitle
                         + mMainActivity.getString(R.string.lying_on_the_ground_message))
             }
-        }
+        }*/
         updateZone()
         mScreenController.mGameScreen.updateMapBuffer()
     }

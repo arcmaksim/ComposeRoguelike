@@ -11,13 +11,18 @@ class MapController {
     private lateinit var mMap: Array<Array<MapClass>>
 
 
+    init {
+        generateNewMap()
+    }
+
+
     fun getMap(): Array<Array<MapClass>> = mMap
 
     fun generateNewMap() {
         MapHelper.init(mMapWidth, mMapHeight)
         mMap = array2d(mMapWidth, mMapHeight) { MapClass() }
-        val mapGenerator = MapGenerator()
-        mapGenerator.generateMap()
+        /*val mapGenerator = MapGenerator()
+        mapGenerator.generateMap()*/
     }
 
 }

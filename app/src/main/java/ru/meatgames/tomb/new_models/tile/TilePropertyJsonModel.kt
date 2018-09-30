@@ -7,9 +7,9 @@ import com.bluelinelabs.logansquare.annotation.JsonObject
 class TilePropertyJsonModel {
 
 	@JsonField(name = ["name"]) var name: String = ""
-	@JsonField(name = ["passable"]) var passable: Boolean = false
-	@JsonField(name = ["transparent"]) var transparent: Boolean = false
-	@JsonField(name = ["usable"]) var usable: Boolean = false
+	@JsonField(name = ["isPassable"]) var passable: Boolean = false
+	@JsonField(name = ["isTransparent"]) var transparent: Boolean = false
+	@JsonField(name = ["isUsable"]) var usable: Boolean = false
 
 
 	companion object {

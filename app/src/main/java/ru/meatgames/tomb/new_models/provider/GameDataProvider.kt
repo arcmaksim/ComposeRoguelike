@@ -17,14 +17,16 @@ object GameDataProvider {
 
 	fun init(context: Context) {
 		tiles = TileRepo(context)
-
-		val rooms = LoganSquare.parse(context.assets.open("data/rooms.json"), RoomRepo::class.java)
-
 		stats = LoganSquare.parse(context.assets.open("data/stats.json"), StatRepo::class.java)
 		armor = LoganSquare.parse(context.assets.open("data/armor.json"), ArmorRepo::class.java)
-		weapons = LoganSquare.parse(context.assets.open("data/weapons.json"), WeaponRepo::class.java)
-		shields = LoganSquare.parse(context.assets.open("data/shields.json"), ShieldRepo::class.java)
-		consumables = LoganSquare.parse(context.assets.open("data/consumables.json"), ConsumableRepo::class.java)
+		weapons = LoganSquare.parse(context.assets.open("data/weapons.json"),
+				WeaponRepo::class.java)
+		shields = LoganSquare.parse(context.assets.open("data/shields.json"),
+				ShieldRepo::class.java)
+		consumables = LoganSquare.parse(context.assets.open("data/consumables.json"),
+				ConsumableRepo::class.java)
 	}
+
+	fun getRooms(context: Context): RoomRepo = RoomRepo(context)
 
 }

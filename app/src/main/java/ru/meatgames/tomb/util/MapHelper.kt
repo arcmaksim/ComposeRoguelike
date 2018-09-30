@@ -37,7 +37,7 @@ object MapHelper {
     @JvmStatic
     fun getMapTile(coordX: Int, coordY: Int): MapClass? {
         if (horizontal(coordX) && vertical(coordY)) {
-            return GameController.getMap()[coordX][coordY]
+            return GameController.getMap2()[coordX][coordY]
         } else {
             return null
         }
@@ -64,13 +64,13 @@ object MapHelper {
 
     @JvmStatic
     fun changeTile(mapX: Int, mapY: Int, floorId: Int, objectId: Int) {
-        GameController.getMap()[mapX][mapY].mFloorID = floorId
+        GameController.getMap2()[mapX][mapY].mFloorID = floorId
         changeObject(mapX, mapY, objectId)
     }
 
     @JvmStatic
     fun changeObject(mapX: Int, mapY: Int, objectId: Int) {
-        val map = GameController.getMap()
+        val map = GameController.getMap2()
 
         map[mapX][mapY].mObjectID = objectId
 
@@ -89,21 +89,21 @@ object MapHelper {
     }
 
     @JvmStatic
-    fun getFloorId(mapX: Int, mapY: Int) = GameController.getMap()[mapX][mapY].mFloorID
+    fun getFloorId(mapX: Int, mapY: Int) = GameController.getMap2()[mapX][mapY].mFloorID
 
     @JvmStatic
-    fun getObjectId(mapX: Int, mapY: Int) = GameController.getMap()[mapX][mapY].mObjectID
+    fun getObjectId(mapX: Int, mapY: Int) = GameController.getMap2()[mapX][mapY].mObjectID
 
     @JvmStatic
     fun getItem(mapX: Int, mapY: Int): Item? {
-        if (GameController.getMap()[mapX][mapY].mItems.size != 0) {
-            return GameController.getMap()[mapX][mapY].mItems[0]
+        return if (GameController.getMap2()[mapX][mapY].mItems.isNotEmpty()) {
+            GameController.getMap2()[mapX][mapY].mItems[0]
         } else {
-            return null
+            null
         }
     }
 
     @JvmStatic
-    fun isWall(mapX: Int, mapY: Int) = (horizontal(mapX) && vertical(mapY) && GameController.getMap()[mapX][mapY].isWall)
+    fun isWall(mapX: Int, mapY: Int) = (horizontal(mapX) && vertical(mapY) && GameController.getMap2()[mapX][mapY].isWall)
 
 }

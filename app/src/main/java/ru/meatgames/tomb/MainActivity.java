@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         MobList temp = new MobList(t);
         temp.x = x;
         temp.y = y;
-        GameController.getMap()[x][y].addMob(temp);
+        GameController.getMap2()[x][y].addMob(temp);
         addInQueue(temp);
     }
 

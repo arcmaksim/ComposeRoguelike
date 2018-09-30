@@ -11,11 +11,11 @@
         "....."
       ],
       "objects": [
-        "#####",
-        "#...#",
-        "#...#",
-        "#...#",
-        "#####"
+        "#WWW#",
+        "W...W",
+        "W...W",
+        "W...W",
+        "#WWW#"
       ],
       "floor_symbols": [
         {
@@ -29,8 +29,17 @@
           "meaning": "wall_0"
         },
         {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
           "symbol": ".",
           "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
         }
       ]
     }

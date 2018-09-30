@@ -23,7 +23,7 @@ class TileTextureJsonModel {
 		@JsonField(name = ["w"]) var w: Int = 0
 		@JsonField(name = ["h"]) var h: Int = 0
 
-		fun toRect(): Rect = Rect(x, y, w, h)
+		fun toRect(): Rect = Rect(x, y, x+ w, y + h)
 	}
 
 }
