@@ -34,6 +34,11 @@ class NewMapGenerator(context: Context) {
 
 	val outerWalls: HashMap<Int, ArrayList<Pair<Int, Int>>> = HashMap()
 
+	val minAreaWidth: Int = 6
+	val minAreaHeight: Int = 6
+	val minAreaSquare: Int = 40
+	val targetRoomRatio: Float = .75F
+
 
 	fun findCell(): Boolean {
 		for (z2 in 0..19) {
