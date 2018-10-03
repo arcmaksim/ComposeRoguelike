@@ -10,6 +10,7 @@ class RoomRepo(context: Context) {
 			RoomsDataJsonModel::class.java)
 			.getRooms()
 
+
 	fun getRandomRoom(): Room {
 		return rooms.first()
 	}

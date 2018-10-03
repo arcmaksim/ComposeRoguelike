@@ -9,6 +9,7 @@ import android.view.MotionEvent
 import ru.meatgames.tomb.AreaGenerator
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.new_models.repo.TileRepo
 import ru.meatgames.tomb.util.MapHelper
 import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
@@ -59,7 +60,8 @@ class MapScreen(context: Context) : BasicScreen(context) {
 
     override fun drawScreen(canvas: Canvas?) {
         drawBackground(canvas!!)
-        drawAreas(canvas)
+        //drawAreas(canvas)
+        drawMap(canvas)
         mBackButton.draw(canvas)
         postInvalidate()
     }
@@ -81,32 +83,21 @@ class MapScreen(context: Context) : BasicScreen(context) {
 
 
     private fun drawMap(canvas: Canvas) {
-        for (x in 0 until MapHelper.mMapWidth)
-            for (y in 0 until MapHelper.mMapHeight) {
-                if (MapHelper.getMapTile(x, y)!!.mIsDiscovered) {
-                    when (MapHelper.getMapTile(x ,y)!!.mObjectID) {
-                        0 -> canvas.drawRect(x * mMarkerSize,
-                                (y + 1) * mMarkerSize,
-                                (x + 1) * mMarkerSize,
-                                (y + 2) * mMarkerSize,
-                                mRoomBackgroundPaint)
-                        31, 32 -> canvas.drawRect(x * mMarkerSize,
-                                (y + 1) * mMarkerSize,
-                                (x + 1) * mMarkerSize,
-                                (y + 2) * mMarkerSize,
-                                mDoorMarkerPaint)
-                        40 -> canvas.drawRect(x * mMarkerSize,
-                                (y + 1) * mMarkerSize,
-                                (x + 1) * mMarkerSize,
-                                (y + 2) * mMarkerSize,
-                                mExitMarkerPaint)
-                    }
-                }
-            }
-        canvas.drawRect(GameController.mHero.mx * mMarkerSize,
-                (GameController.mHero.my + 1) * mMarkerSize,
-                (GameController.mHero.mx + 1) * mMarkerSize,
-                (GameController.mHero.my + 2) * mMarkerSize,
+	    val map = GameController.getMap()
+	    for (i in 0 until map.size) {
+			val tileObject = map[i].objectTile
+		    if (tileObject != TileRepo.voidTile && tileObject != TileRepo.emptyTile) {
+			    canvas.drawRect(i % MapHelper.mMapWidth * (mMarkerSize - 3),
+					    (i / MapHelper.mMapWidth + 1) * (mMarkerSize - 3),
+					    (i % MapHelper.mMapWidth + 1) * (mMarkerSize - 3),
+					    (i / MapHelper.mMapWidth + 2) * (mMarkerSize - 3),
+					    mRoomBackgroundPaint)
+		    }
+	    }
+        canvas.drawRect(GameController.mHero.mx * (mMarkerSize - 3),
+                (GameController.mHero.my + 1) * (mMarkerSize - 3),
+                (GameController.mHero.mx + 1) * (mMarkerSize - 3),
+                (GameController.mHero.my + 2) * (mMarkerSize - 3),
                 mHeroMarkerPaint)
     }
 
@@ -125,6 +116,10 @@ class MapScreen(context: Context) : BasicScreen(context) {
 
     private fun generateNewAreas() {
         areas = areaGenerator.generateAreas()
+		        .asSequence()
+		        .sortedByDescending { it.width() * it.height() }
+		        .take(10)
+		        .toList()
         areaColors = List(areas.size) {
             Triple(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         }

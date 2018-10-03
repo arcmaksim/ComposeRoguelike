@@ -51,20 +51,26 @@ class RoomsDataJsonModel {
 					.map { it.symbol }
 					.toSet()
 
+			var objectsString = ""
 			for (y in 0 until objects.size) {
-				val objectLine = objects[y]
-				for (x in 0 until objectLine.length) {
-					if (outerSymbols.contains(objectLine[x].toString())) {
-						when {
-							objects.getOrElse(y - 1) { "     " }.getOrElse(x) { '.' }.toString() == voidSymbol.symbol ->
-								addToOuterTiles(0, x, y)
-							objectLine.getOrElse(x + 1) { '.' }.toString() == voidSymbol.symbol ->
-								addToOuterTiles(1, x, y)
-							objects.getOrElse(y + 1) { "     " }.toString() == voidSymbol.symbol ->
-								addToOuterTiles(2, x, y)
-							objectLine.getOrElse(x - 1) { '.' }.toString() == voidSymbol.symbol ->
-								addToOuterTiles(3, x, y)
-						}
+				objectsString += objects[y]
+			}
+
+            val verticalPredicate = { index: Int ->
+                objectsString.getOrElse(index) { ' ' }.toString() == voidSymbol.symbol
+            }
+            val horizontalPredicate = { lineIndex: Int, index: Int ->
+				!(lineIndex in 0 until width && objectsString[index].toString() != voidSymbol.symbol)
+            }
+
+			for (i in 0 until objectsString.length) {
+				val symbol = objectsString[i].toString()
+				if (outerSymbols.contains(symbol)) {
+					when {
+                        verticalPredicate.invoke(i - width) -> addToOuterTiles(0, i % width, i / width)
+                        horizontalPredicate.invoke(i % width + 1, i + 1) -> addToOuterTiles(1, i % width, i / width)
+                        verticalPredicate.invoke(i + width) -> addToOuterTiles(2, i % width, i / width)
+                        horizontalPredicate.invoke(i % width - 1, i - 1) -> addToOuterTiles(3, i % width, i / width)
 					}
 				}
 			}

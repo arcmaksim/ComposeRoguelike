@@ -8,7 +8,7 @@ class AreaGenerator {
     private val minAreaWidth: Int = 6
     private val minAreaHeight: Int = 6
     private val minAreaSquare: Int = 40
-    private val targetRoomRatio: Float = .75F
+    private val targetRoomRatio: Float = .2F
 
 
     private val isAreaDividable: (Rect) -> Boolean = { area ->
@@ -20,12 +20,14 @@ class AreaGenerator {
 
     fun generateAreas(initialArea: Rect = Rect(0, 0, 63, 63)): List<Rect> {
         val targetRoomCount = ((initialArea.width() * initialArea.height()) / minAreaSquare * targetRoomRatio).toInt()
+        val criticalSquare = initialArea.width() * initialArea.height() / 4
 
         val random = Random()
         val areas: MutableList<Rect> = mutableListOf(initialArea)
         val availableAreas: MutableList<Rect> = mutableListOf(initialArea)
         while (true) {
-            val area = availableAreas[random.nextInt(availableAreas.size)]
+            // TODO: optimize - add criticalArea list
+            val area = availableAreas.firstOrNull { it.width() * it.height() >= criticalSquare } ?: availableAreas[random.nextInt(availableAreas.size)]
             val (firstArea, secondArea) =
                     when (area.width() > area.height()) {
                         true -> {
@@ -52,7 +54,12 @@ class AreaGenerator {
 
             areas.remove(area)
             availableAreas.remove(area)
-            if (availableAreas.isEmpty() || availableAreas.size >= targetRoomCount) break
+            if (availableAreas.isEmpty() || areas.size >= targetRoomCount) {
+                for (availableArea in availableAreas) {
+                    areas.add(availableArea)
+                }
+                break
+            }
         }
 
         return areas
