@@ -78,7 +78,8 @@ class NewMapGenerator(context: Context) {
 				initialMapCell.second * mapCellSize - initialMapCell.second + 1)
 		for (i in 0 until 100) {
 			val mapCell = randomMapCell.invoke()
-			generateRoom(initialRoom, mapCell)
+			val room = newRoom()
+			generateRoom(room, mapCell)
 		}
 
 		// Remove walls between rooms
@@ -97,7 +98,7 @@ class NewMapGenerator(context: Context) {
 
 
 	private fun newRoom(): Room {
-		return roomRepo.rooms.first()
+		return roomRepo.rooms[rnd.nextInt(roomRepo.rooms.size)]
 	}
 
 	private fun generateRoom(room: Room, mapCell: Coordinate) {
@@ -141,13 +142,13 @@ class NewMapGenerator(context: Context) {
 		val mapX = area.left * mapCellSize - area.left
 		val mapY = area.top * mapCellSize - area.top
 
-		for (w in 0 until room.width) {
-			for (h in 0 until room.height) {
-				val tileObject = room.objectTiles[room.objects[w][h].toString()]!!
+		for (h in 0 until room.height) {
+			for (w in 0 until room.width) {
+				val tileObject = room.objectTiles[room.objects[h][w].toString()]!!
 				if (tileObject != TileRepo.voidTile) {
 					changeTile(mapX + w,
 							mapY + h,
-							room.floorTiles[room.floor[w][h].toString()]!!,
+							room.floorTiles[room.floor[h][w].toString()]!!,
 							tileObject)
 				}
 			}

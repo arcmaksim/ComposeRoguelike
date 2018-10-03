@@ -2,6 +2,7 @@ package ru.meatgames.tomb.new_models.tile
 
 import com.bluelinelabs.logansquare.annotation.JsonField
 import com.bluelinelabs.logansquare.annotation.JsonObject
+import com.bluelinelabs.logansquare.annotation.OnJsonParseComplete
 
 @JsonObject
 class TilePropertyJsonModel {
@@ -10,6 +11,11 @@ class TilePropertyJsonModel {
 	@JsonField(name = ["isPassable"]) var passable: Boolean = false
 	@JsonField(name = ["isTransparent"]) var transparent: Boolean = false
 	@JsonField(name = ["isUsable"]) var usable: Boolean = false
+
+	@OnJsonParseComplete
+	fun asd() {
+		transparent
+	}
 
 
 	companion object {

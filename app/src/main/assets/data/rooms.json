@@ -46,6 +46,112 @@
           "meaning": "void"
         }
       ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "......."
+      ],
+      "objects": [
+        "  #W#  ",
+        "  #.#  ",
+        "###.###",
+        "W.....W",
+        "###.###",
+        "  #.#  ",
+        "  #W#  "
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "......."
+      ],
+      "objects": [
+        "#######",
+        "#SSSSS#",
+        "W.....W",
+        "W..TC.W",
+        "W.SSS.W",
+        "W.....W",
+        "#WWWWW#"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "T",
+          "meaning": "table_with_papers"
+        },
+        {
+          "symbol": "S",
+          "meaning": "bookshelf"
+        },
+        {
+          "symbol": "C",
+          "meaning": "chair"
+        }
+      ]
     }
   ]
 }
