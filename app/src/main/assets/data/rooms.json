@@ -152,6 +152,507 @@
           "meaning": "chair"
         }
       ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".12223.",
+        ".45556.",
+        ".45556.",
+        ".45556.",
+        ".78889.",
+        "......."
+      ],
+      "objects": [
+        "#######",
+        "#.RTR.#",
+        "W.....W",
+        "W.....W",
+        "W.....W",
+        "#C.C.C#",
+        "#######"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        },
+        {
+          "symbol": "1",
+          "meaning": "carpet_blue_top_left"
+        },
+        {
+          "symbol": "2",
+          "meaning": "carpet_blue_top"
+        },
+        {
+          "symbol": "3",
+          "meaning": "carpet_blue_top_right"
+        },
+        {
+          "symbol": "4",
+          "meaning": "carpet_blue_left"
+        },
+        {
+          "symbol": "5",
+          "meaning": "carpet_blue_center"
+        },
+        {
+          "symbol": "6",
+          "meaning": "carpet_blue_right"
+        },
+        {
+          "symbol": "7",
+          "meaning": "carpet_blue_bottom_left"
+        },
+        {
+          "symbol": "8",
+          "meaning": "carpet_blue_bottom"
+        },
+        {
+          "symbol": "9",
+          "meaning": "carpet_blue_bottom_right"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "T",
+          "meaning": "throne"
+        },
+        {
+          "symbol": "R",
+          "meaning": "weapon_rack_small"
+        },
+        {
+          "symbol": "C",
+          "meaning": "chest_closed"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "......."
+      ],
+      "objects": [
+        "##WWW##",
+        "#.....#",
+        "W..A..W",
+        "W.wFm.W",
+        "W..b..W",
+        "#.....#",
+        "##WWW##"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "F",
+          "meaning": "fountain"
+        },
+        {
+          "symbol": "w",
+          "meaning": "statue_warrior"
+        },
+        {
+          "symbol": "m",
+          "meaning": "statue_wizzard"
+        },
+        {
+          "symbol": "A",
+          "meaning": "statue_archer"
+        },
+        {
+          "symbol": "b",
+          "meaning": "statue_broken"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "......."
+      ],
+      "objects": [
+        "#W#####",
+        "#.b...#",
+        "#...b.W",
+        "#bdbd.#",
+        "W..bd.#",
+        "#.....#",
+        "#######"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "b",
+          "meaning": "barrel"
+        },
+        {
+          "symbol": "d",
+          "meaning": "barrel_broken"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "......."
+      ],
+      "objects": [
+        "#######",
+        "#<==>v#",
+        "W....v#",
+        "W.....W",
+        "#.<=>v#",
+        "#....v#",
+        "#######"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "v",
+          "meaning": "vase_1"
+        },
+        {
+          "symbol": "<",
+          "meaning": "table_dinner_left"
+        },
+        {
+          "symbol": "=",
+          "meaning": "table_middle"
+        },
+        {
+          "symbol": ">",
+          "meaning": "table_dinner_right"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".......",
+        "..123..",
+        ".1556..",
+        ".7889..",
+        ".......",
+        "......."
+      ],
+      "objects": [
+        "#######",
+        "#S<=>S#",
+        "#S...S#",
+        "W....S#",
+        "W.....W",
+        "#<>SS.W",
+        "#######"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        },
+        {
+          "symbol": "1",
+          "meaning": "carpet_red_top_left"
+        },
+        {
+          "symbol": "2",
+          "meaning": "carpet_red_top"
+        },
+        {
+          "symbol": "3",
+          "meaning": "carpet_red_top_right"
+        },
+        {
+          "symbol": "4",
+          "meaning": "carpet_red_left"
+        },
+        {
+          "symbol": "5",
+          "meaning": "carpet_red_center"
+        },
+        {
+          "symbol": "6",
+          "meaning": "carpet_red_right"
+        },
+        {
+          "symbol": "7",
+          "meaning": "carpet_red_bottom_left"
+        },
+        {
+          "symbol": "8",
+          "meaning": "carpet_red_bottom"
+        },
+        {
+          "symbol": "9",
+          "meaning": "carpet_red_bottom_right"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "S",
+          "meaning": "bookshelf"
+        },
+        {
+          "symbol": "<",
+          "meaning": "bench_left"
+        },
+        {
+          "symbol": "=",
+          "meaning": "bench_center"
+        },
+        {
+          "symbol": ">",
+          "meaning": "bench_right"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "......."
+      ],
+      "objects": [
+        "#WW####",
+        "#.....#",
+        "#.....W",
+        "###A..W",
+        "W.....W",
+        "W.....#",
+        "#######"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "A",
+          "meaning": "statue_archer"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 7,
+      "floor": [
+        "._.....",
+        "._.....",
+        ".______",
+        "._.....",
+        "__.....",
+        "__.....",
+        "......."
+      ],
+      "objects": [
+        "#W#####",
+        "#.cVCc#",
+        "#.....W",
+        "#.T...#",
+        "W...t.#",
+        "W.....#",
+        "#####W#"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        },
+        {
+          "symbol": "_",
+          "meaning": "floor_1"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        },
+        {
+          "symbol": "c",
+          "meaning": "coffin"
+        },
+        {
+          "symbol": "C",
+          "meaning": "coffin_opened"
+        },
+        {
+          "symbol": "V",
+          "meaning": "coffin_empty"
+        },
+        {
+          "symbol": "T",
+          "meaning": "tombstone_0"
+        },
+        {
+          "symbol": "t",
+          "meaning": "tombstone_1"
+        }
+      ]
     }
   ]
 }

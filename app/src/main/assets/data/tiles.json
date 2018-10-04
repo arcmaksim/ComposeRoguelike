@@ -95,6 +95,318 @@
       "isPassable": false,
       "isTransparent": false,
       "isUsable": false
+    },
+    {
+      "name": "barrel",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "barrel_broken",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "bench_center",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "bench_left",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "bench_right",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_bottom",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_bottom_left",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_bottom_right",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_center",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_left",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_right",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_top",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_top_left",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_top_right",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_bottom",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_bottom_left",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_bottom_right",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_center",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_left",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_right",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_top",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_top_left",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_top_right",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "coffin",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "coffin_empty",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "coffin_opened",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "fountain",
+      "isPassable": false,
+      "isTransparent": false,
+      "isUsable": false
+    },
+    {
+      "name": "fountain_empty",
+      "isPassable": false,
+      "isTransparent": false,
+      "isUsable": false
+    },
+    {
+      "name": "statue_archer",
+      "isPassable": false,
+      "isTransparent": false,
+      "isUsable": false
+    },
+    {
+      "name": "statue_broken",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "statue_warrior",
+      "isPassable": false,
+      "isTransparent": false,
+      "isUsable": false
+    },
+    {
+      "name": "statue_wizzard",
+      "isPassable": false,
+      "isTransparent": false,
+      "isUsable": false
+    },
+    {
+      "name": "table_dinner_left",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "table_dinner_right",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "table_left",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "table_middle",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "table_right",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "throne",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "tombstone_0",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "tombstone_1",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "tombstone_2",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "tombstone_3",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "tombstone_4",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "tombstone_broken",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "vase_0",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "vase_1",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "vase_broken_0",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "vase_broken_1",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "vase_shuttered_0",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "vase_shuttered_1",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "weapon_rack_small",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": true
+    },
+    {
+      "name": "weapon_rack_big",
+      "isPassable": false,
+      "isTransparent": true,
+      "isUsable": true
     }
   ]
 }
