@@ -15,6 +15,7 @@ class RoomsDataJsonModel {
 
 	@JsonObject
 	class RoomJsonModel {
+		@JsonField(name = ["name"]) lateinit var name: String
 		@JsonField(name = ["width"]) var width: Int = 0
 		@JsonField(name = ["height"]) var height: Int = 0
 		@JsonField(name = ["floor"]) lateinit var floor: List<String>
@@ -89,7 +90,8 @@ class RoomsDataJsonModel {
 	fun getRooms(): List<Room> {
 		return List(roomsModels.size) { index ->
 			val roomJsonModel = roomsModels[index]
-			Room(roomJsonModel.width,
+			Room(roomJsonModel.name,
+					roomJsonModel.width,
 					roomJsonModel.height,
 					roomJsonModel.floor,
 					roomJsonModel.objects,

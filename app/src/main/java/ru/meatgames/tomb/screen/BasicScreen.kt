@@ -3,7 +3,7 @@ package ru.meatgames.tomb.screen
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.View
 import ru.meatgames.tomb.MainActivity
 import ru.meatgames.tomb.R

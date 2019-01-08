@@ -1,8 +1,8 @@
 package ru.meatgames.tomb;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import ru.meatgames.tomb.new_models.provider.GameDataProvider;

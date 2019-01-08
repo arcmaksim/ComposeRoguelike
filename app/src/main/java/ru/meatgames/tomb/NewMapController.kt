@@ -1,6 +1,7 @@
 package ru.meatgames.tomb
 
 import android.content.Context
+import ru.meatgames.tomb.map_generation.NewMapGenerator
 import ru.meatgames.tomb.new_models.map.MapTile
 import ru.meatgames.tomb.new_models.repo.TileRepo
 import ru.meatgames.tomb.new_models.tile.Tile

@@ -153,12 +153,9 @@ class InventoryScreen(
 
 	private fun drawFlags(canvas: Canvas) {
 		for (i in 0..4) {
-
-			val iconBitmap = if (!mFilterStates[i])
-				Assets.getInventoryFilterIcon(i * 2)
-			else
-				Assets.getInventoryFilterIcon(i * 2 + 1)
-
+			val iconBitmap =
+					if (!mFilterStates[i]) Assets.getInventoryFilterIcon(i * 2)
+					else Assets.getInventoryFilterIcon(i * 2 + 1)
 			canvas.drawBitmap(iconBitmap,
 					mFilterButtonsWidth * i + (mFilterButtonsWidth - iconBitmap.width) / 2,
 					(mFilterPanelBorder - iconBitmap.height) / 2,

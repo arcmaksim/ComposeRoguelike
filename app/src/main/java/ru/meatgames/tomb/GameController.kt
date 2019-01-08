@@ -48,6 +48,7 @@ object GameController {
     val maxLvl = 3
     val maxMobs = 6
 
+
     @JvmStatic
     fun init(mainActivity: MainActivity) {
         mMainActivity = mainActivity

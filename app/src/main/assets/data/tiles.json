@@ -181,6 +181,24 @@
       "isUsable": false
     },
     {
+      "name": "carpet_blue_insignia_0",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_insignia_1",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_blue_insignia_2",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
       "name": "carpet_red_bottom",
       "isPassable": true,
       "isTransparent": true,
@@ -235,6 +253,24 @@
       "isUsable": false
     },
     {
+      "name": "carpet_red_insignia_0",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_insignia_1",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
+      "name": "carpet_red_insignia_2",
+      "isPassable": true,
+      "isTransparent": true,
+      "isUsable": false
+    },
+    {
       "name": "coffin",
       "isPassable": false,
       "isTransparent": true,
@@ -283,7 +319,7 @@
       "isUsable": false
     },
     {
-      "name": "statue_wizzard",
+      "name": "statue_wizard",
       "isPassable": false,
       "isTransparent": false,
       "isUsable": false
@@ -307,7 +343,7 @@
       "isUsable": false
     },
     {
-      "name": "table_middle",
+      "name": "table_center",
       "isPassable": false,
       "isTransparent": true,
       "isUsable": false
