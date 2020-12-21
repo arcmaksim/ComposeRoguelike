@@ -208,8 +208,10 @@ class InventoryScreen(
 		canvas.clipRect(mScreenRect, Region.Op.REPLACE)
 	}
 
-	override fun drawScreen(canvas: Canvas?) {
-		drawBackground(canvas!!)
+	override fun drawScreen(
+			canvas: Canvas
+	) {
+		drawBackground(canvas)
 		drawFlags(canvas)
 		drawList(canvas)
 		mLeftSoftButton.draw(canvas)
@@ -218,18 +220,25 @@ class InventoryScreen(
 		postInvalidate()
 	}
 
-	private fun showItemList(isWeaponsAllowed: Boolean = mFilterStates[0],
+	private fun showItemList(
+			isWeaponsAllowed: Boolean = mFilterStates[0],
 			isShieldsAllowed: Boolean = mFilterStates[1],
 			isArmorAllowed: Boolean = mFilterStates[2],
 			isGearAllowed: Boolean = mFilterStates[3],
-			isConsumablesAllowed: Boolean = mFilterStates[4]) {
+			isConsumablesAllowed: Boolean = mFilterStates[4]
+	) {
 		scrollPermission = true
 
 		mCurrentScroll = 0
 		mSavedScroll = 0
 
-		setFilters(isWeaponsAllowed, isShieldsAllowed, isArmorAllowed, isGearAllowed,
-				isConsumablesAllowed)
+		setFilters(
+				isWeaponsAllowed,
+				isShieldsAllowed,
+				isArmorAllowed,
+				isGearAllowed,
+				isConsumablesAllowed
+		)
 		populateItemList()
 	}
 

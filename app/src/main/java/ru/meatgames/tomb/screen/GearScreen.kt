@@ -12,7 +12,9 @@ import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
 import ru.meatgames.tomb.view.Button
 
-class GearScreen(context: Context) : BasicScreen(context) {
+class GearScreen(
+        context: Context
+) : BasicScreen(context) {
 
     override val TAG: String = "Gear Screen"
 
@@ -64,8 +66,10 @@ class GearScreen(context: Context) : BasicScreen(context) {
                 (GameController.mHero.equipmentList[0] as Weapon).twoHanded
     }
 
-    override fun drawScreen(canvas: Canvas?) {
-        drawBackground(canvas!!)
+    override fun drawScreen(
+            canvas: Canvas
+    ) {
+        drawBackground(canvas)
         drawGear(canvas)
         mLeftSoftButton.draw(canvas)
         mBackButton.draw(canvas)

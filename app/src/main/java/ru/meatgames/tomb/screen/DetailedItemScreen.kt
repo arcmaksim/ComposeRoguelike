@@ -86,8 +86,10 @@ class DetailedItemScreen(
         }
     }
 
-    override fun drawScreen(canvas: Canvas?) {
-        drawBackground(canvas!!)
+    override fun drawScreen(
+            canvas: Canvas
+    ) {
+        drawBackground(canvas)
         drawItem(canvas)
         //mLeftSoftButton.draw(canvas)
         //mMiddleSoftButton.draw(canvas)

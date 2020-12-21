@@ -11,7 +11,9 @@ import ru.meatgames.tomb.util.FPSLogger
 import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.fillFrame
 
-abstract class BasicScreen(context: Context) : View(context) {
+abstract class BasicScreen(
+        context: Context
+) : View(context) {
 
     companion object {
         @JvmStatic private var currentFrameNanoTime: Long = 0L
@@ -49,7 +51,7 @@ abstract class BasicScreen(context: Context) : View(context) {
 
 
     override fun onDraw(
-            canvas: Canvas?
+            canvas: Canvas
     ) {
         if (isFocused) {
             currentFrameNanoTime = System.nanoTime()
@@ -65,7 +67,7 @@ abstract class BasicScreen(context: Context) : View(context) {
         invalidate()
     }
 
-    abstract fun drawScreen(canvas: Canvas?)
+    abstract fun drawScreen(canvas: Canvas)
 
     protected fun drawBackground(
             canvas: Canvas,

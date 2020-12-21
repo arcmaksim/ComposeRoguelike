@@ -10,55 +10,66 @@ import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
 import ru.meatgames.tomb.view.Button
 
-class MainMenu(mContext: Context) : BasicScreen(mContext) {
+class MainMenu(
+        context: Context
+) : BasicScreen(context) {
 
     override val TAG: String = "Main Menu"
 
-    private val mTitleTextPaint: Paint = ScreenHelper.getDefaultTextPaint(mContext)
-    private val mNewGameButton: Button
-    private val mExitGameButton: Button
-
-    init {
-        mTitleTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
-
-        mNewGameButton = Button(context, "Новая игра")
-        mNewGameButton.textPaint.textAlign = Paint.Align.LEFT
-        mNewGameButton.dimensions = Rect(0,
+    private val titleTextPaint: Paint = ScreenHelper.getDefaultTextPaint(context).apply {
+        textSize = UnitConverter.convertSpToPixels(32F, context)
+    }
+    private val newGameButton: Button = Button(context, "Новая игра").apply {
+        textPaint.textAlign = Paint.Align.LEFT
+        dimensions = Rect(
+                0,
                 screenHeight - screenHeight / 10,
                 screenWidth / 3,
-                screenHeight)
-
-        mExitGameButton = Button(context, "Выход")
-        mExitGameButton.textPaint.textAlign = Paint.Align.RIGHT
-        mExitGameButton.dimensions = Rect(screenWidth / 3 * 2,
+                screenHeight
+        )
+    }
+    private val exitGameButton: Button = Button(context, "Выход").apply {
+        textPaint.textAlign = Paint.Align.RIGHT
+        dimensions = Rect(
+                screenWidth / 3 * 2,
                 screenHeight - screenHeight / 10,
                 screenWidth,
-                screenHeight)
+                screenHeight
+        )
     }
 
-    override fun drawScreen(canvas: Canvas?) {
-        drawBackground(canvas!!)
-        canvas.drawText("Yet Another",
+
+    override fun drawScreen(
+            canvas: Canvas
+    ) {
+        drawBackground(canvas)
+        canvas.drawText(
+                "Yet Another",
                 (screenWidth / 2).toFloat(),
                 (screenHeight / 8 * 3).toFloat(),
-                mTitleTextPaint)
-        canvas.drawText("Roguelike",
+                titleTextPaint
+        )
+        canvas.drawText(
+                "Roguelike",
                 (screenWidth / 2).toFloat(),
                 (screenHeight / 8 * 3 + screenHeight / 16).toFloat(),
-                mTitleTextPaint)
-        mNewGameButton.draw(canvas)
-        mExitGameButton.draw(canvas)
+                titleTextPaint
+        )
+        newGameButton.draw(canvas)
+        exitGameButton.draw(canvas)
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
+    override fun onTouchEvent(
+            event: MotionEvent
+    ): Boolean {
         when (event.action) {
             MotionEvent.ACTION_UP -> {
                 val touchX = event.x.toInt()
                 val touchY = event.y.toInt()
-                if (mNewGameButton.isPressed(touchX, touchY)) {
+                if (newGameButton.isPressed(touchX, touchY)) {
                     GameController.startNewGame()
                 }
-                if (mExitGameButton.isPressed(touchX, touchY)) {
+                if (exitGameButton.isPressed(touchX, touchY)) {
                     GameController.exitGame()
                 }
             }

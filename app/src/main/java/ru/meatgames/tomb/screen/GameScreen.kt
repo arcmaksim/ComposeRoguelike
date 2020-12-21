@@ -15,7 +15,9 @@ import ru.meatgames.tomb.new_models.tile.Tile
 import ru.meatgames.tomb.util.*
 import java.util.*
 
-class GameScreen(context: Context) : BasicScreen(context) {
+class GameScreen(
+        context: Context
+) : BasicScreen(context) {
 
     override val TAG: String = "MainActivity Screen"
 
@@ -236,8 +238,10 @@ class GameScreen(context: Context) : BasicScreen(context) {
         }
     }
 
-    override fun drawScreen(canvas: Canvas?) {
-        drawBackground(canvas!!)
+    override fun drawScreen(
+            canvas: Canvas
+    ) {
+        drawBackground(canvas)
 
         if (!mDrawWinScreen) {
 
