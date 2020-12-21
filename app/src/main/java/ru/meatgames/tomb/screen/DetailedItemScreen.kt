@@ -42,27 +42,27 @@ class DetailedItemScreen(
         mMainTextPaint.textSize = 24f
 
         mLeftSoftButton = Button(context, "")
-        mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
-        mLeftSoftButton.mDimensions = Rect(0,
-                (mScreenHeight * 0.9F).toInt(),
-                mScreenWidth / 3,
-                mScreenHeight)
+        mLeftSoftButton.textPaint.textAlign = Paint.Align.LEFT
+        mLeftSoftButton.dimensions = Rect(0,
+                (screenHeight * 0.9F).toInt(),
+                screenWidth / 3,
+                screenHeight)
 
         mMiddleSoftButton = Button(context, resources.getString(R.string.drop_item_label))
-        mMiddleSoftButton.mDimensions = Rect(mScreenWidth / 3,
-                (mScreenHeight * 0.9F).toInt(),
-                mScreenWidth / 3 * 2,
-                mScreenHeight)
+        mMiddleSoftButton.dimensions = Rect(screenWidth / 3,
+                (screenHeight * 0.9F).toInt(),
+                screenWidth / 3 * 2,
+                screenHeight)
 
         mBackButton = Button(context, resources.getString(R.string.back_label))
-        mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
-        mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
-                (mScreenHeight * 0.9F).toInt(),
-                mScreenWidth,
-                mScreenHeight)
+        mBackButton.textPaint.textAlign = Paint.Align.RIGHT
+        mBackButton.dimensions = Rect(screenWidth / 3 * 2,
+                (screenHeight * 0.9F).toInt(),
+                screenWidth,
+                screenHeight)
 
         val selectedItemSize = Assets.mActualTileSize * mItemBitmapScale
-        val itemBitmapHorizontalPadding = (mScreenWidth - selectedItemSize) / 2
+        val itemBitmapHorizontalPadding = (screenWidth - selectedItemSize) / 2
         mSelectedItemRect = Rect(itemBitmapHorizontalPadding,
                 mItemBitmapVerticalPadding,
                 itemBitmapHorizontalPadding + selectedItemSize,
@@ -72,7 +72,7 @@ class DetailedItemScreen(
         mTextLinePadding = mSecondaryTextPaint.textSize * 1.5F
 
         if (mSelectedItem is Consumable) {
-            mLeftSoftButton.mLabel = context.getString(R.string.use_label)
+            mLeftSoftButton.label = context.getString(R.string.use_label)
         } else {
             /*GameController.mHero.equipmentList[mSelectedItem.mType - 1]?.let {
                 mLeftSoftButton.mLabel = if (mSelectedItem == it) {
@@ -96,10 +96,10 @@ class DetailedItemScreen(
     }
 
     private fun drawItem(canvas: Canvas) {
-        canvas.drawBitmap(Assets.getItemImage(), mSelectedItem.image, mSelectedItemRect, mBitmapPaint)
-        canvas.drawText(mSelectedItem.title, mScreenWidth * 0.5F, mTextTopPadding, mMainTextPaint)
+        canvas.drawBitmap(Assets.getItemImage(), mSelectedItem.image, mSelectedItemRect, bitmapPaint)
+        canvas.drawText(mSelectedItem.title, screenWidth * 0.5F, mTextTopPadding, mMainTextPaint)
         selectedItemProperties.forEachIndexed { index, property ->
-            canvas.drawText(property, mScreenWidth * 0.5F, mTextTopPadding + mTextLinePadding * (index + 1), mSecondaryTextPaint)
+            canvas.drawText(property, screenWidth * 0.5F, mTextTopPadding + mTextLinePadding * (index + 1), mSecondaryTextPaint)
         }
     }
 

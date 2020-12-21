@@ -75,33 +75,33 @@ class InventoryScreen(
 
 		mItemListPadding = UnitConverter.convertDpToPixels(16F, context)
 
-		mFilterPanelBorder = mScreenHeight * 0.075F
-		mFilterButtonsWidth = mScreenWidth * 0.2F
+		mFilterPanelBorder = screenHeight * 0.075F
+		mFilterButtonsWidth = screenWidth * 0.2F
 
 		mLeftSoftButton = Button(context, resources.getString(R.string.gear_label))
-		mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
-		mLeftSoftButton.mDimensions = Rect(0,
-				(mScreenHeight * 0.9F).toInt(),
-				mScreenWidth / 3,
-				mScreenHeight)
+		mLeftSoftButton.textPaint.textAlign = Paint.Align.LEFT
+		mLeftSoftButton.dimensions = Rect(0,
+				(screenHeight * 0.9F).toInt(),
+				screenWidth / 3,
+				screenHeight)
 
 		mBackButton = Button(context, resources.getString(R.string.back_label))
-		mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
-		mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
-				(mScreenHeight * 0.9F).toInt(),
-				mScreenWidth,
-				mScreenHeight)
+		mBackButton.textPaint.textAlign = Paint.Align.RIGHT
+		mBackButton.dimensions = Rect(screenWidth / 3 * 2,
+				(screenHeight * 0.9F).toInt(),
+				screenWidth,
+				screenHeight)
 
 		mSpaceBetweenItemPanels = UnitConverter.convertDpToPixels(2F, context)
 
 		mItemPanelHeight = UnitConverter.convertDpToPixels(40F, context)
 		mItemPanelCombinedHeight = (mItemPanelHeight + mSpaceBetweenItemPanels).toInt()
 
-		mScreenRect = Rect(0, 0, mScreenWidth, mScreenHeight)
+		mScreenRect = Rect(0, 0, screenWidth, screenHeight)
 		mItemListRect = Rect(mItemListPadding.toInt(),
 				(mFilterPanelBorder + mItemListPadding).toInt(),
-				(mScreenWidth - mItemListPadding).toInt(),
-				(mScreenHeight * 0.9F - mItemListPadding).toInt())
+				(screenWidth - mItemListPadding).toInt(),
+				(screenHeight * 0.9F - mItemListPadding).toInt())
 
 		mMaxItemsOnScreen = if (mItemListRect.height() % mItemPanelCombinedHeight == 0) {
 			mItemListRect.height() / mItemPanelCombinedHeight
@@ -201,10 +201,10 @@ class InventoryScreen(
 			}
 		} else {
 			canvas.drawText(context.getString(R.string.inventory_is_empty_label),
-					mScreenWidth * 0.5F, mScreenHeight * 0.125F, mMainTextPaint)
+					screenWidth * 0.5F, screenHeight * 0.125F, mMainTextPaint)
 		}
 
-		mLeftSoftButton.mLabel = context.getString(R.string.gear_label)
+		mLeftSoftButton.label = context.getString(R.string.gear_label)
 		canvas.clipRect(mScreenRect, Region.Op.REPLACE)
 	}
 
@@ -237,7 +237,7 @@ class InventoryScreen(
 
 	fun onTouchInv(sx: Int, sy: Int) {
 		if (sy < mFilterPanelBorder) { // filter buttons panel
-			mFilterStates[sx / mFilterButtonsWidth.toInt()] = !mFilterStates[sx / (mScreenWidth / 5)]
+			mFilterStates[sx / mFilterButtonsWidth.toInt()] = !mFilterStates[sx / (screenWidth / 5)]
 			showItemList()
 		}
 

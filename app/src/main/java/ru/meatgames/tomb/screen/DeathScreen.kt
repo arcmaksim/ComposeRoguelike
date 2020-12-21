@@ -19,10 +19,10 @@ class DeathScreen(context: Context) : BasicScreen(context) {
 
     init {
         mMainMenuButton = Button(context, "В меню")
-        mMainMenuButton.mDimensions = Rect(0,
-                mScreenHeight - mScreenHeight / 10,
-                mScreenWidth,
-                mScreenHeight)
+        mMainMenuButton.dimensions = Rect(0,
+                screenHeight - screenHeight / 10,
+                screenWidth,
+                screenHeight)
 
         mTextPaint = ScreenHelper.getDefaultTextPaint(context)
         mTextPaint.textSize = 24f
@@ -32,7 +32,7 @@ class DeathScreen(context: Context) : BasicScreen(context) {
     override fun drawScreen(canvas: Canvas?) {
         drawBackground(canvas!!)
 
-        canvas.drawText(context.getString(R.string.death_from_label), mScreenWidth * 0.5F, mScreenHeight * 0.4F, mTextPaint)
+        canvas.drawText(context.getString(R.string.death_from_label), screenWidth * 0.5F, screenHeight * 0.4F, mTextPaint)
         //canvas.drawBitmap(GameController.lastAttack, (mScreenWidth - GameController.lastAttack.width) * 0.5F, mScreenHeight * 0.425F, null)
 
         mMainMenuButton.draw(canvas)

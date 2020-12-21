@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.support.v4.content.ContextCompat
 import android.view.MotionEvent
+import androidx.core.content.ContextCompat
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.util.MapHelper
@@ -37,13 +37,13 @@ class MapScreen(context: Context) : BasicScreen(context) {
         mTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
 
         mBackButton = Button(context, resources.getString(R.string.back_label))
-        mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
-        mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
-                mScreenHeight - mScreenHeight / 10,
-                mScreenWidth,
-                mScreenHeight)
+        mBackButton.textPaint.textAlign = Paint.Align.RIGHT
+        mBackButton.dimensions = Rect(screenWidth / 3 * 2,
+                screenHeight - screenHeight / 10,
+                screenWidth,
+                screenHeight)
 
-        mMarkerSize = (mScreenWidth / MapHelper.mMapWidth).toFloat()
+        mMarkerSize = (screenWidth / MapHelper.mMapWidth).toFloat()
     }
 
     override fun drawScreen(canvas: Canvas?) {

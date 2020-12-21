@@ -37,28 +37,28 @@ class GearScreen(context: Context) : BasicScreen(context) {
 
     init {
         mLeftSoftButton = Button(context, resources.getString(R.string.inventory_label))
-        mLeftSoftButton.mTextPaint.textAlign = Paint.Align.LEFT
-        mLeftSoftButton.mDimensions = Rect(0,
-                (mScreenHeight * 0.9F).toInt(),
-                mScreenWidth / 3,
-                mScreenHeight)
+        mLeftSoftButton.textPaint.textAlign = Paint.Align.LEFT
+        mLeftSoftButton.dimensions = Rect(0,
+                (screenHeight * 0.9F).toInt(),
+                screenWidth / 3,
+                screenHeight)
 
         mBackButton = Button(context, resources.getString(R.string.back_label))
-        mBackButton.mTextPaint.textAlign = Paint.Align.RIGHT
-        mBackButton.mDimensions = Rect(mScreenWidth / 3 * 2,
-                (mScreenHeight * 0.9F).toInt(),
-                mScreenWidth,
-                mScreenHeight)
+        mBackButton.textPaint.textAlign = Paint.Align.RIGHT
+        mBackButton.dimensions = Rect(screenWidth / 3 * 2,
+                (screenHeight * 0.9F).toInt(),
+                screenWidth,
+                screenHeight)
 
         val margin = UnitConverter.convertDpToPixels(16F, context).toInt()
-        val cardWidth = (mScreenWidth - 4 * margin) / 3
+        val cardWidth = (screenWidth - 4 * margin) / 3
         val cardHeight = UnitConverter.convertDpToPixels(160F, context).toInt()
 
         mPrimaryArmRect = Rect(margin, margin, cardWidth + margin, cardHeight + margin)
         mSecondaryArmRect = Rect(cardWidth + 2 * margin, margin, 2 * (cardWidth + margin), cardHeight + margin)
         mPrimaryArmAltRect = Rect(margin, margin, (cardWidth + margin) * 2, cardHeight + margin)
-        mBodyRect = Rect(mScreenWidth - cardWidth - margin, margin, mScreenWidth - margin, cardHeight + margin)
-        mGearRect = Rect(margin, cardHeight + 2 * margin, mScreenWidth - margin, (mScreenHeight * 0.9F).toInt() - margin)
+        mBodyRect = Rect(screenWidth - cardWidth - margin, margin, screenWidth - margin, cardHeight + margin)
+        mGearRect = Rect(margin, cardHeight + 2 * margin, screenWidth - margin, (screenHeight * 0.9F).toInt() - margin)
 
         mIsTwoHandedWeaponEquipped = GameController.mHero.equipmentList[0] is Weapon &&
                 (GameController.mHero.equipmentList[0] as Weapon).twoHanded

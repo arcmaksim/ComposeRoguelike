@@ -3,8 +3,8 @@ package ru.meatgames.tomb.screen
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.support.v4.content.ContextCompat
 import android.view.View
+import androidx.core.content.ContextCompat
 import ru.meatgames.tomb.MainActivity
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.util.FPSLogger
@@ -14,47 +14,51 @@ import ru.meatgames.tomb.util.fillFrame
 abstract class BasicScreen(context: Context) : View(context) {
 
     companion object {
-        @JvmStatic private var mCurrentFrameNanoTime: Long = 0L
-        @JvmStatic private var mPreviousFrameNanoTime: Long = System.nanoTime()
-        @JvmStatic private var mCurrentFrameTime: Long = 0L
-        @JvmStatic private var mFrameDeltaTime: Long = 0L
+        @JvmStatic private var currentFrameNanoTime: Long = 0L
+        @JvmStatic private var previousFrameNanoTime: Long = System.nanoTime()
+        @JvmStatic private var currentFrameTime: Long = 0L
+        @JvmStatic private var frameDeltaTime: Long = 0L
 
-        @JvmStatic protected val mBackgroundPaint = Paint()
-        @JvmStatic protected val mBitmapPaint = Paint()
+        @JvmStatic protected val backgroundPaint = Paint()
+        @JvmStatic protected val bitmapPaint = Paint()
 
         init {
-            mBitmapPaint.isAntiAlias = false
-            mBitmapPaint.isFilterBitmap = false
+            bitmapPaint.isAntiAlias = false
+            bitmapPaint.isFilterBitmap = false
         }
     }
 
     abstract protected val TAG: String
-    protected var mRecordFPS: Boolean = true
+    protected var recordFPS: Boolean = true
 
-    protected val mScreenWidth: Int
-    protected val mScreenHeight: Int
+    protected val screenWidth: Int
+    protected val screenHeight: Int
+
 
     init {
         isFocusable = true
         isFocusableInTouchMode = true
 
         val screenSize = ScreenHelper.getScreenSize((context as MainActivity).windowManager)
-        mScreenWidth = screenSize.x
-        mScreenHeight = screenSize.y
+        screenWidth = screenSize.x
+        screenHeight = screenSize.y
 
         // TODO: move init to static init
-        mBackgroundPaint.color = ContextCompat.getColor(getContext(), R.color.mainBackground)
+        backgroundPaint.color = ContextCompat.getColor(getContext(), R.color.mainBackground)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+
+    override fun onDraw(
+            canvas: Canvas?
+    ) {
         if (isFocused) {
-            mCurrentFrameNanoTime = System.nanoTime()
-            mCurrentFrameTime = System.currentTimeMillis()
+            currentFrameNanoTime = System.nanoTime()
+            currentFrameTime = System.currentTimeMillis()
 
-            mFrameDeltaTime = mCurrentFrameNanoTime - mPreviousFrameNanoTime
-            mPreviousFrameNanoTime = mCurrentFrameNanoTime
+            frameDeltaTime = currentFrameNanoTime - previousFrameNanoTime
+            previousFrameNanoTime = currentFrameNanoTime
 
-            if (mRecordFPS) FPSLogger.addEntry(mFrameDeltaTime)
+            if (recordFPS) FPSLogger.addEntry(frameDeltaTime)
         }
 
         drawScreen(canvas)
@@ -63,12 +67,15 @@ abstract class BasicScreen(context: Context) : View(context) {
 
     abstract fun drawScreen(canvas: Canvas?)
 
-    protected fun drawBackground(canvas: Canvas, backgroundPaint: Paint = mBackgroundPaint) {
-        canvas.fillFrame(mScreenWidth, mScreenHeight, backgroundPaint)
+    protected fun drawBackground(
+            canvas: Canvas,
+            backgroundPaint: Paint = BasicScreen.backgroundPaint
+    ) {
+        canvas.fillFrame(screenWidth, screenHeight, backgroundPaint)
     }
 
-    fun getCurrentTime() = mCurrentFrameTime
+    fun getCurrentTime() = currentFrameTime
 
-    fun getCurrentNanoTime() = mCurrentFrameNanoTime
+    fun getCurrentNanoTime() = currentFrameNanoTime
 
 }

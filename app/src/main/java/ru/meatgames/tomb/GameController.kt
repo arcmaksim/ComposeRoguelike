@@ -40,7 +40,7 @@ object GameController {
     lateinit var lastAttack: Bitmap
 
     private var mMainGameThread: Thread? = null
-    private var mMainGameLoop: MainGameLoop? = null
+    private var mainGameLoop: MainGameLoop? = null
 
     var mDrawInputAreas = false
 
@@ -367,16 +367,16 @@ object GameController {
 
     fun gameOver() {
         mMainGameThread?.let {
-            mMainGameLoop?.terminate()
+            mainGameLoop?.terminate()
         }
         mMainGameThread = null
         changeScreen(Screens.MAIN_MENU)
     }
 
     fun newGameLoop() {
-        if (mMainGameLoop == null) {
-            mMainGameLoop = MainGameLoop()
-            mMainGameThread = Thread(mMainGameLoop)
+        if (mainGameLoop == null) {
+            mainGameLoop = MainGameLoop()
+            mMainGameThread = Thread(mainGameLoop)
         }
         //(mMainGameThread as Thread).start()
     }

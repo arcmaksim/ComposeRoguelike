@@ -4,37 +4,39 @@ import android.content.Context
 import android.graphics.Rect
 import android.view.View
 
-abstract class BasicButton(context: Context?) : View(context) {
+abstract class BasicButton(
+        context: Context?
+) : View(context) {
 
-    abstract var mDimensions: Rect
+    abstract var dimensions: Rect
     var mIsEnabled: Boolean = true
 
-    fun isPressed(xCoordinate: Int, yCoordinate: Int) =
-            if (mIsEnabled)
-                mDimensions.contains(xCoordinate, yCoordinate)
-            else
-                false
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) =
-            setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec))
+    override fun onMeasure(
+            widthMeasureSpec: Int,
+            heightMeasureSpec: Int
+    ) = setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec))
 
-    private fun measureWidth(measureSpec: Int): Int =
-            getMeasurement(measureSpec, mDimensions.width())
+    fun isPressed(
+            xCoordinate: Int,
+            yCoordinate: Int
+    ) = if (mIsEnabled) dimensions.contains(xCoordinate, yCoordinate) else false
 
-    private fun measureHeight(measureSpec: Int): Int =
-            getMeasurement(measureSpec, mDimensions.height())
+    private fun measureWidth(
+            measureSpec: Int
+    ): Int = getMeasurement(measureSpec, dimensions.width())
 
-    private fun getMeasurement(measureSpec: Int, preferred: Int): Int {
-        val specSize = MeasureSpec.getSize(measureSpec)
-        var measurement = 0
+    private fun measureHeight(
+            measureSpec: Int
+    ): Int = getMeasurement(measureSpec, dimensions.height())
 
-        when (MeasureSpec.getMode(measureSpec)) {
-            MeasureSpec.EXACTLY -> measurement = specSize
-            MeasureSpec.AT_MOST -> Math.min(preferred, specSize)
-            else -> measurement = preferred
-        }
-
-        return measurement
+    private fun getMeasurement(
+            measureSpec: Int,
+            preferred: Int
+    ): Int = when (val specSize = MeasureSpec.getSize(measureSpec)) {
+        MeasureSpec.EXACTLY -> specSize
+        MeasureSpec.AT_MOST -> preferred.coerceAtMost(specSize)
+        else -> preferred
     }
 
 }

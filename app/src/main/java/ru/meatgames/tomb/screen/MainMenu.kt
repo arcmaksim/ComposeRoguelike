@@ -22,29 +22,29 @@ class MainMenu(mContext: Context) : BasicScreen(mContext) {
         mTitleTextPaint.textSize = UnitConverter.convertSpToPixels(32F, context)
 
         mNewGameButton = Button(context, "Новая игра")
-        mNewGameButton.mTextPaint.textAlign = Paint.Align.LEFT
-        mNewGameButton.mDimensions = Rect(0,
-                mScreenHeight - mScreenHeight / 10,
-                mScreenWidth / 3,
-                mScreenHeight)
+        mNewGameButton.textPaint.textAlign = Paint.Align.LEFT
+        mNewGameButton.dimensions = Rect(0,
+                screenHeight - screenHeight / 10,
+                screenWidth / 3,
+                screenHeight)
 
         mExitGameButton = Button(context, "Выход")
-        mExitGameButton.mTextPaint.textAlign = Paint.Align.RIGHT
-        mExitGameButton.mDimensions = Rect(mScreenWidth / 3 * 2,
-                mScreenHeight - mScreenHeight / 10,
-                mScreenWidth,
-                mScreenHeight)
+        mExitGameButton.textPaint.textAlign = Paint.Align.RIGHT
+        mExitGameButton.dimensions = Rect(screenWidth / 3 * 2,
+                screenHeight - screenHeight / 10,
+                screenWidth,
+                screenHeight)
     }
 
     override fun drawScreen(canvas: Canvas?) {
         drawBackground(canvas!!)
         canvas.drawText("Yet Another",
-                (mScreenWidth / 2).toFloat(),
-                (mScreenHeight / 8 * 3).toFloat(),
+                (screenWidth / 2).toFloat(),
+                (screenHeight / 8 * 3).toFloat(),
                 mTitleTextPaint)
         canvas.drawText("Roguelike",
-                (mScreenWidth / 2).toFloat(),
-                (mScreenHeight / 8 * 3 + mScreenHeight / 16).toFloat(),
+                (screenWidth / 2).toFloat(),
+                (screenHeight / 8 * 3 + screenHeight / 16).toFloat(),
                 mTitleTextPaint)
         mNewGameButton.draw(canvas)
         mExitGameButton.draw(canvas)
