@@ -6,32 +6,27 @@ import ru.meatgames.tomb.GameState
 import ru.meatgames.tomb.InventoryFilterType
 import ru.meatgames.tomb.MainActivity
 
-class ScreenController {
+class ScreenController(
+        private val activity: MainActivity
+) {
 
-    private var mMainActivity: MainActivity
-
-    lateinit var mGameScreen: GameScreen
-    lateinit var mMainMenuScreen: MainMenu
+    var mGameScreen: GameScreen = GameScreen(activity)
+    var mMainMenuScreen: MainMenu = MainMenu(activity)
 
     private lateinit var lastScreen: Screens
 
-    constructor(mainActivity: MainActivity) {
-        mMainActivity = mainActivity
 
-        init()
-    }
-
-    private fun init() {
-        mMainMenuScreen = MainMenu(mMainActivity)
-        mGameScreen = GameScreen(mMainActivity)
-    }
-
-    fun initGameScreen(camX: Int, camY: Int) {
+    fun initGameScreen(
+            camX: Int,
+            camY: Int
+    ) {
         mGameScreen.camx = camX
         mGameScreen.camy = camY
     }
 
-    fun changeScreen(screen: Screens) {
+    fun changeScreen(
+            screen: Screens
+    ) {
         val view: View
         when (screen) {
             Screens.GAME_SCREEN -> {
@@ -42,28 +37,28 @@ class ScreenController {
             Screens.INVENTORY_SCREEN -> {
                 GameController.setState(GameState.INVENTORY_SCREEN)
                 lastScreen = Screens.INVENTORY_SCREEN
-                view = InventoryScreen(mMainActivity, null)
+                view = InventoryScreen(activity, null)
             }
             Screens.CHARACTER_SCREEN -> {
                 GameController.setState(GameState.STATS_SCREEN)
-                view = CharacterScreen(mMainActivity)
+                view = CharacterScreen(activity)
             }
             Screens.MAP_SCREEN -> {
                 GameController.setState(GameState.MAP_SCREEN)
-                view = MapScreen(mMainActivity)
+                view = MapScreen(activity)
             }
             Screens.GEAR_SCREEN -> {
                 GameController.setState(GameState.GEAR_SCREEN)
                 lastScreen = Screens.GEAR_SCREEN
-                view = GearScreen(mMainActivity)
+                view = GearScreen(activity)
             }
             Screens.DETAILED_ITEM_SCREEN -> {
                 GameController.setState(GameState.DETAILED_ITEM_SCREEN)
-                view = DetailedItemScreen(mMainActivity, GameController.selectedItem)
+                view = DetailedItemScreen(activity, GameController.selectedItem)
             }
             Screens.DEATH_SCREEN -> {
                 GameController.setState(GameState.DEATH_SCREEN)
-                view = DeathScreen(mMainActivity)
+                view = DeathScreen(activity)
             }
             Screens.MAIN_MENU -> {
                 GameController.setState(GameState.MAIN_MENU)
@@ -73,15 +68,27 @@ class ScreenController {
 
         // TODO: temporal solution
         //GameController.mHero.interruptAllActions()
-        mMainActivity.setContentView(view)
+        activity.setContentView(view)
         view.requestFocus()
+    }
+
+    fun changeScreen2(
+            state: GameState
+    ) {
+        when (state) {
+            GameState.MAIN_MENU -> GameController.setState(GameState.MAIN_GAME)
+        }
+        // TODO: temporal solution
+        //GameController.mHero.interruptAllActions()
     }
 
     fun changeToLastScreen() = changeScreen(lastScreen)
 
-    fun showInventoryWithFilters(filter: InventoryFilterType) {
-        val inventoryScreen = InventoryScreen(mMainActivity, filter)
-        mMainActivity.setContentView(inventoryScreen)
+    fun showInventoryWithFilters(
+            filter: InventoryFilterType
+    ) {
+        val inventoryScreen = InventoryScreen(activity, filter)
+        activity.setContentView(inventoryScreen)
         inventoryScreen.requestFocus()
     }
 

@@ -3,6 +3,7 @@ package ru.meatgames.tomb
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Vibrator
+import androidx.compose.ui.platform.setContent
 import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
 import ru.meatgames.tomb.model.MapClass
@@ -48,11 +49,13 @@ object GameController {
     val maxLvl = 3
     val maxMobs = 6
 
+
     @JvmStatic
-    fun init(mainActivity: MainActivity) {
+    fun init(
+            mainActivity: MainActivity
+    ) {
         mMainActivity = mainActivity
         mVibrator = mMainActivity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
         init()
     }
 
@@ -64,7 +67,8 @@ object GameController {
 
     @JvmStatic
     fun start() {
-        changeScreen(Screens.MAIN_MENU)
+        mMainActivity.setContent { TombApp() }
+        changeScreen2(GameState.MAIN_GAME)
         curLvls = 0
         newGameLoop()
     }
@@ -122,6 +126,8 @@ object GameController {
     fun generateNewMap() = mMapController.generateNewMap(mMainActivity)
 
     fun changeScreen(screen: Screens) = mScreenController.changeScreen(screen)
+
+    fun changeScreen2(gameState: GameState) = mScreenController.changeScreen2(gameState)
 
     fun changeToLastScreen() = mScreenController.changeToLastScreen()
 

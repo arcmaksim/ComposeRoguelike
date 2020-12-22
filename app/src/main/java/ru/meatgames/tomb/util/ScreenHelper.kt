@@ -10,22 +10,22 @@ import ru.meatgames.tomb.R
 object ScreenHelper {
 
     @JvmStatic
-    fun getScreenSize(windowManager: WindowManager): Point {
-        val size = Point()
-        windowManager.defaultDisplay.getSize(size)
-        return size
+    fun getScreenSize(
+            windowManager: WindowManager
+    ): Point = Point().also {
+        windowManager.defaultDisplay.getSize(it)
     }
 
     @JvmStatic
-    fun getDefaultTextPaint(context: Context): Paint {
-        val mDefaultTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        mDefaultTextPaint.color = context.resources.getColor(R.color.white)
-        mDefaultTextPaint.style = Paint.Style.FILL
-        mDefaultTextPaint.textSize = 16f
-        mDefaultTextPaint.textScaleX = 1f
-        mDefaultTextPaint.textAlign = Paint.Align.CENTER
-        mDefaultTextPaint.typeface = Typeface.createFromAsset(context.assets, "fonts/Bulgaria_Glorious_Cyr.ttf")
-        return mDefaultTextPaint
+    fun getDefaultTextPaint(
+            context: Context
+    ): Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = context.resources.getColor(R.color.white)
+        style = Paint.Style.FILL
+        textSize = 16f
+        textScaleX = 1f
+        textAlign = Paint.Align.CENTER
+        typeface = Typeface.createFromAsset(context.assets, "fonts/bulgaria_glorious_cyr.ttf")
     }
 
 }

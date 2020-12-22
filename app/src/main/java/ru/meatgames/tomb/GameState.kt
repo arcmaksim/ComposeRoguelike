@@ -1,12 +1,12 @@
 package ru.meatgames.tomb
 
-enum class GameState(val state: Int) {
-    MAIN_MENU(0),
-    MAIN_GAME(1),
-    INVENTORY_SCREEN(2),
-    GEAR_SCREEN(3),
-    DETAILED_ITEM_SCREEN(4),
-    STATS_SCREEN(5),
-    MAP_SCREEN(6),
-    DEATH_SCREEN(7)
+enum class GameState(val id: String) {
+    MAIN_MENU("mainMenu"),
+    MAIN_GAME("mainGame"),
+    INVENTORY_SCREEN("inventory"),
+    GEAR_SCREEN("gear"),
+    DETAILED_ITEM_SCREEN("itemDetails"),
+    STATS_SCREEN("stats"),
+    MAP_SCREEN("map"),
+    DEATH_SCREEN("death")
 }
