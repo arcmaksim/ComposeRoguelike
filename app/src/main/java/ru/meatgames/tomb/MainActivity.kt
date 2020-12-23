@@ -3,6 +3,7 @@ package ru.meatgames.tomb
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.ExperimentalMaterialApi
 import ru.meatgames.tomb.GameController.getMap2
 import ru.meatgames.tomb.GameController.showExitDialog
 import ru.meatgames.tomb.GameController.start
@@ -14,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     var firstMob: MobList? = null
 
 
+    @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupFullScreenMode()
@@ -25,13 +27,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupFullScreenMode() {
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or View.SYSTEM_UI_FLAG_IMMERSIVE)
+            or View.SYSTEM_UI_FLAG_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_IMMERSIVE)
     }
 
     override fun onSaveInstanceState(
-            outState: Bundle
+        outState: Bundle
     ) {
         super.onSaveInstanceState(outState)
         /** TODO: saving game
@@ -58,9 +60,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun createMob(
-            x: Int,
-            y: Int,
-            t: Int
+        x: Int,
+        y: Int,
+        t: Int
     ) {
         val temp = MobList(t)
         temp.x = x

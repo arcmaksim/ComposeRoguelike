@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.screen
+package ru.meatgames.tomb.screen.view
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,6 +10,7 @@ import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.new_models.item.Consumable
 import ru.meatgames.tomb.new_models.item.InventoryItem
+import ru.meatgames.tomb.screen.BasicScreen
 import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
 import ru.meatgames.tomb.view.Button
@@ -98,7 +99,7 @@ class DetailedItemScreen(
     }
 
     private fun drawItem(canvas: Canvas) {
-        canvas.drawBitmap(Assets.getItemImage(), mSelectedItem.image, mSelectedItemRect, bitmapPaint)
+        //canvas.drawBitmap(Assets.getItemImage(), mSelectedItem.image, mSelectedItemRect, bitmapPaint)
         canvas.drawText(mSelectedItem.title, screenWidth * 0.5F, mTextTopPadding, mMainTextPaint)
         selectedItemProperties.forEachIndexed { index, property ->
             canvas.drawText(property, screenWidth * 0.5F, mTextTopPadding + mTextLinePadding * (index + 1), mSecondaryTextPaint)

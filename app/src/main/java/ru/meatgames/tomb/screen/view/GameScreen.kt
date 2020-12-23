@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.screen
+package ru.meatgames.tomb.screen.view
 
 import android.content.Context
 import android.graphics.Canvas
@@ -12,6 +12,8 @@ import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.new_models.repo.TileRepo
 import ru.meatgames.tomb.new_models.tile.Tile
+import ru.meatgames.tomb.screen.BasicScreen
+import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.*
 import java.util.*
 

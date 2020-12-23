@@ -20,14 +20,6 @@ abstract class BasicScreen(
         @JvmStatic private var previousFrameNanoTime: Long = System.nanoTime()
         @JvmStatic private var currentFrameTime: Long = 0L
         @JvmStatic private var frameDeltaTime: Long = 0L
-
-        @JvmStatic protected val backgroundPaint = Paint()
-        @JvmStatic protected val bitmapPaint = Paint()
-
-        init {
-            bitmapPaint.isAntiAlias = false
-            bitmapPaint.isFilterBitmap = false
-        }
     }
 
     abstract protected val TAG: String
@@ -35,6 +27,12 @@ abstract class BasicScreen(
 
     protected val screenWidth: Int
     protected val screenHeight: Int
+
+    protected val backgroundPaint = Paint()
+    protected val bitmapPaint = Paint().apply {
+        isAntiAlias = false
+        isFilterBitmap = false
+    }
 
 
     init {
@@ -71,7 +69,7 @@ abstract class BasicScreen(
 
     protected fun drawBackground(
             canvas: Canvas,
-            backgroundPaint: Paint = BasicScreen.backgroundPaint
+            backgroundPaint: Paint = this.backgroundPaint
     ) {
         canvas.fillFrame(screenWidth, screenHeight, backgroundPaint)
     }

@@ -3,14 +3,17 @@ package ru.meatgames.tomb
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ru.meatgames.tomb.screen.MainMenuCompose
+import ru.meatgames.tomb.screen.compose.MainMenuCompose
+import ru.meatgames.tomb.screen.compose.StubScreen
 
+@ExperimentalMaterialApi
 @Composable
 fun TombApp(
 ) {
@@ -18,10 +21,14 @@ fun TombApp(
             modifier = Modifier.background(Color(0x212121)).fillMaxSize()
     ) {
         val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = GameState.MAIN_MENU.id) {
-            composable(GameState.MAIN_MENU.id) {
-                GameController.changeScreen2(GameState.MAIN_MENU)
-                MainMenuCompose(navHostController = navController)
+        NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
+            composable(GameState.MainMenu.id) {
+                GameController.changeScreen2(GameState.MainMenu)
+                MainMenuCompose(navController = navController)
+            }
+            composable(GameState.Stub.id) {
+                GameController.changeScreen2(GameState.Stub)
+                StubScreen(navController = navController)
             }
         }
     }

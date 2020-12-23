@@ -1,10 +1,11 @@
-package ru.meatgames.tomb.screen
+package ru.meatgames.tomb.screen.view
 
 import android.view.View
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.GameState
 import ru.meatgames.tomb.InventoryFilterType
 import ru.meatgames.tomb.MainActivity
+import ru.meatgames.tomb.screen.Screens
 
 class ScreenController(
         private val activity: MainActivity
@@ -30,38 +31,38 @@ class ScreenController(
         val view: View
         when (screen) {
             Screens.GAME_SCREEN -> {
-                GameController.setState(GameState.MAIN_GAME)
+                GameController.setState(GameState.MainGame)
                 view = mGameScreen
                 view.updateMapBuffer()
             }
             Screens.INVENTORY_SCREEN -> {
-                GameController.setState(GameState.INVENTORY_SCREEN)
+                GameController.setState(GameState.Inventory)
                 lastScreen = Screens.INVENTORY_SCREEN
                 view = InventoryScreen(activity, null)
             }
             Screens.CHARACTER_SCREEN -> {
-                GameController.setState(GameState.STATS_SCREEN)
+                GameController.setState(GameState.Stats)
                 view = CharacterScreen(activity)
             }
             Screens.MAP_SCREEN -> {
-                GameController.setState(GameState.MAP_SCREEN)
+                GameController.setState(GameState.Map)
                 view = MapScreen(activity)
             }
             Screens.GEAR_SCREEN -> {
-                GameController.setState(GameState.GEAR_SCREEN)
+                GameController.setState(GameState.Gear)
                 lastScreen = Screens.GEAR_SCREEN
                 view = GearScreen(activity)
             }
             Screens.DETAILED_ITEM_SCREEN -> {
-                GameController.setState(GameState.DETAILED_ITEM_SCREEN)
+                GameController.setState(GameState.ItemDetails)
                 view = DetailedItemScreen(activity, GameController.selectedItem)
             }
             Screens.DEATH_SCREEN -> {
-                GameController.setState(GameState.DEATH_SCREEN)
+                GameController.setState(GameState.Death)
                 view = DeathScreen(activity)
             }
             Screens.MAIN_MENU -> {
-                GameController.setState(GameState.MAIN_MENU)
+                GameController.setState(GameState.MainMenu)
                 view = mMainMenuScreen
             }
         }
@@ -76,7 +77,7 @@ class ScreenController(
             state: GameState
     ) {
         when (state) {
-            GameState.MAIN_MENU -> GameController.setState(GameState.MAIN_GAME)
+            else -> GameController.setState(state)
         }
         // TODO: temporal solution
         //GameController.mHero.interruptAllActions()

@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.screen
+package ru.meatgames.tomb.screen.view
 
 import android.content.Context
 import android.graphics.*
@@ -8,6 +8,8 @@ import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.InventoryFilterType
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.new_models.item.Weapon
+import ru.meatgames.tomb.screen.BasicScreen
+import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
 import ru.meatgames.tomb.view.Button

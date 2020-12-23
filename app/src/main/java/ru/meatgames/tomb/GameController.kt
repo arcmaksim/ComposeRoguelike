@@ -3,6 +3,7 @@ package ru.meatgames.tomb
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Vibrator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.platform.setContent
 import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
@@ -11,7 +12,7 @@ import ru.meatgames.tomb.new_models.item.InventoryItem
 import ru.meatgames.tomb.new_models.map.MapTile
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
 import ru.meatgames.tomb.new_models.tile.Tile
-import ru.meatgames.tomb.screen.ScreenController
+import ru.meatgames.tomb.screen.view.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper
 import ru.meatgames.tomb.util.ObjectHelper
@@ -65,10 +66,11 @@ object GameController {
         zone = array2d(11, 11) { 0 }
     }
 
+    @ExperimentalMaterialApi
     @JvmStatic
     fun start() {
         mMainActivity.setContent { TombApp() }
-        changeScreen2(GameState.MAIN_GAME)
+        changeScreen2(GameState.MainGame)
         curLvls = 0
         newGameLoop()
     }
