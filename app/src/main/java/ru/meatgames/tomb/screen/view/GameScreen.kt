@@ -282,13 +282,13 @@ class GameScreen(
                 if (currentMapBufferTile.mIsVisible) {
                     currentMapBufferTile.floorTile?.let { floorTile ->
                         canvas.drawBitmap(Assets.tileset,
-                                floorTile.image,
+                                floorTile.imageRect,
                                 mTileBuffer2[index],
                                 bitmapPaint)
                     }
                     currentMapBufferTile.objectTile?.let { objectTile ->
                         canvas.drawBitmap(Assets.tileset,
-                                objectTile.image,
+                                objectTile.imageRect,
                                 mTileBuffer2[index],
                                 bitmapPaint)
                     }

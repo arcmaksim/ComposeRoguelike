@@ -2,9 +2,11 @@ package ru.meatgames.tomb.db
 
 import android.graphics.Rect
 
-class TileDB(var mIsPassable: Boolean,
-             var mIsTransparent: Boolean,
-             var mIsUsable: Boolean) {
+class TileDB(
+    val isPassable: Boolean,
+    val isTransparent: Boolean,
+    val isUsable: Boolean,
+) {
 
     var img: Rect? = null
 
