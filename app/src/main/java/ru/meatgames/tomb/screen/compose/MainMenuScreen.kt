@@ -43,17 +43,9 @@ private val buttonTextStyle = TextStyle(
 
 
 @ExperimentalMaterialApi
-@Composable
-fun MainMenuCompose(
-    navController: NavController
-) {
-    MainMenuContent(navController)
-}
-
-@ExperimentalMaterialApi
 @Preview(widthDp = 360, heightDp = 640)
 @Composable
-private fun MainMenuContent(
+fun MainMenuScreen(
     navController: NavController
 ) = Box(
     modifier = Modifier.background(Color(0x212121)).fillMaxSize()

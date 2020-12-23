@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ru.meatgames.tomb.screen.compose.MainMenuCompose
+import ru.meatgames.tomb.screen.compose.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.StubScreen
 
 @ExperimentalMaterialApi
@@ -24,7 +24,7 @@ fun TombApp(
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
                 GameController.changeScreen2(GameState.MainMenu)
-                MainMenuCompose(navController = navController)
+                MainMenuScreen(navController = navController)
             }
             composable(GameState.Stub.id) {
                 GameController.changeScreen2(GameState.Stub)
