@@ -1,113 +1,112 @@
-package ru.meatgames.tomb.screen.compose
+package ru.meatgames.tomb.screen.compose.game
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.font.fontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
-import ru.meatgames.tomb.*
-import ru.meatgames.tomb.new_models.getFloorImage
-import ru.meatgames.tomb.screen.compose.game.GameMapChunk
-import ru.meatgames.tomb.screen.compose.game.GameMapTile
-import ru.meatgames.tomb.screen.compose.game.GameScreenViewModel
+import ru.meatgames.tomb.NewAssets
+import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.util.asIntOffset
+import ru.meatgames.tomb.util.asIntSize
+import kotlin.math.abs
 
 @Composable
 fun GameScreen(
     gameScreenViewModel: GameScreenViewModel,
-    navController: NavController
+    navController: NavController,
 ) {
-    val visibleMapChunk = gameScreenViewModel.visibleMapChunk.observeAsState()
-    visibleMapChunk.value?.let { Map(it, navController) }
+    val visibleMapChunk by gameScreenViewModel.visibleMapChunk.collectAsState()
+    Map(visibleMapChunk, navController, gameScreenViewModel::onMoveCharacter)
 }
 
-@Preview(widthDp = 360, heightDp = 640)
 @Composable
 private fun Map(
     gameMapChunk: GameMapChunk,
-    navController: NavController
-) = Box(
-    modifier = Modifier.background(Color(0x212121)).fillMaxSize()
+    navController: NavController,
+    onCharacterMove: (Direction) -> Unit,
+) = BoxWithConstraints(
+    modifier = Modifier
+        .background(Color(0xFF212121))
+        .fillMaxSize(),
 ) {
-    LazyGrid(
-        items = gameMapChunk.gameMapTiles,
-        columns = gameMapChunk.width,
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1F)
+            .align(Alignment.Center)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        onCharacterMove(
+                            when {
+                                it.x > it.y && it.x.toDp() > maxWidth - it.y.toDp() -> Direction.Right
+                                it.x > it.y -> Direction.Top
+                                it.x < it.y && it.y.toDp() > maxWidth - it.x.toDp() -> Direction.Bottom
+                                else -> Direction.Left
+                            }
+                        )
+                    }
+                )
+            },
     ) {
+        val tileDimension = size.width.toInt() / gameMapChunk.width
+        val offset = (size.width.toInt() - (tileDimension * gameMapChunk.width)) / 2
+        val tileSize = IntSize(tileDimension, tileDimension)
 
-    }
-    Text(
-        text = "Yet Another\nRoguelike",
-        modifier = Modifier.padding(16.dp).align(Alignment.Center),
-        style = TextStyle(
-            fontFamily = fontFamily(font(R.font.bulgaria_glorious_cyr)),
-            fontSize = 32.sp,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-    )
-    MainMenuButton(
-        title = "Новая игра",
-        modifier = Modifier.align(Alignment.BottomStart)
-    ) {
-        navController.navigate(GameState.Stub.id)
-    }
-    MainMenuButton(
-        title = "Выход",
-        modifier = Modifier.align(Alignment.BottomEnd)
-    ) {
-        navController.navigate(GameState.Stub.id)
-    }
-}
+        val animation = derivedStateOf {
+            (abs(System.currentTimeMillis()) / 600 % 2).toInt()
+        }
 
-@Composable
-private fun MapTile(
-    tileIndex: Int,
-    rowSize: Int,
-    tileRow: Int,
-    tile: GameMapTile
-) = Canvas(
-    modifier = Modifier.background(Color(0x212121)).fillMaxSize()
-) {
-    if (!tile.isVisible) return@Canvas
-    tile.floor?.let { floorTile ->
+        gameMapChunk.gameMapTiles.mapIndexed { index, tile ->
+            //if (!tile.isVisible) return@Canvas
+
+            val column = index % gameMapChunk.width
+            val row = index / gameMapChunk.width
+            val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
+
+            tile.floor?.let { floorTile ->
+                drawImage(
+                    NewAssets.tileset,
+                    srcOffset = floorTile.imageRect.asIntOffset(),
+                    srcSize = floorTile.imageRect.asIntSize(),
+                    dstOffset = dstOffset,
+                    dstSize = tileSize,
+                    filterQuality = FilterQuality.None,
+                )
+            }
+            tile.`object`?.let { objectTile ->
+                if (objectTile.name == "nothing" || objectTile.name == "void") return@let
+                drawImage(
+                    NewAssets.tileset,
+                    srcOffset = objectTile.imageRect.asIntOffset(),
+                    srcSize = objectTile.imageRect.asIntSize(),
+                    dstOffset = dstOffset,
+                    dstSize = tileSize,
+                    filterQuality = FilterQuality.None,
+                )
+            }
+        }
+
         drawImage(
-            imageResource(id = floorTile.getFloorImage()),
-            Offset()
+            NewAssets.getHeroBitmap(animation.value),
+            dstOffset = IntOffset(offset + tileDimension * (viewportWidth / 2), tileDimension * (viewportHeight / 2)),
+            dstSize = tileSize,
+            filterQuality = FilterQuality.None,
         )
-        drawBitmap(Assets.tileset,
-            floorTile.imageRect,
-            mTileBuffer2[index],
-            bitmapPaint)
-    }
-    tile.objectTile?.let { objectTile ->
-        canvas.drawBitmap(Assets.tileset,
-            objectTile.imageRect,
-            mTileBuffer2[index],
-            bitmapPaint)
-    }
-    tile.mShadowPaint?.let {
-        canvas.drawRect(
-            mTileBuffer2[index].left.toFloat(),
-            mTileBuffer2[index].top.toFloat(),
-            mTileBuffer2[index].right.toFloat(),
-            mTileBuffer2[index].bottom.toFloat(),
-            it)
     }
 }

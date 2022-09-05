@@ -1,6 +1,8 @@
 package ru.meatgames.tomb.screen
 
-enum class Screens(val screenID: Int) {
+enum class Screens(
+    val screenID: Int
+) {
     MAIN_MENU(0),
     GAME_SCREEN(1),
     CHARACTER_SCREEN(2),

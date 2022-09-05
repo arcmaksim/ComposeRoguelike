@@ -3,8 +3,8 @@ package ru.meatgames.tomb
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Vibrator
+import androidx.activity.compose.setContent
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.ui.platform.setContent
 import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
 import ru.meatgames.tomb.model.MapClass
@@ -53,7 +53,7 @@ object GameController {
 
     @JvmStatic
     fun init(
-            mainActivity: MainActivity
+        mainActivity: MainActivity
     ) {
         mMainActivity = mainActivity
         mVibrator = mMainActivity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator

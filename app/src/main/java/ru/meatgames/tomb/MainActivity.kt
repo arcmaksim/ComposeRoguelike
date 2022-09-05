@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupFullScreenMode()
-        Assets.init(this)
+        NewAssets.loadAssets(this)
         GameDataProvider.init(this)
         GameController.init(this)
         start()

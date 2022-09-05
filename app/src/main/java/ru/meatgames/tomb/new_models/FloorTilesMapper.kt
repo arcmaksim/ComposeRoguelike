@@ -3,14 +3,14 @@ package ru.meatgames.tomb.new_models
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.new_models.tile.Tile
 
-fun Tile.getFloorImage(): Int = when (name) {
+val Tile.floorImageId: Int
+    get() = when (name) {
     "FLOOR_0" -> R.mipmap.floor_0
     "FLOOR_1" -> R.mipmap.floor_1
     "FLOOR_CHECKED" -> R.mipmap.floor_checked
     else -> R.mipmap.floor_missing
 }
 
-/*
 fun Tile.getObjectImage() {
     when (name) {
         "BOOKSHELF" -> "bookshelf"
@@ -26,4 +26,4 @@ fun Tile.getObjectImage() {
         "TABLE_WITH_PAPERS" -> "table_with_papers"
         "WALL_0" -> "wall_0"
     }
-}*/
+}

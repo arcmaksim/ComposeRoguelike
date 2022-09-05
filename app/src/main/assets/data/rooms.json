@@ -5,9 +5,9 @@
       "height": 5,
       "floor": [
         ".....",
+        "._._.",
         ".....",
-        ".....",
-        ".....",
+        "._...",
         "....."
       ],
       "objects": [
@@ -21,6 +21,57 @@
         {
           "symbol": ".",
           "meaning": "floor_0"
+        },
+        {
+          "symbol": "_",
+          "meaning": "floor_1"
+        }
+      ],
+      "object_symbols": [
+        {
+          "symbol": "#",
+          "meaning": "wall_0"
+        },
+        {
+          "symbol": "W",
+          "meaning": "wall_0",
+          "isOuterWall": true
+        },
+        {
+          "symbol": ".",
+          "meaning": "nothing"
+        },
+        {
+          "symbol": " ",
+          "meaning": "void"
+        }
+      ]
+    },
+    {
+      "width": 7,
+      "height": 5,
+      "floor": [
+        ".......",
+        "._..._.",
+        ".......",
+        "._.....",
+        "......."
+      ],
+      "objects": [
+        "#WWWWW#",
+        "W.....W",
+        "W..W..W",
+        "W.....W",
+        "#WWWWW#"
+      ],
+      "floor_symbols": [
+        {
+          "symbol": ".",
+          "meaning": "floor_0"
+        },
+        {
+          "symbol": "_",
+          "meaning": "floor_1"
         }
       ],
       "object_symbols": [

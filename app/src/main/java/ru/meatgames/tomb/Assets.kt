@@ -1,8 +1,11 @@
 package ru.meatgames.tomb
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import org.xmlpull.v1.XmlPullParser
 import ru.meatgames.tomb.db.*
 import ru.meatgames.tomb.util.ScreenHelper
@@ -20,8 +23,9 @@ object Assets {
     lateinit var stats: Array<StatsDB>
     private lateinit var walls: Array<Bitmap>
     private lateinit var heroSprites: Array<Bitmap>
+    private lateinit var heroBitmaps: Array<ImageBitmap>
 
-    lateinit var mImageRects: Array<Rect>
+    var mImageRects: Array<Rect> = emptyArray()
 
     lateinit var mCharacterIcon: Bitmap
     lateinit var mInventoryIcon: Bitmap
@@ -31,6 +35,8 @@ object Assets {
     lateinit var mFilterIcons: Array<Bitmap>
 
     lateinit var tileset: Bitmap
+    @Deprecated("Migrate to NewAssets")
+    lateinit var tilesetImageBitmap: ImageBitmap
 
     private lateinit var mFloorTileset: Bitmap
     private lateinit var mObjectTileset: Bitmap
@@ -68,19 +74,20 @@ object Assets {
         mActualTileSize = mOriginalTileSize * mScaleAmount
     }
 
+    @Deprecated("Migrate to NewAssets")
     fun loadAssets() {
-        loadStats()
-        loadTiles()
-        loadObjects()
-        loadItems()
-        loadMobs()
+        //loadStats()
+        //loadTiles()
+        //loadObjects()
+        //loadItems()
+        //loadMobs()
 
-        mImageRects = Array(100) { i ->
+        /*mImageRects = Array(100) { i ->
             Rect(i % 5 * mOriginalTileSize,
                     i / 5 * mOriginalTileSize,
                     i % 5 * mOriginalTileSize + mOriginalTileSize,
                     i / 5 * mOriginalTileSize + mOriginalTileSize)
-        }
+        }*/
 
         var temp = getBitmapFromAsset("character_animation_sheet")
         heroSprites = Array(4) { i ->
@@ -90,6 +97,7 @@ object Assets {
                     mOriginalTileSize,
                     mOriginalTileSize)
         }
+        heroBitmaps = heroSprites.map { it.asImageBitmap() }.toTypedArray()
 
         bag = getBitmapFromAsset("bag")
         mCharacterIcon = getBitmapFromAsset("character_icon")
@@ -97,6 +105,7 @@ object Assets {
         mSkipTurnIcon = getBitmapFromAsset("skip_turn_icon")
 
         tileset = getBitmapFromAsset("tiles")
+        tilesetImageBitmap = tileset.asImageBitmap()
 
         mFloorTileset = getBitmapFromAsset("floor_tileset")
         mObjectTileset = getBitmapFromAsset("objects_tileset")
@@ -266,6 +275,10 @@ object Assets {
 
     @JvmStatic
     fun getHeroSprite(frame: Int): Bitmap = heroSprites[frame]
+
+    @Deprecated("Migrate to NewAssets")
+    @JvmStatic
+    fun getHeroBitmap(frame: Int): ImageBitmap = heroBitmaps[frame]
 
     fun getFloorImage() = mFloorTileset
 

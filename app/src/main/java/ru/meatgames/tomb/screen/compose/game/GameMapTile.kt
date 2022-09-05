@@ -13,4 +13,13 @@ data class GameMapTile(
     val shadowPaint: Paint? = null,
     val hasItem: Boolean = false,
     val hasEnemy: Boolean = false,
-)
+) {
+
+    companion object {
+        val voidMapTile = GameMapTile()
+    }
+
+    val isPassable: Boolean
+        get() = floor?.isPassable ?: false && `object`?.isPassable ?: true
+
+}

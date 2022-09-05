@@ -9,12 +9,17 @@ import ru.meatgames.tomb.new_models.tile.TileTextureJsonModel
 
 class TileRepo(context: Context) {
 
-    var tiles: List<Tile>
-
+    val tiles: List<Tile>
 
     init {
-        val textureAtlasTileData = LoganSquare.parse(context.assets.open("images/tiles.json"), TileTextureJsonModel::class.java)
-        val tileData = LoganSquare.parse(context.assets.open("data/tiles.json"), TilePropertiesJsonModel::class.java)
+        val textureAtlasTileData = LoganSquare.parse(
+            context.assets.open("images/tiles.json"),
+            TileTextureJsonModel::class.java,
+        )
+        val tileData = LoganSquare.parse(
+            context.assets.open("data/tiles.json"),
+            TilePropertiesJsonModel::class.java,
+        )
 
         tiles = List(tileData.tiles.size) { index ->
             val tile = tileData.tiles[index]
@@ -22,23 +27,27 @@ class TileRepo(context: Context) {
         }
     }
 
-
-    fun getTile(tileName: String): Tile = tiles.first { it.name == tileName }
-
+    fun getTile(
+        tileName: String,
+    ): Tile = tiles.first { it.name == tileName }
 
     companion object {
-        @JvmStatic val voidTile = Tile(
-                "void",
-                true,
-                true,
-                false,
-                Rect(0, 0, 24, 24))
-        @JvmStatic val emptyTile = Tile(
-                "nothing",
-                true,
-                true,
-                false,
-                Rect(0, 0, 24, 24))
+        @JvmStatic
+        val voidTile = Tile(
+            name = "void",
+            isPassable = true,
+            isTransparent = true,
+            isUsable = false,
+            imageRect = Rect(0, 0, 24, 24),
+        )
+        @JvmStatic
+        val emptyTile = Tile(
+            name = "nothing",
+            isPassable = true,
+            isTransparent = true,
+            isUsable = false,
+            imageRect = Rect(0, 0, 24, 24),
+        )
     }
 
 }
