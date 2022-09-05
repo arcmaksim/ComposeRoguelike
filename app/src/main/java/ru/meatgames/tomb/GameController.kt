@@ -3,6 +3,8 @@ package ru.meatgames.tomb
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Vibrator
+import androidx.activity.compose.setContent
+import androidx.compose.material.ExperimentalMaterialApi
 import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
 import ru.meatgames.tomb.model.MapClass
@@ -10,7 +12,7 @@ import ru.meatgames.tomb.new_models.item.InventoryItem
 import ru.meatgames.tomb.new_models.map.MapTile
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
 import ru.meatgames.tomb.new_models.tile.Tile
-import ru.meatgames.tomb.screen.ScreenController
+import ru.meatgames.tomb.screen.view.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper
 import ru.meatgames.tomb.util.ObjectHelper
@@ -40,7 +42,7 @@ object GameController {
     lateinit var lastAttack: Bitmap
 
     private var mMainGameThread: Thread? = null
-    private var mMainGameLoop: MainGameLoop? = null
+    private var mainGameLoop: MainGameLoop? = null
 
     var mDrawInputAreas = false
 
@@ -48,11 +50,13 @@ object GameController {
     val maxLvl = 3
     val maxMobs = 6
 
+
     @JvmStatic
-    fun init(mainActivity: MainActivity) {
+    fun init(
+        mainActivity: MainActivity
+    ) {
         mMainActivity = mainActivity
         mVibrator = mMainActivity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
         init()
     }
 
@@ -62,9 +66,11 @@ object GameController {
         zone = array2d(11, 11) { 0 }
     }
 
+    @ExperimentalMaterialApi
     @JvmStatic
     fun start() {
-        changeScreen(Screens.MAIN_MENU)
+        mMainActivity.setContent { TombApp() }
+        changeScreen2(GameState.MainGame)
         curLvls = 0
         newGameLoop()
     }
@@ -122,6 +128,8 @@ object GameController {
     fun generateNewMap() = mMapController.generateNewMap(mMainActivity)
 
     fun changeScreen(screen: Screens) = mScreenController.changeScreen(screen)
+
+    fun changeScreen2(gameState: GameState) = mScreenController.changeScreen2(gameState)
 
     fun changeToLastScreen() = mScreenController.changeToLastScreen()
 
@@ -367,16 +375,16 @@ object GameController {
 
     fun gameOver() {
         mMainGameThread?.let {
-            mMainGameLoop?.terminate()
+            mainGameLoop?.terminate()
         }
         mMainGameThread = null
         changeScreen(Screens.MAIN_MENU)
     }
 
     fun newGameLoop() {
-        if (mMainGameLoop == null) {
-            mMainGameLoop = MainGameLoop()
-            mMainGameThread = Thread(mMainGameLoop)
+        if (mainGameLoop == null) {
+            mainGameLoop = MainGameLoop()
+            mMainGameThread = Thread(mainGameLoop)
         }
         //(mMainGameThread as Thread).start()
     }

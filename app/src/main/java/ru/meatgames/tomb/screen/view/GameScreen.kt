@@ -1,21 +1,25 @@
-package ru.meatgames.tomb.screen
+package ru.meatgames.tomb.screen.view
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.MotionEvent
+import androidx.core.content.ContextCompat
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.new_models.repo.TileRepo
 import ru.meatgames.tomb.new_models.tile.Tile
+import ru.meatgames.tomb.screen.BasicScreen
+import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.*
 import java.util.*
 
-class GameScreen(context: Context) : BasicScreen(context) {
+class GameScreen(
+        context: Context
+) : BasicScreen(context) {
 
     override val TAG: String = "MainActivity Screen"
 
@@ -94,11 +98,11 @@ class GameScreen(context: Context) : BasicScreen(context) {
         black = Paint()
         black.color = resources.getColor(R.color.black)
 
-        mHeroX = (mScreenWidth - mActualTileSize).div(2)
-        mHeroY = (mScreenHeight - mActualTileSize).div(2)
+        mHeroX = (screenWidth - mActualTileSize).div(2)
+        mHeroY = (screenHeight - mActualTileSize).div(2)
 
-        mMapOffsetX = (mScreenWidth - mActualTileSize * 9).div(2)
-        mMapOffsetY = (mScreenHeight - mActualTileSize * 9).div(2)
+        mMapOffsetX = (screenWidth - mActualTileSize * 9).div(2)
+        mMapOffsetY = (screenHeight - mActualTileSize * 9).div(2)
 
         for (x in 0 until mMapViewportWidth) {
             for (y in 0 until mMapViewportHeight) {
@@ -236,8 +240,10 @@ class GameScreen(context: Context) : BasicScreen(context) {
         }
     }
 
-    override fun drawScreen(canvas: Canvas?) {
-        drawBackground(canvas!!)
+    override fun drawScreen(
+            canvas: Canvas
+    ) {
+        drawBackground(canvas)
 
         if (!mDrawWinScreen) {
 
@@ -245,7 +251,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
 
             drawMap(canvas, animationFrame)
             if (!GameController.mHero.mIsFacingLeft) animationFrame += 2
-            canvas.drawBitmap(Assets.getHeroSprite(animationFrame), null, mHeroRect, mBitmapPaint)
+            canvas.drawBitmap(Assets.getHeroSprite(animationFrame), null, mHeroRect, bitmapPaint)
 
             drawHUD(canvas)
 
@@ -254,7 +260,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
             if (mDrawExitDialog) drawExitDialog(canvas)
 
             val currentXP = GameController.mHero.getStat(20).toFloat() / GameController.mHero.getStat(21)
-            canvas.drawRect(4F, mScreenHeight - 11F, Math.round(mScreenWidth * 0.99F * currentXP).toFloat(), mScreenHeight - 4F, mDarkBluePaint)
+            canvas.drawRect(4F, screenHeight - 11F, Math.round(screenWidth * 0.99F * currentXP).toFloat(), screenHeight - 4F, mDarkBluePaint)
 
             if (mDrawProgressBar) drawProgressBar(canvas)
 
@@ -276,15 +282,15 @@ class GameScreen(context: Context) : BasicScreen(context) {
                 if (currentMapBufferTile.mIsVisible) {
                     currentMapBufferTile.floorTile?.let { floorTile ->
                         canvas.drawBitmap(Assets.tileset,
-                                floorTile.image,
+                                floorTile.imageRect,
                                 mTileBuffer2[index],
-                                mBitmapPaint)
+                                bitmapPaint)
                     }
                     currentMapBufferTile.objectTile?.let { objectTile ->
                         canvas.drawBitmap(Assets.tileset,
-                                objectTile.image,
+                                objectTile.imageRect,
                                 mTileBuffer2[index],
-                                mBitmapPaint)
+                                bitmapPaint)
                     }
                     currentMapBufferTile.mShadowPaint?.let {
                         canvas.drawRect(
@@ -303,20 +309,20 @@ class GameScreen(context: Context) : BasicScreen(context) {
         mTextPaint.textAlign = Paint.Align.CENTER
 
         canvas.drawBitmap(Assets.mInventoryIcon,
-                (mScreenWidth / 8 - Assets.mInventoryIcon.width / 2).toFloat(),
-                mScreenHeight * 0.9F + (mScreenHeight * 0.1F - Assets.mInventoryIcon.height) / 2,
+                (screenWidth / 8 - Assets.mInventoryIcon.width / 2).toFloat(),
+                screenHeight * 0.9F + (screenHeight * 0.1F - Assets.mInventoryIcon.height) / 2,
                 null)
         canvas.drawText("HP  ${GameController.mHero.getStat(5)} / ${GameController.mHero.getStat(6)}",
-                mScreenWidth * 0.5F,
-                mScreenHeight * 0.94F,
+                screenWidth * 0.5F,
+                screenHeight * 0.94F,
                 mTextPaint)
         canvas.drawText("MP  ${GameController.mHero.getStat(7)} / ${GameController.mHero.getStat(8)}",
-                mScreenWidth * 0.5F,
-                mScreenHeight * 0.965F,
+                screenWidth * 0.5F,
+                screenHeight * 0.965F,
                 mTextPaint)
         canvas.drawBitmap(Assets.mSkipTurnIcon,
-                (mScreenWidth / 8 * 7 - Assets.mSkipTurnIcon.width / 2).toFloat(),
-                mScreenHeight * 0.9F + (mScreenHeight * 0.1F - Assets.mSkipTurnIcon.height) / 2,
+                (screenWidth / 8 * 7 - Assets.mSkipTurnIcon.width / 2).toFloat(),
+                screenHeight * 0.9F + (screenHeight * 0.1F - Assets.mSkipTurnIcon.height) / 2,
                 null)
         mTextPaint.textAlign = Paint.Align.LEFT
     }
@@ -327,7 +333,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
         val r = 190f
         var x: Int
         var y: Int
-        canvas.fillFrame(mScreenWidth, mScreenHeight, mMenuBackgroundPaint)
+        canvas.fillFrame(screenWidth, screenHeight, mMenuBackgroundPaint)
         for (c in 0 until n) {
             x = (r * Math.cos(Math.toRadians((270 + z * c).toDouble()))).toInt()
             y = (r * Math.sin(Math.toRadians((270 + z * c).toDouble()))).toInt()
@@ -337,35 +343,35 @@ class GameScreen(context: Context) : BasicScreen(context) {
     }
 
     private fun drawLines(canvas: Canvas) {
-        val temp = (mScreenHeight - (mScreenHeight + mScreenWidth) * 0.1F) / 3
+        val temp = (screenHeight - (screenHeight + screenWidth) * 0.1F) / 3
         for (i in 1..2) {
-            canvas.drawLine((mScreenWidth / 3 * i).toFloat(),
-                    mScreenWidth * 0.1F,
-                    (mScreenWidth / 3 * i).toFloat(),
-                    mScreenHeight * 0.9F,
-                    mBackgroundPaint)
+            canvas.drawLine((screenWidth / 3 * i).toFloat(),
+                    screenWidth * 0.1F,
+                    (screenWidth / 3 * i).toFloat(),
+                    screenHeight * 0.9F,
+                    backgroundPaint)
             canvas.drawLine(0F,
                     temp * i + 48,
-                    mScreenWidth.toFloat(),
+                    screenWidth.toFloat(),
                     temp * i + 48,
-                    mBackgroundPaint)
+                    backgroundPaint)
         }
-        canvas.drawLine(0F, mScreenWidth * 0.1F, mScreenWidth.toFloat(), mScreenWidth * 0.1F, mBackgroundPaint) // apparently it needs to be exactly width, not height
-        canvas.drawLine(mScreenWidth * 0.5F, 0F, mScreenWidth * 0.5F, mScreenWidth * 0.1F, mBackgroundPaint)
-        canvas.drawLine(0F, mScreenHeight * 0.9F, mScreenWidth.toFloat(), mScreenHeight * 0.9F, mBackgroundPaint)
-        canvas.drawLine(mScreenWidth * 0.25F, mScreenHeight * 0.9F, mScreenWidth * 0.25F, mScreenHeight.toFloat(), mBackgroundPaint)
-        canvas.drawLine(mScreenWidth * 0.75F, mScreenHeight * 0.9F, mScreenWidth * 0.75F, mScreenHeight.toFloat(), mBackgroundPaint)
+        canvas.drawLine(0F, screenWidth * 0.1F, screenWidth.toFloat(), screenWidth * 0.1F, backgroundPaint) // apparently it needs to be exactly width, not height
+        canvas.drawLine(screenWidth * 0.5F, 0F, screenWidth * 0.5F, screenWidth * 0.1F, backgroundPaint)
+        canvas.drawLine(0F, screenHeight * 0.9F, screenWidth.toFloat(), screenHeight * 0.9F, backgroundPaint)
+        canvas.drawLine(screenWidth * 0.25F, screenHeight * 0.9F, screenWidth * 0.25F, screenHeight.toFloat(), backgroundPaint)
+        canvas.drawLine(screenWidth * 0.75F, screenHeight * 0.9F, screenWidth * 0.75F, screenHeight.toFloat(), backgroundPaint)
     }
 
     private fun drawExitDialog(canvas: Canvas) {
-        canvas.fillFrame(mScreenWidth, mScreenHeight, mSemiTransparentBackgroundPaint)
-        canvas.drawRect(mScreenWidth * 0.05F, mScreenHeight * 0.4F, mScreenWidth * 0.95F, mScreenHeight * 0.59F, mMenuBackgroundPaint)
+        canvas.fillFrame(screenWidth, screenHeight, mSemiTransparentBackgroundPaint)
+        canvas.drawRect(screenWidth * 0.05F, screenHeight * 0.4F, screenWidth * 0.95F, screenHeight * 0.59F, mMenuBackgroundPaint)
         mTextPaint.textAlign = Paint.Align.CENTER
         mTextPaint.textSize = 24f
-        canvas.drawText(context.getString(R.string.exit_game_message), mScreenWidth * 0.5F, mScreenHeight * 0.46F, mTextPaint)
+        canvas.drawText(context.getString(R.string.exit_game_message), screenWidth * 0.5F, screenHeight * 0.46F, mTextPaint)
         mTextPaint.textSize = 16f
-        canvas.drawText(context.getString(R.string.yes), mScreenWidth * 0.29F, mScreenHeight * 0.555F, mTextPaint)
-        canvas.drawText(context.getString(R.string.No), mScreenWidth * 0.71F, mScreenHeight * 0.555F, mTextPaint)
+        canvas.drawText(context.getString(R.string.yes), screenWidth * 0.29F, screenHeight * 0.555F, mTextPaint)
+        canvas.drawText(context.getString(R.string.No), screenWidth * 0.71F, screenHeight * 0.555F, mTextPaint)
     }
 
     private fun drawLog(canvas: Canvas) {
@@ -406,11 +412,11 @@ class GameScreen(context: Context) : BasicScreen(context) {
         mTextPaint.textAlign = Paint.Align.CENTER
         mTextPaint.textSize = 24f
         if (mDrawWinScreen) {
-            canvas.drawText(context.getString(R.string.victory_label), mScreenWidth * 0.5F, mScreenHeight * 0.4F, mTextPaint)
-            canvas.drawText(context.getString(R.string.king_was_slain_label), mScreenWidth * 0.5F, mScreenHeight * 0.45F, mTextPaint)
+            canvas.drawText(context.getString(R.string.victory_label), screenWidth * 0.5F, screenHeight * 0.4F, mTextPaint)
+            canvas.drawText(context.getString(R.string.king_was_slain_label), screenWidth * 0.5F, screenHeight * 0.45F, mTextPaint)
         }
         mTextPaint.textSize = 16f
-        canvas.drawText(context.getString(R.string.to_menu_label), mScreenWidth * 0.5F, mScreenHeight * 0.95F, mTextPaint)
+        canvas.drawText(context.getString(R.string.to_menu_label), screenWidth * 0.5F, screenHeight * 0.95F, mTextPaint)
     }
 
     private fun afterProgressBar(result: Int) {
@@ -536,19 +542,19 @@ class GameScreen(context: Context) : BasicScreen(context) {
     private fun onTouchMain(touchX: Int, touchY: Int) {
         clearLog()
 
-        if (touchY < mScreenWidth * 0.1F && touchX > mScreenWidth * 0.5F) {
+        if (touchY < screenWidth * 0.1F && touchX > screenWidth * 0.5F) {
             GameController.changeScreen(Screens.MAP_SCREEN)
         }
 
-        if (touchY < mScreenWidth * 0.1F && touchX < mScreenWidth * 0.5F) {
+        if (touchY < screenWidth * 0.1F && touchX < screenWidth * 0.5F) {
             GameController.mDrawInputAreas = !GameController.mDrawInputAreas
         }
 
-        val temp = (mScreenHeight - (mScreenHeight + mScreenWidth) * 0.1F) / 3
-        if (touchY > mScreenWidth * 0.1F && touchY < mScreenHeight * 0.9F) {
+        val temp = (screenHeight - (screenHeight + screenWidth) * 0.1F) / 3
+        if (touchY > screenWidth * 0.1F && touchY < screenHeight * 0.9F) {
 
-            val x = touchX / (mScreenWidth / 3) - 1
-            val y = ((touchY - mScreenWidth * 0.1F) / temp).toInt() - 1
+            val x = touchX / (screenWidth / 3) - 1
+            val y = ((touchY - screenWidth * 0.1F) / temp).toInt() - 1
 
             if (x == 0 && y == 0) {
                 if (MapHelper.getObjectId(x, y) == 11) {
@@ -570,18 +576,18 @@ class GameScreen(context: Context) : BasicScreen(context) {
             }
         }
 
-        if (touchY > mScreenHeight * 0.9F) {
+        if (touchY > screenHeight * 0.9F) {
 
-            if (touchX < mScreenWidth * 0.25F) {
+            if (touchX < screenWidth * 0.25F) {
                 GameController.changeScreen(Screens.INVENTORY_SCREEN)
             }
 
-            if (touchX > mScreenWidth * 0.25F && touchX < mScreenWidth * 0.75F) {
+            if (touchX > screenWidth * 0.25F && touchX < screenWidth * 0.75F) {
                 GameController.changeScreen(Screens.CHARACTER_SCREEN)
             }
 
             // TODO: refactor
-            if (touchX > mScreenWidth * 0.75F) {
+            if (touchX > screenWidth * 0.75F) {
                 if (GameController.mHero.mIsResting) {
                     GameController.mHero.interruptResting()
                 } else {
@@ -603,8 +609,8 @@ class GameScreen(context: Context) : BasicScreen(context) {
     }
 
     private fun onTouchExitDialog(touchX: Int, touchY: Int) {
-        if (touchY > mScreenHeight * 0.48F && touchY < mScreenHeight * 0.59F && touchX > mScreenWidth * 0.05F && touchX < mScreenWidth * 0.95F)
-            if (touchX < mScreenWidth * 0.5F) {
+        if (touchY > screenHeight * 0.48F && touchY < screenHeight * 0.59F && touchX > screenWidth * 0.05F && touchX < screenWidth * 0.95F)
+            if (touchX < screenWidth * 0.5F) {
                 GameController.exitGame()
             } else {
                 mDrawExitDialog = false
@@ -612,7 +618,7 @@ class GameScreen(context: Context) : BasicScreen(context) {
     }
 
     private fun onTouchFinal(touchX: Int, touchY: Int) {
-        if (touchY > mScreenHeight * 0.9F) {
+        if (touchY > screenHeight * 0.9F) {
             mDrawWinScreen = false
             GameController.startNewGame()
         }

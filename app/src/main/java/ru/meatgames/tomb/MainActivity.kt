@@ -1,99 +1,107 @@
-package ru.meatgames.tomb;
+package ru.meatgames.tomb
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.ExperimentalMaterialApi
+import ru.meatgames.tomb.GameController.getMap2
+import ru.meatgames.tomb.GameController.showExitDialog
+import ru.meatgames.tomb.GameController.start
+import ru.meatgames.tomb.new_models.provider.GameDataProvider
 
-import ru.meatgames.tomb.new_models.provider.GameDataProvider;
+class MainActivity : AppCompatActivity() {
 
-public class MainActivity extends AppCompatActivity {
+    var turnCount = 0
+    var firstMob: MobList? = null
 
-    public int turnCount = 0;
-    public MobList firstMob;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setupFullScreenMode();
-
-        Assets.init(this);
-        GameDataProvider.INSTANCE.init(this);
-        GameController.init(this);
-
-        GameController.start();
+    @ExperimentalMaterialApi
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setupFullScreenMode()
+        NewAssets.loadAssets(this)
+        GameDataProvider.init(this)
+        GameController.init(this)
+        start()
     }
 
-    private void setupFullScreenMode() {
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    private fun setupFullScreenMode() {
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            or View.SYSTEM_UI_FLAG_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_IMMERSIVE)
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
+    override fun onSaveInstanceState(
+        outState: Bundle
+    ) {
+        super.onSaveInstanceState(outState)
         /** TODO: saving game
-         *  1. Save map
-         *  1.1 Save consumables
-         *  1.2. Save creatures
-         *  2. Save hero
-         *  2.1. Save map position and stats
-         *  2.2. Save inventory content and it's state
-         *  3. Save game state and current game screen state
+         * 1. Save map
+         * 1.1. Save consumables
+         * 1.2. Save creatures
+         * 2. Save hero
+         * 2.1. Save map position and stats
+         * 2.2. Save inventory content and it's state
+         * 3. Save game state and current game screen state
          */
-
     }
 
-    public void onBackPressed() {
+    override fun onBackPressed() {
         /*if (!Assets.INSTANCE.getMapview().getMDrawProgressBar()) {
             GameController.mHero.interruptAllActions();
             Assets.INSTANCE.getMapview().setMDrawExitDialog(!Assets.INSTANCE.getMapview().getMDrawExitDialog());
         }*/
-        GameController.showExitDialog();
+        showExitDialog()
     }
 
-    public void exitGame() {
-        finish();
+    fun exitGame() {
+        finish()
     }
 
-    public void createMob(int x, int y, int t) {
-        MobList temp = new MobList(t);
-        temp.x = x;
-        temp.y = y;
-        GameController.getMap2()[x][y].addMob(temp);
-        addInQueue(temp);
+    fun createMob(
+        x: Int,
+        y: Int,
+        t: Int
+    ) {
+        val temp = MobList(t)
+        temp.x = x
+        temp.y = y
+        getMap2()[x][y].addMob(temp)
+        addInQueue(temp)
     }
 
-    public void addInQueue(MobList mob) {
-        mob.turnCount = turnCount + mob.mob.getMSpeed();
+    fun addInQueue(mob: MobList) {
+        mob.turnCount = turnCount + mob.mob.mSpeed
         if (firstMob == null) {
-            firstMob = mob;
+            firstMob = mob
         } else {
-            MobList cur;
-            boolean b = false;
-            for (cur = firstMob; cur.turnCount <= mob.turnCount; cur = cur.next)
+            var cur: MobList
+            var b = false
+            cur = firstMob!!
+            while (cur.turnCount <= mob.turnCount) {
                 if (cur.next == null) {
-                    b = true;
-                    break;
+                    b = true
+                    break
                 }
+                cur = cur.next
+            }
             if (b) {
-                cur.next = mob;
-                cur.next.next = null;
+                cur.next = mob
+                cur.next.next = null
             } else {
-                MobList temp;
-                if (cur == firstMob) {
-                    temp = firstMob;
-                    firstMob = mob;
-                    firstMob.next = temp;
+                var temp: MobList
+                if (cur === firstMob) {
+                    temp = firstMob!!
+                    firstMob = mob
+                    firstMob!!.next = temp
                 } else {
-                    for (temp = firstMob; temp.next != cur; temp = temp.next) {
+                    temp = firstMob!!
+                    while (temp.next !== cur) {
+                        temp = temp.next
                     }
-                    temp.next = mob;
-                    temp.next.next = cur;
+                    temp.next = mob
+                    temp.next.next = cur
                 }
             }
         }

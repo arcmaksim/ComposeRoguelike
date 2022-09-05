@@ -149,7 +149,7 @@ class NewMapGenerator(context: Context) {
 
 		val random = Random()
 
-		for (i in 0..9) {
+		/*for (i in 0..9) {
 			val direction = random.nextInt(4)
 			val walls = initialRoom.outerWalls[direction] ?: emptyList<ArrayList<Pair<Int, Int>>>()
 			if (walls.isNotEmpty()) {
@@ -167,7 +167,7 @@ class NewMapGenerator(context: Context) {
 					// TODO: place room
 				}
 			}
-		}
+		}*/
 
 		placeRoom(x2, y2, initialRoom)
 	}
