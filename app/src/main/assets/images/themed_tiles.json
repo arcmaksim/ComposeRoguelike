@@ -25,7 +25,7 @@
 			"verticalTileOffset": 5
 		},
 		{
-			"name": "Mythril",
+			"name": "Mithril",
 			"verticalTileOffset": 6
 		},
 		{
@@ -37,7 +37,7 @@
 			"verticalTileOffset": 8
 		},
 		{
-			"name": "Dwarwen dungeon",
+			"name": "Dwarven dungeon",
 			"verticalTileOffset": 9
 		},
 		{
@@ -79,111 +79,111 @@
 	],
 	"themedTiles": [
 		{
-			"role": "WallFlat",
+			"purpose": "WallFlat",
 			"horizontalTileOffset": 0
 		},
 		{
-			"role": "WallFlatCracked",
+			"purpose": "WallFlatCracked",
 			"horizontalTileOffset": 1
 		},
 		{
-			"role": "WallFlatDamaged",
+			"purpose": "WallFlatDamaged",
 			"horizontalTileOffset": 2
 		},
 		{
-			"role": "FloorVarioant1",
+			"purpose": "FloorVariant1",
 			"horizontalTileOffset": 3
 		},
 		{
-			"role": "FloorVarioant2",
+			"purpose": "FloorVariant2",
 			"horizontalTileOffset": 4
 		},
 		{
-			"role": "FloorVarioant3",
+			"purpose": "FloorVariant3",
 			"horizontalTileOffset": 5
 		},
 		{
-			"role": "FloorVarioant4",
+			"purpose": "FloorVariant4",
 			"horizontalTileOffset": 6
 		},
 		{
-			"role": "StairsUp",
+			"purpose": "StairsUp",
 			"horizontalTileOffset": 7
 		},
 		{
-			"role": "StairsDown",
+			"purpose": "StairsDown",
 			"horizontalTileOffset": 8
 		},
 		{
-			"role": "Wall0",
+			"purpose": "Wall0",
 			"horizontalTileOffset": 9
 		},
 		{
-			"role": "Wall2",
+			"purpose": "Wall2",
 			"horizontalTileOffset": 10
 		},
 		{
-			"role": "Wall10",
+			"purpose": "Wall10",
 			"horizontalTileOffset": 11
 		},
 		{
-			"role": "Wall8",
+			"purpose": "Wall8",
 			"horizontalTileOffset": 12
 		},
 		{
-			"role": "Wall4",
+			"purpose": "Wall4",
 			"horizontalTileOffset": 13
 		},
 		{
-			"role": "Wall5",
+			"purpose": "Wall5",
 			"horizontalTileOffset": 14
 		},
 		{
-			"role": "Wall1",
+			"purpose": "Wall1",
 			"horizontalTileOffset": 15
 		},
 		{
-			"role": "Wall6",
+			"purpose": "Wall6",
 			"horizontalTileOffset": 16
 		},
 		{
-			"role": "Wall12",
+			"purpose": "Wall12",
 			"horizontalTileOffset": 17
 		},
 		{
-			"role": "Wall3",
+			"purpose": "Wall3",
 			"horizontalTileOffset": 18
 		},
 		{
-			"role": "Wall9",
+			"purpose": "Wall9",
 			"horizontalTileOffset": 19
 		},
 		{
-			"role": "Wall15",
+			"purpose": "Wall15",
 			"horizontalTileOffset": 20
 		},
 		{
-			"role": "Wall14",
+			"purpose": "Wall14",
 			"horizontalTileOffset": 21
 		},
 		{
-			"role": "Wall13",
+			"purpose": "Wall13",
 			"horizontalTileOffset": 22
 		},
 		{
-			"role": "Wall7",
+			"purpose": "Wall7",
 			"horizontalTileOffset": 23
 		},
 		{
-			"role": "Wall11",
+			"purpose": "Wall11",
 			"horizontalTileOffset": 24
 		},
 		{
-			"role": "WallCrackedVertical",
+			"purpose": "WallCrackedVertical",
 			"horizontalTileOffset": 25
 		},
 		{
-			"role": "WallCrackedHorizontal",
+			"purpose": "WallCrackedHorizontal",
 			"horizontalTileOffset": 26
 		}
 	]
