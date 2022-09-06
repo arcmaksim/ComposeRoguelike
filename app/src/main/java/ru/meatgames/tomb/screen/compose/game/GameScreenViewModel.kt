@@ -56,12 +56,6 @@ class GameScreenViewModel : ViewModel() {
     private fun GameMapChunk.update(
         wrapper: MapWrapper,
     ): GameMapChunk = copy(
-           /* gameMapTiles = (0 until viewportHeight).map { line ->
-                val start = (mapOffsetY + line) * wrapper.height + mapOffsetX
-                val end = start + viewportWidth
-                wrapper.tiles.copyOfRange(start, end)
-            }.fold(emptyList()) { acc, item -> acc + item },
-        )*/
         gameMapTiles = (0 until viewportHeight).map { line ->
                 val start = (mapOffsetY + line) * wrapper.height + mapOffsetX
                 val end = start + viewportWidth
@@ -83,18 +77,6 @@ class GameScreenViewModel : ViewModel() {
                 }
             }.fold(emptyList()) { acc, item -> acc + item },
     )
-
-/*
-private fun GameMapChunk.update(
-        wrapper: MapWrapper,
-    ): GameMapChunk = copy(
-            gameMapTiles = (0 until viewportHeight).map { line ->
-                val start = (mapOffsetY + line) * wrapper.height + mapOffsetX
-                val end = start + viewportWidth
-                wrapper.tiles.copyOfRange(start, end)
-            }.fold(emptyList()) { acc, item -> acc + item },
-        )
- */
 
     fun onMoveCharacter(
         moveDirection: Direction,
