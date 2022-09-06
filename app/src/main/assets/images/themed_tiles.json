@@ -1,0 +1,190 @@
+{
+	"themes": [
+		{
+			"name": "Dungeon",
+			"verticalTileOffset": 0
+		},
+		{
+			"name": "Castle",
+			"verticalTileOffset": 1
+		},
+		{
+			"name": "Deep Dungeon",
+			"verticalTileOffset": 2
+		},
+		{
+			"name": "Evil castle",
+			"verticalTileOffset": 3
+		},
+		{
+			"name": "Tunnels",
+			"verticalTileOffset": 4
+		},
+		{
+			"name": "From the Depths",
+			"verticalTileOffset": 5
+		},
+		{
+			"name": "Mythril",
+			"verticalTileOffset": 6
+		},
+		{
+			"name": "Blue Steel",
+			"verticalTileOffset": 7
+		},
+		{
+			"name": "Golden",
+			"verticalTileOffset": 8
+		},
+		{
+			"name": "Dwarwen dungeon",
+			"verticalTileOffset": 9
+		},
+		{
+			"name": "Green Metal",
+			"verticalTileOffset": 10
+		},
+		{
+			"name": "Caves",
+			"verticalTileOffset": 11
+		},
+		{
+			"name": "Overgrowth",
+			"verticalTileOffset": 12
+		},
+		{
+			"name": "Earth",
+			"verticalTileOffset": 13
+		},
+		{
+			"name": "Garden",
+			"verticalTileOffset": 14
+		},
+		{
+			"name": "Catacombs",
+			"verticalTileOffset": 15
+		},
+		{
+			"name": "Ice - low",
+			"verticalTileOffset": 16
+		},
+		{
+			"name": "Ice - high",
+			"verticalTileOffset": 17
+		},
+		{
+			"name": "Sand",
+			"verticalTileOffset": 18
+		}
+	],
+	"themedTiles": [
+		{
+			"role": "WallFlat",
+			"horizontalTileOffset": 0
+		},
+		{
+			"role": "WallFlatCracked",
+			"horizontalTileOffset": 1
+		},
+		{
+			"role": "WallFlatDamaged",
+			"horizontalTileOffset": 2
+		},
+		{
+			"role": "FloorVarioant1",
+			"horizontalTileOffset": 3
+		},
+		{
+			"role": "FloorVarioant2",
+			"horizontalTileOffset": 4
+		},
+		{
+			"role": "FloorVarioant3",
+			"horizontalTileOffset": 5
+		},
+		{
+			"role": "FloorVarioant4",
+			"horizontalTileOffset": 6
+		},
+		{
+			"role": "StairsUp",
+			"horizontalTileOffset": 7
+		},
+		{
+			"role": "StairsDown",
+			"horizontalTileOffset": 8
+		},
+		{
+			"role": "Wall0",
+			"horizontalTileOffset": 9
+		},
+		{
+			"role": "Wall2",
+			"horizontalTileOffset": 10
+		},
+		{
+			"role": "Wall10",
+			"horizontalTileOffset": 11
+		},
+		{
+			"role": "Wall8",
+			"horizontalTileOffset": 12
+		},
+		{
+			"role": "Wall4",
+			"horizontalTileOffset": 13
+		},
+		{
+			"role": "Wall5",
+			"horizontalTileOffset": 14
+		},
+		{
+			"role": "Wall1",
+			"horizontalTileOffset": 15
+		},
+		{
+			"role": "Wall6",
+			"horizontalTileOffset": 16
+		},
+		{
+			"role": "Wall12",
+			"horizontalTileOffset": 17
+		},
+		{
+			"role": "Wall3",
+			"horizontalTileOffset": 18
+		},
+		{
+			"role": "Wall9",
+			"horizontalTileOffset": 19
+		},
+		{
+			"role": "Wall15",
+			"horizontalTileOffset": 20
+		},
+		{
+			"role": "Wall14",
+			"horizontalTileOffset": 21
+		},
+		{
+			"role": "Wall13",
+			"horizontalTileOffset": 22
+		},
+		{
+			"role": "Wall7",
+			"horizontalTileOffset": 23
+		},
+		{
+			"role": "Wall11",
+			"horizontalTileOffset": 24
+		},
+		{
+			"role": "WallCrackedVertical",
+			"horizontalTileOffset": 25
+		},
+		{
+			"role": "WallCrackedHorizontal",
+			"horizontalTileOffset": 26
+		}
+	]
+}
