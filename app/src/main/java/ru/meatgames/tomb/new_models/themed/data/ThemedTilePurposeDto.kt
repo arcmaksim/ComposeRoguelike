@@ -2,9 +2,10 @@ package ru.meatgames.tomb.new_models.themed.data
 
 @kotlinx.serialization.Serializable
 enum class ThemedTilePurposeDto {
-    WallFlat,
-    WallFlatCracked,
-    WallFlatDamaged,
+    // all tiles from tileset
+    WallSingle,
+    WallSingleDamaged,
+    WallSingleCracked,
     FloorVariant1,
     FloorVariant2,
     FloorVariant3,
@@ -29,4 +30,6 @@ enum class ThemedTilePurposeDto {
     Wall15,
     WallCrackedVertical,
     WallCrackedHorizontal,
+    // specific tile for room definition
+    Wall,
 }

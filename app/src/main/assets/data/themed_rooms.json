@@ -1,17 +1,13 @@
 {
   "symbolMapping": [
     {
-      "purpose": "WallContinuous",
+      "purpose": "Wall",
       "symbol": "#"
     },
     {
-      "purpose": "WallContinuous",
+      "purpose": "Wall",
       "symbol": "W",
       "isConnectionTile": true
-    },
-    {
-      "purpose": "WallSingle",
-      "symbol": "X"
     },
     {
       "purpose": "StairsUp",

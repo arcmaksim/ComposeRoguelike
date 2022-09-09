@@ -175,7 +175,7 @@ class ThemedMapGenerator(
                     mapY = y,
                     floorTile = tiles.first { it.purpose == ThemedTilePurpose.FloorVariant1 }
                         .toThemedTile(tileset),
-                    objectTile = tiles.first { it.purpose == ThemedTilePurpose.Wall0 }
+                    objectTile = tiles.first { it.purpose == ThemedTilePurpose.Wall }
                         .toThemedTile(tileset),
                 )
             }
@@ -270,16 +270,8 @@ private fun ThemedTilePurposeDefinition.toThemedTile(
         ThemedTilePurpose.FloorVariant4 -> Triple(true, true, false)
         ThemedTilePurpose.StairsDown -> Triple(false, true, true)
         ThemedTilePurpose.StairsUp -> Triple(false, false, true)
-        ThemedTilePurpose.Wall0, ThemedTilePurpose.Wall1,
-        ThemedTilePurpose.Wall2, ThemedTilePurpose.Wall3,
-        ThemedTilePurpose.Wall4, ThemedTilePurpose.Wall5,
-        ThemedTilePurpose.Wall6, ThemedTilePurpose.Wall7,
-        ThemedTilePurpose.Wall8, ThemedTilePurpose.Wall9,
-        ThemedTilePurpose.Wall10, ThemedTilePurpose.Wall11,
-        ThemedTilePurpose.Wall12, ThemedTilePurpose.Wall13,
-        ThemedTilePurpose.Wall14, ThemedTilePurpose.Wall15,
-        ThemedTilePurpose.WallFlat, ThemedTilePurpose.WallFlatCracked,
-        ThemedTilePurpose.WallFlatDamaged, ThemedTilePurpose.WallCrackedVertical,
+        ThemedTilePurpose.Wall, ThemedTilePurpose.WallCracked,
+        ThemedTilePurpose.WallDamaged, ThemedTilePurpose.WallCrackedVertical,
         ThemedTilePurpose.WallCrackedHorizontal -> Triple(false, false, true)
     }
 
@@ -309,7 +301,7 @@ data class ThemedNewMapConfig(
 )
 
 private val ThemedGameMapTile?.isWall: Boolean
-    get() = this?.`object`?.purposeDefinition?.purpose == ThemedTilePurpose.Wall0
+    get() = this?.`object`?.purposeDefinition?.purpose == ThemedTilePurpose.Wall
 
 private val ThemedGameMapTile?.isEmpty: Boolean
     get() = this?.`object` == null || this.`object`.purposeDefinition.purpose == ThemedTilePurpose.Empty

@@ -79,15 +79,15 @@
 	],
 	"themedTiles": [
 		{
-			"purpose": "WallFlat",
+			"purpose": "WallSingle",
 			"horizontalTileOffset": 0
 		},
 		{
-			"purpose": "WallFlatDamaged",
+			"purpose": "WallSingleDamaged",
 			"horizontalTileOffset": 1
 		},
 		{
-			"purpose": "WallFlatCracked",
+			"purpose": "WallSingleCracked",
 			"horizontalTileOffset": 2
 		},
 		{
