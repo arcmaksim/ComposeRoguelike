@@ -54,32 +54,32 @@ private fun Map(
         val offset = (size.width.toInt() - (tileDimension * maxSize)) / 2
         val tileSize = IntSize(tileDimension, tileDimension)
 
-        for (x in 0 until room.width) {
-            for (y in 0 until room.height) {
-                val dstOffset = IntOffset(offset + x * tileDimension, y * tileDimension)
-                room.floorTiles[room.floor[y][x].toString()]?.let { floorTile ->
-                    drawImage(
-                        NewAssets.tileset,
-                        srcOffset = floorTile.imageRect.asIntOffset(),
-                        srcSize = floorTile.imageRect.asIntSize(),
-                        dstOffset = dstOffset,
-                        dstSize = tileSize,
-                        filterQuality = FilterQuality.None,
-                    )
-                }
-                if (renderType == RoomRenderType.Floor) continue
-                room.objectTiles[room.objects[y][x].toString()]?.let { objectTile ->
-                    if (objectTile.name == "nothing" || objectTile.name == "void") return@let
-                    drawImage(
-                        NewAssets.tileset,
-                        srcOffset = objectTile.imageRect.asIntOffset(),
-                        srcSize = objectTile.imageRect.asIntSize(),
-                        dstOffset = dstOffset,
-                        dstSize = tileSize,
-                        filterQuality = FilterQuality.None,
-                        alpha = objectAlpha,
-                    )
-                }
+        for (i in 0 until room.width * room.height) {
+            val x = i % room.width
+            val y = i / room.width
+            val dstOffset = IntOffset(offset + x * tileDimension, y * tileDimension)
+            room.floorTiles[room.floor[i]]?.let { floorTile ->
+                drawImage(
+                    NewAssets.tileset,
+                    srcOffset = floorTile.imageRect.asIntOffset(),
+                    srcSize = floorTile.imageRect.asIntSize(),
+                    dstOffset = dstOffset,
+                    dstSize = tileSize,
+                    filterQuality = FilterQuality.None,
+                )
+            }
+            if (renderType == RoomRenderType.Floor) continue
+            room.objectTiles[room.objects[i]]?.let { objectTile ->
+                if (objectTile.name == "nothing" || objectTile.name == "void") return@let
+                drawImage(
+                    NewAssets.tileset,
+                    srcOffset = objectTile.imageRect.asIntOffset(),
+                    srcSize = objectTile.imageRect.asIntSize(),
+                    dstOffset = dstOffset,
+                    dstSize = tileSize,
+                    filterQuality = FilterQuality.None,
+                    alpha = objectAlpha,
+                )
             }
         }
     }
