@@ -8,17 +8,19 @@ import androidx.compose.ui.graphics.asImageBitmap
 import java.io.IOException
 import java.io.InputStream
 
+private const val originalTileSize: Int = 24
+
 object NewAssets {
 
-    private val originalTileSize: Int = 24
-
     lateinit var tileset: ImageBitmap
+    lateinit var themedTileset: ImageBitmap
     private lateinit var heroBitmaps: Array<ImageBitmap>
 
     fun loadAssets(
         context: Context,
     ) {
         tileset = context.getBitmapFromAsset("tiles").asImageBitmap()
+        themedTileset = context.getBitmapFromAsset("themed_tiles").asImageBitmap()
 
         val temp = context.getBitmapFromAsset("character_animation_sheet")
         val heroSprites = Array(4) { i ->
