@@ -1,13 +1,18 @@
 package ru.meatgames.tomb.new_models.themed.domain.tile
 
-import ru.meatgames.tomb.new_models.themed.data.tile.ThemedTileDto
+import androidx.compose.ui.unit.IntOffset
 
 data class ThemedTile(
-    val purpose: ThemedTilePurpose,
-    val horizontalTileOffset: Int,
+    val theme: ThemedTileset,
+    val purposeDefinition: ThemedTilePurposeDefinition,
+    val isPassable: Boolean,
+    val isTransparent: Boolean,
+    val isUsable: Boolean,
 )
 
-fun ThemedTileDto.toEntity(): ThemedTile = ThemedTile(
-    purpose = purpose.toEntity(),
-    horizontalTileOffset = horizontalTileOffset,
+fun ThemedTile.getOffset(
+    tileSize: Int = 24,
+): IntOffset = IntOffset(
+    x = purposeDefinition.horizontalTileOffset * tileSize,
+    y = theme.verticalTileOffset * tileSize,
 )

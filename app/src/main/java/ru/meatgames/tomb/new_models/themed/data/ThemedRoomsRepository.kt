@@ -9,7 +9,7 @@ import ru.meatgames.tomb.new_models.themed.data.tile.ThemedTilesetsDto
 import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoom
 import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoomSymbolMapping
 import ru.meatgames.tomb.new_models.themed.domain.room.toEntity
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
 import ru.meatgames.tomb.new_models.themed.domain.tile.toEntity
 
@@ -51,7 +51,7 @@ class ThemedRoomsRepository(
 
 class ThemedRoomsData(
     val tilesets: List<ThemedTileset>,
-    val tiles: List<ThemedTile>,
+    val tiles: List<ThemedTilePurposeDefinition>,
     val rooms: List<ThemedRoom>,
     val symbolMappings: List<ThemedRoomSymbolMapping>,
 )

@@ -3,7 +3,7 @@ package ru.meatgames.tomb.new_models.themed.domain
 import ru.meatgames.tomb.new_models.themed.data.ThemedRoomsRepository
 import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoom
 import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoomSymbolMapping
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
 
 class ThemedRoomsInteractor(
@@ -14,7 +14,7 @@ class ThemedRoomsInteractor(
     val availableRooms: List<ThemedRoom>
 
     private val mappings: List<ThemedRoomSymbolMapping>
-    private val tiles: List<ThemedTile>
+    private val tiles: List<ThemedTilePurposeDefinition>
 
     init {
         val loadedData = repo.loadData()
@@ -50,6 +50,6 @@ class ThemedRoomsInteractor(
 class ThemedRoomBlueprint(
     val tileset: ThemedTileset,
     val room: ThemedRoom,
-    val tiles: List<ThemedTile>,
+    val tiles: List<ThemedTilePurposeDefinition>,
     val mappings: List<ThemedRoomSymbolMapping>,
 )

@@ -1,37 +1,38 @@
 package ru.meatgames.tomb
 
-import androidx.compose.runtime.MutableState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.new_models.repo.TileRepo
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
 import ru.meatgames.tomb.new_models.tile.Tile
 import ru.meatgames.tomb.screen.compose.game.GameMapTile
+import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
 
-class NewMapController2(
+class ThemedMapController(
     val mapWidth: Int,
     val mapHeight: Int,
 ) {
 
-    private val _map: MutableStateFlow<MapWrapper> = MutableStateFlow(
-        MapWrapper(
+    private val _map: MutableStateFlow<ThemedMapWrapper> = MutableStateFlow(
+        ThemedMapWrapper(
             width = mapWidth,
             height = mapHeight,
-            tiles = Array(mapWidth * mapHeight) { GameMapTile() },
+            tiles = Array(mapWidth * mapHeight) { ThemedGameMapTile() },
             updateTime = System.currentTimeMillis(),
         )
     )
-    val map: StateFlow<MapWrapper> = _map
+    val map: StateFlow<ThemedMapWrapper> = _map
 
     fun getTile(
         x: Int,
         y: Int,
-    ): GameMapTile? = map.value.tiles.getOrNull(x + y * mapWidth)
+    ): ThemedGameMapTile? = map.value.tiles.getOrNull(x + y * mapWidth)
 
     fun changeFloorTile(
         x: Int,
         y: Int,
-        tile: Tile,
+        tile: ThemedTile,
     ) {
         val index = x + y * mapWidth
         if (index !in map.value.tiles.indices) return
@@ -47,10 +48,8 @@ class NewMapController2(
     fun changeObjectTile(
         x: Int,
         y: Int,
-        tile: Tile,
+        tile: ThemedTile,
     ) {
-        if (tile == TileRepo.voidTile) return
-
         val index = x + y * mapWidth
         if (index !in map.value.tiles.indices) return
 
@@ -64,8 +63,8 @@ class NewMapController2(
 
 }
 
-data class MapWrapper(
-    val tiles: Array<GameMapTile>,
+data class ThemedMapWrapper(
+    val tiles: Array<ThemedGameMapTile>,
     val width: Int,
     val height: Int,
     val updateTime: Long,
