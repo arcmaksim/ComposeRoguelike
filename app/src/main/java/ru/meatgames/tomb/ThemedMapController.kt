@@ -75,7 +75,7 @@ data class ThemedMapWrapper(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as MapWrapper
+        other as ThemedMapWrapper
 
         if (!tiles.contentEquals(other.tiles)) return false
         if (width != other.width) return false
