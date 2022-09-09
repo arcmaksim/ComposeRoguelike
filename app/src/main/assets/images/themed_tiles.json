@@ -83,11 +83,11 @@
 			"horizontalTileOffset": 0
 		},
 		{
-			"purpose": "WallFlatCracked",
+			"purpose": "WallFlatDamaged",
 			"horizontalTileOffset": 1
 		},
 		{
-			"purpose": "WallFlatDamaged",
+			"purpose": "WallFlatCracked",
 			"horizontalTileOffset": 2
 		},
 		{
