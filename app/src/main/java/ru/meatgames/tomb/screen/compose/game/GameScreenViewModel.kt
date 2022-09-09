@@ -9,14 +9,13 @@ import kotlinx.coroutines.launch
 import ru.meatgames.tomb.*
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
 import ru.meatgames.tomb.new_models.tile.Tile
-import kotlin.math.abs
 
 const val viewportWidth = 11
 const val viewportHeight = 11
 
 class GameScreenViewModel : ViewModel() {
 
-    private val mapGenerator = NewMapGenerator2(
+    private val mapGenerator = MapGenerator(
         tileRepo = GameDataProvider.tiles,
         roomRepo = GameDataProvider.getRooms(Game.appContext),
         mapWidth = 32,
@@ -31,7 +30,7 @@ class GameScreenViewModel : ViewModel() {
     private val _isIdle = MutableStateFlow(true)
     val isIdle: StateFlow<Boolean> = _isIdle
 
-    private val mapController2: NewMapController2
+    private val mapController2: MapController
 
     init {
         val generatedMapConfig = mapGenerator.generateMap()
