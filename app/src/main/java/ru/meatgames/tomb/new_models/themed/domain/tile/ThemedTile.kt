@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.new_models.themed.domain.tile
 
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 
 data class ThemedTile(
     val theme: ThemedTileset,
@@ -15,4 +16,11 @@ fun ThemedTile.getOffset(
 ): IntOffset = IntOffset(
     x = purposeDefinition.horizontalTileOffset * tileSize,
     y = theme.verticalTileOffset * tileSize,
+)
+
+fun ThemedTile.getSize(
+    tileSize: Int = 24,
+): IntSize = IntSize(
+    width = tileSize,
+    height = tileSize,
 )

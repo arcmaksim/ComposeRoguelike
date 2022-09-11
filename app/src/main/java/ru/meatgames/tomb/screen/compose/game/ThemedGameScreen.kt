@@ -23,6 +23,7 @@ import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurpose
 import ru.meatgames.tomb.new_models.themed.domain.tile.getOffset
+import ru.meatgames.tomb.new_models.themed.domain.tile.getSize
 import kotlin.math.abs
 
 @Composable
@@ -80,10 +81,11 @@ private fun Map(
             val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
 
             tile.floor?.let { floorTile ->
+                if (floorTile.purposeDefinition.purpose == ThemedTilePurpose.Empty) return@let
                 drawImage(
                     NewAssets.themedTileset,
                     srcOffset = floorTile.getOffset(),
-                    srcSize = tileSize,
+                    srcSize = floorTile.getSize(),
                     dstOffset = dstOffset,
                     dstSize = tileSize,
                     filterQuality = FilterQuality.None,
@@ -94,7 +96,7 @@ private fun Map(
                 drawImage(
                     NewAssets.themedTileset,
                     srcOffset = objectTile.getOffset(),
-                    srcSize = tileSize,
+                    srcSize = objectTile.getSize(),
                     dstOffset = dstOffset,
                     dstSize = tileSize,
                     filterQuality = FilterQuality.None,
