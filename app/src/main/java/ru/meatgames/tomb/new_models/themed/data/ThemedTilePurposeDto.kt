@@ -32,4 +32,5 @@ enum class ThemedTilePurposeDto {
     WallCrackedHorizontal,
     // specific tile for room definition
     Wall,
+    Empty,
 }

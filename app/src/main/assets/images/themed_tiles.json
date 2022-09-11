@@ -185,6 +185,10 @@
 		{
 			"purpose": "WallCrackedHorizontal",
 			"horizontalTileOffset": 26
+		},
+		{
+			"purpose": "Empty",
+			"horizontalTileOffset": -1
 		}
 	]
 }

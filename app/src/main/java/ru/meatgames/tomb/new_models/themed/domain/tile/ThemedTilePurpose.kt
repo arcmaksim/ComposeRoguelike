@@ -17,7 +17,7 @@ enum class ThemedTilePurpose {
     Empty,
 }
 
-fun ThemedTilePurposeDto?.toEntity(): ThemedTilePurpose = when (this) {
+fun ThemedTilePurposeDto.toEntity(): ThemedTilePurpose = when (this) {
     ThemedTilePurposeDto.FloorVariant1 -> ThemedTilePurpose.FloorVariant1
     ThemedTilePurposeDto.FloorVariant2 -> ThemedTilePurpose.FloorVariant2
     ThemedTilePurposeDto.FloorVariant3 -> ThemedTilePurpose.FloorVariant3
@@ -37,5 +37,5 @@ fun ThemedTilePurposeDto?.toEntity(): ThemedTilePurpose = when (this) {
     ThemedTilePurposeDto.Wall12, ThemedTilePurposeDto.Wall13,
     ThemedTilePurposeDto.Wall14, ThemedTilePurposeDto.Wall15,
     ThemedTilePurposeDto.WallSingle, ThemedTilePurposeDto.Wall -> ThemedTilePurpose.Wall
-    null -> ThemedTilePurpose.Empty
+    ThemedTilePurposeDto.Empty -> ThemedTilePurpose.Empty
 }
