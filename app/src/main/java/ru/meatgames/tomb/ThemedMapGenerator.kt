@@ -22,10 +22,11 @@ class ThemedMapGenerator(
     private val tiles: List<ThemedTilePurposeDefinition>
     private val rooms: List<ThemedRoom>
     private val mapping: List<ThemedRoomSymbolMapping>
+    private val random = Random(System.currentTimeMillis())
 
     init {
         val themedRoomsConfig = roomRepo.loadData()
-        tileset = themedRoomsConfig.tilesets.random()
+        tileset = themedRoomsConfig.tilesets.random(random)
         tiles = themedRoomsConfig.tiles
         rooms = themedRoomsConfig.rooms
         mapping = themedRoomsConfig.symbolMappings
