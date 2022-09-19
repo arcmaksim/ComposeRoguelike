@@ -5,7 +5,7 @@ import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurpose
 import ru.meatgames.tomb.new_models.themed.domain.tile.toEntity
 
 data class ThemedRoomSymbolMapping(
-    val purpose: ThemedTilePurpose?,
+    val purpose: ThemedTilePurpose,
     val symbol: Char,
     val isConnectionTile: Boolean,
 )

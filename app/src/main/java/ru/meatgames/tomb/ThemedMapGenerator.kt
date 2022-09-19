@@ -69,12 +69,12 @@ class ThemedMapGenerator(
             initialRoom,
         )
 
-        /*val random = Random(System.currentTimeMillis())
+        val random = Random(System.currentTimeMillis())
 
         roomLoop@ for (i in 0 until this.maxRooms) {
             Timber.d("-----------------------------------------")
             Timber.d("Attempting to place ${i + 1} room of ${this.maxRooms}")
-            val room = roomRepo.rooms.random(random).rotate()
+            val room = rooms.random(random)
 
             Timber.d("Outer walls pool - $outerWallsPool")
 
@@ -123,14 +123,15 @@ class ThemedMapGenerator(
                     mapController.changeObjectTile(
                         randomOuterWall.first,
                         randomOuterWall.second,
-                        tileRepo.getTile("door_closed"),
+                        ThemedTile
+                        //tileRepo.getTile("door_closed"),
                     )
-                    Timber.d("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
+                    Timber.d("Placed empty tile at ${randomOuterWall.first} ${randomOuterWall.second}")
                     outerWallsPool.remove(randomOuterWall)
                     break
                 }
             }
-        }*/
+        }
 
         return ThemedNewMapConfig(
             startingPositionX = initialRoomPositionX + 2,
@@ -191,8 +192,6 @@ class ThemedMapGenerator(
     ) {
         for (w in 0 until room.width) {
             for (h in 0 until room.height) {
-                val floorSymbol = room.floor[w + h * room.width]
-                val objectSymbol = room.floor[w + h * room.width]
                 changeTile(
                     mapX = x + w,
                     mapY = y + h,
@@ -210,9 +209,9 @@ class ThemedMapGenerator(
             }
         }
 
-        /*for (wall in room.outerWalls) {
+        for (wall in room.outerWalls) {
             outerWallsPool.add(x + wall.first to y + wall.second)
-        }*/
+        }
 
         Timber.d("Placed room at $x $y with dimensions ${room.width} x ${room.height}")
     }
