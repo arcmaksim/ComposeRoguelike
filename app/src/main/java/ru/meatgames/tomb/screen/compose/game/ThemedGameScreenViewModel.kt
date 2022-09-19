@@ -98,7 +98,7 @@ class ThemedGameScreenViewModel : ViewModel() {
         val (offsetX, offsetY) = moveDirection.resolvedOffsets
 
         val chunk = visibleMapChunk.value
-        val index = viewportWidth * viewportHeight / 2 + offsetX + offsetY * viewportWidth
+        val index = themedViewportWidth * themedViewportHeight / 2 + offsetX + offsetY * themedViewportWidth
         val tile = chunk.gameMapTiles[index]
 
         when {
@@ -154,8 +154,8 @@ class ThemedGameScreenViewModel : ViewModel() {
 }
 
 data class ThemedGameMapChunk(
-    val width: Int = viewportWidth,
-    val height: Int = viewportHeight,
+    val width: Int = themedViewportWidth,
+    val height: Int = themedViewportHeight,
     val mapOffsetX: Int,
     val mapOffsetY: Int,
     val gameMapTiles: List<ThemedGameMapTile>,

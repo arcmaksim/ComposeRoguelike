@@ -108,7 +108,10 @@ private fun Map(
 
         drawImage(
             NewAssets.getHeroBitmap(animation.value),
-            dstOffset = IntOffset(offset + tileDimension * (viewportWidth / 2), tileDimension * (viewportHeight / 2)),
+            dstOffset = IntOffset(
+                x = offset + tileDimension * (themedViewportWidth / 2),
+                y = tileDimension * (themedViewportHeight / 2),
+            ),
             dstSize = tileSize,
             filterQuality = FilterQuality.None,
         )
