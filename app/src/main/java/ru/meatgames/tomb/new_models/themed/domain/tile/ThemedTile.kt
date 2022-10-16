@@ -23,7 +23,7 @@ fun ThemedTile.getOffset(
         val (offsetX, offsetY) = purposeDefinition.getOffsets()
         IntOffset(
             x = offsetX * tileSize,
-            y = offsetY * offsetY,
+            y = offsetY * tileSize,
         )
     }
 }
