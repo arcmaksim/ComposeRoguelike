@@ -43,10 +43,13 @@ data class ThemedRoom(
 
 }
 
-fun ThemedRoomDto.toEntity(): ThemedRoom = ThemedRoom(
+fun ThemedRoomDto.toEntity(
+    symbolMapping: List<ThemedRoomSymbolMapping>,
+): ThemedRoom = ThemedRoom(
     name = name,
     width = width,
     height = height,
     floor = floor.fold("") { acc, item -> acc + item },
     objects = objects.fold("") { acc, item -> acc + item },
+    symbolMapping = symbolMapping,
 )

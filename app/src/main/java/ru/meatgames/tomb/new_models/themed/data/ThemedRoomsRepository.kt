@@ -48,7 +48,7 @@ class ThemedRoomsRepository(
             context.assets.open("data/themed_rooms.json")
         )
         val mappings = roomsData.symbolMapping.map { it.toEntity() }
-        val rooms = roomsData.rooms.map { it.toEntity() }
+        val rooms = roomsData.rooms.map { it.toEntity(mappings) }
 
         return ThemedRoomsData(
             tilesets = tilesets,
