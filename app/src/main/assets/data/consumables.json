@@ -1,0 +1,15 @@
+{
+  "consumables": [
+    {
+      "id": "3000",
+      "title": "Зелье здоровья",
+      "ending": "о",
+      "statModifiers": [
+        {
+          "id": "currentHealth",
+          "modifier": 10
+        }
+      ]
+    }
+  ]
+}

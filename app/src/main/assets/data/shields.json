@@ -1,0 +1,49 @@
+{
+  "shields": [
+    {
+      "id": 2000,
+      "title": "Железный щит",
+      "ending": "",
+      "statModifiers": [
+        {
+          "id": "defense",
+          "modifier": 1
+        },
+        {
+          "id": "armor",
+          "modifier": 0
+        }
+      ]
+    },
+    {
+      "id": 2001,
+      "title": "Башенный щит",
+      "ending": "",
+      "statModifiers": [
+        {
+          "id": "defense",
+          "modifier": 1
+        },
+        {
+          "id": "armor",
+          "modifier": 1
+        }
+      ]
+    },
+    {
+      "id": 2002,
+      "title": "Щит 'Кожа Дракона'",
+      "ending": "",
+      "statModifiers": [
+        {
+          "id": "defense",
+          "modifier": 2
+        },
+        {
+          "id": "armor",
+          "modifier": 1
+        }
+      ]
+    }
+  ]
+}
