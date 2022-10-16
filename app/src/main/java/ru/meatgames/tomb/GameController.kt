@@ -26,7 +26,7 @@ object GameController {
     private lateinit var mVibrator: Vibrator
 
     private lateinit var mScreenController: ScreenController
-    private lateinit var mMapController: NewMapController
+    private lateinit var mMapController: MapController
 
     lateinit var mHero: HeroClass
 
@@ -62,7 +62,7 @@ object GameController {
 
     private fun init() {
         mScreenController = ScreenController(mMainActivity)
-        mMapController = NewMapController()
+        mMapController = MapController(96, 96)
         zone = array2d(11, 11) { 0 }
     }
 
@@ -111,21 +111,18 @@ object GameController {
         mHero.my = mapY + 2
     }
 
-    @JvmStatic
-    fun getMap(): Array<MapTile> = mMapController.getMap()
-
     // TODO: Temp solution
     @JvmStatic
-    fun getMap2(): Array<Array<MapClass>> = MapController().getMap()
+    fun getMap2(): Array<Array<MapClass>> = emptyArray() // MapController().getMap()
 
-    fun getMapTile(x: Int, y: Int): MapTile? = mMapController.getMapTile(x, y)
+    fun getMapTile(x: Int, y: Int): MapTile? = null // mMapController.getMapTile(x, y)
 
     fun changeFloorTile(x: Int, y: Int, tile: Tile) = mMapController.changeFloorTile(x, y, tile)
 
     fun changeObjectTile(x: Int, y: Int, tile: Tile) = mMapController.changeObjectTile(x, y, tile)
 
     @JvmStatic
-    fun generateNewMap() = mMapController.generateNewMap(mMainActivity)
+    fun generateNewMap() = Unit // mMapController.generateNewMap(mMainActivity)
 
     fun changeScreen(screen: Screens) = mScreenController.changeScreen(screen)
 
@@ -172,8 +169,8 @@ object GameController {
     fun spread(i1: Int, j1: Int, c: Int) {
         for (i in i1 - 1 until i1 + 2)
             for (j in j1 - 1 until j1 + 2)
-                if (zone[i][j] == zoneDefaultValue
-                        && mMapController.getMapTile(mScreenController.mGameScreen.camx - 1 + i, mScreenController.mGameScreen.camy - 1 + j)?.isPassable == true)
+                if (zone[i][j] == zoneDefaultValue)
+                        //&& mMapController.getMapTile(mScreenController.mGameScreen.camx - 1 + i, mScreenController.mGameScreen.camy - 1 + j)?.isPassable == true)
                 //&& !mMapController.getMapTile(mScreenController.mGameScreen.camx - 1 + i, mScreenController.mGameScreen.camy - 1 + j).hasMob())
                     zone[i][j] = c
     }

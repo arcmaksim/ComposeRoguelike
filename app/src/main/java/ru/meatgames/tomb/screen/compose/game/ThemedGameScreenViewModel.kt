@@ -8,40 +8,51 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.*
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
+import ru.meatgames.tomb.new_models.themed.data.ThemedRoomsRepository
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
+import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
+import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
 import ru.meatgames.tomb.new_models.tile.Tile
+import kotlin.math.abs
 
-const val viewportWidth = 11
-const val viewportHeight = 11
+const val themedViewportWidth = 11
+const val themedViewportHeight = 11
 
-class GameScreenViewModel : ViewModel() {
+class ThemedGameScreenViewModel : ViewModel() {
 
-    private val mapGenerator = MapGenerator(
-        tileRepo = GameDataProvider.tiles,
-        roomRepo = GameDataProvider.getRooms(Game.appContext),
+    private val mapGenerator = ThemedMapGenerator(
+        roomRepo = ThemedRoomsRepository(Game.appContext),
         mapWidth = 32,
         mapHeight = 32,
     )
 
     private val _visibleMapChunk = MutableStateFlow(
-        GameMapChunk(viewportWidth, viewportHeight, 0, 0, emptyList())
+        ThemedGameMapChunk(
+            themedViewportWidth,
+            themedViewportHeight,
+            mapOffsetX = 0,
+            mapOffsetY = 0,
+            gameMapTiles = emptyList(),
+        )
     )
-    val visibleMapChunk: StateFlow<GameMapChunk> = _visibleMapChunk
+    val visibleMapChunk: StateFlow<ThemedGameMapChunk> = _visibleMapChunk
 
     private val _isIdle = MutableStateFlow(true)
     val isIdle: StateFlow<Boolean> = _isIdle
 
-    private val mapController2: MapController
+    private val mapController: ThemedMapController
 
     init {
         val generatedMapConfig = mapGenerator.generateMap()
 
-        _visibleMapChunk.value = GameMapChunk(
-            mapOffsetX = generatedMapConfig.startingPositionX - viewportWidth / 2,
-            mapOffsetY = generatedMapConfig.startingPositionY - viewportHeight / 2,
+        _visibleMapChunk.value = ThemedGameMapChunk(
+            mapOffsetX = generatedMapConfig.startingPositionX - themedViewportWidth / 2,
+            mapOffsetY = generatedMapConfig.startingPositionY - themedViewportHeight / 2,
             gameMapTiles = emptyList(),
         )
 
-        mapController2 = generatedMapConfig.mapController
+        mapController = generatedMapConfig.mapController
 
         viewModelScope.launch {
             generatedMapConfig.mapController.map.collect { wrapper ->
@@ -52,24 +63,24 @@ class GameScreenViewModel : ViewModel() {
         }
     }
 
-    private fun GameMapChunk.update(
-        wrapper: MapWrapper,
-    ): GameMapChunk = copy(
-        gameMapTiles = (0 until viewportHeight).map { line ->
+    private fun ThemedGameMapChunk.update(
+        wrapper: ThemedMapWrapper,
+    ): ThemedGameMapChunk = copy(
+        gameMapTiles = (0 until themedViewportHeight).map { line ->
                 val start = (mapOffsetY + line) * wrapper.height + mapOffsetX
-                val end = start + viewportWidth
+                val end = start + themedViewportWidth
                 when {
-                    mapOffsetY + line !in 0 until wrapper.height -> Array(viewportWidth) { GameMapTile.voidMapTile }
-                    mapOffsetX < 0 -> Array(viewportWidth) {
+                    mapOffsetY + line !in 0 until wrapper.height -> Array(themedViewportWidth) { ThemedGameMapTile.voidMapTile }
+                    mapOffsetX < 0 -> Array(themedViewportWidth) {
                         when {
-                            mapOffsetX + it < 0 -> GameMapTile.voidMapTile
+                            mapOffsetX + it < 0 -> ThemedGameMapTile.voidMapTile
                             else -> wrapper.tiles[start + it]
                         }
                     }
-                    mapOffsetX + viewportWidth > wrapper.width -> Array(viewportWidth) {
+                    mapOffsetX + themedViewportWidth > wrapper.width -> Array(themedViewportWidth) {
                         when {
                             mapOffsetX + it < wrapper.width -> wrapper.tiles[start + it]
-                            else -> GameMapTile.voidMapTile
+                            else -> ThemedGameMapTile.voidMapTile
                         }
                     }
                     else -> wrapper.tiles.copyOfRange(start, end)
@@ -105,13 +116,13 @@ class GameScreenViewModel : ViewModel() {
         _isIdle.value = true
     }
 
-    private fun GameMapTile.useObjectTile(
+    private fun ThemedGameMapTile.useObjectTile(
         mapX: Int,
         mapY: Int,
     ) {
         val resolvedTileReplacementOnUse = `object`?.resolveTileReplacementOnUse() ?: return
 
-        mapController2.changeObjectTile(
+        mapController.changeObjectTile(
             x = mapX,
             y = mapY,
             tile = resolvedTileReplacementOnUse,
@@ -126,21 +137,26 @@ class GameScreenViewModel : ViewModel() {
             it.copy(
                 mapOffsetX = it.mapOffsetX + offsetX,
                 mapOffsetY = it.mapOffsetY + offsetY,
-            ).update(mapController2.map.value)
+            ).update(mapController.map.value)
         }
     }
 
-    private fun Tile.resolveTileReplacementOnUse(): Tile? = when (name) {
-        "door_closed" -> GameDataProvider.tiles.getTile("door_opened")
-        else -> null
+    private fun ThemedTile.resolveTileReplacementOnUse(): ThemedTile? {
+        val definition = purposeDefinition as? ThemedTilePurposeDefinition.General ?: return null
+        return when (definition.purpose) {
+            GeneralTilePurpose.ClosedDoor -> ThemedTilePurposeDefinition.General(
+                purpose = GeneralTilePurpose.OpenDoor,
+            ).toThemedTile(theme)
+            else -> null
+        }
     }
 
 }
 
-data class GameMapChunk(
+data class ThemedGameMapChunk(
     val width: Int = viewportWidth,
     val height: Int = viewportHeight,
     val mapOffsetX: Int,
     val mapOffsetY: Int,
-    val gameMapTiles: List<GameMapTile>,
+    val gameMapTiles: List<ThemedGameMapTile>,
 )
