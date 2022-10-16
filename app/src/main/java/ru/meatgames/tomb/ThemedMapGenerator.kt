@@ -8,6 +8,7 @@ import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurpose
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
+import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
 import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
 import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
 import timber.log.Timber
@@ -283,23 +284,6 @@ private fun ThemedTilePurposeDefinition.Standard.toThemedTile(
         ThemedTilePurpose.Wall, ThemedTilePurpose.WallCracked,
         ThemedTilePurpose.WallDamaged, ThemedTilePurpose.WallCrackedVertical,
         ThemedTilePurpose.WallCrackedHorizontal -> Triple(false, false, true)
-    }
-
-    return ThemedTile(
-        theme = themedTileset,
-        purposeDefinition = this,
-        isPassable = isPassable,
-        isUsable = isUsable,
-        isTransparent = isTransparent,
-    )
-}
-
-private fun ThemedTilePurposeDefinition.General.toThemedTile(
-    themedTileset: ThemedTileset,
-): ThemedTile {
-    val (isPassable, isTransparent, isUsable) = when (purpose) {
-        GeneralTilePurpose.OpenDoor -> Triple(true, true, false)
-        GeneralTilePurpose.ClosedDoor -> Triple(false, true, true)
     }
 
     return ThemedTile(

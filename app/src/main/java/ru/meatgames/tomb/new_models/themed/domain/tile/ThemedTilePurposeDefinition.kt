@@ -29,3 +29,20 @@ fun ThemedTilePurposeDefinitionDto.toEntity(): ThemedTilePurposeDefinition =
         purpose = purpose.toEntity(),
         horizontalTileOffset = horizontalTileOffset,
     )
+
+fun ThemedTilePurposeDefinition.General.toThemedTile(
+    themedTileset: ThemedTileset,
+): ThemedTile {
+    val (isPassable, isTransparent, isUsable) = when (purpose) {
+        GeneralTilePurpose.OpenDoor -> Triple(true, true, false)
+        GeneralTilePurpose.ClosedDoor -> Triple(false, true, true)
+    }
+
+    return ThemedTile(
+        theme = themedTileset,
+        purposeDefinition = this,
+        isPassable = isPassable,
+        isUsable = isUsable,
+        isTransparent = isTransparent,
+    )
+}

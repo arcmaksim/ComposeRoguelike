@@ -10,6 +10,9 @@ import ru.meatgames.tomb.*
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
 import ru.meatgames.tomb.new_models.themed.data.ThemedRoomsRepository
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
+import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
+import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
 import ru.meatgames.tomb.new_models.tile.Tile
 import kotlin.math.abs
 
@@ -99,12 +102,12 @@ class ThemedGameScreenViewModel : ViewModel() {
         val tile = chunk.gameMapTiles[index]
 
         when {
-            /*tile.`object`?.isUsable == true -> {
+            tile.`object`?.isUsable == true -> {
                 tile.useObjectTile(
                     chunk.mapOffsetX + viewportWidth / 2 + offsetX,
                     chunk.mapOffsetY + viewportHeight / 2 + offsetY,
                 )
-            }*/
+            }
             chunk.gameMapTiles[index].isPassable -> {
                 updateVisibleMapChunk(offsetX, offsetY)
             }
@@ -113,7 +116,7 @@ class ThemedGameScreenViewModel : ViewModel() {
         _isIdle.value = true
     }
 
-    /*private fun ThemedGameMapTile.useObjectTile(
+    private fun ThemedGameMapTile.useObjectTile(
         mapX: Int,
         mapY: Int,
     ) {
@@ -124,7 +127,7 @@ class ThemedGameScreenViewModel : ViewModel() {
             y = mapY,
             tile = resolvedTileReplacementOnUse,
         )
-    }*/
+    }
 
     private fun updateVisibleMapChunk(
         offsetX: Int,
@@ -138,10 +141,15 @@ class ThemedGameScreenViewModel : ViewModel() {
         }
     }
 
-    /*private fun ThemedTile.resolveTileReplacementOnUse(): Tile? = when (purposeDefinition.purpose) {
-        "door_closed" -> GameDataProvider.tiles.getTile("door_opened")
-        else -> null
-    }*/
+    private fun ThemedTile.resolveTileReplacementOnUse(): ThemedTile? {
+        val definition = purposeDefinition as? ThemedTilePurposeDefinition.General ?: return null
+        return when (definition.purpose) {
+            GeneralTilePurpose.ClosedDoor -> ThemedTilePurposeDefinition.General(
+                purpose = GeneralTilePurpose.OpenDoor,
+            ).toThemedTile(theme)
+            else -> null
+        }
+    }
 
 }
 
