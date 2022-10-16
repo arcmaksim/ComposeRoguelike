@@ -8,6 +8,7 @@ import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurpose
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
+import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
 import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
 import timber.log.Timber
 import kotlin.random.Random
@@ -71,9 +72,9 @@ class ThemedMapGenerator(
 
         val random = Random(System.currentTimeMillis())
 
-        roomLoop@ for (i in 0 until this.maxRooms) {
+        roomLoop@ for (i in 0 until maxRooms) {
             Timber.d("-----------------------------------------")
-            Timber.d("Attempting to place ${i + 1} room of ${this.maxRooms}")
+            Timber.d("Attempting to place ${i + 1} room of $maxRooms")
             val room = rooms.random(random)
 
             Timber.d("Outer walls pool - $outerWallsPool")
@@ -123,8 +124,9 @@ class ThemedMapGenerator(
                     mapController.changeObjectTile(
                         randomOuterWall.first,
                         randomOuterWall.second,
-                        ThemedTile
-                        //tileRepo.getTile("door_closed"),
+                        ThemedTilePurposeDefinition.General(
+                            purpose = GeneralTilePurpose.ClosedDoor,
+                        ).toThemedTile(tileset),
                     )
                     Timber.d("Placed empty tile at ${randomOuterWall.first} ${randomOuterWall.second}")
                     outerWallsPool.remove(randomOuterWall)
@@ -170,15 +172,23 @@ class ThemedMapGenerator(
     }
 
     private fun ThemedMapController.clearMap() {
+        val floorTilePurposeDefinition = tiles.first {
+            it is ThemedTilePurposeDefinition.Standard
+                    && it.purpose == ThemedTilePurpose.FloorVariant1
+        } as ThemedTilePurposeDefinition.Standard
+
+        val wallTilePurposeDefinition = tiles.first {
+            it is ThemedTilePurposeDefinition.Standard
+                    && it.purpose == ThemedTilePurpose.Wall
+        } as ThemedTilePurposeDefinition.Standard
+
         for (x in 0 until mapWidth) {
             for (y in 0 until mapHeight) {
                 changeTile(
                     mapX = x,
                     mapY = y,
-                    floorTile = tiles.first { it.purpose == ThemedTilePurpose.FloorVariant1 }
-                        .toThemedTile(tileset),
-                    objectTile = tiles.first { it.purpose == ThemedTilePurpose.Wall }
-                        .toThemedTile(tileset),
+                    floorTile = floorTilePurposeDefinition.toThemedTile(tileset),
+                    objectTile = wallTilePurposeDefinition.toThemedTile(tileset),
                 )
             }
         }
@@ -261,7 +271,7 @@ class ThemedMapGenerator(
 
 }
 
-private fun ThemedTilePurposeDefinition.toThemedTile(
+private fun ThemedTilePurposeDefinition.Standard.toThemedTile(
     themedTileset: ThemedTileset,
 ): ThemedTile {
     val (isPassable, isTransparent, isUsable) = when (purpose) {
@@ -284,13 +294,32 @@ private fun ThemedTilePurposeDefinition.toThemedTile(
     )
 }
 
+private fun ThemedTilePurposeDefinition.General.toThemedTile(
+    themedTileset: ThemedTileset,
+): ThemedTile {
+    val (isPassable, isTransparent, isUsable) = when (purpose) {
+        GeneralTilePurpose.OpenDoor -> Triple(true, true, false)
+        GeneralTilePurpose.ClosedDoor -> Triple(false, true, true)
+    }
+
+    return ThemedTile(
+        theme = themedTileset,
+        purposeDefinition = this,
+        isPassable = isPassable,
+        isUsable = isUsable,
+        isTransparent = isTransparent,
+    )
+}
+
 private fun Char.toThemedTile(
     tileset: ThemedTileset,
     tiles: List<ThemedTilePurposeDefinition>,
     symbolMapping: List<ThemedRoomSymbolMapping>,
 ): ThemedTile {
     val mapping = symbolMapping.first { it.symbol == this }
-    val purposeDefinition = tiles.first { it.purpose == mapping.purpose }
+    val purposeDefinition = tiles.first {
+        (it as ThemedTilePurposeDefinition.Standard).purpose == mapping.purpose
+    } as ThemedTilePurposeDefinition.Standard
     return purposeDefinition.toThemedTile(tileset)
 }
 
@@ -301,7 +330,17 @@ data class ThemedNewMapConfig(
 )
 
 private val ThemedGameMapTile?.isWall: Boolean
-    get() = this?.`object`?.purposeDefinition?.purpose == ThemedTilePurpose.Wall
+    get() {
+        val purposeDefinition = this?.`object`
+            ?.purposeDefinition as? ThemedTilePurposeDefinition.Standard
+            ?: return false
+        return purposeDefinition.purpose == ThemedTilePurpose.Wall
+    }
 
 private val ThemedGameMapTile?.isEmpty: Boolean
-    get() = this?.`object` == null || this.`object`.purposeDefinition.purpose == ThemedTilePurpose.Empty
+    get() {
+        val `object` = this?.`object` ?: return false
+        val purposeDefinition = `object`.purposeDefinition as? ThemedTilePurposeDefinition.Standard
+        ?: return false
+        return purposeDefinition.purpose == ThemedTilePurpose.Empty
+    }

@@ -12,6 +12,7 @@ import ru.meatgames.tomb.new_models.themed.domain.room.toEntity
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
 import ru.meatgames.tomb.new_models.themed.domain.tile.toEntity
+import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
 
 @OptIn(ExperimentalSerializationApi::class)
 class ThemedRoomsRepository(
@@ -23,7 +24,17 @@ class ThemedRoomsRepository(
             context.assets.open("images/themed_tiles.json"),
         )
 
-        val tiles = tileData.themedTiles.map { it.toEntity() }
+        val parsedTiles = tileData.themedTiles.map { it.toEntity() }
+        val generalTiles = listOf(
+            ThemedTilePurposeDefinition.General(
+                purpose = GeneralTilePurpose.OpenDoor,
+            ),
+            ThemedTilePurposeDefinition.General(
+                purpose = GeneralTilePurpose.ClosedDoor,
+            )
+        )
+
+        val tiles = parsedTiles + generalTiles
 
         val tilesets = List(tileData.themes.size) { index ->
             val theme = tileData.themes[index]

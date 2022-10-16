@@ -2,6 +2,7 @@ package ru.meatgames.tomb.new_models.themed.domain.tile
 
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
 
 data class ThemedTile(
     val theme: ThemedTileset,
@@ -13,10 +14,24 @@ data class ThemedTile(
 
 fun ThemedTile.getOffset(
     tileSize: Int = 24,
-): IntOffset = IntOffset(
-    x = purposeDefinition.horizontalTileOffset * tileSize,
-    y = theme.verticalTileOffset * tileSize,
-)
+): IntOffset = when (purposeDefinition) {
+    is ThemedTilePurposeDefinition.Standard -> IntOffset(
+        x = purposeDefinition.horizontalTileOffset * tileSize,
+        y = theme.verticalTileOffset * tileSize,
+    )
+    is ThemedTilePurposeDefinition.General -> {
+        val (offsetX, offsetY) = purposeDefinition.getOffsets()
+        IntOffset(
+            x = offsetX * tileSize,
+            y = offsetY * offsetY,
+        )
+    }
+}
+
+private fun ThemedTilePurposeDefinition.General.getOffsets(): Pair<Int, Int> = when (purpose) {
+    GeneralTilePurpose.ClosedDoor -> 3 to 0
+    GeneralTilePurpose.OpenDoor -> 1 to 1
+}
 
 fun ThemedTile.getSize(
     tileSize: Int = 24,

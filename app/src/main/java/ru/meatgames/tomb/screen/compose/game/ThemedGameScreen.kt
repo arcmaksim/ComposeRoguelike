@@ -15,15 +15,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurpose
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.getOffset
 import ru.meatgames.tomb.new_models.themed.domain.tile.getSize
+import ru.meatgames.tomb.new_models.themed.domain.tile.isEmpty
 import kotlin.math.abs
 
 @Composable
@@ -81,9 +83,9 @@ private fun Map(
             val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
 
             tile.floor?.let { floorTile ->
-                if (floorTile.purposeDefinition.purpose == ThemedTilePurpose.Empty) return@let
+                if (floorTile.purposeDefinition.isEmpty) return@let
                 drawImage(
-                    NewAssets.themedTileset,
+                    image = floorTile.purposeDefinition.resolveTileset(),
                     srcOffset = floorTile.getOffset(),
                     srcSize = floorTile.getSize(),
                     dstOffset = dstOffset,
@@ -92,9 +94,9 @@ private fun Map(
                 )
             }
             tile.`object`?.let { objectTile ->
-                if (objectTile.purposeDefinition.purpose == ThemedTilePurpose.Empty) return@let
+                if (objectTile.purposeDefinition.isEmpty) return@let
                 drawImage(
-                    NewAssets.themedTileset,
+                    image = objectTile.purposeDefinition.resolveTileset(),
                     srcOffset = objectTile.getOffset(),
                     srcSize = objectTile.getSize(),
                     dstOffset = dstOffset,
@@ -111,4 +113,9 @@ private fun Map(
             filterQuality = FilterQuality.None,
         )
     }
+}
+
+fun ThemedTilePurposeDefinition.resolveTileset(): ImageBitmap = when (this) {
+    is ThemedTilePurposeDefinition.Standard -> NewAssets.themedTileset
+    is ThemedTilePurposeDefinition.General -> NewAssets.tileset
 }
