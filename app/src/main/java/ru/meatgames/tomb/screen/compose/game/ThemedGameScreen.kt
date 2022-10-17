@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.map_screen.ThemedGameMapChunk
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.getOffset
 import ru.meatgames.tomb.new_models.themed.domain.tile.getSize
@@ -108,7 +109,7 @@ private fun Map(
 
         drawImage(
             NewAssets.getHeroBitmap(animation.value),
-            dstOffset = IntOffset(offset + tileDimension * (viewportWidth / 2), tileDimension * (viewportHeight / 2)),
+            dstOffset = IntOffset(offset + tileDimension * (themedViewportWidth / 2), tileDimension * (themedViewportHeight / 2)),
             dstSize = tileSize,
             filterQuality = FilterQuality.None,
         )

@@ -94,15 +94,15 @@ class ThemedGameScreenViewModel @Inject constructor(
         val (offsetX, offsetY) = moveDirection.resolvedOffsets
 
         val chunk = visibleMapChunk.value
-        val index = viewportWidth * viewportHeight / 2 + offsetX + offsetY * viewportWidth
+        val index = themedViewportWidth * themedViewportHeight / 2 + offsetX + offsetY * themedViewportWidth
         val tile = chunk.gameMapTiles[index]
 
         when {
             tile.`object`?.isUsable == true -> {
                 mapInteractionController.useTile(
                     tile = tile,
-                    mapX = chunk.mapOffsetX + viewportWidth / 2 + offsetX,
-                    mapY = chunk.mapOffsetY + viewportHeight / 2 + offsetY,
+                    mapX = chunk.mapOffsetX + themedViewportWidth / 2 + offsetX,
+                    mapY = chunk.mapOffsetY + themedViewportHeight / 2 + offsetY,
                 )
             }
 
