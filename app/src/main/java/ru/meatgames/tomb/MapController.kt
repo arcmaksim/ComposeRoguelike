@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.new_models.repo.TileRepo
 import ru.meatgames.tomb.new_models.tile.Tile
-import ru.meatgames.tomb.screen.compose.game.GameMapTile
+import ru.meatgames.tomb.new_models.tile.GameMapTile
 
 class MapController(
     val mapWidth: Int,

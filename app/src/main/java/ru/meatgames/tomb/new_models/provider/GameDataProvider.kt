@@ -3,7 +3,6 @@ package ru.meatgames.tomb.new_models.provider
 import android.content.Context
 import com.bluelinelabs.logansquare.LoganSquare
 import ru.meatgames.tomb.new_models.repo.*
-import ru.meatgames.tomb.new_models.room.RoomRepo
 
 object GameDataProvider {
 
@@ -17,7 +16,7 @@ object GameDataProvider {
     fun init(
         context: Context,
     ) {
-        tiles = TileRepo(context)
+        tiles = TileRepo()
         stats = LoganSquare.parse(
             context.assets.open("data/stats.json"),
             StatRepo::class.java,
@@ -39,9 +38,5 @@ object GameDataProvider {
             ConsumableRepo::class.java,
         )*/
     }
-
-    fun getRooms(
-        context: Context,
-    ): RoomRepo = RoomRepo(context)
 
 }

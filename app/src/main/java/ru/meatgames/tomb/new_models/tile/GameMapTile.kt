@@ -1,7 +1,6 @@
-package ru.meatgames.tomb.screen.compose.game
+package ru.meatgames.tomb.new_models.tile
 
 import android.graphics.Paint
-import ru.meatgames.tomb.new_models.tile.Tile
 
 data class GameMapTile(
     val floor: Tile? = null,
