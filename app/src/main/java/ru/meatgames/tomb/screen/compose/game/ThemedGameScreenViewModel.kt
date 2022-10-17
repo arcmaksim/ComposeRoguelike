@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.*
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
+import ru.meatgames.tomb.domain.map_screen.ThemedGameMapChunk
 import javax.inject.Inject
 
 const val themedViewportWidth = 11
@@ -126,11 +127,3 @@ class ThemedGameScreenViewModel @Inject constructor(
     }
 
 }
-
-data class ThemedGameMapChunk(
-    val width: Int = viewportWidth,
-    val height: Int = viewportHeight,
-    val mapOffsetX: Int,
-    val mapOffsetY: Int,
-    val gameMapTiles: List<ThemedGameMapTile>,
-)
