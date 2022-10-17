@@ -3,15 +3,18 @@ package ru.meatgames.tomb
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import ru.meatgames.tomb.new_models.repo.TileRepo
+import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
+import ru.meatgames.tomb.di.MAP_WIDTH_KEY
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
-import ru.meatgames.tomb.new_models.tile.Tile
-import ru.meatgames.tomb.screen.compose.game.GameMapTile
 import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
 
-class ThemedMapController(
-    val mapWidth: Int,
-    val mapHeight: Int,
+@Singleton
+class ThemedMapController @Inject constructor(
+    @Named(MAP_WIDTH_KEY) val mapWidth: Int,
+    @Named(MAP_HEIGHT_KEY) val mapHeight: Int,
 ) {
 
     private val _map: MutableStateFlow<ThemedMapWrapper> = MutableStateFlow(

@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
+import dagger.hilt.android.AndroidEntryPoint
 import ru.meatgames.tomb.GameController.getMap2
 import ru.meatgames.tomb.GameController.showExitDialog
 import ru.meatgames.tomb.GameController.start
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     var turnCount = 0

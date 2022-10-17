@@ -12,12 +12,12 @@ import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
 import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
 import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
 import timber.log.Timber
+import javax.inject.Inject
 import kotlin.random.Random
 
-class ThemedMapGenerator(
+class ThemedMapGenerator @Inject constructor(
     roomRepo: ThemedRoomsRepository,
-    private val mapWidth: Int = 96,
-    private val mapHeight: Int = 96,
+    private val mapController: ThemedMapController,
 ) {
 
     private val tileset: ThemedTileset
@@ -57,8 +57,6 @@ class ThemedMapGenerator(
     private var outerWallsPool: MutableSet<Pair<Int, Int>> = mutableSetOf()
 
     fun generateMap(): ThemedNewMapConfig {
-        val mapController = ThemedMapController(mapWidth, mapHeight)
-
         mapController.clearMap()
 
         val initialRoomPositionX = 10
