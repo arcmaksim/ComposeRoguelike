@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.new_models.themed.data
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -13,10 +14,11 @@ import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefiniti
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
 import ru.meatgames.tomb.new_models.themed.domain.tile.toEntity
 import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
+import javax.inject.Inject
 
 @OptIn(ExperimentalSerializationApi::class)
-class ThemedRoomsRepository(
-    private val context: Context,
+class ThemedRoomsRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
 ) {
 
     fun loadData(): ThemedRoomsData {
