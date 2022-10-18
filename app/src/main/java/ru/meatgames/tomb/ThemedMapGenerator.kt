@@ -270,41 +270,6 @@ class ThemedMapGenerator @Inject constructor(
 
 }
 
-private fun ThemedTilePurposeDefinition.Standard.toThemedTile(
-    themedTileset: ThemedTileset,
-): ThemedTile {
-    val (isPassable, isTransparent, isUsable) = when (purpose) {
-        ThemedTilePurpose.Empty, ThemedTilePurpose.FloorVariant1,
-        ThemedTilePurpose.FloorVariant2, ThemedTilePurpose.FloorVariant3,
-        ThemedTilePurpose.FloorVariant4 -> Triple(true, true, false)
-        ThemedTilePurpose.StairsDown -> Triple(false, true, true)
-        ThemedTilePurpose.StairsUp -> Triple(false, false, true)
-        ThemedTilePurpose.Wall, ThemedTilePurpose.WallCracked,
-        ThemedTilePurpose.WallDamaged, ThemedTilePurpose.WallCrackedVertical,
-        ThemedTilePurpose.WallCrackedHorizontal -> Triple(false, false, true)
-    }
-
-    return ThemedTile(
-        theme = themedTileset,
-        purposeDefinition = this,
-        isPassable = isPassable,
-        isUsable = isUsable,
-        isTransparent = isTransparent,
-    )
-}
-
-private fun Char.toThemedTile(
-    tileset: ThemedTileset,
-    tiles: List<ThemedTilePurposeDefinition>,
-    symbolMapping: List<ThemedRoomSymbolMapping>,
-): ThemedTile {
-    val mapping = symbolMapping.first { it.symbol == this }
-    val purposeDefinition = tiles.first {
-        (it as ThemedTilePurposeDefinition.Standard).purpose == mapping.purpose
-    } as ThemedTilePurposeDefinition.Standard
-    return purposeDefinition.toThemedTile(tileset)
-}
-
 data class ThemedNewMapConfig(
     val startingPositionX: Int,
     val startingPositionY: Int,
