@@ -92,6 +92,7 @@ private fun ThemedRoomRenderer(
                 )
             }
 
+            if (renderType == RoomRenderType.Floor) continue
             room.objects[i].toThemedTile(
                 tileset = tileset,
                 tiles = tiles,
