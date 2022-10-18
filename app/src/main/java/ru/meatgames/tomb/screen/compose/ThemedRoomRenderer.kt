@@ -17,25 +17,42 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
-import ru.meatgames.tomb.new_models.room.Room
-import ru.meatgames.tomb.new_models.room.RoomRepo
-import ru.meatgames.tomb.util.asIntOffset
-import ru.meatgames.tomb.util.asIntSize
+import ru.meatgames.tomb.new_models.themed.data.ThemedRoomsRepository
+import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoom
+import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoomSymbolMapping
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
+import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
+import ru.meatgames.tomb.new_models.themed.domain.tile.getOffset
+import ru.meatgames.tomb.new_models.themed.domain.tile.getSize
+import ru.meatgames.tomb.new_models.themed.domain.tile.isEmpty
+import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
 import kotlin.math.max
+import kotlin.random.Random
 
 @Preview
 @Composable
-private fun MapPreview() {
+private fun ThemedRoomRenderer() {
     val context = LocalContext.current
+
     GameDataProvider.init(context)
     NewAssets.loadAssets(context)
-    val roomRepo = RoomRepo(context)
-    Map(roomRepo.rooms[0])
+
+    val data = ThemedRoomsRepository(context).loadData()
+
+    ThemedRoomRenderer(
+        tileset = data.tilesets.random(Random),
+        tiles = data.tiles,
+        symbolMapping = data.symbolMappings,
+        room = data.rooms.first(),
+    )
 }
 
 @Composable
-private fun Map(
-    room: Room,
+private fun ThemedRoomRenderer(
+    tileset: ThemedTileset,
+    tiles: List<ThemedTilePurposeDefinition>,
+    symbolMapping: List<ThemedRoomSymbolMapping>,
+    room: ThemedRoom,
     renderType: RoomRenderType = RoomRenderType.Full,
 ) = BoxWithConstraints(
     modifier = Modifier
@@ -58,23 +75,33 @@ private fun Map(
             val x = i % room.width
             val y = i / room.width
             val dstOffset = IntOffset(offset + x * tileDimension, y * tileDimension)
-            room.floorTiles[room.floor[i]]?.let { floorTile ->
+
+            room.floor[i].toThemedTile(
+                tileset = tileset,
+                tiles = tiles,
+                symbolMapping = symbolMapping,
+            ).apply {
+                if (purposeDefinition.isEmpty) return@apply
                 drawImage(
-                    NewAssets.tileset,
-                    srcOffset = floorTile.imageRect.asIntOffset(),
-                    srcSize = floorTile.imageRect.asIntSize(),
+                    image = NewAssets.themedTileset,
+                    srcOffset = getOffset(),
+                    srcSize = getSize(),
                     dstOffset = dstOffset,
                     dstSize = tileSize,
                     filterQuality = FilterQuality.None,
                 )
             }
-            if (renderType == RoomRenderType.Floor) continue
-            room.objectTiles[room.objects[i]]?.let { objectTile ->
-                if (objectTile.name == "nothing" || objectTile.name == "void") return@let
+
+            room.objects[i].toThemedTile(
+                tileset = tileset,
+                tiles = tiles,
+                symbolMapping = symbolMapping,
+            ).apply {
+                if (purposeDefinition.isEmpty) return@apply
                 drawImage(
-                    NewAssets.tileset,
-                    srcOffset = objectTile.imageRect.asIntOffset(),
-                    srcSize = objectTile.imageRect.asIntSize(),
+                    image = NewAssets.themedTileset,
+                    srcOffset = getOffset(),
+                    srcSize = getSize(),
                     dstOffset = dstOffset,
                     dstSize = tileSize,
                     filterQuality = FilterQuality.None,
