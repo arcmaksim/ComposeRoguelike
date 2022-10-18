@@ -1,6 +1,5 @@
 package ru.meatgames.tomb
 
-import ru.meatgames.tomb.new_models.room.Room
 import ru.meatgames.tomb.new_models.themed.data.ThemedRoomsRepository
 import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoom
 import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoomSymbolMapping
@@ -235,35 +234,43 @@ class ThemedMapGenerator @Inject constructor(
         changeObjectTile(mapX, mapY, objectTile)
     }
 
-    private fun Room.verticallyMirrored(): Room = copy(
+    private fun ThemedRoom.verticallyMirrored(): ThemedRoom = copy(
         floor = floor.reversed(),
         objects = objects.reversed(),
     )
 
-    private fun Room.rotate(
+    private fun ThemedRoom.rotate(
         random: Random = Random,
-    ): Room = when (random.nextInt(4)) {
+    ): ThemedRoom = when (random.nextInt(4)) {
         0 -> this
         1 -> rotate90()
         2 -> rotate180()
         else -> rotate270()
     }
 
-    private fun Room.rotate90(): Room = copy(
+    private fun ThemedRoom.rotate90(): ThemedRoom = copy(
         width = height,
         height = width,
-        floor = List(floor.size) { index -> floor[(index / height) + (height - 1 - index % height) * width] },
-        objects = List(objects.size) { index -> objects[(index / height) + (height - 1 - index % height) * width] },
+        floor = floor.indices.map { index ->
+            floor[(index / height) + (height - 1 - index % height) * width]
+        }.fold("") { acc, item -> acc + item },
+        objects = objects.indices.map { index ->
+            objects[(index / height) + (height - 1 - index % height) * width]
+        }.fold("") { acc, item -> acc + item },
     )
 
-    private fun Room.rotate270(): Room = copy(
+    private fun ThemedRoom.rotate270(): ThemedRoom = copy(
         width = height,
         height = width,
-        floor = List(floor.size) { index -> floor[width - 1 + (index % height) * width - index / height] },
-        objects = List(objects.size) { index -> objects[width - 1 + (index % height) * width - index / height] },
+        floor = floor.indices.map { index ->
+            floor[width - 1 + (index % height) * width - index / height]
+        }.fold("") { acc, item -> acc + item },
+        objects = objects.indices.map { index ->
+            objects[width - 1 + (index % height) * width - index / height]
+        }.fold("") { acc, item -> acc + item },
     )
 
-    private fun Room.rotate180(): Room = copy(
+    private fun ThemedRoom.rotate180(): ThemedRoom = copy(
         floor = floor.reversed(),
         objects = objects.reversed(),
     )
@@ -288,6 +295,6 @@ private val ThemedGameMapTile?.isEmpty: Boolean
     get() {
         val `object` = this?.`object` ?: return false
         val purposeDefinition = `object`.purposeDefinition as? ThemedTilePurposeDefinition.Standard
-        ?: return false
+            ?: return false
         return purposeDefinition.purpose == ThemedTilePurpose.Empty
     }
