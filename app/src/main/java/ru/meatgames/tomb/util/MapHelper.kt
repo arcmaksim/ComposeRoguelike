@@ -2,8 +2,8 @@ package ru.meatgames.tomb.util
 
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
-import ru.meatgames.tomb.model.Item
-import ru.meatgames.tomb.model.MapClass
+import ru.meatgames.tomb.old_model.Item
+import ru.meatgames.tomb.old_model.MapClass
 
 object MapHelper {
 

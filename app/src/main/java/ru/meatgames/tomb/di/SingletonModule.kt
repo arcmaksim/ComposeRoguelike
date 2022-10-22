@@ -9,8 +9,8 @@ import ru.meatgames.tomb.domain.MapController
 import ru.meatgames.tomb.domain.MapControllerImpl
 import ru.meatgames.tomb.domain.MapGenerator
 import ru.meatgames.tomb.domain.MapTerraformer
-import ru.meatgames.tomb.new_models.room.data.ThemedRoomsData
-import ru.meatgames.tomb.new_models.room.data.ThemedRoomsRepository
+import ru.meatgames.tomb.model.room.data.ThemedRoomsData
+import ru.meatgames.tomb.model.room.data.ThemedRoomsRepository
 import javax.inject.Named
 
 private const val MAP_WIDTH = 32

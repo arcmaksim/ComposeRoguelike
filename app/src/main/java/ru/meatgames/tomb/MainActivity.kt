@@ -8,7 +8,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.meatgames.tomb.GameController.getMap2
 import ru.meatgames.tomb.GameController.showExitDialog
 import ru.meatgames.tomb.GameController.start
-import ru.meatgames.tomb.new_models.provider.GameDataProvider
+import ru.meatgames.tomb.model.provider.GameDataProvider
 import javax.inject.Inject
 
 @AndroidEntryPoint

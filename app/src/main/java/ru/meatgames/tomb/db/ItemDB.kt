@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.db
 
 import android.graphics.Rect
-import ru.meatgames.tomb.model.Item
+import ru.meatgames.tomb.old_model.Item
 
 // TODO: reformat code - not very readable
 class ItemDB(type: Int,

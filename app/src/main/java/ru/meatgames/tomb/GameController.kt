@@ -5,11 +5,11 @@ import android.graphics.Bitmap
 import android.os.Vibrator
 import androidx.activity.compose.setContent
 import androidx.compose.material.ExperimentalMaterialApi
-import ru.meatgames.tomb.model.HeroClass
-import ru.meatgames.tomb.model.Item
-import ru.meatgames.tomb.model.MapClass
-import ru.meatgames.tomb.new_models.item.InventoryItem
-import ru.meatgames.tomb.new_models.provider.GameDataProvider
+import ru.meatgames.tomb.old_model.HeroClass
+import ru.meatgames.tomb.old_model.Item
+import ru.meatgames.tomb.old_model.MapClass
+import ru.meatgames.tomb.model.item.InventoryItem
+import ru.meatgames.tomb.model.provider.GameDataProvider
 import ru.meatgames.tomb.screen.view.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper

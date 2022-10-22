@@ -7,7 +7,7 @@ import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.InventoryFilterType
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.new_models.item.Weapon
+import ru.meatgames.tomb.model.item.Weapon
 import ru.meatgames.tomb.screen.BasicScreen
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.ScreenHelper
