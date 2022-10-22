@@ -9,6 +9,7 @@ import ru.meatgames.tomb.GameController.getMap2
 import ru.meatgames.tomb.GameController.showExitDialog
 import ru.meatgames.tomb.GameController.start
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -16,6 +17,8 @@ class MainActivity : AppCompatActivity() {
     var turnCount = 0
     var firstMob: MobList? = null
 
+    @Inject
+    lateinit var gameController: ru.meatgames.tomb.domain.GameController
 
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {

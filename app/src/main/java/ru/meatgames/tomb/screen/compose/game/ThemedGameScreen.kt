@@ -3,10 +3,12 @@ package ru.meatgames.tomb.screen.compose.game
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -17,16 +19,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.domain.map_screen.ThemedGameMapChunk
+import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.getOffset
 import ru.meatgames.tomb.new_models.themed.domain.tile.getSize
 import ru.meatgames.tomb.new_models.themed.domain.tile.isEmpty
+import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 
 @Composable
@@ -34,13 +40,39 @@ fun ThemedGameScreen(
     gameScreenViewModel: ThemedGameScreenViewModel,
     navController: NavController,
 ) {
-    val visibleMapChunk by gameScreenViewModel.visibleMapChunk.collectAsState()
-    Map(visibleMapChunk, navController, gameScreenViewModel::onMoveCharacter)
+    val mapState by gameScreenViewModel.mapState.collectAsState()
+
+    when (val state = mapState) {
+        is MapScreenController.MapScreenState.Loading -> Loading()
+        is MapScreenController.MapScreenState.Ready -> Map(
+            mapState = state,
+            navController = navController,
+            onCharacterMove = gameScreenViewModel::onMoveCharacter,
+        )
+    }
+}
+
+@Composable
+private fun Loading() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "Loading...",
+            style = TextStyle(
+                fontFamily = fontFamily,
+                fontSize = 24.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+            ),
+        )
+    }
 }
 
 @Composable
 private fun Map(
-    gameMapChunk: ThemedGameMapChunk,
+    mapState: MapScreenController.MapScreenState.Ready,
     navController: NavController,
     onCharacterMove: (Direction) -> Unit,
 ) = BoxWithConstraints(
@@ -68,19 +100,19 @@ private fun Map(
                 )
             },
     ) {
-        val tileDimension = size.width.toInt() / gameMapChunk.width
-        val offset = (size.width.toInt() - (tileDimension * gameMapChunk.width)) / 2
+        val tileDimension = size.width.toInt() / mapState.viewportWidth
+        val offset = (size.width.toInt() - (tileDimension * mapState.viewportWidth)) / 2
         val tileSize = IntSize(tileDimension, tileDimension)
 
         val animation = derivedStateOf {
             (abs(System.currentTimeMillis()) / 600 % 2).toInt()
         }
 
-        gameMapChunk.gameMapTiles.mapIndexed { index, tile ->
+        mapState.tiles.mapIndexed { index, tile ->
             //if (!tile.isVisible) return@Canvas
 
-            val column = index % gameMapChunk.width
-            val row = index / gameMapChunk.width
+            val column = index % mapState.viewportWidth
+            val row = index / mapState.viewportWidth
             val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
 
             tile.floor?.let { floorTile ->
@@ -109,7 +141,7 @@ private fun Map(
 
         drawImage(
             NewAssets.getHeroBitmap(animation.value),
-            dstOffset = IntOffset(offset + tileDimension * (themedViewportWidth / 2), tileDimension * (themedViewportHeight / 2)),
+            dstOffset = IntOffset(offset + tileDimension * (mapState.viewportWidth / 2), tileDimension * (mapState.viewportHeight / 2)),
             dstSize = tileSize,
             filterQuality = FilterQuality.None,
         )
