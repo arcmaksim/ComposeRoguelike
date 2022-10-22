@@ -1,7 +1,6 @@
-package ru.meatgames.tomb.new_models.themed.domain.tile
+package ru.meatgames.tomb.new_models.tile.domain
 
-import ru.meatgames.tomb.new_models.themed.data.tile.ThemedTilePurposeDefinitionDto
-import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
+import ru.meatgames.tomb.new_models.tile.data.ThemedTilePurposeDefinitionDto
 
 
 sealed class ThemedTilePurposeDefinition {

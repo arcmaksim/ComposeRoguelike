@@ -1,6 +1,6 @@
-package ru.meatgames.tomb.new_models.themed.domain.tile
+package ru.meatgames.tomb.new_models.tile.domain
 
-import ru.meatgames.tomb.new_models.themed.data.ThemedTilePurposeDto
+import ru.meatgames.tomb.new_models.tile.data.ThemedTilePurposeDto
 
 enum class ThemedTilePurpose {
     Wall,

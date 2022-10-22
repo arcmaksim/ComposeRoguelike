@@ -1,6 +1,6 @@
 package ru.meatgames.tomb.screen.compose.game
 
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTile
 
 data class ThemedGameMapTile(
     val floor: ThemedTile? = null,

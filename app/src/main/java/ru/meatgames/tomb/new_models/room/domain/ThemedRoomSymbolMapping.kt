@@ -1,8 +1,8 @@
-package ru.meatgames.tomb.new_models.themed.domain.room
+package ru.meatgames.tomb.new_models.room.domain
 
-import ru.meatgames.tomb.new_models.themed.data.room.ThemedRoomSymbolMappingDto
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurpose
-import ru.meatgames.tomb.new_models.themed.domain.tile.toEntity
+import ru.meatgames.tomb.new_models.room.data.ThemedRoomSymbolMappingDto
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTilePurpose
+import ru.meatgames.tomb.new_models.tile.domain.toEntity
 
 data class ThemedRoomSymbolMapping(
     val purpose: ThemedTilePurpose,

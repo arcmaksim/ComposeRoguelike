@@ -2,15 +2,15 @@ package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.logMessage
-import ru.meatgames.tomb.new_models.themed.data.ThemedRoomsData
-import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoom
-import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoomSymbolMapping
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurpose
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
-import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
-import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
+import ru.meatgames.tomb.new_models.room.data.ThemedRoomsData
+import ru.meatgames.tomb.new_models.room.domain.ThemedRoom
+import ru.meatgames.tomb.new_models.room.domain.ThemedRoomSymbolMapping
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTile
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTilePurpose
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTilePurposeDefinition
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTileset
+import ru.meatgames.tomb.new_models.tile.domain.toThemedTile
+import ru.meatgames.tomb.new_models.tile.domain.GeneralTilePurpose
 import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
 import javax.inject.Inject
 import kotlin.random.Random

@@ -17,15 +17,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
-import ru.meatgames.tomb.new_models.themed.data.ThemedRoomsRepository
-import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoom
-import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoomSymbolMapping
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTileset
-import ru.meatgames.tomb.new_models.themed.domain.tile.getOffset
-import ru.meatgames.tomb.new_models.themed.domain.tile.getSize
-import ru.meatgames.tomb.new_models.themed.domain.tile.isEmpty
-import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
+import ru.meatgames.tomb.new_models.room.data.ThemedRoomsRepository
+import ru.meatgames.tomb.new_models.room.domain.ThemedRoom
+import ru.meatgames.tomb.new_models.room.domain.ThemedRoomSymbolMapping
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTilePurposeDefinition
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTileset
+import ru.meatgames.tomb.new_models.tile.domain.getOffset
+import ru.meatgames.tomb.new_models.tile.domain.getSize
+import ru.meatgames.tomb.new_models.tile.domain.isEmpty
+import ru.meatgames.tomb.new_models.tile.domain.toThemedTile
 import kotlin.math.max
 import kotlin.random.Random
 

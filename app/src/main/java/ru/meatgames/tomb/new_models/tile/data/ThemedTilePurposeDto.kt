@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.new_models.themed.data
+package ru.meatgames.tomb.new_models.tile.data
 
 @kotlinx.serialization.Serializable
 enum class ThemedTilePurposeDto {

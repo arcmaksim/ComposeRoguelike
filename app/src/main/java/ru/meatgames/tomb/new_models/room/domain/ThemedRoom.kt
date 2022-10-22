@@ -1,6 +1,6 @@
-package ru.meatgames.tomb.new_models.themed.domain.room
+package ru.meatgames.tomb.new_models.room.domain
 
-import ru.meatgames.tomb.new_models.themed.data.room.ThemedRoomDto
+import ru.meatgames.tomb.new_models.room.data.ThemedRoomDto
 
 data class ThemedRoom(
     val name: String,

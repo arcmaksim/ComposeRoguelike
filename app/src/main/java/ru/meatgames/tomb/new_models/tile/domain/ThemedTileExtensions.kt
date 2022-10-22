@@ -1,9 +1,8 @@
-package ru.meatgames.tomb.new_models.themed.domain.tile
+package ru.meatgames.tomb.new_models.tile.domain
 
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import ru.meatgames.tomb.new_models.themed.domain.room.ThemedRoomSymbolMapping
-import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
+import ru.meatgames.tomb.new_models.room.domain.ThemedRoomSymbolMapping
 
 fun ThemedTile.getOffset(
     tileSize: Int = 24,

@@ -28,10 +28,10 @@ import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
-import ru.meatgames.tomb.new_models.themed.domain.tile.getOffset
-import ru.meatgames.tomb.new_models.themed.domain.tile.getSize
-import ru.meatgames.tomb.new_models.themed.domain.tile.isEmpty
+import ru.meatgames.tomb.new_models.tile.domain.ThemedTilePurposeDefinition
+import ru.meatgames.tomb.new_models.tile.domain.getOffset
+import ru.meatgames.tomb.new_models.tile.domain.getSize
+import ru.meatgames.tomb.new_models.tile.domain.isEmpty
 import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 

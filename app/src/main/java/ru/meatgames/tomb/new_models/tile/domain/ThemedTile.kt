@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.new_models.themed.domain.tile
+package ru.meatgames.tomb.new_models.tile.domain
 
 data class ThemedTile(
     val theme: ThemedTileset,
