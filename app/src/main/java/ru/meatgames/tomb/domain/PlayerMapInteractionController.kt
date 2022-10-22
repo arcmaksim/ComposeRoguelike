@@ -1,28 +1,70 @@
 package ru.meatgames.tomb.domain
 
-import ru.meatgames.tomb.ThemedMapController
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTile
 import ru.meatgames.tomb.new_models.themed.domain.tile.ThemedTilePurposeDefinition
 import ru.meatgames.tomb.new_models.themed.domain.tile.toThemedTile
 import ru.meatgames.tomb.new_models.tile.GeneralTilePurpose
+import ru.meatgames.tomb.resolvedOffsets
 import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
 import javax.inject.Inject
 
 class PlayerMapInteractionController @Inject constructor(
-    private val mapController: ThemedMapController,
+    private val characterController: CharacterController,
+    private val mapTerraformer: MapTerraformer,
+    private val mapController: MapController,
 ) {
 
+    private val characterStateFlow = characterController.characterStateFlow
+
+    init {
+        // TODO update
+        GlobalScope.launch {
+            characterStateFlow.collect {}
+        }
+    }
+
+    fun makeMove(
+        direction: Direction,
+    ) {
+        val (offsetX, offsetY) = direction.resolvedOffsets
+        val capturedFlow = characterStateFlow.value
+        val mapX = capturedFlow.mapX + offsetX
+        val mapY = capturedFlow.mapY + offsetY
+
+        val tile = mapController.getTile(
+            x = mapX,
+            y = mapY,
+        ) ?: return
+
+        when {
+            tile.`object`?.isUsable == true -> {
+                useTile(
+                    mapX = mapX,
+                    mapY = mapY,
+                    tile = tile,
+                )
+            }
+
+            tile.`object` == null || tile.`object`.isPassable -> {
+                characterController.move(direction)
+            }
+        }
+    }
+
     fun useTile(
-        tile: ThemedGameMapTile,
         mapX: Int,
         mapY: Int,
+        tile: ThemedGameMapTile,
     ) {
         val resolvedTileReplacementOnUse = tile.`object`?.resolveTileReplacementOnUse() ?: return
 
-        mapController.changeObjectTile(
+        mapTerraformer.changeObject(
             x = mapX,
             y = mapY,
-            tile = resolvedTileReplacementOnUse,
+            objectTile = resolvedTileReplacementOnUse,
         )
     }
 
