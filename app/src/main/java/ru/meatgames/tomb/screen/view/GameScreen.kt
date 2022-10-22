@@ -10,10 +10,9 @@ import androidx.core.content.ContextCompat
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.new_models.repo.TileRepo
-import ru.meatgames.tomb.new_models.tile.Tile
 import ru.meatgames.tomb.screen.BasicScreen
 import ru.meatgames.tomb.screen.Screens
+import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
 import ru.meatgames.tomb.util.*
 import java.util.*
 
@@ -144,9 +143,9 @@ class GameScreen(
         for (i in 0 until mMapBufferWidth * mMapBufferHeight) {
             GameController.getMapTile(i % mMapBufferWidth + camx - 1, i / mMapBufferWidth + camy - 1)?.let {
 
-                mMapBuffer2[i].floorTile = it.floorTile
+                /*mMapBuffer2[i].floorTile = it.floorTile
                 mMapBuffer2[i].objectTile = if (it.objectTile.name != TileRepo.emptyTile.name &&
-                        it.objectTile.name != TileRepo.voidTile.name) it.objectTile else null
+                        it.objectTile.name != TileRepo.voidTile.name) it.objectTile else null*/
 
                 val shadowX = Math.abs(i % mMapBufferWidth - 5)
                 val shadowY = Math.abs(i / mMapBufferWidth - 5)
@@ -280,7 +279,7 @@ class GameScreen(
                 val currentMapBufferTile = mMapBuffer2[x + 1 + (y + 1) * mMapBufferWidth]
 
                 if (currentMapBufferTile.mIsVisible) {
-                    currentMapBufferTile.floorTile?.let { floorTile ->
+                    /*currentMapBufferTile.floorTile?.let { floorTile ->
                         canvas.drawBitmap(Assets.tileset,
                                 floorTile.imageRect,
                                 mTileBuffer2[index],
@@ -291,7 +290,7 @@ class GameScreen(
                                 objectTile.imageRect,
                                 mTileBuffer2[index],
                                 bitmapPaint)
-                    }
+                    }*/
                     currentMapBufferTile.mShadowPaint?.let {
                         canvas.drawRect(
                                 mTileBuffer2[index].left.toFloat(),
@@ -497,7 +496,7 @@ class GameScreen(
             if (x in 0..mMapBufferWidth && y in 0..mMapBufferHeight) {
                 val currentTile = mMapBuffer2[x + y * mMapBufferWidth]
                 if (!currentTile.mIsVisible) currentTile.mIsVisible = v
-                if (currentTile.objectTile?.isTransparent == false) v = false
+                //if (currentTile.objectTile?.isTransparent == false) v = false
             }
         }
     }
@@ -697,8 +696,8 @@ class GameScreen(
 
     inner class MapBufferCell2 {
 
-        var floorTile: Tile? = null
-        var objectTile: Tile? = null
+        var floorTile: Any? = null
+        var objectTile: ThemedGameMapTile? = null
         /*var mItemId: Int = 0
         var mCreatureId: Int = 0*/
         var mWallBitmap: Int = -1

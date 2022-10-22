@@ -9,9 +9,7 @@ import ru.meatgames.tomb.model.HeroClass
 import ru.meatgames.tomb.model.Item
 import ru.meatgames.tomb.model.MapClass
 import ru.meatgames.tomb.new_models.item.InventoryItem
-import ru.meatgames.tomb.new_models.map.MapTile
 import ru.meatgames.tomb.new_models.provider.GameDataProvider
-import ru.meatgames.tomb.new_models.tile.Tile
 import ru.meatgames.tomb.screen.view.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper
@@ -26,7 +24,6 @@ object GameController {
     private lateinit var mVibrator: Vibrator
 
     private lateinit var mScreenController: ScreenController
-    private lateinit var mMapController: MapController
 
     lateinit var mHero: HeroClass
 
@@ -62,7 +59,6 @@ object GameController {
 
     private fun init() {
         mScreenController = ScreenController(mMainActivity)
-        mMapController = MapController(96, 96)
         zone = array2d(11, 11) { 0 }
     }
 
@@ -115,11 +111,7 @@ object GameController {
     @JvmStatic
     fun getMap2(): Array<Array<MapClass>> = emptyArray() // MapController().getMap()
 
-    fun getMapTile(x: Int, y: Int): MapTile? = null // mMapController.getMapTile(x, y)
-
-    fun changeFloorTile(x: Int, y: Int, tile: Tile) = mMapController.changeFloorTile(x, y, tile)
-
-    fun changeObjectTile(x: Int, y: Int, tile: Tile) = mMapController.changeObjectTile(x, y, tile)
+    fun getMapTile(x: Int, y: Int): Any? = null // mMapController.getMapTile(x, y)
 
     @JvmStatic
     fun generateNewMap() = Unit // mMapController.generateNewMap(mMainActivity)

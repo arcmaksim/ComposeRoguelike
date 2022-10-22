@@ -6,7 +6,6 @@ import ru.meatgames.tomb.new_models.repo.*
 
 object GameDataProvider {
 
-    lateinit var tiles: TileRepo
     lateinit var stats: StatRepo
     lateinit var armor: ArmorRepo
     lateinit var weapons: WeaponRepo
@@ -16,7 +15,6 @@ object GameDataProvider {
     fun init(
         context: Context,
     ) {
-        tiles = TileRepo()
         stats = LoganSquare.parse(
             context.assets.open("data/stats.json"),
             StatRepo::class.java,
