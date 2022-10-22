@@ -56,7 +56,7 @@ fun ThemedTilePurposeDefinition.Standard.toThemedTile(
         ThemedTilePurpose.StairsUp -> Triple(false, false, true)
         ThemedTilePurpose.Wall, ThemedTilePurpose.WallCracked,
         ThemedTilePurpose.WallDamaged, ThemedTilePurpose.WallCrackedVertical,
-        ThemedTilePurpose.WallCrackedHorizontal -> Triple(false, false, true)
+        ThemedTilePurpose.WallCrackedHorizontal -> Triple(false, false, false)
     }
 
     return ThemedTile(
