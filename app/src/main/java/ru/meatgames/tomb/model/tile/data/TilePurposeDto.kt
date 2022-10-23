@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.model.tile.data
 
 @kotlinx.serialization.Serializable
-enum class ThemedTilePurposeDto {
+enum class TilePurposeDto {
     // all tiles from tileset
     WallSingle,
     WallSingleDamaged,

@@ -5,32 +5,32 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
-import ru.meatgames.tomb.model.room.domain.ThemedRoom
-import ru.meatgames.tomb.model.room.domain.ThemedRoomSymbolMapping
+import ru.meatgames.tomb.model.room.domain.Room
+import ru.meatgames.tomb.model.room.domain.RoomSymbolMapping
 import ru.meatgames.tomb.model.room.domain.toEntity
-import ru.meatgames.tomb.model.tile.data.ThemedTilesetsDto
-import ru.meatgames.tomb.model.tile.domain.ThemedTilePurposeDefinition
-import ru.meatgames.tomb.model.tile.domain.ThemedTileset
+import ru.meatgames.tomb.model.tile.data.TilesetsDto
+import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
+import ru.meatgames.tomb.model.tile.domain.Tileset
 import ru.meatgames.tomb.model.tile.domain.toEntity
 import ru.meatgames.tomb.model.tile.domain.GeneralTilePurpose
 import javax.inject.Inject
 
 @OptIn(ExperimentalSerializationApi::class)
-class ThemedRoomsRepository @Inject constructor(
+class RoomsRepository @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 
-    fun loadData(): ThemedRoomsData {
-        val tileData = Json.decodeFromStream<ThemedTilesetsDto>(
+    fun loadData(): RoomsData {
+        val tileData = Json.decodeFromStream<TilesetsDto>(
             context.assets.open("images/themed_tiles.json"),
         )
 
-        val parsedTiles = tileData.themedTiles.map { it.toEntity() }
+        val parsedTiles = tileData.tilePurposeDefinition.map { it.toEntity() }
         val generalTiles = listOf(
-            ThemedTilePurposeDefinition.General(
+            TilePurposeDefinition.General(
                 purpose = GeneralTilePurpose.OpenDoor,
             ),
-            ThemedTilePurposeDefinition.General(
+            TilePurposeDefinition.General(
                 purpose = GeneralTilePurpose.ClosedDoor,
             )
         )
@@ -39,19 +39,19 @@ class ThemedRoomsRepository @Inject constructor(
 
         val tilesets = List(tileData.themes.size) { index ->
             val theme = tileData.themes[index]
-            ThemedTileset(
+            Tileset(
                 name = theme.name,
                 verticalTileOffset = theme.verticalTileOffset,
             )
         }
 
-        val roomsData = Json.decodeFromStream<ThemedRoomsDto>(
+        val roomsData = Json.decodeFromStream<RoomsDto>(
             context.assets.open("data/themed_rooms.json")
         )
         val mappings = roomsData.symbolMapping.map { it.toEntity() }
         val rooms = roomsData.rooms.map { it.toEntity(mappings) }
 
-        return ThemedRoomsData(
+        return RoomsData(
             tilesets = tilesets,
             tiles = tiles,
             rooms = rooms,
@@ -61,9 +61,9 @@ class ThemedRoomsRepository @Inject constructor(
 
 }
 
-class ThemedRoomsData(
-    val tilesets: List<ThemedTileset>,
-    val tiles: List<ThemedTilePurposeDefinition>,
-    val rooms: List<ThemedRoom>,
-    val symbolMappings: List<ThemedRoomSymbolMapping>,
+class RoomsData(
+    val tilesets: List<Tileset>,
+    val tiles: List<TilePurposeDefinition>,
+    val rooms: List<Room>,
+    val symbolMappings: List<RoomSymbolMapping>,
 )

@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.model.tile.data
 
 @kotlinx.serialization.Serializable
-class ThemedTilePurposeDefinitionDto(
-    val purpose: ThemedTilePurposeDto,
+class TilePurposeDefinitionDto(
+    val purpose: TilePurposeDto,
     val horizontalTileOffset: Int,
 )

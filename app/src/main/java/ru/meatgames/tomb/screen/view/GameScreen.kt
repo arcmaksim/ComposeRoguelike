@@ -12,7 +12,7 @@ import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.screen.BasicScreen
 import ru.meatgames.tomb.screen.Screens
-import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
+import ru.meatgames.tomb.screen.compose.game.MapTile
 import ru.meatgames.tomb.util.*
 import java.util.*
 
@@ -697,7 +697,7 @@ class GameScreen(
     inner class MapBufferCell2 {
 
         var floorTile: Any? = null
-        var objectTile: ThemedGameMapTile? = null
+        var objectTile: MapTile? = null
         /*var mItemId: Int = 0
         var mCreatureId: Int = 0*/
         var mWallBitmap: Int = -1

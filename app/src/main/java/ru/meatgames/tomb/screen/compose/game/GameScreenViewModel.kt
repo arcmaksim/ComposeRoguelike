@@ -10,7 +10,7 @@ import ru.meatgames.tomb.domain.PlayerMapInteractionController
 import javax.inject.Inject
 
 @HiltViewModel
-class ThemedGameScreenViewModel @Inject constructor(
+class GameScreenViewModel @Inject constructor(
     controller: MapScreenController,
     private val mapInteractionController: PlayerMapInteractionController,
 ) : ViewModel() {

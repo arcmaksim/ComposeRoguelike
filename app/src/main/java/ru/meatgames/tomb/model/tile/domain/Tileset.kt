@@ -1,6 +1,6 @@
 package ru.meatgames.tomb.model.tile.domain
 
-class ThemedTileset(
+class Tileset(
     val name: String,
     val verticalTileOffset: Int,
 )

@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
-import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
+import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -55,7 +55,7 @@ class MapScreenController @Inject constructor(
     }
 
     private fun filterTiles(
-        streamedTiles: List<ThemedGameMapTile>,
+        streamedTiles: List<MapTile>,
         mapX: Int,
         mapY: Int,
         mapWidth: Int,
@@ -66,13 +66,13 @@ class MapScreenController @Inject constructor(
             val end = start + viewportWidth
             when {
                 mapY + line !in 0 until mapHeight -> {
-                    List(viewportWidth) { ThemedGameMapTile.voidMapTile }
+                    List(viewportWidth) { MapTile.voidMapTile }
                 }
 
                 mapX < 0 -> {
                     List(viewportWidth) {
                         when {
-                            mapX + it < 0 -> ThemedGameMapTile.voidMapTile
+                            mapX + it < 0 -> MapTile.voidMapTile
                             else -> streamedTiles[start + it]
                         }
                     }
@@ -84,14 +84,14 @@ class MapScreenController @Inject constructor(
                     ) {
                         when {
                             mapX + it < mapWidth -> streamedTiles[start + it]
-                            else -> ThemedGameMapTile.voidMapTile
+                            else -> MapTile.voidMapTile
                         }
                     }
                 }
 
                 else -> streamedTiles.subList(start, end)
             }
-        }.fold(emptyList<ThemedGameMapTile>()) { acc, item -> acc + item }
+        }.fold(emptyList<MapTile>()) { acc, item -> acc + item }
 
         return MapScreenState.Ready(
             viewportWidth = viewportWidth,
@@ -105,7 +105,7 @@ class MapScreenController @Inject constructor(
         data class Ready(
             val viewportWidth: Int,
             val viewportHeight: Int,
-            val tiles: List<ThemedGameMapTile>,
+            val tiles: List<MapTile>,
         ) : MapScreenState()
 
         object Loading : MapScreenState()

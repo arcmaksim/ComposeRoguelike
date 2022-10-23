@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.model.room.data
 
 @kotlinx.serialization.Serializable
-class ThemedRoomDto(
+class RoomDto(
     val name: String,
     val width: Int,
     val height: Int,

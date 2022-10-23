@@ -2,31 +2,31 @@ package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.logMessage
-import ru.meatgames.tomb.model.room.data.ThemedRoomsData
-import ru.meatgames.tomb.model.room.domain.ThemedRoom
-import ru.meatgames.tomb.model.room.domain.ThemedRoomSymbolMapping
-import ru.meatgames.tomb.model.tile.domain.ThemedTile
-import ru.meatgames.tomb.model.tile.domain.ThemedTilePurpose
-import ru.meatgames.tomb.model.tile.domain.ThemedTilePurposeDefinition
-import ru.meatgames.tomb.model.tile.domain.ThemedTileset
-import ru.meatgames.tomb.model.tile.domain.toThemedTile
+import ru.meatgames.tomb.model.room.data.RoomsData
+import ru.meatgames.tomb.model.room.domain.Room
+import ru.meatgames.tomb.model.room.domain.RoomSymbolMapping
+import ru.meatgames.tomb.model.tile.domain.Tile
+import ru.meatgames.tomb.model.tile.domain.TilePurpose
+import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
+import ru.meatgames.tomb.model.tile.domain.Tileset
+import ru.meatgames.tomb.model.tile.domain.toTile
 import ru.meatgames.tomb.model.tile.domain.GeneralTilePurpose
-import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
+import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import kotlin.random.Random
 
 class SimpleMapGenerator @Inject constructor(
-    themedRoomsData: ThemedRoomsData,
+    roomsData: RoomsData,
 ) {
 
     private val maxRoomsAttempts = 25
     private val maxRoomPlacementAttempts = 5
     private val random = Random(System.currentTimeMillis())
 
-    private val tileset: ThemedTileset = themedRoomsData.tilesets.random(random)
-    private val tiles: List<ThemedTilePurposeDefinition> = themedRoomsData.tiles
-    private val rooms: List<ThemedRoom> = themedRoomsData.rooms
-    private val mapping: List<ThemedRoomSymbolMapping> = themedRoomsData.symbolMappings
+    private val tileset: Tileset = roomsData.tilesets.random(random)
+    private val tiles: List<TilePurposeDefinition> = roomsData.tiles
+    private val rooms: List<Room> = roomsData.rooms
+    private val mapping: List<RoomSymbolMapping> = roomsData.symbolMappings
 
     private val outerWallsPool: MutableSet<Pair<Int, Int>> = mutableSetOf()
 
@@ -83,9 +83,9 @@ class SimpleMapGenerator @Inject constructor(
                     y = randomOuterWall.second,
                 ) {
                     copy(
-                        `object` = ThemedTilePurposeDefinition.General(
+                        `object` = TilePurposeDefinition.General(
                             purpose = GeneralTilePurpose.ClosedDoor,
-                        ).toThemedTile(tileset),
+                        ).toTile(tileset),
                     )
                 }
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
@@ -131,14 +131,14 @@ class SimpleMapGenerator @Inject constructor(
 
     private fun LevelMap.clearMap() {
         val floorTilePurposeDefinition = tiles.first {
-            it is ThemedTilePurposeDefinition.Standard
-                    && it.purpose == ThemedTilePurpose.FloorVariant1
-        } as ThemedTilePurposeDefinition.Standard
+            it is TilePurposeDefinition.Standard
+                    && it.purpose == TilePurpose.FloorVariant1
+        } as TilePurposeDefinition.Standard
 
         val wallTilePurposeDefinition = tiles.first {
-            it is ThemedTilePurposeDefinition.Standard
-                    && it.purpose == ThemedTilePurpose.Wall
-        } as ThemedTilePurposeDefinition.Standard
+            it is TilePurposeDefinition.Standard
+                    && it.purpose == TilePurpose.Wall
+        } as TilePurposeDefinition.Standard
 
         updateBatch {
             for (x in 0 until width) {
@@ -148,8 +148,8 @@ class SimpleMapGenerator @Inject constructor(
                         y = y,
                     ) {
                         copy(
-                            floor = floorTilePurposeDefinition.toThemedTile(tileset),
-                            `object` = wallTilePurposeDefinition.toThemedTile(tileset),
+                            floor = floorTilePurposeDefinition.toTile(tileset),
+                            `object` = wallTilePurposeDefinition.toTile(tileset),
                         )
                     }
                 }
@@ -161,7 +161,7 @@ class SimpleMapGenerator @Inject constructor(
     private fun LevelMap.placeRoom(
         x: Int,
         y: Int,
-        room: ThemedRoom,
+        room: Room,
     ) {
         updateBatch {
             for (i in 0 until room.width * room.height) {
@@ -173,8 +173,8 @@ class SimpleMapGenerator @Inject constructor(
                     y = y + yOffset,
                 ) {
                     copy(
-                        floor = room.floor[i].toThemedTile(),
-                        `object` = room.objects[i].toThemedTile(),
+                        floor = room.floor[i].toTile(),
+                        `object` = room.objects[i].toTile(),
                     )
                 }
             }
@@ -187,7 +187,7 @@ class SimpleMapGenerator @Inject constructor(
         log("Placed room at $x $y with dimensions ${room.width} x ${room.height}")
     }
 
-    private fun Char.toThemedTile(): ThemedTile = toThemedTile(
+    private fun Char.toTile(): Tile = this@toTile.toTile(
         tileset = tileset,
         tiles = tiles,
         symbolMapping = mapping,
@@ -210,21 +210,21 @@ class SimpleMapGenerator @Inject constructor(
         return true
     }
 
-    private fun ThemedRoom.verticallyMirrored(): ThemedRoom = copy(
+    private fun Room.verticallyMirrored(): Room = copy(
         floor = floor.reversed(),
         objects = objects.reversed(),
     )
 
-    private fun ThemedRoom.rotate(
+    private fun Room.rotate(
         random: Random = Random,
-    ): ThemedRoom = when (random.nextInt(4)) {
+    ): Room = when (random.nextInt(4)) {
         0 -> this
         1 -> rotate90()
         2 -> rotate180()
         else -> rotate270()
     }
 
-    private fun ThemedRoom.rotate90(): ThemedRoom = copy(
+    private fun Room.rotate90(): Room = copy(
         width = height,
         height = width,
         floor = floor.indices.map { index ->
@@ -235,7 +235,7 @@ class SimpleMapGenerator @Inject constructor(
         }.fold("") { acc, item -> acc + item },
     )
 
-    private fun ThemedRoom.rotate270(): ThemedRoom = copy(
+    private fun Room.rotate270(): Room = copy(
         width = height,
         height = width,
         floor = floor.indices.map { index ->
@@ -246,7 +246,7 @@ class SimpleMapGenerator @Inject constructor(
         }.fold("") { acc, item -> acc + item },
     )
 
-    private fun ThemedRoom.rotate180(): ThemedRoom = copy(
+    private fun Room.rotate180(): Room = copy(
         floor = floor.reversed(),
         objects = objects.reversed(),
     )
@@ -267,18 +267,18 @@ data class GeneratedMapConfiguration(
     val startingPositionY: Int,
 )
 
-private val ThemedGameMapTile?.isWall: Boolean
+private val MapTile?.isWall: Boolean
     get() {
         val purposeDefinition = this?.`object`
-            ?.purposeDefinition as? ThemedTilePurposeDefinition.Standard
+            ?.purposeDefinition as? TilePurposeDefinition.Standard
             ?: return false
-        return purposeDefinition.purpose == ThemedTilePurpose.Wall
+        return purposeDefinition.purpose == TilePurpose.Wall
     }
 
-private val ThemedGameMapTile?.isEmpty: Boolean
+private val MapTile?.isEmpty: Boolean
     get() {
         val `object` = this?.`object` ?: return false
-        val purposeDefinition = `object`.purposeDefinition as? ThemedTilePurposeDefinition.Standard
+        val purposeDefinition = `object`.purposeDefinition as? TilePurposeDefinition.Standard
             ?: return false
-        return purposeDefinition.purpose == ThemedTilePurpose.Empty
+        return purposeDefinition.purpose == TilePurpose.Empty
     }

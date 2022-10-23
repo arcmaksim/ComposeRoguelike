@@ -17,6 +17,7 @@ import ru.meatgames.tomb.util.ObjectHelper
 import ru.meatgames.tomb.util.array2d
 import java.util.*
 
+@Deprecated("Old implementation")
 object GameController {
 
     private lateinit var mMainActivity: MainActivity

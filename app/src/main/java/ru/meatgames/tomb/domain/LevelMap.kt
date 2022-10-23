@@ -3,24 +3,24 @@ package ru.meatgames.tomb.domain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.logMessage
-import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
+import ru.meatgames.tomb.screen.compose.game.MapTile
 
 class LevelMap(
     val width: Int,
     val height: Int,
 ) {
 
-    private val array = Array(width * height) { ThemedGameMapTile.voidMapTile }
+    private val array = Array(width * height) { MapTile.voidMapTile }
 
     private val _state = MutableStateFlow(array.toList())
-    val state: StateFlow<List<ThemedGameMapTile>> = _state
+    val state: StateFlow<List<MapTile>> = _state
 
     private val editor = EditorImpl()
 
     fun getTile(
         x: Int,
         y: Int,
-    ): ThemedGameMapTile? {
+    ): MapTile? {
         val capturedState = state.value
         val index = calcIndex(x, y)
         if (index < 0 || index >= capturedState.size) {
@@ -36,7 +36,7 @@ class LevelMap(
     fun updateSingleTile(
         x: Int,
         y: Int,
-        update: ThemedGameMapTile.() -> ThemedGameMapTile,
+        update: MapTile.() -> MapTile,
     ) {
         val index = calcIndex(x, y)
         if (!updateTile(index, update)) return
@@ -45,7 +45,7 @@ class LevelMap(
 
     private fun updateTile(
         index: Int,
-        update: ThemedGameMapTile.() -> ThemedGameMapTile,
+        update: MapTile.() -> MapTile,
     ): Boolean {
         val mapSize = state.value.size
         if (index < 0 || index >= mapSize) {
@@ -77,7 +77,7 @@ class LevelMap(
         fun updateSingleTile(
             x: Int,
             y: Int,
-            update: ThemedGameMapTile.() -> ThemedGameMapTile,
+            update: MapTile.() -> MapTile,
         )
 
     }
@@ -87,7 +87,7 @@ class LevelMap(
         override fun updateSingleTile(
             x: Int,
             y: Int,
-            update: ThemedGameMapTile.() -> ThemedGameMapTile,
+            update: MapTile.() -> MapTile,
         ) {
             if (!updateTile(calcIndex(x, y), update)) return
         }

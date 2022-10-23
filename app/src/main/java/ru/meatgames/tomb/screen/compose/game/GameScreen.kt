@@ -28,7 +28,7 @@ import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.model.tile.domain.ThemedTilePurposeDefinition
+import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
 import ru.meatgames.tomb.model.tile.domain.getOffset
 import ru.meatgames.tomb.model.tile.domain.getSize
 import ru.meatgames.tomb.model.tile.domain.isEmpty
@@ -36,8 +36,8 @@ import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 
 @Composable
-fun ThemedGameScreen(
-    gameScreenViewModel: ThemedGameScreenViewModel,
+fun GameScreen(
+    gameScreenViewModel: GameScreenViewModel,
     navController: NavController,
 ) {
     val mapState by gameScreenViewModel.mapState.collectAsState()
@@ -148,7 +148,7 @@ private fun Map(
     }
 }
 
-fun ThemedTilePurposeDefinition.resolveTileset(): ImageBitmap = when (this) {
-    is ThemedTilePurposeDefinition.Standard -> NewAssets.themedTileset
-    is ThemedTilePurposeDefinition.General -> NewAssets.tileset
+fun TilePurposeDefinition.resolveTileset(): ImageBitmap = when (this) {
+    is TilePurposeDefinition.Standard -> NewAssets.themedTileset
+    is TilePurposeDefinition.General -> NewAssets.tileset
 }

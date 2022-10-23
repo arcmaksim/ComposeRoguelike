@@ -17,29 +17,29 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.model.provider.GameDataProvider
-import ru.meatgames.tomb.model.room.data.ThemedRoomsRepository
-import ru.meatgames.tomb.model.room.domain.ThemedRoom
-import ru.meatgames.tomb.model.room.domain.ThemedRoomSymbolMapping
-import ru.meatgames.tomb.model.tile.domain.ThemedTilePurposeDefinition
-import ru.meatgames.tomb.model.tile.domain.ThemedTileset
+import ru.meatgames.tomb.model.room.data.RoomsRepository
+import ru.meatgames.tomb.model.room.domain.Room
+import ru.meatgames.tomb.model.room.domain.RoomSymbolMapping
+import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
+import ru.meatgames.tomb.model.tile.domain.Tileset
 import ru.meatgames.tomb.model.tile.domain.getOffset
 import ru.meatgames.tomb.model.tile.domain.getSize
 import ru.meatgames.tomb.model.tile.domain.isEmpty
-import ru.meatgames.tomb.model.tile.domain.toThemedTile
+import ru.meatgames.tomb.model.tile.domain.toTile
 import kotlin.math.max
 import kotlin.random.Random
 
 @Preview
 @Composable
-private fun ThemedRoomRenderer() {
+private fun RoomRenderer() {
     val context = LocalContext.current
 
     GameDataProvider.init(context)
     NewAssets.loadAssets(context)
 
-    val data = ThemedRoomsRepository(context).loadData()
+    val data = RoomsRepository(context).loadData()
 
-    ThemedRoomRenderer(
+    RoomRenderer(
         tileset = data.tilesets.random(Random),
         tiles = data.tiles,
         symbolMapping = data.symbolMappings,
@@ -48,11 +48,11 @@ private fun ThemedRoomRenderer() {
 }
 
 @Composable
-private fun ThemedRoomRenderer(
-    tileset: ThemedTileset,
-    tiles: List<ThemedTilePurposeDefinition>,
-    symbolMapping: List<ThemedRoomSymbolMapping>,
-    room: ThemedRoom,
+private fun RoomRenderer(
+    tileset: Tileset,
+    tiles: List<TilePurposeDefinition>,
+    symbolMapping: List<RoomSymbolMapping>,
+    room: Room,
     renderType: RoomRenderType = RoomRenderType.Full,
 ) = BoxWithConstraints(
     modifier = Modifier
@@ -76,7 +76,7 @@ private fun ThemedRoomRenderer(
             val y = i / room.width
             val dstOffset = IntOffset(offset + x * tileDimension, y * tileDimension)
 
-            room.floor[i].toThemedTile(
+            room.floor[i].toTile(
                 tileset = tileset,
                 tiles = tiles,
                 symbolMapping = symbolMapping,
@@ -93,7 +93,7 @@ private fun ThemedRoomRenderer(
             }
 
             if (renderType == RoomRenderType.Floor) continue
-            room.objects[i].toThemedTile(
+            room.objects[i].toTile(
                 tileset = tileset,
                 tiles = tiles,
                 symbolMapping = symbolMapping,

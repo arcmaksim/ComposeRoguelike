@@ -9,8 +9,8 @@ import ru.meatgames.tomb.domain.MapController
 import ru.meatgames.tomb.domain.MapControllerImpl
 import ru.meatgames.tomb.domain.MapGenerator
 import ru.meatgames.tomb.domain.MapTerraformer
-import ru.meatgames.tomb.model.room.data.ThemedRoomsData
-import ru.meatgames.tomb.model.room.data.ThemedRoomsRepository
+import ru.meatgames.tomb.model.room.data.RoomsData
+import ru.meatgames.tomb.model.room.data.RoomsRepository
 import javax.inject.Named
 
 private const val MAP_WIDTH = 32
@@ -44,9 +44,9 @@ class SingletonModule {
     fun mapViewportHeightConst(): Int = MAP_VIEWPORT_HEIGHT
 
     @Provides
-    fun provideThemedRoomsData(
-        themedRoomsRepository: ThemedRoomsRepository,
-    ): ThemedRoomsData = themedRoomsRepository.loadData()
+    fun provideRoomsData(
+        roomsRepository: RoomsRepository,
+    ): RoomsData = roomsRepository.loadData()
 
 }
 

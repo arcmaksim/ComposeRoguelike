@@ -3,12 +3,12 @@ package ru.meatgames.tomb.domain
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.model.tile.domain.ThemedTile
-import ru.meatgames.tomb.model.tile.domain.ThemedTilePurposeDefinition
-import ru.meatgames.tomb.model.tile.domain.toThemedTile
+import ru.meatgames.tomb.model.tile.domain.Tile
+import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
+import ru.meatgames.tomb.model.tile.domain.toTile
 import ru.meatgames.tomb.model.tile.domain.GeneralTilePurpose
 import ru.meatgames.tomb.resolvedOffsets
-import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
+import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 
 class PlayerMapInteractionController @Inject constructor(
@@ -57,7 +57,7 @@ class PlayerMapInteractionController @Inject constructor(
     fun useTile(
         mapX: Int,
         mapY: Int,
-        tile: ThemedGameMapTile,
+        tile: MapTile,
     ) {
         val resolvedTileReplacementOnUse = tile.`object`?.resolveTileReplacementOnUse() ?: return
 
@@ -68,12 +68,12 @@ class PlayerMapInteractionController @Inject constructor(
         )
     }
 
-    private fun ThemedTile.resolveTileReplacementOnUse(): ThemedTile? {
-        val definition = purposeDefinition as? ThemedTilePurposeDefinition.General ?: return null
+    private fun Tile.resolveTileReplacementOnUse(): Tile? {
+        val definition = purposeDefinition as? TilePurposeDefinition.General ?: return null
         return when (definition.purpose) {
-            GeneralTilePurpose.ClosedDoor -> ru.meatgames.tomb.model.tile.domain.ThemedTilePurposeDefinition.General(
+            GeneralTilePurpose.ClosedDoor -> ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition.General(
                 purpose = GeneralTilePurpose.OpenDoor,
-            ).toThemedTile(theme)
+            ).toTile(theme)
 
             else -> null
         }

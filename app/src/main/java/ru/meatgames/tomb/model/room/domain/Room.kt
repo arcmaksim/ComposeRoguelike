@@ -1,8 +1,8 @@
 package ru.meatgames.tomb.model.room.domain
 
-import ru.meatgames.tomb.model.room.data.ThemedRoomDto
+import ru.meatgames.tomb.model.room.data.RoomDto
 
-data class ThemedRoom(
+data class Room(
     val name: String,
     val width: Int,
     val height: Int,
@@ -19,7 +19,7 @@ data class ThemedRoom(
         height: Int,
         floor: String,
         objects: String,
-        symbolMapping: List<ThemedRoomSymbolMapping>,
+        symbolMapping: List<RoomSymbolMapping>,
     ) : this(
         name = name,
         width = width,
@@ -43,9 +43,9 @@ data class ThemedRoom(
 
 }
 
-fun ThemedRoomDto.toEntity(
-    symbolMapping: List<ThemedRoomSymbolMapping>,
-): ThemedRoom = ThemedRoom(
+fun RoomDto.toEntity(
+    symbolMapping: List<RoomSymbolMapping>,
+): Room = Room(
     name = name,
     width = width,
     height = height,

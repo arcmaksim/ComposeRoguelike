@@ -4,9 +4,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
-import ru.meatgames.tomb.model.tile.domain.ThemedTile
+import ru.meatgames.tomb.model.tile.domain.Tile
 import ru.meatgames.tomb.model.tile.domain.isEmpty
-import ru.meatgames.tomb.screen.compose.game.ThemedGameMapTile
+import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -43,12 +43,12 @@ class MapControllerImpl @Inject constructor(
     override fun getTile(
         x: Int,
         y: Int,
-    ): ThemedGameMapTile? = levelMap.getTile(x, y)
+    ): MapTile? = levelMap.getTile(x, y)
 
     override fun changeObject(
         x: Int,
         y: Int,
-        objectTile: ThemedTile,
+        objectTile: Tile,
     ) {
         levelMap.updateSingleTile(
             x = x,
@@ -69,7 +69,7 @@ interface MapTerraformer {
     fun changeObject(
         x: Int,
         y: Int,
-        objectTile: ThemedTile,
+        objectTile: Tile,
     )
 }
 
@@ -79,13 +79,13 @@ interface MapController {
     fun getTile(
         x: Int,
         y: Int,
-    ): ThemedGameMapTile?
+    ): MapTile?
 }
 
 data class LevelMapWrapper(
     val width: Int,
     val height: Int,
-    val state: StateFlow<List<ThemedGameMapTile>>,
+    val state: StateFlow<List<MapTile>>,
 ) {
 
     override fun toString(): String {
