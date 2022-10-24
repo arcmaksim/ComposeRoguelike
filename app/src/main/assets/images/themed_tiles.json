@@ -77,7 +77,7 @@
 			"verticalTileOffset": 18
 		}
 	],
-	"themedTiles": [
+	"tilePurpose": [
 		{
 			"purpose": "WallSingle",
 			"horizontalTileOffset": 0

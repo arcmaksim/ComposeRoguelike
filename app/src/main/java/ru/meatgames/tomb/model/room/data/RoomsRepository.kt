@@ -25,7 +25,7 @@ class RoomsRepository @Inject constructor(
             context.assets.open("images/themed_tiles.json"),
         )
 
-        val parsedTiles = tileData.tilePurposeDefinition.map { it.toEntity() }
+        val parsedTiles = tileData.tilePurpose.map { it.toEntity() }
         val generalTiles = listOf(
             TilePurposeDefinition.General(
                 purpose = GeneralTilePurpose.OpenDoor,
