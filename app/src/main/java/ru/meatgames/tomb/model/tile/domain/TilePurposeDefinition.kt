@@ -34,7 +34,7 @@ fun TilePurposeDefinition.General.toTile(
 ): Tile {
     val (isPassable, isTransparent, isUsable) = when (purpose) {
         GeneralTilePurpose.OpenDoor -> Triple(true, true, false)
-        GeneralTilePurpose.ClosedDoor -> Triple(false, true, true)
+        GeneralTilePurpose.ClosedDoor -> Triple(false, false, true)
     }
 
     return Tile(
