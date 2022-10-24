@@ -14,4 +14,7 @@ data class MapTile(
     val isPassable: Boolean
         get() = floor?.isPassable ?: false && `object`?.isPassable ?: true
 
+    val isTransparent: Boolean
+        get() = floor?.isTransparent ?: true && `object`?.isTransparent ?: true
+
 }

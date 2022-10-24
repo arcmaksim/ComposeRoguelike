@@ -109,39 +109,43 @@ private fun Map(
         }
 
         mapState.tiles.mapIndexed { index, tile ->
-            //if (!tile.isVisible) return@Canvas
+            if (mapState.visibilityMask[index]) {
 
-            val column = index % mapState.viewportWidth
-            val row = index / mapState.viewportWidth
-            val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
+                val column = index % mapState.viewportWidth
+                val row = index / mapState.viewportWidth
+                val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
 
-            tile.floor?.let { floorTile ->
-                if (floorTile.purposeDefinition.isEmpty) return@let
-                drawImage(
-                    image = floorTile.purposeDefinition.resolveTileset(),
-                    srcOffset = floorTile.getOffset(),
-                    srcSize = floorTile.getSize(),
-                    dstOffset = dstOffset,
-                    dstSize = tileSize,
-                    filterQuality = FilterQuality.None,
-                )
-            }
-            tile.`object`?.let { objectTile ->
-                if (objectTile.purposeDefinition.isEmpty) return@let
-                drawImage(
-                    image = objectTile.purposeDefinition.resolveTileset(),
-                    srcOffset = objectTile.getOffset(),
-                    srcSize = objectTile.getSize(),
-                    dstOffset = dstOffset,
-                    dstSize = tileSize,
-                    filterQuality = FilterQuality.None,
-                )
+                tile.floor?.let { floorTile ->
+                    if (floorTile.purposeDefinition.isEmpty) return@let
+                    drawImage(
+                        image = floorTile.purposeDefinition.resolveTileset(),
+                        srcOffset = floorTile.getOffset(),
+                        srcSize = floorTile.getSize(),
+                        dstOffset = dstOffset,
+                        dstSize = tileSize,
+                        filterQuality = FilterQuality.None,
+                    )
+                }
+                tile.`object`?.let { objectTile ->
+                    if (objectTile.purposeDefinition.isEmpty) return@let
+                    drawImage(
+                        image = objectTile.purposeDefinition.resolveTileset(),
+                        srcOffset = objectTile.getOffset(),
+                        srcSize = objectTile.getSize(),
+                        dstOffset = dstOffset,
+                        dstSize = tileSize,
+                        filterQuality = FilterQuality.None,
+                    )
+                }
             }
         }
 
         drawImage(
             NewAssets.getHeroBitmap(animation.value),
-            dstOffset = IntOffset(offset + tileDimension * (mapState.viewportWidth / 2), tileDimension * (mapState.viewportHeight / 2)),
+            dstOffset = IntOffset(
+                x = offset + tileDimension * (mapState.viewportWidth / 2),
+                y = tileDimension * (mapState.viewportHeight / 2)
+            ),
             dstSize = tileSize,
             filterQuality = FilterQuality.None,
         )

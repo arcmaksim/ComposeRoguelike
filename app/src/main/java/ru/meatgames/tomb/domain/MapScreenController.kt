@@ -39,15 +39,37 @@ class MapScreenController @Inject constructor(
                         return@combine MapScreenState.Loading
                     }
 
-                    val mapOffsetX = character.mapX - viewportWidth / 2
-                    val mapOffsetY = character.mapY - viewportHeight / 2
+                    val characterScreenX = viewportWidth / 2
+                    val characterScreenY = viewportHeight / 2
 
-                    return@combine filterTiles(
+                    val mapOffsetX = character.mapX - characterScreenX
+                    val mapOffsetY = character.mapY - characterScreenY
+
+                    val filteredTiles = filterTiles(
                         streamedTiles = tiles,
                         mapX = mapOffsetX,
                         mapY = mapOffsetY,
                         mapWidth = map.mapWrapper.width,
                         mapHeight = map.mapWrapper.height,
+                    )
+
+                    val mask = BooleanArray(filteredTiles.size) { false }
+
+                    computeFov(
+                        originX = characterScreenX,
+                        originY = characterScreenY,
+                        maxDepth = viewportWidth / 2 + 1,
+                        revealTile = { x, y -> mask[x + y * viewportWidth] = true },
+                        checkIfTileIsBlocking = { x, y ->
+                            !filteredTiles[x + y * viewportWidth].isTransparent
+                        }
+                    )
+
+                    return@combine MapScreenState.Ready(
+                        viewportWidth = viewportWidth,
+                        viewportHeight = viewportHeight,
+                        tiles = filteredTiles,
+                        visibilityMask = mask,
                     )
                 }
             }.collect(_state::emit)
@@ -60,7 +82,7 @@ class MapScreenController @Inject constructor(
         mapY: Int,
         mapWidth: Int,
         mapHeight: Int,
-    ): MapScreenState.Ready {
+    ): List<MapTile> {
         val tiles = (0 until viewportHeight).map { line ->
             val start = (mapY + line) * mapWidth + mapX
             val end = start + viewportWidth
@@ -93,11 +115,13 @@ class MapScreenController @Inject constructor(
             }
         }.fold(emptyList<MapTile>()) { acc, item -> acc + item }
 
-        return MapScreenState.Ready(
+        return tiles
+
+        /*return MapScreenState.Ready(
             viewportWidth = viewportWidth,
             viewportHeight = viewportHeight,
             tiles = tiles,
-        )
+        )*/
     }
 
     sealed class MapScreenState {
@@ -106,7 +130,30 @@ class MapScreenController @Inject constructor(
             val viewportWidth: Int,
             val viewportHeight: Int,
             val tiles: List<MapTile>,
-        ) : MapScreenState()
+            val visibilityMask: BooleanArray,
+        ) : MapScreenState() {
+            override fun equals(other: Any?): Boolean {
+                if (this === other) return true
+                if (javaClass != other?.javaClass) return false
+
+                other as Ready
+
+                if (viewportWidth != other.viewportWidth) return false
+                if (viewportHeight != other.viewportHeight) return false
+                if (tiles != other.tiles) return false
+                if (!visibilityMask.contentEquals(other.visibilityMask)) return false
+
+                return true
+            }
+
+            override fun hashCode(): Int {
+                var result = viewportWidth
+                result = 31 * result + viewportHeight
+                result = 31 * result + tiles.hashCode()
+                result = 31 * result + visibilityMask.contentHashCode()
+                return result
+            }
+        }
 
         object Loading : MapScreenState()
 
