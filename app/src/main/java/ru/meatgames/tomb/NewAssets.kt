@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.IntSize
 import java.io.IOException
 import java.io.InputStream
 
@@ -15,6 +16,8 @@ object NewAssets {
     lateinit var tileset: ImageBitmap
     lateinit var themedTileset: ImageBitmap
     private lateinit var heroBitmaps: Array<ImageBitmap>
+
+    val tileSize: IntSize = IntSize(24, 24)
 
     fun loadAssets(
         context: Context,

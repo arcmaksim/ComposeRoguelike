@@ -29,9 +29,6 @@ import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
-import ru.meatgames.tomb.model.tile.domain.getOffset
-import ru.meatgames.tomb.model.tile.domain.getSize
-import ru.meatgames.tomb.model.tile.domain.isEmpty
 import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 
@@ -108,30 +105,25 @@ private fun Map(
             (abs(System.currentTimeMillis()) / 600 % 2).toInt()
         }
 
-        mapState.tiles.mapIndexed { index, tile ->
-            if (mapState.visibilityMask[index]) {
-
+        mapState.tiles.forEachIndexed { index, cell ->
+            cell?.apply {
                 val column = index % mapState.viewportWidth
                 val row = index / mapState.viewportWidth
                 val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
 
-                tile.floor?.let { floorTile ->
-                    if (floorTile.purposeDefinition.isEmpty) return@let
+                drawImage(
+                    image = floorTile.asset,
+                    srcOffset = floorTile.srcOffset,
+                    srcSize = NewAssets.tileSize,
+                    dstOffset = dstOffset,
+                    dstSize = tileSize,
+                    filterQuality = FilterQuality.None,
+                )
+                objectTile?.let { objectTile ->
                     drawImage(
-                        image = floorTile.purposeDefinition.resolveTileset(),
-                        srcOffset = floorTile.getOffset(),
-                        srcSize = floorTile.getSize(),
-                        dstOffset = dstOffset,
-                        dstSize = tileSize,
-                        filterQuality = FilterQuality.None,
-                    )
-                }
-                tile.`object`?.let { objectTile ->
-                    if (objectTile.purposeDefinition.isEmpty) return@let
-                    drawImage(
-                        image = objectTile.purposeDefinition.resolveTileset(),
-                        srcOffset = objectTile.getOffset(),
-                        srcSize = objectTile.getSize(),
+                        image = objectTile.asset,
+                        srcOffset = objectTile.srcOffset,
+                        srcSize = NewAssets.tileSize,
                         dstOffset = dstOffset,
                         dstSize = tileSize,
                         filterQuality = FilterQuality.None,
@@ -139,7 +131,6 @@ private fun Map(
                 }
             }
         }
-
         drawImage(
             NewAssets.getHeroBitmap(animation.value),
             dstOffset = IntOffset(
