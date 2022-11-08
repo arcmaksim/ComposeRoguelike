@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.model.room.domain
 
 import ru.meatgames.tomb.model.room.data.RoomDto
+import ru.meatgames.tomb.model.tile.data.ObjectTileMapping
 
 data class Room(
     val name: String,
@@ -19,7 +20,7 @@ data class Room(
         height: Int,
         floor: String,
         objects: String,
-        symbolMapping: List<RoomSymbolMapping>,
+        objectMapping: List<ObjectTileMapping>,
     ) : this(
         name = name,
         width = width,
@@ -27,9 +28,9 @@ data class Room(
         floor = floor,
         objects = objects,
     ) {
-        val outerSymbols = symbolMapping.asSequence()
+        val outerSymbols = objectMapping.asSequence()
             .filter { it.isConnectionTile }
-            .map { it.symbol }
+            .map { it.symbol.first() }
             .toSet()
 
         outerWalls = objects.mapIndexedNotNull { index, char ->
@@ -44,12 +45,12 @@ data class Room(
 }
 
 fun RoomDto.toEntity(
-    symbolMapping: List<RoomSymbolMapping>,
+    objectMapping: List<ObjectTileMapping>,
 ): Room = Room(
     name = name,
     width = width,
     height = height,
     floor = floor.fold("") { acc, item -> acc + item },
     objects = objects.fold("") { acc, item -> acc + item },
-    symbolMapping = symbolMapping,
+    objectMapping = objectMapping,
 )

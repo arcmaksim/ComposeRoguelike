@@ -1,0 +1,52 @@
+{
+  "floorMapping": [
+    {
+      "entity": "Floor",
+      "symbol": "1"
+    }
+  ],
+  "objectMapping": [
+    {
+      "entity": "Wall",
+      "symbol": "#"
+    },
+    {
+      "entity": "Wall",
+      "symbol": "W",
+      "isConnectionTile": true
+    },
+    {
+      "entity": "StairsUp",
+      "symbol": "U"
+    },
+    {
+      "entity": "StairsDown",
+      "symbol": "D"
+    },
+    {
+      "entity": null,
+      "symbol": "."
+    }
+  ],
+  "rooms": [
+    {
+      "name": "Default",
+      "width": 5,
+      "height": 5,
+      "floor": [
+        "11111",
+        "11111",
+        "11111",
+        "11111",
+        "11111"
+      ],
+      "objects": [
+        "#WWW#",
+        "W...W",
+        "W...W",
+        "W...W",
+        "#WWW#"
+      ]
+    }
+  ]
+}
