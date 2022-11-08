@@ -7,26 +7,33 @@ class TestFov {
 
     @Test
     fun testFov() {
-        val map =
-                "#######" +
-                "###.###" +
-                "##...##" +
-                "##...##" +
-                "##...##" +
-                "#######" +
-                "#######"
+        val mapSize = 9
+        val viewportSize = mapSize - 2
 
-        val mask = BooleanArray(map.length) { false }
+        val map =
+                "#########" +
+                "#########" +
+                "####.####" +
+                "###...###" +
+                "###...###" +
+                "###...###" +
+                "#########" +
+                "#########" +
+                "#########"
+
+        assert(map.length == mapSize * mapSize)
+
+        val mask = BooleanArray(viewportSize * viewportSize) { false }
 
         computeFov(
-            originX = 3,
-            originY = 3,
-            maxDepth = 4,
+            originX = viewportSize / 2,
+            originY = viewportSize / 2,
+            maxDepth = mapSize / 2,
             checkIfTileIsBlocking = { x: Int, y: Int ->
-                map[x + y * 7] == '#'
+                map[(x + 1) + (y + 1) * mapSize] == '#'
             },
             revealTile = { x: Int, y: Int ->
-                mask[x + y * 7] = true
+                mask[x + y * viewportSize] = true
             },
         )
 
@@ -39,9 +46,19 @@ class TestFov {
                 "x#####x\n" +
                 "xxxxxxx\n"
 
-        val result = map.mapIndexed { index, value ->
-            val asd = if (index % 7 == 6) "\n" else ""
-            if (mask[index]) "$value$asd" else "x$asd"
+        assert(expectedMap.length == (viewportSize + 1) * viewportSize)
+
+        val result = map.filterIndexed { index, _ ->
+            val x = index % mapSize
+            if (x == 0 || x == mapSize - 1) return@filterIndexed false
+
+            val y = index / mapSize
+            if (y == 0 || y == mapSize - 1) return@filterIndexed false
+
+            return@filterIndexed true
+        }.mapIndexed { index, value ->
+            val newLine = if (index % viewportSize == viewportSize - 1) "\n" else ""
+            if (mask[index]) "$value$newLine" else "x$newLine"
         }.reduce { acc, s -> acc + s }
 
         assert(expectedMap == result)
