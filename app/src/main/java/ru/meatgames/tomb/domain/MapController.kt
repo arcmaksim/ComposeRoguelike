@@ -4,8 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
-import ru.meatgames.tomb.model.tile.domain.Tile
-import ru.meatgames.tomb.model.tile.domain.isEmpty
+import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import javax.inject.Named
@@ -48,14 +47,14 @@ class MapControllerImpl @Inject constructor(
     override fun changeObject(
         x: Int,
         y: Int,
-        objectTile: Tile,
+        objectEntityTile: ObjectEntityTile,
     ) {
         levelMap.updateSingleTile(
             x = x,
             y = y,
         ) {
             copy(
-                `object` = objectTile,
+                objectEntityTile = objectEntityTile,
             )
         }
     }
@@ -69,7 +68,7 @@ interface MapTerraformer {
     fun changeObject(
         x: Int,
         y: Int,
-        objectTile: Tile,
+        objectEntityTile: ObjectEntityTile,
     )
 }
 
@@ -92,7 +91,7 @@ data class LevelMapWrapper(
         val flowValue = state.value
         return flowValue.mapIndexed { index, value ->
             val nextLinePostfix = if (index % width == width - 1) "\n" else ""
-            if (value.`object`?.purposeDefinition?.isEmpty == true) ".$nextLinePostfix" else "#$nextLinePostfix"
+            if (value.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
         }.fold("") { acc, item -> acc + item }
     }
 
