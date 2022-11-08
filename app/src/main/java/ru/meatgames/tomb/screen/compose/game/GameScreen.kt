@@ -1,5 +1,12 @@
 package ru.meatgames.tomb.screen.compose.game
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateValue
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -15,6 +22,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +40,9 @@ import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.render.MapRenderTile
-import kotlin.math.abs
+
+private const val HERO_ANIMATION_FRAME_TIME = 600
+private const val HERO_ANIMATION_FRAMES = 2
 
 @Composable
 fun GameScreen(
@@ -78,6 +90,29 @@ private fun Map(
         .background(Color(0xFF212121))
         .fillMaxSize(),
 ) {
+    val infiniteTransition = rememberInfiniteTransition()
+
+    var heroAnimationDirectionModifier by remember { mutableStateOf(0) }
+
+    val heroAnimationFrame by infiniteTransition.animateValue(
+        initialValue = 0,
+        targetValue = HERO_ANIMATION_FRAMES,
+        typeConverter = Int.VectorConverter,
+        animationSpec = infiniteRepeatable(
+            repeatMode = RepeatMode.Restart,
+            animation = tween(
+                durationMillis = HERO_ANIMATION_FRAME_TIME * HERO_ANIMATION_FRAMES,
+                easing = LinearEasing,
+            ),
+        )
+    )
+
+    val resultHeroFrame by remember {
+        derivedStateOf {
+            heroAnimationDirectionModifier + heroAnimationFrame
+        }
+    }
+    
     Text(
         modifier = Modifier
             .align(Alignment.TopEnd)
@@ -85,7 +120,7 @@ private fun Map(
         text = "${mapState.points}",
         style = h2TextStyle,
     )
-    
+
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
@@ -97,10 +132,16 @@ private fun Map(
                     onTap = {
                         onCharacterMove(
                             when {
-                                it.x > it.y && it.x.toDp() > maxWidth - it.y.toDp() -> Direction.Right
+                                it.x > it.y && it.x.toDp() > maxWidth - it.y.toDp() -> {
+                                    heroAnimationDirectionModifier = HERO_ANIMATION_FRAMES
+                                    Direction.Right
+                                }
                                 it.x > it.y -> Direction.Top
                                 it.x < it.y && it.y.toDp() > maxWidth - it.x.toDp() -> Direction.Bottom
-                                else -> Direction.Left
+                                else -> {
+                                    heroAnimationDirectionModifier = 0
+                                    Direction.Left
+                                }
                             }
                         )
                     }
@@ -110,10 +151,6 @@ private fun Map(
         val tileDimension = size.width.toInt() / mapState.viewportWidth
         val offset = (size.width.toInt() - (tileDimension * mapState.viewportWidth)) / 2
         val tileSize = IntSize(tileDimension, tileDimension)
-
-        val animation = derivedStateOf {
-            (abs(System.currentTimeMillis()) / 600 % 2).toInt()
-        }
 
         mapState.tiles.forEachIndexed { index, renderTile ->
             val column = index % mapState.viewportWidth
@@ -139,7 +176,7 @@ private fun Map(
             }
         }
         drawImage(
-            NewAssets.getHeroBitmap(animation.value),
+            NewAssets.getHeroBitmap(resultHeroFrame),
             dstOffset = IntOffset(
                 x = offset + tileDimension * (mapState.viewportWidth / 2),
                 y = tileDimension * (mapState.viewportHeight / 2)
