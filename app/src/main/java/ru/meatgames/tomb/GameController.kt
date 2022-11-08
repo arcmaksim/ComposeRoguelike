@@ -250,14 +250,14 @@ object GameController {
         val mapBufferWidth = mScreenController.mGameScreen.mMapBufferWidth
         val mapBufferHeight = mScreenController.mGameScreen.mMapBufferHeight
         val tile = mapBuffer[mapBufferWidth / 2 + mx + (mapBufferHeight / 2 + my) * mapBufferWidth]
-        if (tile.objectTile?.isPassable != false) {
+        /*if (tile.objectTile?.isPassable != false) {
             mIsPlayerTurn = false
             mIsPlayerMoved = true
         } else {
             mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.path_is_blocked_message))
             vibrate()
             mIsPlayerMoved = false
-        }
+        }*/
     }
 
     fun attack(map: MapClass) {

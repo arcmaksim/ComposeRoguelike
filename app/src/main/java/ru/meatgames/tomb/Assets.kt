@@ -1,29 +1,23 @@
 package ru.meatgames.tomb
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import org.xmlpull.v1.XmlPullParser
 import ru.meatgames.tomb.db.*
 import ru.meatgames.tomb.util.ScreenHelper
 import java.io.IOException
 import java.io.InputStream
 
+@Deprecated("Migrate to NewAssets")
 object Assets {
 
     private lateinit var mMainActivity: MainActivity
 
-    lateinit var tiles: Array<TileDB>
-    lateinit var objects: Array<ObjectDB> // 0 element is opaque
     lateinit var itemDB: Array<ItemDB>
     lateinit var mobDB: Array<MobDB>
     lateinit var stats: Array<StatsDB>
-    private lateinit var walls: Array<Bitmap>
     private lateinit var heroSprites: Array<Bitmap>
-    private lateinit var heroBitmaps: Array<ImageBitmap>
 
     var mImageRects: Array<Rect> = emptyArray()
 
@@ -34,19 +28,11 @@ object Assets {
     lateinit var bag: Bitmap
     lateinit var mFilterIcons: Array<Bitmap>
 
-    lateinit var tileset: Bitmap
-    @Deprecated("Migrate to NewAssets")
-    lateinit var tilesetImageBitmap: ImageBitmap
-
-    private lateinit var mFloorTileset: Bitmap
-    private lateinit var mObjectTileset: Bitmap
     private lateinit var mItemsSheet: Bitmap
     // creatures have 2 frames
     private lateinit var mCreaturesSheetDefault: Bitmap
     private lateinit var mCreaturesSheetAlternative: Bitmap
 
-    val maxTiles = 12
-    val maxObjects = 17
     val maxItems = 17
     val maxStats = 35
 
@@ -76,19 +62,6 @@ object Assets {
 
     @Deprecated("Migrate to NewAssets")
     fun loadAssets() {
-        //loadStats()
-        //loadTiles()
-        //loadObjects()
-        //loadItems()
-        //loadMobs()
-
-        /*mImageRects = Array(100) { i ->
-            Rect(i % 5 * mOriginalTileSize,
-                    i / 5 * mOriginalTileSize,
-                    i % 5 * mOriginalTileSize + mOriginalTileSize,
-                    i / 5 * mOriginalTileSize + mOriginalTileSize)
-        }*/
-
         var temp = getBitmapFromAsset("character_animation_sheet")
         heroSprites = Array(4) { i ->
             Bitmap.createBitmap(temp,
@@ -97,24 +70,15 @@ object Assets {
                     mOriginalTileSize,
                     mOriginalTileSize)
         }
-        heroBitmaps = heroSprites.map { it.asImageBitmap() }.toTypedArray()
 
         bag = getBitmapFromAsset("bag")
         mCharacterIcon = getBitmapFromAsset("character_icon")
         mInventoryIcon = getBitmapFromAsset("inventory_icon")
         mSkipTurnIcon = getBitmapFromAsset("skip_turn_icon")
 
-        tileset = getBitmapFromAsset("tiles")
-        tilesetImageBitmap = tileset.asImageBitmap()
-
-        mFloorTileset = getBitmapFromAsset("floor_tileset")
-        mObjectTileset = getBitmapFromAsset("objects_tileset")
         mItemsSheet = getBitmapFromAsset("items_sheet")
         mCreaturesSheetDefault = getBitmapFromAsset("creatures_sheet")
         mCreaturesSheetAlternative = getBitmapFromAsset("creatures_sheet_alt")
-
-        temp = getBitmapFromAsset("walls_tileset")
-        walls = Array(16) { i -> Bitmap.createBitmap(temp, i % 4 * mOriginalTileSize, i / 4 * mOriginalTileSize, mOriginalTileSize, mOriginalTileSize) }
 
         mFilterIcons = arrayOf(Bitmap.createScaledBitmap(getBitmapFromAsset("weapons_icon_outline"), 30, 30, false),
                 Bitmap.createScaledBitmap(getBitmapFromAsset("weapons_icon_filling"), 30, 30, false),
@@ -142,41 +106,6 @@ object Assets {
             val isMaximum = parser.getAttributeValue(0) == "t"
             parser.next()
             StatsDB(statTitle, isSingle, isMaximum)
-        }
-    }
-
-    private fun loadTiles() {
-        val parser = mMainActivity.resources.getXml(R.xml.tiles)
-        tiles = Array(maxTiles) {
-            while (parser.eventType != XmlPullParser.END_DOCUMENT) {
-                if (parser.eventType == XmlPullParser.START_TAG && parser.name == "tile") {
-                    break
-                }
-                parser.next()
-            }
-            val isPassable = parser.getAttributeValue(0) == "t"
-            val isTransparent = parser.getAttributeValue(1) == "t"
-            val isUsable = parser.getAttributeValue(2) == "t"
-            parser.next()
-            TileDB(isPassable, isTransparent, isUsable)
-        }
-    }
-
-    private fun loadObjects() {
-        val parser = mMainActivity.resources.getXml(R.xml.objects)
-        objects = Array(maxObjects) {
-            while (parser.eventType != XmlPullParser.END_DOCUMENT) {
-                if (parser.eventType == XmlPullParser.START_TAG && parser.name == "object") {
-                    break
-                }
-                parser.next()
-            }
-            val isPassable = parser.getAttributeValue(1) == "t"
-            val isTransparent = parser.getAttributeValue(2) == "t"
-            val isUsable = parser.getAttributeValue(3) == "t"
-            val isWall = parser.getAttributeValue(0) == "t"
-            parser.next()
-            ObjectDB(isPassable, isTransparent, isUsable, isWall)
         }
     }
 
@@ -276,21 +205,7 @@ object Assets {
     @JvmStatic
     fun getHeroSprite(frame: Int): Bitmap = heroSprites[frame]
 
-    @Deprecated("Migrate to NewAssets")
-    @JvmStatic
-    fun getHeroBitmap(frame: Int): ImageBitmap = heroBitmaps[frame]
-
-    fun getFloorImage() = mFloorTileset
-
-    fun getObjectImage() = mObjectTileset
-
-    fun getWallImage(wallId: Int) = walls[wallId]
-
     fun getItemImage() = mItemsSheet
-
-    fun getCreatureImage(frame: Int): Bitmap {
-        return if (frame == 0) mCreaturesSheetDefault else mCreaturesSheetAlternative
-    }
 
     fun getAssetRect(id: Int) = mImageRects[id]
 

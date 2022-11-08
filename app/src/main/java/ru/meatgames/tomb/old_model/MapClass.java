@@ -55,7 +55,8 @@ public class MapClass {
     }
 
     public boolean isWall() {
-        return Assets.INSTANCE.getObjects()[mObjectID].getMIsWall();
+        return false;
+        //return Assets.INSTANCE.getObjects()[mObjectID].getMIsWall();
     }
 
 }

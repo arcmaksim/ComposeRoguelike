@@ -74,9 +74,10 @@ object MapHelper {
 
         map[mapX][mapY].mObjectID = objectId
 
-        map[mapX][mapY].mIsPassable = Assets.objects[objectId].mIsPassable
+        // Update flags
+        /*map[mapX][mapY].mIsPassable = Assets.objects[objectId].mIsPassable
         map[mapX][mapY].mIsTransparent = Assets.objects[objectId].mIsTransparent
-        map[mapX][mapY].mIsUsable = Assets.objects[objectId].mIsUsable
+        map[mapX][mapY].mIsUsable = Assets.objects[objectId].mIsUsable*/
     }
 
     @JvmStatic
