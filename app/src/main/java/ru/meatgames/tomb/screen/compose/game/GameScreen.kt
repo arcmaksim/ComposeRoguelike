@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -28,7 +27,7 @@ import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
+import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 
@@ -105,21 +104,21 @@ private fun Map(
             (abs(System.currentTimeMillis()) / 600 % 2).toInt()
         }
 
-        mapState.tiles.forEachIndexed { index, cell ->
-            cell?.apply {
+        mapState.tiles.forEachIndexed { index, renderTile ->
+            if (renderTile is MapRenderTile.Revealed) {
                 val column = index % mapState.viewportWidth
                 val row = index / mapState.viewportWidth
                 val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
 
                 drawImage(
-                    image = floorTile.asset,
-                    srcOffset = floorTile.srcOffset,
+                    image = renderTile.floorData.asset,
+                    srcOffset = renderTile.floorData.srcOffset,
                     srcSize = NewAssets.tileSize,
                     dstOffset = dstOffset,
                     dstSize = tileSize,
                     filterQuality = FilterQuality.None,
                 )
-                objectTile?.let { objectTile ->
+                renderTile.objectData?.let { objectTile ->
                     drawImage(
                         image = objectTile.asset,
                         srcOffset = objectTile.srcOffset,
@@ -141,9 +140,4 @@ private fun Map(
             filterQuality = FilterQuality.None,
         )
     }
-}
-
-fun TilePurposeDefinition.resolveTileset(): ImageBitmap = when (this) {
-    is TilePurposeDefinition.Standard -> NewAssets.themedTileset
-    is TilePurposeDefinition.General -> NewAssets.tileset
 }
