@@ -1,0 +1,18 @@
+{
+	"tiles": [
+		{
+			"tile": "DoorClosed",
+			"horizontalOffset": 0
+		},
+		{
+			"tile": "DoorOpened",
+			"horizontalOffset": 1
+		}
+	],
+	"themes": [
+		{
+			"name": "Default",
+			"verticalOffset": 0
+		}
+	]
+}

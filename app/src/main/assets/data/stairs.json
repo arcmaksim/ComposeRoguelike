@@ -1,0 +1,90 @@
+{
+	"tiles": [
+		{
+			"tile": "StairsUp",
+			"horizontalOffset": 0
+		},
+		{
+			"tile": "StairsDown",
+			"horizontalOffset": 1
+		}
+	],
+	"themes": [
+		{
+			"name": "Dungeon",
+			"verticalOffset": 0
+		},
+		{
+			"name": "Castle",
+			"verticalOffset": 1
+		},
+		{
+			"name": "Deep Dungeon",
+			"verticalOffset": 2
+		},
+		{
+			"name": "Evil castle",
+			"verticalOffset": 3
+		},
+		{
+			"name": "Tunnels",
+			"verticalOffset": 4
+		},
+		{
+			"name": "From the Depths",
+			"verticalOffset": 5
+		},
+		{
+			"name": "Mithril",
+			"verticalOffset": 6
+		},
+		{
+			"name": "Blue Steel",
+			"verticalOffset": 7
+		},
+		{
+			"name": "Golden",
+			"verticalOffset": 8
+		},
+		{
+			"name": "Dwarven dungeon",
+			"verticalOffset": 9
+		},
+		{
+			"name": "Green Metal",
+			"verticalOffset": 10
+		},
+		{
+			"name": "Caves",
+			"verticalOffset": 11
+		},
+		{
+			"name": "Overgrowth",
+			"verticalOffset": 12
+		},
+		{
+			"name": "Earth",
+			"verticalOffset": 13
+		},
+		{
+			"name": "Garden",
+			"verticalOffset": 14
+		},
+		{
+			"name": "Catacombs",
+			"verticalOffset": 15
+		},
+		{
+			"name": "Ice - low",
+			"verticalOffset": 16
+		},
+		{
+			"name": "Ice - high",
+			"verticalOffset": 17
+		},
+		{
+			"name": "Sand",
+			"verticalOffset": 18
+		}
+	]
+}
