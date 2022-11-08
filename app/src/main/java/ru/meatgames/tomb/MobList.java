@@ -2,8 +2,8 @@ package ru.meatgames.tomb;
 
 import android.graphics.Rect;
 
-import ru.meatgames.tomb.model.MapClass;
-import ru.meatgames.tomb.model.MobClass;
+import ru.meatgames.tomb.old_model.MapClass;
+import ru.meatgames.tomb.old_model.MobClass;
 
 public class MobList {
 

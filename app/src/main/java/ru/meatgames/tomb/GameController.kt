@@ -5,13 +5,11 @@ import android.graphics.Bitmap
 import android.os.Vibrator
 import androidx.activity.compose.setContent
 import androidx.compose.material.ExperimentalMaterialApi
-import ru.meatgames.tomb.model.HeroClass
-import ru.meatgames.tomb.model.Item
-import ru.meatgames.tomb.model.MapClass
-import ru.meatgames.tomb.new_models.item.InventoryItem
-import ru.meatgames.tomb.new_models.map.MapTile
-import ru.meatgames.tomb.new_models.provider.GameDataProvider
-import ru.meatgames.tomb.new_models.tile.Tile
+import ru.meatgames.tomb.old_model.HeroClass
+import ru.meatgames.tomb.old_model.Item
+import ru.meatgames.tomb.old_model.MapClass
+import ru.meatgames.tomb.model.item.InventoryItem
+import ru.meatgames.tomb.model.provider.GameDataProvider
 import ru.meatgames.tomb.screen.view.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper
@@ -19,6 +17,7 @@ import ru.meatgames.tomb.util.ObjectHelper
 import ru.meatgames.tomb.util.array2d
 import java.util.*
 
+@Deprecated("Old implementation")
 object GameController {
 
     private lateinit var mMainActivity: MainActivity
@@ -26,7 +25,6 @@ object GameController {
     private lateinit var mVibrator: Vibrator
 
     private lateinit var mScreenController: ScreenController
-    private lateinit var mMapController: MapController
 
     lateinit var mHero: HeroClass
 
@@ -62,7 +60,6 @@ object GameController {
 
     private fun init() {
         mScreenController = ScreenController(mMainActivity)
-        mMapController = MapController(96, 96)
         zone = array2d(11, 11) { 0 }
     }
 
@@ -115,11 +112,7 @@ object GameController {
     @JvmStatic
     fun getMap2(): Array<Array<MapClass>> = emptyArray() // MapController().getMap()
 
-    fun getMapTile(x: Int, y: Int): MapTile? = null // mMapController.getMapTile(x, y)
-
-    fun changeFloorTile(x: Int, y: Int, tile: Tile) = mMapController.changeFloorTile(x, y, tile)
-
-    fun changeObjectTile(x: Int, y: Int, tile: Tile) = mMapController.changeObjectTile(x, y, tile)
+    fun getMapTile(x: Int, y: Int): Any? = null // mMapController.getMapTile(x, y)
 
     @JvmStatic
     fun generateNewMap() = Unit // mMapController.generateNewMap(mMainActivity)
@@ -257,14 +250,14 @@ object GameController {
         val mapBufferWidth = mScreenController.mGameScreen.mMapBufferWidth
         val mapBufferHeight = mScreenController.mGameScreen.mMapBufferHeight
         val tile = mapBuffer[mapBufferWidth / 2 + mx + (mapBufferHeight / 2 + my) * mapBufferWidth]
-        if (tile.objectTile?.isPassable != false) {
+        /*if (tile.objectTile?.isPassable != false) {
             mIsPlayerTurn = false
             mIsPlayerMoved = true
         } else {
             mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.path_is_blocked_message))
             vibrate()
             mIsPlayerMoved = false
-        }
+        }*/
     }
 
     fun attack(map: MapClass) {

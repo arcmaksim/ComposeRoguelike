@@ -5,10 +5,6 @@ enum class Direction {
     Right,
     Top,
     Bottom,
-    LeftTop,
-    RightTop,
-    LeftBottom,
-    RightBottom,
 }
 
 val Direction.resolvedOffsets: Pair<Int, Int>
@@ -17,8 +13,4 @@ val Direction.resolvedOffsets: Pair<Int, Int>
         Direction.Right -> 1 to 0
         Direction.Top -> 0 to -1
         Direction.Bottom -> 0 to 1
-        Direction.LeftTop -> -1 to -1
-        Direction.RightTop -> 1 to -1
-        Direction.LeftBottom -> -1 to 1
-        Direction.RightBottom -> 1 to 1
     }

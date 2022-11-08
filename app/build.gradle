@@ -2,10 +2,13 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "kotlin-kapt"
+    id "com.google.dagger.hilt.android"
     id "org.jetbrains.kotlin.plugin.serialization" version "$kotlin_version"
 }
 
 android {
+    namespace "ru.meatgames.tomb"
+
     compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
@@ -43,13 +46,6 @@ android {
     }
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xskip-prerelease-check"]
-    }
-}
-
 repositories {
     google()
     mavenCentral()
@@ -58,12 +54,12 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    implementation "androidx.core:core-ktx:1.8.0"
-    implementation "androidx.appcompat:appcompat:1.5.0"
+    implementation "androidx.core:core-ktx:1.9.0"
+    implementation "androidx.appcompat:appcompat:1.5.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.ui:ui-tooling:$compose_version"
@@ -71,10 +67,16 @@ dependencies {
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation "androidx.navigation:navigation-compose:$compose_navigation_version"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
+
+    implementation "com.google.dagger:hilt-android:$dagger_version"
+    kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     implementation "com.jakewharton.timber:timber:4.7.1"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.11.1"
+    implementation "com.fasterxml.jackson.core:jackson-core:2.13.2"
     implementation "com.bluelinelabs:logansquare:1.3.7"
     kapt "com.bluelinelabs:logansquare-compiler:1.3.7"
+
+    testImplementation 'junit:junit:4.13.2'
 }

@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.db
 
 import android.graphics.Rect
-import ru.meatgames.tomb.model.MobClass
+import ru.meatgames.tomb.old_model.MobClass
 
 class MobDB {
 

@@ -8,8 +8,8 @@ import android.view.MotionEvent
 import ru.meatgames.tomb.Assets
 import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.new_models.item.Consumable
-import ru.meatgames.tomb.new_models.item.InventoryItem
+import ru.meatgames.tomb.model.item.Consumable
+import ru.meatgames.tomb.model.item.InventoryItem
 import ru.meatgames.tomb.screen.BasicScreen
 import ru.meatgames.tomb.util.ScreenHelper
 import ru.meatgames.tomb.util.UnitConverter
