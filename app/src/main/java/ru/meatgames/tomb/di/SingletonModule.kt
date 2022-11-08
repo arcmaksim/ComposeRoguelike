@@ -5,12 +5,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import ru.meatgames.tomb.domain.MapController
 import ru.meatgames.tomb.domain.MapControllerImpl
 import ru.meatgames.tomb.domain.MapGenerator
 import ru.meatgames.tomb.domain.MapTerraformer
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.data.RoomsRepository
+import ru.meatgames.tomb.render.MapRenderTilesDecorator
+import ru.meatgames.tomb.render.WallsDecorator
 import javax.inject.Named
 
 private const val MAP_WIDTH = 32
@@ -68,5 +71,11 @@ abstract class BindingSingletonModule {
     abstract fun bindMapController(
         controller: MapControllerImpl,
     ): MapController
+
+    @Binds
+    @IntoSet
+    abstract fun bindWallsDecorator(
+        decorator: WallsDecorator,
+    ): MapRenderTilesDecorator
 
 }
