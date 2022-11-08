@@ -13,8 +13,6 @@ private const val originalTileSize: Int = 24
 
 object NewAssets {
 
-    lateinit var tileset: ImageBitmap
-    lateinit var themedTileset: ImageBitmap
     private lateinit var heroBitmaps: Array<ImageBitmap>
 
     val tileSize: IntSize = IntSize(24, 24)
@@ -22,16 +20,14 @@ object NewAssets {
     fun loadAssets(
         context: Context,
     ) {
-        tileset = context.getBitmapFromAsset("tiles").asImageBitmap()
-        themedTileset = context.getBitmapFromAsset("themed_tiles").asImageBitmap()
-
-        val temp = context.getBitmapFromAsset("character_animation_sheet")
+        val charactedAnimationSheet = context.getBitmapFromAsset("character_animation_sheet")
         val heroSprites = Array(4) { i ->
-            Bitmap.createBitmap(temp,
+            Bitmap.createBitmap(
+                charactedAnimationSheet,
                 i * originalTileSize,
                 0,
                 originalTileSize,
-                originalTileSize
+                originalTileSize,
             )
         }
         heroBitmaps = heroSprites.map { it.asImageBitmap() }.toTypedArray()
