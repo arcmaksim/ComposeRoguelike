@@ -4,13 +4,10 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
-import ru.meatgames.tomb.model.room.domain.RoomSymbolMapping
-import ru.meatgames.tomb.model.tile.domain.Tile
-import ru.meatgames.tomb.model.tile.domain.TilePurpose
-import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
-import ru.meatgames.tomb.model.tile.domain.Tileset
-import ru.meatgames.tomb.model.tile.domain.toTile
-import ru.meatgames.tomb.model.tile.domain.GeneralTilePurpose
+import ru.meatgames.tomb.model.tile.data.FloorTileMapping
+import ru.meatgames.tomb.model.tile.data.ObjectTileMapping
+import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
+import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import kotlin.random.Random
@@ -23,10 +20,9 @@ class SimpleMapGenerator @Inject constructor(
     private val maxRoomPlacementAttempts = 5
     private val random = Random(System.currentTimeMillis())
 
-    private val tileset: Tileset = roomsData.tilesets.random(random)
-    private val tiles: List<TilePurposeDefinition> = roomsData.tiles
     private val rooms: List<Room> = roomsData.rooms
-    private val mapping: List<RoomSymbolMapping> = roomsData.symbolMappings
+    private val floorMapping: List<FloorTileMapping> = roomsData.floorMapping
+    private val objectMapping: List<ObjectTileMapping> = roomsData.objectMapping
 
     private val outerWallsPool: MutableSet<Pair<Int, Int>> = mutableSetOf()
 
@@ -44,8 +40,6 @@ class SimpleMapGenerator @Inject constructor(
             y = initialRoomPositionY,
             room = initialRoom,
         )
-
-        val random = Random(System.currentTimeMillis())
 
         roomLoop@ for (i in 0 until maxRoomsAttempts) {
             log("-----------------------------------------")
@@ -65,7 +59,6 @@ class SimpleMapGenerator @Inject constructor(
                     Direction.Bottom -> randomOuterWall.first - 1 to randomOuterWall.second
                     Direction.Left -> randomOuterWall.first - (room.width - 1) to randomOuterWall.second - 1
                     Direction.Right -> randomOuterWall.first to randomOuterWall.second - 1
-                    else -> throw IllegalStateException()
                 }
 
                 val isZoneEmpty = map.checkZone(
@@ -83,9 +76,7 @@ class SimpleMapGenerator @Inject constructor(
                     y = randomOuterWall.second,
                 ) {
                     copy(
-                        `object` = TilePurposeDefinition.General(
-                            purpose = GeneralTilePurpose.ClosedDoor,
-                        ).toTile(tileset),
+                        objectEntityTile = ObjectEntityTile.DoorClosed,
                     )
                 }
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
@@ -130,16 +121,6 @@ class SimpleMapGenerator @Inject constructor(
     }
 
     private fun LevelMap.clearMap() {
-        val floorTilePurposeDefinition = tiles.first {
-            it is TilePurposeDefinition.Standard
-                    && it.purpose == TilePurpose.FloorVariant1
-        } as TilePurposeDefinition.Standard
-
-        val wallTilePurposeDefinition = tiles.first {
-            it is TilePurposeDefinition.Standard
-                    && it.purpose == TilePurpose.Wall
-        } as TilePurposeDefinition.Standard
-
         updateBatch {
             for (x in 0 until width) {
                 for (y in 0 until height) {
@@ -148,8 +129,8 @@ class SimpleMapGenerator @Inject constructor(
                         y = y,
                     ) {
                         copy(
-                            floor = floorTilePurposeDefinition.toTile(tileset),
-                            `object` = wallTilePurposeDefinition.toTile(tileset),
+                            floorEntityTile = FloorEntityTile.Floor,
+                            objectEntityTile = ObjectEntityTile.Wall,
                         )
                     }
                 }
@@ -173,8 +154,8 @@ class SimpleMapGenerator @Inject constructor(
                     y = y + yOffset,
                 ) {
                     copy(
-                        floor = room.floor[i].toTile(),
-                        `object` = room.objects[i].toTile(),
+                        floorEntityTile = room.floor[i].toFloorEntity(),
+                        objectEntityTile = room.objects[i].toObjectEntity(),
                     )
                 }
             }
@@ -187,11 +168,13 @@ class SimpleMapGenerator @Inject constructor(
         log("Placed room at $x $y with dimensions ${room.width} x ${room.height}")
     }
 
-    private fun Char.toTile(): Tile = this@toTile.toTile(
-        tileset = tileset,
-        tiles = tiles,
-        symbolMapping = mapping,
-    )
+    private fun Char.toFloorEntity(): FloorEntityTile = floorMapping.first {
+        it.symbol == this@toFloorEntity.toString()
+    }.entity
+
+    private fun Char.toObjectEntity(): ObjectEntityTile? = objectMapping.first {
+        it.symbol == this@toObjectEntity.toString()
+    }.entity
 
     private fun LevelMap.checkZone(
         mapX: Int,
@@ -269,16 +252,12 @@ data class GeneratedMapConfiguration(
 
 private val MapTile?.isWall: Boolean
     get() {
-        val purposeDefinition = this?.`object`
-            ?.purposeDefinition as? TilePurposeDefinition.Standard
-            ?: return false
-        return purposeDefinition.purpose == TilePurpose.Wall
+        this ?: return false
+        return objectEntityTile == ObjectEntityTile.Wall
     }
 
 private val MapTile?.isEmpty: Boolean
     get() {
-        val `object` = this?.`object` ?: return false
-        val purposeDefinition = `object`.purposeDefinition as? TilePurposeDefinition.Standard
-            ?: return false
-        return purposeDefinition.purpose == TilePurpose.Empty
+        this ?: return false
+        return objectEntityTile == null
     }
