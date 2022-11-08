@@ -16,43 +16,57 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import ru.meatgames.tomb.NewAssets
-import ru.meatgames.tomb.model.provider.GameDataProvider
+import ru.meatgames.tomb.domain.MapRenderProcessor
+import ru.meatgames.tomb.render.WallsDecorator
 import ru.meatgames.tomb.model.room.data.RoomsRepository
-import ru.meatgames.tomb.model.room.domain.Room
-import ru.meatgames.tomb.model.room.domain.RoomSymbolMapping
-import ru.meatgames.tomb.model.tile.domain.TilePurposeDefinition
-import ru.meatgames.tomb.model.tile.domain.Tileset
-import ru.meatgames.tomb.model.tile.domain.getOffset
-import ru.meatgames.tomb.model.tile.domain.getSize
-import ru.meatgames.tomb.model.tile.domain.isEmpty
-import ru.meatgames.tomb.model.tile.domain.toTile
+import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.screen.compose.game.MapTile
 import kotlin.math.max
-import kotlin.random.Random
 
 @Preview
 @Composable
 private fun RoomRenderer() {
     val context = LocalContext.current
 
-    GameDataProvider.init(context)
-    NewAssets.loadAssets(context)
+    val roomsData = RoomsRepository(context).loadData()
+    val mapRenderProcessor = MapRenderProcessor(
+        themeAssets = ThemeAssets(context),
+        mapDecorators = setOf(WallsDecorator()),
+    )
 
-    val data = RoomsRepository(context).loadData()
+    val room = roomsData.rooms.first()
+
+    val mapTiles = (0 until room.width * room.height).map { index ->
+        MapTile(
+            floorEntityTile = roomsData.floorMapping
+                .first { it.symbol == room.floor[index].toString() }.entity,
+            objectEntityTile = roomsData.objectMapping
+                .first { it.symbol == room.objects[index].toString() }.entity,
+        )
+    }
+
+    val renderTiles = mapRenderProcessor.produceRenderTilesFrom(
+        tiles = mapTiles,
+        tilesLineWidth = room.width,
+        shouldRenderTile = { true },
+    )
+
+    val roomPreviewData = RoomPreviewData(
+        roomName = room.name,
+        roomWidth = room.width,
+        roomHeight = room.height,
+        tiles = renderTiles,
+    )
 
     RoomRenderer(
-        tileset = data.tilesets.random(Random),
-        tiles = data.tiles,
-        symbolMapping = data.symbolMappings,
-        room = data.rooms.first(),
+        roomPreviewData = roomPreviewData,
     )
 }
 
 @Composable
 private fun RoomRenderer(
-    tileset: Tileset,
-    tiles: List<TilePurposeDefinition>,
-    symbolMapping: List<RoomSymbolMapping>,
-    room: Room,
+    roomPreviewData: RoomPreviewData,
     renderType: RoomRenderType = RoomRenderType.Full,
 ) = BoxWithConstraints(
     modifier = Modifier
@@ -60,58 +74,54 @@ private fun RoomRenderer(
         .fillMaxSize(),
 ) {
     val objectAlpha = if (renderType == RoomRenderType.TransparentObjects) .2f else 1f
+
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1F)
             .align(Alignment.Center),
     ) {
-        val maxSize = max(room.width, room.height)
+        val maxSize = max(roomPreviewData.roomWidth, roomPreviewData.roomHeight)
         val tileDimension = size.width.toInt() / maxSize
         val offset = (size.width.toInt() - (tileDimension * maxSize)) / 2
         val tileSize = IntSize(tileDimension, tileDimension)
 
-        for (i in 0 until room.width * room.height) {
-            val x = i % room.width
-            val y = i / room.width
-            val dstOffset = IntOffset(offset + x * tileDimension, y * tileDimension)
+        roomPreviewData.tiles.mapIndexed { index, renderTile ->
+            if (renderTile is MapRenderTile.Revealed) {
+                val column = index % roomPreviewData.roomWidth
+                val row = index / roomPreviewData.roomWidth
+                val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
 
-            room.floor[i].toTile(
-                tileset = tileset,
-                tiles = tiles,
-                symbolMapping = symbolMapping,
-            ).apply {
-                if (purposeDefinition.isEmpty) return@apply
                 drawImage(
-                    image = NewAssets.themedTileset,
-                    srcOffset = getOffset(),
-                    srcSize = getSize(),
+                    image = renderTile.floorData.asset,
+                    srcOffset = renderTile.floorData.srcOffset,
+                    srcSize = NewAssets.tileSize,
                     dstOffset = dstOffset,
                     dstSize = tileSize,
                     filterQuality = FilterQuality.None,
                 )
-            }
-
-            if (renderType == RoomRenderType.Floor) continue
-            room.objects[i].toTile(
-                tileset = tileset,
-                tiles = tiles,
-                symbolMapping = symbolMapping,
-            ).apply {
-                if (purposeDefinition.isEmpty) return@apply
-                drawImage(
-                    image = NewAssets.themedTileset,
-                    srcOffset = getOffset(),
-                    srcSize = getSize(),
-                    dstOffset = dstOffset,
-                    dstSize = tileSize,
-                    filterQuality = FilterQuality.None,
-                    alpha = objectAlpha,
-                )
+                renderTile.objectData?.let { objectTile ->
+                    drawImage(
+                        image = objectTile.asset,
+                        srcOffset = objectTile.srcOffset,
+                        srcSize = NewAssets.tileSize,
+                        dstOffset = dstOffset,
+                        dstSize = tileSize,
+                        filterQuality = FilterQuality.None,
+                        alpha = objectAlpha,
+                    )
+                }
             }
         }
     }
 }
+
+data class RoomPreviewData(
+    val roomName: String,
+    val roomWidth: Int,
+    val roomHeight: Int,
+    val tiles: List<MapRenderTile>,
+)
 
 private enum class RoomRenderType {
     Floor,
