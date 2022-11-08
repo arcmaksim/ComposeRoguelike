@@ -10,7 +10,7 @@ class LevelMap(
     val height: Int,
 ) {
 
-    private val array = Array(width * height) { MapTile.voidMapTile }
+    private val array = Array(width * height) { MapTile.initialTile }
 
     private val _state = MutableStateFlow(array.toList())
     val state: StateFlow<List<MapTile>> = _state
