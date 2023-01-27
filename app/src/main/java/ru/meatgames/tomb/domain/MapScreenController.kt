@@ -10,11 +10,14 @@ import kotlinx.coroutines.launch
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
 import ru.meatgames.tomb.model.temp.TilesController
+import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import javax.inject.Named
+import javax.inject.Singleton
 
+@Singleton
 class MapScreenController @Inject constructor(
     @Named(MAP_VIEWPORT_WIDTH_KEY)
     private val viewportWidth: Int,
@@ -29,11 +32,15 @@ class MapScreenController @Inject constructor(
     private val _state = MutableStateFlow<MapScreenState>(MapScreenState.Loading)
     val state: StateFlow<MapScreenState> = _state
 
+    private var previousCharacterIdleAnimationDirection: CharacterIdleAnimationDirection = CharacterIdleAnimationDirection.Left
+
     private val cachedVisibilityMask = BooleanArray(viewportWidth * viewportWidth) { false }
 
     private val preProcessingBufferSizeModifier: Int = 1
-    private val preProcessingViewportWidth: Int = viewportWidth + 2 * preProcessingBufferSizeModifier
-    private val preProcessingViewportHeight: Int = viewportHeight + 2 * preProcessingBufferSizeModifier
+    private val preProcessingViewportWidth: Int =
+        viewportWidth + 2 * preProcessingBufferSizeModifier
+    private val preProcessingViewportHeight: Int =
+        viewportHeight + 2 * preProcessingBufferSizeModifier
 
     init {
         GlobalScope.launch {

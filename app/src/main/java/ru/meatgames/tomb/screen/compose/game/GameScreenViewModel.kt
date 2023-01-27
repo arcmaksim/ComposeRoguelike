@@ -12,7 +12,9 @@ import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.PlayerAnimationState
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
+import ru.meatgames.tomb.domain.PlayerMoveResult
 import javax.inject.Inject
 
 private const val TARGET_POINTS = 10
@@ -30,6 +32,9 @@ class GameScreenViewModel @Inject constructor(
     private val _mapState = MutableStateFlow(controller.state.value)
     val mapState: StateFlow<MapScreenController.MapScreenState> = controller.state
 
+    private val _animationState = Channel<PlayerAnimationState>()
+    val animationState: Flow<PlayerAnimationState> = _animationState.receiveAsFlow()
+
     private val _isIdle = MutableStateFlow(true)
     val isIdle: StateFlow<Boolean> = _isIdle
     
@@ -45,13 +50,19 @@ class GameScreenViewModel @Inject constructor(
     }
 
     fun onMoveCharacter(
-        moveDirection: Direction,
+        direction: Direction,
     ) {
         if (!isIdle.value) return
 
         _isIdle.value = false
 
-        mapInteractionController.makeMove(moveDirection)
+        _animationState.trySend(
+            when (val result = mapInteractionController.makeMove(direction)) {
+                is PlayerMoveResult.Block -> PlayerAnimationState.Shake()
+                is PlayerMoveResult.Move -> PlayerAnimationState.Scroll(result.direction)
+                else -> PlayerAnimationState.NoAnimation
+            }
+        )
 
         _isIdle.value = true
     }
