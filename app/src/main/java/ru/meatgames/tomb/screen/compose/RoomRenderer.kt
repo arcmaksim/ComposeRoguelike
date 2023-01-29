@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +19,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.NewAssets
+import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.RoomPreviewRenderProcessor
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.temp.ThemeAssets
@@ -37,7 +41,7 @@ private fun RoomRenderer() {
         mapDecorators = setOf(WallsDecorator()),
     )
 
-    val room = roomsData.rooms.first()
+    val room = roomsData.rooms.random()
 
     val mapTiles = (0 until room.width * room.height).map { index ->
         MapTile(
@@ -85,6 +89,13 @@ private fun RoomRenderer(
         eraseColor(android.graphics.Color.MAGENTA)
         asImageBitmap()
     }
+    
+    Text(
+        modifier = Modifier.fillMaxWidth()
+            .padding(24.dp),
+        text = roomPreviewData.roomName,
+        style = h2TextStyle,
+    )
     
     Canvas(
         modifier = Modifier
