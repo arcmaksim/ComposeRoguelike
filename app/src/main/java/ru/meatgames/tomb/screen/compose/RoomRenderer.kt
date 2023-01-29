@@ -92,7 +92,8 @@ private fun RoomRenderer(
     
     Text(
         modifier = Modifier.fillMaxWidth()
-            .padding(24.dp),
+            .padding(top = 48.dp)
+            .padding(horizontal = 24.dp),
         text = roomPreviewData.roomName,
         style = h2TextStyle,
     )
@@ -108,12 +109,12 @@ private fun RoomRenderer(
         val outlineOffset = (size.width.toInt() - (tileDimension * maxSize)) / 2
         
         val horizontalOffset = if (roomPreviewData.roomWidth < roomPreviewData.roomHeight) {
-            (roomPreviewData.roomHeight - roomPreviewData.roomWidth) / 2 * tileDimension
+            ((roomPreviewData.roomHeight - roomPreviewData.roomWidth) / 2f * tileDimension).toInt()
         } else {
             0
         }
         val verticalOffset = if (roomPreviewData.roomHeight < roomPreviewData.roomWidth) {
-            (roomPreviewData.roomWidth - roomPreviewData.roomHeight) / 2 * tileDimension
+            ((roomPreviewData.roomWidth - roomPreviewData.roomHeight) / 2f * tileDimension).toInt()
         } else {
             0
         }
