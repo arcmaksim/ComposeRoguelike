@@ -10,11 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ru.meatgames.tomb.GameState
 import ru.meatgames.tomb.design.BaseTextButton
-import ru.meatgames.tomb.design.baseTextStyle
+import ru.meatgames.tomb.design.h1TextStyle
 
 @Composable
 fun MainMenuScreen(
@@ -29,9 +28,7 @@ fun MainMenuScreen(
         modifier = Modifier
             .padding(16.dp)
             .align(Alignment.Center),
-        style = baseTextStyle.copy(
-            fontSize = 32.sp,
-        ),
+        style = h1TextStyle,
     )
     BaseTextButton(
         title = "Новая игра",

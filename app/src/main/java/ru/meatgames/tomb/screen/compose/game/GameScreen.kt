@@ -18,18 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.design.BaseTextButton
+import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.screen.compose.MainMenuButton
-import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 
 @Composable
@@ -58,12 +55,7 @@ private fun Loading() {
     ) {
         Text(
             text = "Loading...",
-            style = TextStyle(
-                fontFamily = fontFamily,
-                fontSize = 24.sp,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-            ),
+            style = h2TextStyle,
         )
     }
 }
@@ -144,7 +136,7 @@ private fun Map(
         )
     }
     
-    MainMenuButton(
+    BaseTextButton(
         title = "New map",
         modifier = Modifier.align(Alignment.BottomEnd),
         onClick = onMapGeneration,

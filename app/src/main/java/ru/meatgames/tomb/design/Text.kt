@@ -22,5 +22,13 @@ val baseTextStyle: TextStyle
     )
 
 val h1TextStyle = baseTextStyle.copy(
+    fontSize = 32.sp,
+)
+
+val h2TextStyle = baseTextStyle.copy(
+    fontSize = 24.sp,
+)
+
+val h3TextStyle = baseTextStyle.copy(
     fontSize = 16.sp,
 )
