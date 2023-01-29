@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.compose
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,16 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import ru.meatgames.tomb.NewAssets
-import ru.meatgames.tomb.domain.MapRenderProcessor
-import ru.meatgames.tomb.render.WallsDecorator
+import ru.meatgames.tomb.domain.RoomPreviewRenderProcessor
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.render.WallsDecorator
 import ru.meatgames.tomb.screen.compose.game.MapTile
 import kotlin.math.max
 
@@ -30,7 +32,7 @@ private fun RoomRenderer() {
     val context = LocalContext.current
 
     val roomsData = RoomsRepository(context).loadData()
-    val mapRenderProcessor = MapRenderProcessor(
+    val mapRenderProcessor = RoomPreviewRenderProcessor(
         themeAssets = ThemeAssets(context),
         mapDecorators = setOf(WallsDecorator()),
     )
@@ -49,7 +51,6 @@ private fun RoomRenderer() {
     val renderTiles = mapRenderProcessor.produceRenderTilesFrom(
         tiles = mapTiles,
         tilesLineWidth = room.width,
-        shouldRenderTile = { true },
     )
 
     val roomPreviewData = RoomPreviewData(
@@ -57,6 +58,7 @@ private fun RoomRenderer() {
         roomWidth = room.width,
         roomHeight = room.height,
         tiles = renderTiles,
+        outerWalls = room.outerWalls,
     )
 
     RoomRenderer(
@@ -74,7 +76,16 @@ private fun RoomRenderer(
         .fillMaxSize(),
 ) {
     val objectAlpha = if (renderType == RoomRenderType.TransparentObjects) .2f else 1f
-
+    
+    val bitmap = Bitmap.createBitmap(
+        NewAssets.tileSize.width,
+        NewAssets.tileSize.height,
+        Bitmap.Config.RGB_565,
+    ).run {
+        eraseColor(android.graphics.Color.MAGENTA)
+        asImageBitmap()
+    }
+    
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
@@ -111,6 +122,17 @@ private fun RoomRenderer(
                         alpha = objectAlpha,
                     )
                 }
+                
+                if (roomPreviewData.outerWalls.contains(column to row)) {
+                    drawImage(
+                        image = bitmap,
+                        srcSize = NewAssets.tileSize,
+                        dstOffset = dstOffset,
+                        dstSize = tileSize,
+                        filterQuality = FilterQuality.None,
+                        alpha = .4f,
+                    )
+                }
             }
         }
     }
@@ -121,6 +143,7 @@ data class RoomPreviewData(
     val roomWidth: Int,
     val roomHeight: Int,
     val tiles: List<MapRenderTile>,
+    val outerWalls: Set<Pair<Int, Int>>,
 )
 
 private enum class RoomRenderType {
