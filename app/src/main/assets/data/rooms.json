@@ -116,7 +116,7 @@
       ]
     },
     {
-      "name": "Corridor5",
+      "name": "Corridor3",
       "width": 3,
       "height": 5,
       "floor": [
@@ -135,7 +135,7 @@
       ]
     },
     {
-      "name": "Corridor6",
+      "name": "Corridor4",
       "width": 3,
       "height": 6,
       "floor": [
@@ -156,7 +156,7 @@
       ]
     },
     {
-      "name": "Corridor7",
+      "name": "Corridor5",
       "width": 3,
       "height": 7,
       "floor": [
