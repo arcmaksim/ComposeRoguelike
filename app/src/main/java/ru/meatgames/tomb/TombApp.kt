@@ -27,11 +27,9 @@ fun TombApp() {
         val gameScreenViewModel: GameScreenViewModel = hiltViewModel()
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
-                GameController.changeScreen2(GameState.MainMenu)
                 MainMenuScreen(navController = navController)
             }
             composable(GameState.MainGame.id) {
-                GameController.changeScreen2(GameState.MainGame)
                 GameScreen(
                     gameScreenViewModel = gameScreenViewModel,
                     navController = navController,
