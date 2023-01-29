@@ -94,14 +94,29 @@ private fun RoomRenderer(
     ) {
         val maxSize = max(roomPreviewData.roomWidth, roomPreviewData.roomHeight)
         val tileDimension = size.width.toInt() / maxSize
-        val offset = (size.width.toInt() - (tileDimension * maxSize)) / 2
+        val outlineOffset = (size.width.toInt() - (tileDimension * maxSize)) / 2
+        
+        val horizontalOffset = if (roomPreviewData.roomWidth < roomPreviewData.roomHeight) {
+            (roomPreviewData.roomHeight - roomPreviewData.roomWidth) / 2 * tileDimension
+        } else {
+            0
+        }
+        val verticalOffset = if (roomPreviewData.roomHeight < roomPreviewData.roomWidth) {
+            (roomPreviewData.roomWidth - roomPreviewData.roomHeight) / 2 * tileDimension
+        } else {
+            0
+        }
+        
         val tileSize = IntSize(tileDimension, tileDimension)
 
         roomPreviewData.tiles.mapIndexed { index, renderTile ->
             if (renderTile is MapRenderTile.Revealed) {
                 val column = index % roomPreviewData.roomWidth
                 val row = index / roomPreviewData.roomWidth
-                val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
+                val dstOffset = IntOffset(
+                    outlineOffset + horizontalOffset + column * tileDimension,
+                    verticalOffset + row * tileDimension,
+                )
 
                 drawImage(
                     image = renderTile.floorData.asset,
