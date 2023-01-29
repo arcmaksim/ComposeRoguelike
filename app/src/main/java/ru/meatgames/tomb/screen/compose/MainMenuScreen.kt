@@ -70,7 +70,7 @@ fun MainMenuScreen(
 }
 
 @Composable
-private fun MainMenuButton(
+fun MainMenuButton(
     title: String,
     modifier: Modifier,
     onClick: () -> Unit,

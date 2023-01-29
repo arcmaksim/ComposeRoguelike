@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.*
+import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
 import javax.inject.Inject
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class GameScreenViewModel @Inject constructor(
     controller: MapScreenController,
     private val mapInteractionController: PlayerMapInteractionController,
+    private val gameController: GameController,
 ) : ViewModel() {
 
     val mapState: StateFlow<MapScreenController.MapScreenState> = controller.state
@@ -30,6 +32,10 @@ class GameScreenViewModel @Inject constructor(
         mapInteractionController.makeMove(moveDirection)
 
         _isIdle.value = true
+    }
+    
+    fun newMap() {
+        gameController.generateNewMap()
     }
 
 }

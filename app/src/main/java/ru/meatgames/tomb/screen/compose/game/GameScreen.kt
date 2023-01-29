@@ -28,6 +28,7 @@ import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.screen.compose.MainMenuButton
 import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 
@@ -44,6 +45,7 @@ fun GameScreen(
             mapState = state,
             navController = navController,
             onCharacterMove = gameScreenViewModel::onMoveCharacter,
+            onMapGeneration = gameScreenViewModel::newMap,
         )
     }
 }
@@ -71,6 +73,7 @@ private fun Map(
     mapState: MapScreenController.MapScreenState.Ready,
     navController: NavController,
     onCharacterMove: (Direction) -> Unit,
+    onMapGeneration: () -> Unit,
 ) = BoxWithConstraints(
     modifier = Modifier
         .background(Color(0xFF212121))
@@ -140,4 +143,10 @@ private fun Map(
             filterQuality = FilterQuality.None,
         )
     }
+    
+    MainMenuButton(
+        title = "New map",
+        modifier = Modifier.align(Alignment.BottomEnd),
+        onClick = onMapGeneration,
+    )
 }
