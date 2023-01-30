@@ -46,7 +46,7 @@ class RoomPreviewRenderProcessor @Inject constructor(
 
     private fun List<RenderTiles?>.revealAllTiles(): List<MapRenderTile> = map { tile ->
         when (tile) {
-            null -> MapRenderTile.Hidden
+            null -> MapRenderTile.Hidden()
             else -> MapRenderTile.Revealed(
                 floorData = tile.first.toFloorRenderTileData(),
                 objectData = tile.second?.toObjectRenderTileData(),
@@ -68,12 +68,13 @@ class RoomPreviewRenderProcessor @Inject constructor(
         FloorEntityTile.Floor -> FloorRenderTile.Floor
     }
 
-    private fun ObjectEntityTile.toObjectRenderTile(): ObjectRenderTile = when (this) {
+    private fun ObjectEntityTile.toObjectRenderTile(): ObjectRenderTile? = when (this) {
         ObjectEntityTile.DoorClosed -> ObjectRenderTile.DoorClosed
         ObjectEntityTile.DoorOpened -> ObjectRenderTile.DoorOpened
         ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
         ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
+        ObjectEntityTile.Gismo -> null
     }
 
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =
