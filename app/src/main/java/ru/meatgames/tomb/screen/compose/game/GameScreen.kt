@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -100,29 +101,26 @@ private fun Map(
         }
 
         mapState.tiles.forEachIndexed { index, renderTile ->
-            if (renderTile is MapRenderTile.Revealed) {
-                val column = index % mapState.viewportWidth
-                val row = index / mapState.viewportWidth
-                val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
-
-                drawImage(
-                    image = renderTile.floorData.asset,
-                    srcOffset = renderTile.floorData.srcOffset,
-                    srcSize = NewAssets.tileSize,
-                    dstOffset = dstOffset,
-                    dstSize = tileSize,
-                    filterQuality = FilterQuality.None,
-                )
-                renderTile.objectData?.let { objectTile ->
-                    drawImage(
-                        image = objectTile.asset,
-                        srcOffset = objectTile.srcOffset,
-                        srcSize = NewAssets.tileSize,
+            val column = index % mapState.viewportWidth
+            val row = index / mapState.viewportWidth
+            val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
+            
+            when (renderTile) {
+                is MapRenderTile.Revealed -> {
+                    drawRevealedTile(
+                        renderTile = renderTile,
                         dstOffset = dstOffset,
-                        dstSize = tileSize,
-                        filterQuality = FilterQuality.None,
+                        tileSize = tileSize,
                     )
                 }
+                is MapRenderTile.Hidden -> {
+                    drawHiddenTile(
+                        renderTile = renderTile,
+                        dstOffset = dstOffset,
+                        tileSize = tileSize,
+                    )
+                }
+                else -> Unit
             }
         }
         drawImage(
@@ -141,4 +139,50 @@ private fun Map(
         modifier = Modifier.align(Alignment.BottomEnd),
         onClick = onMapGeneration,
     )
+}
+
+private fun DrawScope.drawRevealedTile(
+    renderTile: MapRenderTile.Revealed,
+    dstOffset: IntOffset,
+    tileSize: IntSize,
+) {
+    val filterQuality = FilterQuality.None
+    
+    drawImage(
+        image = renderTile.floorData.asset,
+        srcOffset = renderTile.floorData.srcOffset,
+        srcSize = NewAssets.tileSize,
+        dstOffset = dstOffset,
+        dstSize = tileSize,
+        filterQuality = filterQuality,
+    )
+    renderTile.objectData?.let { objectTile ->
+        drawImage(
+            image = objectTile.asset,
+            srcOffset = objectTile.srcOffset,
+            srcSize = NewAssets.tileSize,
+            dstOffset = dstOffset,
+            dstSize = tileSize,
+            filterQuality = filterQuality,
+        )
+    }
+}
+
+private fun DrawScope.drawHiddenTile(
+    renderTile: MapRenderTile.Hidden,
+    dstOffset: IntOffset,
+    tileSize: IntSize,
+) {
+    val filterQuality = FilterQuality.None
+    
+    renderTile.effectData?.let { effectData ->
+        drawImage(
+            image = effectData.asset,
+            srcOffset = effectData.srcOffset,
+            srcSize = NewAssets.tileSize,
+            dstOffset = dstOffset,
+            dstSize = tileSize,
+            filterQuality = filterQuality,
+        )
+    }
 }
