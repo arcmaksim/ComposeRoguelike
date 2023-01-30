@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.MainMenuScreen
+import ru.meatgames.tomb.screen.compose.StubScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreenViewModel
 
@@ -34,6 +35,9 @@ fun TombApp() {
                     gameScreenViewModel = gameScreenViewModel,
                     navController = navController,
                 )
+            }
+            composable(GameState.Stub.id) {
+                StubScreen()
             }
         }
     }
