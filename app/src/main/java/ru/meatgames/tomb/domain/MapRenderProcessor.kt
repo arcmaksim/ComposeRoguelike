@@ -53,7 +53,7 @@ class MapRenderProcessor @Inject constructor(
         if (x == 0 || x == tilesLineWidth - 1) return@filterIndexed false
 
         val y = index / tilesLineWidth
-        if (y == 0 || y == tilesLineWidth - 1) return@filterIndexed false
+        if (y == 0 || y == (size / tilesLineWidth) - 1) return@filterIndexed false
 
         true
     }
