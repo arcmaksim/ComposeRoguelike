@@ -86,6 +86,7 @@ private fun Map(
             .fillMaxWidth()
             .aspectRatio(1F)
             .align(Alignment.Center)
+            .background(Color(0x1F000000))
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
