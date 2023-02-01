@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
@@ -72,6 +74,13 @@ private fun Map(
         .background(Color(0xFF212121))
         .fillMaxSize(),
 ) {
+    Text(
+        modifier = Modifier.align(Alignment.TopEnd)
+            .padding(top = 16.dp, end = 16.dp),
+        text = "${mapState.points}",
+        style = h2TextStyle,
+    )
+    
     Canvas(
         modifier = Modifier
             .fillMaxWidth()

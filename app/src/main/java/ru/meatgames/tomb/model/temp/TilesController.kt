@@ -18,7 +18,7 @@ class TilesController @Inject constructor() {
         ObjectEntityTile.DoorOpened to TileEntityInteractionProperty(TileEntityInteraction.None, true),
         ObjectEntityTile.StairsUp to TileEntityInteractionProperty(TileEntityInteraction.Interaction, false),
         ObjectEntityTile.StairsDown to TileEntityInteractionProperty(TileEntityInteraction.None, true),
-        ObjectEntityTile.Gismo to TileEntityInteractionProperty(TileEntityInteraction.Block, true),
+        ObjectEntityTile.Gismo to TileEntityInteractionProperty(TileEntityInteraction.Interaction, true),
     )
 
     fun getFloorEntityProperty(
