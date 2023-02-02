@@ -10,14 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import ru.meatgames.tomb.GameState
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h1TextStyle
 
 @Composable
 fun MainMenuScreen(
-    navController: NavController,
+    onNewGame: () -> Unit,
     onCloseApp: () -> Unit,
 ) = Box(
     modifier = Modifier
@@ -34,9 +32,8 @@ fun MainMenuScreen(
     BaseTextButton(
         title = "Новая игра",
         modifier = Modifier.align(Alignment.BottomStart),
-    ) {
-        navController.navigate(GameState.MainGame.id)
-    }
+        onClick = onNewGame,
+    )
     BaseTextButton(
         title = "Выход",
         modifier = Modifier.align(Alignment.BottomEnd),

@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
-import ru.meatgames.tomb.screen.compose.game.GameScreenViewModel
 
 @ExperimentalMaterialApi
 @Composable
@@ -27,17 +26,18 @@ fun TombApp(
             .fillMaxSize(),
     ) {
         val navController = rememberNavController()
-        val gameScreenViewModel: GameScreenViewModel = hiltViewModel()
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
                 MainMenuScreen(
-                    navController = navController,
+                    onNewGame = {
+                        navController.navigate(GameState.MainGame.id)
+                    },
                     onCloseApp = onCloseApp,
                 )
             }
             composable(GameState.MainGame.id) {
                 GameScreen(
-                    gameScreenViewModel = gameScreenViewModel,
+                    gameScreenViewModel = hiltViewModel(),
                 ) {
                     navController.navigate(GameState.WinScreen.id)
                 }
