@@ -14,4 +14,5 @@ enum class ObjectEntityTile {
     DoorOpened,
     StairsUp,
     StairsDown,
+    Gismo,
 }

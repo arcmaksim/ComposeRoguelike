@@ -62,7 +62,7 @@ class PlayerMapInteractionController @Inject constructor(
         mapY: Int,
         objectEntityTile: ObjectEntityTile,
     ) {
-        val resolvedTileReplacementOnUse = objectEntityTile.resolveTileReplacementOnUse() ?: return
+        val resolvedTileReplacementOnUse = objectEntityTile.resolveTileReplacementOnUse()
 
         mapTerraformer.changeObject(
             x = mapX,
@@ -73,6 +73,10 @@ class PlayerMapInteractionController @Inject constructor(
 
     private fun ObjectEntityTile.resolveTileReplacementOnUse(): ObjectEntityTile? = when (this) {
         ObjectEntityTile.DoorClosed -> ObjectEntityTile.DoorOpened
+        ObjectEntityTile.Gismo -> {
+            characterController.increasePoint()
+            null
+        }
         else -> null
     }
 
