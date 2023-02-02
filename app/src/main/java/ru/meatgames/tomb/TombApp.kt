@@ -12,13 +12,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.MainMenuScreen
-import ru.meatgames.tomb.screen.compose.StubScreen
+import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreenViewModel
 
 @ExperimentalMaterialApi
 @Composable
-fun TombApp() {
+fun TombApp(
+    onCloseApp: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .background(Color(0xFF212121))
@@ -28,16 +30,22 @@ fun TombApp() {
         val gameScreenViewModel: GameScreenViewModel = hiltViewModel()
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
-                MainMenuScreen(navController = navController)
+                MainMenuScreen(
+                    navController = navController,
+                    onCloseApp = onCloseApp,
+                )
             }
             composable(GameState.MainGame.id) {
                 GameScreen(
                     gameScreenViewModel = gameScreenViewModel,
-                    navController = navController,
-                )
+                ) {
+                    navController.navigate(GameState.WinScreen.id)
+                }
             }
-            composable(GameState.Stub.id) {
-                StubScreen()
+            composable(GameState.WinScreen.id) {
+                WinScreen {
+                    navController.navigate(GameState.MainMenu.id)
+                }
             }
         }
     }

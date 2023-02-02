@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -23,7 +24,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.design.BaseTextButton
@@ -35,15 +35,20 @@ import kotlin.math.abs
 @Composable
 fun GameScreen(
     gameScreenViewModel: GameScreenViewModel,
-    navController: NavController,
+    onWin: () -> Unit,
 ) {
     val mapState by gameScreenViewModel.mapState.collectAsState()
+    
+    LaunchedEffect(Unit) {
+        gameScreenViewModel.events.collect { event ->
+            event?.let { onWin() }
+        }
+    }
 
     when (val state = mapState) {
         is MapScreenController.MapScreenState.Loading -> Loading()
         is MapScreenController.MapScreenState.Ready -> Map(
             mapState = state,
-            navController = navController,
             onCharacterMove = gameScreenViewModel::onMoveCharacter,
             onMapGeneration = gameScreenViewModel::newMap,
         )
@@ -66,7 +71,6 @@ private fun Loading() {
 @Composable
 private fun Map(
     mapState: MapScreenController.MapScreenState.Ready,
-    navController: NavController,
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
 ) = BoxWithConstraints(
@@ -75,7 +79,8 @@ private fun Map(
         .fillMaxSize(),
 ) {
     Text(
-        modifier = Modifier.align(Alignment.TopEnd)
+        modifier = Modifier
+            .align(Alignment.TopEnd)
             .padding(top = 16.dp, end = 16.dp),
         text = "${mapState.points}",
         style = h2TextStyle,

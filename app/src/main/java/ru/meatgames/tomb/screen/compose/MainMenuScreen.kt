@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +18,7 @@ import ru.meatgames.tomb.design.h1TextStyle
 @Composable
 fun MainMenuScreen(
     navController: NavController,
+    onCloseApp: () -> Unit,
 ) = Box(
     modifier = Modifier
         .background(Color(0xFF212121))
@@ -39,7 +40,6 @@ fun MainMenuScreen(
     BaseTextButton(
         title = "Выход",
         modifier = Modifier.align(Alignment.BottomEnd),
-    ) {
-        navController.navigate(GameState.Stub.id)
-    }
+        onClick = onCloseApp,
+    )
 }
