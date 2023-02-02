@@ -11,7 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ru.meatgames.tomb.screen.compose.MainMenuScreen
+import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
 
@@ -29,6 +29,7 @@ fun TombApp(
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
                 MainMenuScreen(
+                    viewModel = hiltViewModel(),
                     onNewGame = {
                         navController.navigate(GameState.MainGame.id)
                     },
