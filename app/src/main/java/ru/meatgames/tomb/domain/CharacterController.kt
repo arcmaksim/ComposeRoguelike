@@ -11,19 +11,9 @@ import javax.inject.Singleton
 @Singleton
 class CharacterController @Inject constructor() {
 
-    private val _characterStateFlow = MutableStateFlow(CharacterState(-1, -1, 0))
+    private val _characterStateFlow = MutableStateFlow(CharacterState(-1, -1))
     val characterStateFlow: StateFlow<CharacterState> = _characterStateFlow
 
-    fun setInitialState(
-        mapX: Int,
-        mapY: Int,
-    ) {
-        _characterStateFlow.value = CharacterState(
-            mapX = mapX,
-            mapY = mapY,
-        )
-    }
-    
     fun setPosition(
         mapX: Int,
         mapY: Int,
@@ -47,19 +37,10 @@ class CharacterController @Inject constructor() {
             )
         }
     }
-    
-    fun increasePoint() {
-        _characterStateFlow.update {
-            it.copy(
-                points = it.points + 1,
-            )
-        }
-    }
 
 }
 
 data class CharacterState(
     val mapX: Int,
     val mapY: Int,
-    val points: Int = 0,
 )

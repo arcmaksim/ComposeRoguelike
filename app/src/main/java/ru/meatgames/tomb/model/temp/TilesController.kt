@@ -18,7 +18,6 @@ class TilesController @Inject constructor() {
         ObjectEntityTile.DoorOpened to TileEntityInteractionProperty(TileEntityInteraction.None, true),
         ObjectEntityTile.StairsUp to TileEntityInteractionProperty(TileEntityInteraction.Interaction, false),
         ObjectEntityTile.StairsDown to TileEntityInteractionProperty(TileEntityInteraction.None, true),
-        ObjectEntityTile.Gismo to TileEntityInteractionProperty(TileEntityInteraction.Interaction, true),
     )
 
     fun getFloorEntityProperty(
@@ -41,7 +40,6 @@ class TilesController @Inject constructor() {
         objectEntity: ObjectEntityTile,
     ): Boolean = objectEntityTileProperties[objectEntity]!!.interaction == TileEntityInteraction.Interaction
 
-    // TODO: add tests to check mapping
     fun isObjectEntityVisibleThrough(
         objectEntity: ObjectEntityTile,
     ): Boolean = objectEntityTileProperties[objectEntity]!!.isVisibleThrough

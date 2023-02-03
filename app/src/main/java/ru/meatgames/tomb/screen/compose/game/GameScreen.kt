@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -19,38 +17,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.design.BaseTextButton
-import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.screen.compose.fontFamily
 import kotlin.math.abs
 
 @Composable
 fun GameScreen(
     gameScreenViewModel: GameScreenViewModel,
-    onWin: () -> Unit,
+    navController: NavController,
 ) {
     val mapState by gameScreenViewModel.mapState.collectAsState()
-    
-    LaunchedEffect(Unit) {
-        gameScreenViewModel.events.collect { event ->
-            event?.let { onWin() }
-        }
-    }
 
     when (val state = mapState) {
         is MapScreenController.MapScreenState.Loading -> Loading()
         is MapScreenController.MapScreenState.Ready -> Map(
             mapState = state,
+            navController = navController,
             onCharacterMove = gameScreenViewModel::onMoveCharacter,
-            onMapGeneration = gameScreenViewModel::newMap,
         )
     }
 }
@@ -63,7 +56,12 @@ private fun Loading() {
     ) {
         Text(
             text = "Loading...",
-            style = h2TextStyle,
+            style = TextStyle(
+                fontFamily = fontFamily,
+                fontSize = 24.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+            ),
         )
     }
 }
@@ -71,27 +69,18 @@ private fun Loading() {
 @Composable
 private fun Map(
     mapState: MapScreenController.MapScreenState.Ready,
+    navController: NavController,
     onCharacterMove: (Direction) -> Unit,
-    onMapGeneration: () -> Unit,
 ) = BoxWithConstraints(
     modifier = Modifier
         .background(Color(0xFF212121))
         .fillMaxSize(),
 ) {
-    Text(
-        modifier = Modifier
-            .align(Alignment.TopEnd)
-            .padding(top = 16.dp, end = 16.dp),
-        text = "${mapState.points}",
-        style = h2TextStyle,
-    )
-    
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1F)
             .align(Alignment.Center)
-            .background(Color(0x1F000000))
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
@@ -116,26 +105,29 @@ private fun Map(
         }
 
         mapState.tiles.forEachIndexed { index, renderTile ->
-            val column = index % mapState.viewportWidth
-            val row = index / mapState.viewportWidth
-            val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
-            
-            when (renderTile) {
-                is MapRenderTile.Revealed -> {
-                    drawRevealedTile(
-                        renderTile = renderTile,
+            if (renderTile is MapRenderTile.Revealed) {
+                val column = index % mapState.viewportWidth
+                val row = index / mapState.viewportWidth
+                val dstOffset = IntOffset(offset + column * tileDimension, row * tileDimension)
+
+                drawImage(
+                    image = renderTile.floorData.asset,
+                    srcOffset = renderTile.floorData.srcOffset,
+                    srcSize = NewAssets.tileSize,
+                    dstOffset = dstOffset,
+                    dstSize = tileSize,
+                    filterQuality = FilterQuality.None,
+                )
+                renderTile.objectData?.let { objectTile ->
+                    drawImage(
+                        image = objectTile.asset,
+                        srcOffset = objectTile.srcOffset,
+                        srcSize = NewAssets.tileSize,
                         dstOffset = dstOffset,
-                        tileSize = tileSize,
+                        dstSize = tileSize,
+                        filterQuality = FilterQuality.None,
                     )
                 }
-                is MapRenderTile.Hidden -> {
-                    drawHiddenTile(
-                        renderTile = renderTile,
-                        dstOffset = dstOffset,
-                        tileSize = tileSize,
-                    )
-                }
-                else -> Unit
             }
         }
         drawImage(
@@ -146,58 +138,6 @@ private fun Map(
             ),
             dstSize = tileSize,
             filterQuality = FilterQuality.None,
-        )
-    }
-    
-    BaseTextButton(
-        title = "New map",
-        modifier = Modifier.align(Alignment.BottomEnd),
-        onClick = onMapGeneration,
-    )
-}
-
-private fun DrawScope.drawRevealedTile(
-    renderTile: MapRenderTile.Revealed,
-    dstOffset: IntOffset,
-    tileSize: IntSize,
-) {
-    val filterQuality = FilterQuality.None
-    
-    drawImage(
-        image = renderTile.floorData.asset,
-        srcOffset = renderTile.floorData.srcOffset,
-        srcSize = NewAssets.tileSize,
-        dstOffset = dstOffset,
-        dstSize = tileSize,
-        filterQuality = filterQuality,
-    )
-    renderTile.objectData?.let { objectTile ->
-        drawImage(
-            image = objectTile.asset,
-            srcOffset = objectTile.srcOffset,
-            srcSize = NewAssets.tileSize,
-            dstOffset = dstOffset,
-            dstSize = tileSize,
-            filterQuality = filterQuality,
-        )
-    }
-}
-
-private fun DrawScope.drawHiddenTile(
-    renderTile: MapRenderTile.Hidden,
-    dstOffset: IntOffset,
-    tileSize: IntSize,
-) {
-    val filterQuality = FilterQuality.None
-    
-    renderTile.effectData?.let { effectData ->
-        drawImage(
-            image = effectData.asset,
-            srcOffset = effectData.srcOffset,
-            srcSize = NewAssets.tileSize,
-            dstOffset = dstOffset,
-            dstSize = tileSize,
-            filterQuality = filterQuality,
         )
     }
 }

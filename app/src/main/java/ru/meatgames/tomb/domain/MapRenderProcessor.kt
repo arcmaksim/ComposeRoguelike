@@ -53,7 +53,7 @@ class MapRenderProcessor @Inject constructor(
         if (x == 0 || x == tilesLineWidth - 1) return@filterIndexed false
 
         val y = index / tilesLineWidth
-        if (y == 0 || y == (size / tilesLineWidth) - 1) return@filterIndexed false
+        if (y == 0 || y == tilesLineWidth - 1) return@filterIndexed false
 
         true
     }
@@ -62,18 +62,14 @@ class MapRenderProcessor @Inject constructor(
         shouldRenderTile: (Int) -> Boolean,
     ): List<MapRenderTile> = mapIndexed { index, tile ->
         when {
-            tile == null -> MapRenderTile.Hidden()
+            tile == null -> MapRenderTile.Hidden
 
             shouldRenderTile(index) -> MapRenderTile.Revealed(
                 floorData = tile.first.toFloorRenderTileData(),
                 objectData = tile.second?.toObjectRenderTileData(),
             )
 
-            else -> MapRenderTile.Hidden(
-                effectData = tile.second
-                    ?.takeIf { it == ObjectRenderTile.Gismo }
-                    ?.toObjectRenderTileData(),
-            )
+            else -> MapRenderTile.Hidden
         }
     }
 
@@ -96,7 +92,6 @@ class MapRenderProcessor @Inject constructor(
         ObjectEntityTile.DoorOpened -> ObjectRenderTile.DoorOpened
         ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
         ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
-        ObjectEntityTile.Gismo -> ObjectRenderTile.Gismo
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
     }
 
