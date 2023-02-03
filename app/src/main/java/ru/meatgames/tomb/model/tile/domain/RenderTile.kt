@@ -10,6 +10,7 @@ enum class ObjectRenderTile {
     StairsDown,
     DoorOpened,
     DoorClosed,
+    Gismo,
     Wall0,
     Wall1,
     Wall2,

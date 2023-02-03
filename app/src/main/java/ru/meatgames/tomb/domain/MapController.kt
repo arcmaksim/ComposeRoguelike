@@ -47,7 +47,7 @@ class MapControllerImpl @Inject constructor(
     override fun changeObject(
         x: Int,
         y: Int,
-        objectEntityTile: ObjectEntityTile,
+        objectEntityTile: ObjectEntityTile?,
     ) {
         levelMap.updateSingleTile(
             x = x,
@@ -68,7 +68,7 @@ interface MapTerraformer {
     fun changeObject(
         x: Int,
         y: Int,
-        objectEntityTile: ObjectEntityTile,
+        objectEntityTile: ObjectEntityTile?,
     )
 }
 

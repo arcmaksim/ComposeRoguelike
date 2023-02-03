@@ -13,9 +13,7 @@ import ru.meatgames.tomb.render.RenderData
 import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 
-typealias RenderTiles = Pair<FloorRenderTile, ObjectRenderTile?>
-
-class MapRenderProcessor @Inject constructor(
+class RoomPreviewRenderProcessor @Inject constructor(
     private val themeAssets: ThemeAssets,
     private val mapDecorators: Set<@JvmSuppressWildcards MapRenderTilesDecorator>,
 ) {
@@ -24,11 +22,11 @@ class MapRenderProcessor @Inject constructor(
     fun produceRenderTilesFrom(
         tiles: List<MapTile?>,
         tilesLineWidth: Int,
-        shouldRenderTile: (Int) -> Boolean,
-    ): List<MapRenderTile> = tiles.mapToRenderTiles()
-        .applyDecorators(tilesLineWidth)
-        .filterExtendedTiles(tilesLineWidth)
-        .applyFOV(shouldRenderTile)
+    ): List<MapRenderTile> {
+        return tiles.mapToRenderTiles()
+            .applyDecorators(tilesLineWidth)
+            .revealAllTiles()
+    }
 
     private fun List<MapTile?>.mapToRenderTiles(): List<RenderTiles?> = map {
         it ?: return@map null
@@ -46,33 +44,12 @@ class MapRenderProcessor @Inject constructor(
         }
     }
 
-    private fun List<RenderTiles?>.filterExtendedTiles(
-        tilesLineWidth: Int,
-    ): List<RenderTiles?> = filterIndexed { index, _ ->
-        val x = index % tilesLineWidth
-        if (x == 0 || x == tilesLineWidth - 1) return@filterIndexed false
-
-        val y = index / tilesLineWidth
-        if (y == 0 || y == (size / tilesLineWidth) - 1) return@filterIndexed false
-
-        true
-    }
-
-    private fun List<RenderTiles?>.applyFOV(
-        shouldRenderTile: (Int) -> Boolean,
-    ): List<MapRenderTile> = mapIndexed { index, tile ->
-        when {
-            tile == null -> MapRenderTile.Hidden()
-
-            shouldRenderTile(index) -> MapRenderTile.Revealed(
+    private fun List<RenderTiles?>.revealAllTiles(): List<MapRenderTile> = map { tile ->
+        when (tile) {
+            null -> MapRenderTile.Hidden()
+            else -> MapRenderTile.Revealed(
                 floorData = tile.first.toFloorRenderTileData(),
                 objectData = tile.second?.toObjectRenderTileData(),
-            )
-
-            else -> MapRenderTile.Hidden(
-                effectData = tile.second
-                    ?.takeIf { it == ObjectRenderTile.Gismo }
-                    ?.toObjectRenderTileData(),
             )
         }
     }
@@ -91,13 +68,13 @@ class MapRenderProcessor @Inject constructor(
         FloorEntityTile.Floor -> FloorRenderTile.Floor
     }
 
-    private fun ObjectEntityTile.toObjectRenderTile(): ObjectRenderTile = when (this) {
+    private fun ObjectEntityTile.toObjectRenderTile(): ObjectRenderTile? = when (this) {
         ObjectEntityTile.DoorClosed -> ObjectRenderTile.DoorClosed
         ObjectEntityTile.DoorOpened -> ObjectRenderTile.DoorOpened
         ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
         ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
-        ObjectEntityTile.Gismo -> ObjectRenderTile.Gismo
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
+        ObjectEntityTile.Gismo -> null
     }
 
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =

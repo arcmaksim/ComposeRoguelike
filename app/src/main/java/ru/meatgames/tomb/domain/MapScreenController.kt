@@ -55,6 +55,7 @@ class MapScreenController @Inject constructor(
                         mapWidth = map.mapWrapper.width,
                         mapHeight = map.mapWrapper.height,
                         tiles = tiles,
+                        points = character.points,
                     )
                 }
             }.collect(_state::emit)
@@ -67,6 +68,7 @@ class MapScreenController @Inject constructor(
         characterY: Int,
         mapWidth: Int,
         mapHeight: Int,
+        points: Int,
     ): MapScreenState.Ready {
         cachedVisibilityMask.updateVisibilityMask()
 
@@ -104,6 +106,7 @@ class MapScreenController @Inject constructor(
                     cachedVisibilityMask[index]
                 },
             ),
+            points = points,
         )
     }
 
@@ -152,6 +155,7 @@ class MapScreenController @Inject constructor(
             val viewportWidth: Int,
             val viewportHeight: Int,
             val tiles: List<MapRenderTile?>,
+            val points: Int,
         ) : MapScreenState()
 
         object Loading : MapScreenState()
