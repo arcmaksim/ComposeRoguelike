@@ -32,16 +32,12 @@ class ThemeAssets @Inject constructor(
     private val floorThemes: FloorThemes
     private val doorsThemes: DoorsThemes
     private val stairsThemes: StairsThemes
-    
-    private val gismo: ImageBitmap
 
     init {
         wallsThemes = context.loadWalls()
         floorThemes = context.loadFloor()
         doorsThemes = context.loadDoors()
         stairsThemes = context.loadStairs()
-        
-        gismo = context.getBitmapFromAsset("bag").asImageBitmap()
 
         val theme = wallsThemes.themes.random(Random(System.currentTimeMillis())).title
 
@@ -165,8 +161,6 @@ class ThemeAssets @Inject constructor(
         ObjectRenderTile.StairsUp -> {
             stairsThemes.atlas to currentTheme.stairsTheme.map.getValue(objectRenderTile)
         }
-        
-        ObjectRenderTile.Gismo -> gismo to IntOffset(0, 0)
 
         ObjectRenderTile.Wall0,
         ObjectRenderTile.Wall1,

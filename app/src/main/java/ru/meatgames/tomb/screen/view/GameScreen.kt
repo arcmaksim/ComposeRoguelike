@@ -279,6 +279,18 @@ class GameScreen(
                 val currentMapBufferTile = mMapBuffer2[x + 1 + (y + 1) * mMapBufferWidth]
 
                 if (currentMapBufferTile.mIsVisible) {
+                    /*currentMapBufferTile.floorTile?.let { floorTile ->
+                        canvas.drawBitmap(Assets.tileset,
+                                floorTile.imageRect,
+                                mTileBuffer2[index],
+                                bitmapPaint)
+                    }
+                    currentMapBufferTile.objectTile?.let { objectTile ->
+                        canvas.drawBitmap(Assets.tileset,
+                                objectTile.imageRect,
+                                mTileBuffer2[index],
+                                bitmapPaint)
+                    }*/
                     currentMapBufferTile.mShadowPaint?.let {
                         canvas.drawRect(
                                 mTileBuffer2[index].left.toFloat(),
