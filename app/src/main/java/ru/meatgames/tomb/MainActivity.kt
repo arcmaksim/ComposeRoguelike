@@ -2,12 +2,12 @@ package ru.meatgames.tomb
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import dagger.hilt.android.AndroidEntryPoint
 import ru.meatgames.tomb.GameController.getMap2
 import ru.meatgames.tomb.GameController.showExitDialog
-import ru.meatgames.tomb.GameController.start
 import ru.meatgames.tomb.model.provider.GameDataProvider
 import javax.inject.Inject
 
@@ -26,8 +26,10 @@ class MainActivity : AppCompatActivity() {
         setupFullScreenMode()
         NewAssets.loadAssets(this)
         GameDataProvider.init(this)
-        GameController.init(this)
-        start()
+    
+        setContent {
+            TombApp(::finish)
+        }
     }
 
     private fun setupFullScreenMode() {

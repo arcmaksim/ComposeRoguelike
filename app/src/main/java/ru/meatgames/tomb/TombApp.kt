@@ -11,31 +11,42 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import ru.meatgames.tomb.screen.compose.MainMenuScreen
+import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
+import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
-import ru.meatgames.tomb.screen.compose.game.GameScreenViewModel
 
 @ExperimentalMaterialApi
 @Composable
-fun TombApp() {
+fun TombApp(
+    onCloseApp: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .background(Color(0xFF212121))
             .fillMaxSize(),
     ) {
         val navController = rememberNavController()
-        val gameScreenViewModel: GameScreenViewModel = hiltViewModel()
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
-                GameController.changeScreen2(GameState.MainMenu)
-                MainMenuScreen(navController = navController)
+                MainMenuScreen(
+                    viewModel = hiltViewModel(),
+                    onNewGame = {
+                        navController.navigate(GameState.MainGame.id)
+                    },
+                    onCloseApp = onCloseApp,
+                )
             }
             composable(GameState.MainGame.id) {
-                GameController.changeScreen2(GameState.MainGame)
                 GameScreen(
-                    gameScreenViewModel = gameScreenViewModel,
-                    navController = navController,
-                )
+                    gameScreenViewModel = hiltViewModel(),
+                ) {
+                    navController.navigate(GameState.WinScreen.id)
+                }
+            }
+            composable(GameState.WinScreen.id) {
+                WinScreen {
+                    navController.navigate(GameState.MainMenu.id)
+                }
             }
         }
     }

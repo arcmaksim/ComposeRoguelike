@@ -9,25 +9,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h1TextStyle
 
 @Preview(widthDp = 360, heightDp = 640,)
 @Composable
-fun StubScreenPreview() {
-    StubScreen()
+fun WinScreenPreview() {
+    WinScreen { Unit }
 }
 
 @Composable
-fun StubScreen() {
+fun WinScreen(
+    onNavigateToMainMenu: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF212121)),
     ) {
         Text(
-            text = "Stub",
+            text = "You win!",
             modifier = Modifier.align(Alignment.Center),
             style = h1TextStyle,
+        )
+    
+        BaseTextButton(
+            title = "To main menu",
+            modifier = Modifier.align(Alignment.BottomEnd),
+            onClick = onNavigateToMainMenu,
         )
     }
 }

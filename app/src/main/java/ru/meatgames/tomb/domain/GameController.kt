@@ -9,14 +9,9 @@ class GameController @Inject constructor(
     private val characterController: CharacterController,
 ) {
 
-    init {
-        generateNewMap()
-    }
-
     fun generateNewMap() {
-        characterController.setPosition(-1 , -1)
         val configuration = mapGenerator.generateNewMap()
-        characterController.setPosition(
+        characterController.setInitialState(
             mapX = configuration.startingPositionX,
             mapY = configuration.startingPositionY,
         )

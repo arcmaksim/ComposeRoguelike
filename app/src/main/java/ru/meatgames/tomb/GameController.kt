@@ -1,10 +1,7 @@
 package ru.meatgames.tomb
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.os.Vibrator
-import androidx.activity.compose.setContent
-import androidx.compose.material.ExperimentalMaterialApi
 import ru.meatgames.tomb.old_model.HeroClass
 import ru.meatgames.tomb.old_model.Item
 import ru.meatgames.tomb.old_model.MapClass
@@ -13,8 +10,6 @@ import ru.meatgames.tomb.model.provider.GameDataProvider
 import ru.meatgames.tomb.screen.view.ScreenController
 import ru.meatgames.tomb.screen.Screens
 import ru.meatgames.tomb.util.MapHelper
-import ru.meatgames.tomb.util.ObjectHelper
-import ru.meatgames.tomb.util.array2d
 import java.util.*
 
 @Deprecated("Old implementation")
@@ -48,30 +43,6 @@ object GameController {
     val maxLvl = 3
     val maxMobs = 6
 
-
-    @JvmStatic
-    fun init(
-        mainActivity: MainActivity
-    ) {
-        mMainActivity = mainActivity
-        mVibrator = mMainActivity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        init()
-    }
-
-    private fun init() {
-        mScreenController = ScreenController(mMainActivity)
-        zone = array2d(11, 11) { 0 }
-    }
-
-    @ExperimentalMaterialApi
-    @JvmStatic
-    fun start() {
-        mMainActivity.setContent { TombApp() }
-        changeScreen2(GameState.MainGame)
-        curLvls = 0
-        newGameLoop()
-    }
-
     @JvmStatic
     fun setState(state: GameState) {
         mState = state
@@ -79,8 +50,6 @@ object GameController {
 
     @JvmStatic
     fun vibrate(vibratePeriod: Long = 30L) = mVibrator.vibrate(vibratePeriod)
-
-    fun updateLOS(x: Int = mHero.mx, y: Int = mHero.my) = mScreenController.mGameScreen.calculateLineOfSight(x, y)
 
     fun updateLOS2(x: Int = 5, y: Int = 5) = mScreenController.mGameScreen.calculateLineOfSight(x, y)
 
@@ -101,13 +70,6 @@ object GameController {
         mMainGameThread!!.start()
     }
 
-    @JvmStatic
-    fun initNewGame(mapX: Int, mapY: Int) {
-        mScreenController.initGameScreen(mapX - 2, mapY - 2)
-        mHero.mx = mapX + 2
-        mHero.my = mapY + 2
-    }
-
     // TODO: Temp solution
     @JvmStatic
     fun getMap2(): Array<Array<MapClass>> = emptyArray() // MapController().getMap()
@@ -118,8 +80,6 @@ object GameController {
     fun generateNewMap() = Unit // mMapController.generateNewMap(mMainActivity)
 
     fun changeScreen(screen: Screens) = mScreenController.changeScreen(screen)
-
-    fun changeScreen2(gameState: GameState) = mScreenController.changeScreen2(gameState)
 
     fun changeToLastScreen() = mScreenController.changeToLastScreen()
 
@@ -192,55 +152,6 @@ object GameController {
                 for (j in yl until yr) {
                     if (zone[i - xl][j - yl] == c) spread(i - xl, j - yl, c + 1)
                 }
-            }
-        }
-    }
-
-    fun isCollision(mx: Int, my: Int) {
-        val mapCell = MapHelper.getMapTile(mx, my)
-        if (mapCell != null) {
-            if (mapCell.mIsUsable) {
-                when (MapHelper.getObjectId(mx, my)) {
-                    ObjectHelper.DOOR_CLOSED -> {
-                        MapHelper.changeObject(mx, my, ObjectHelper.DOOR_OPENED)
-                        mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.door_opened_message))
-                        mIsPlayerMoved = false
-                    }
-                    ObjectHelper.CHEST_CLOSED -> {
-                        MapHelper.changeObject(mx, my, ObjectHelper.CHEST_OPENED)
-                        mScreenController.mGameScreen.mDrawLog = false
-                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.CHEST_OPENED, 1590)
-                        mIsPlayerMoved = false
-                    }
-                    ObjectHelper.BOOKSHELF_FULL -> {
-                        mScreenController.mGameScreen.mDrawLog = false
-                        mScreenController.mGameScreen.initProgressBar(ObjectHelper.BOOKSHELF_FULL, 2590)
-                        mIsPlayerMoved = false
-                    }
-                }
-                mIsPlayerTurn = false
-                return
-            }
-            if (mIsPlayerTurn && mapCell.hasMob()) {
-                attack(mapCell)
-                return
-            }
-            if (mapCell.mIsPassable) {
-                mIsPlayerTurn = false
-                mIsPlayerMoved = true // ?
-                if (mapCell.mObjectID == 15) {
-                    mHero.modifyStat(5, Random().nextInt(3) + 1, -1)
-                    mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.trap_message))
-                    if (mHero.getStat(5) < 1) {
-                        // TODO: refactor
-                        //lastAttack = Bitmap.createScaledBitmap(Assets.objects[15].img, 72, 72, false)
-                        changeScreen(Screens.DEATH_SCREEN)
-                    }
-                }
-            } else {
-                mScreenController.mGameScreen.addLine(mMainActivity.getString(R.string.path_is_blocked_message))
-                vibrate()
-                mIsPlayerMoved = false
             }
         }
     }
@@ -369,14 +280,6 @@ object GameController {
         }
         mMainGameThread = null
         changeScreen(Screens.MAIN_MENU)
-    }
-
-    fun newGameLoop() {
-        if (mainGameLoop == null) {
-            mainGameLoop = MainGameLoop()
-            mMainGameThread = Thread(mainGameLoop)
-        }
-        //(mMainGameThread as Thread).start()
     }
 
 }
