@@ -100,12 +100,15 @@ private fun Map(
         .fillMaxSize()
 ) {
     val width = LocalDensity.current.run { maxWidth.toPx() }.toInt()
-    val tileDimension = width / viewportWidth
+    val tileDimension = width / mapState.viewportWidth
     val tileSize = IntSize(tileDimension, tileDimension)
 
     val view = LocalView.current
     val shakeHorizontalOffset = remember { Animatable(0f) }
-    val horizontalOffset = IntOffset((width - (tileDimension * viewportWidth)) / 2 + shakeHorizontalOffset.value.toInt(), 0)
+    val horizontalOffset = IntOffset(
+        x = (width - (tileDimension * mapState.viewportWidth)) / 2 + shakeHorizontalOffset.value.toInt(),
+        y = 0,
+    )
 
     LaunchedEffect(animation) {
         when (animation) {
