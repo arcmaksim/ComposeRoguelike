@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -28,12 +29,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -51,26 +55,26 @@ private const val HERO_ANIMATION_FRAMES = 2
 
 @Composable
 fun GameScreen(
-    gameScreenViewModel: GameScreenViewModel,
+    viewModel: GameScreenViewModel,
     onWin: () -> Unit,
 ) {
-    val mapState by gameScreenViewModel.mapState.collectAsState()
+    val mapState by viewModel.mapState.collectAsState()
     
     LaunchedEffect(Unit) {
-        gameScreenViewModel.events.collect { event ->
+        viewModel.events.collect { event ->
             event?.let { onWin() }
         }
     }
 
-    val animation by gameScreenViewModel.animationState.collectAsState(initial = PlayerAnimationState.NoAnimation)
+    val animation by viewModel.animationState.collectAsState(initial = PlayerAnimationState.NoAnimation)
 
     when (val state = mapState) {
         is MapScreenController.MapScreenState.Loading -> Loading()
         is MapScreenController.MapScreenState.Ready -> Map(
             mapState = state,
             animation = animation,
-            onCharacterMove = gameScreenViewModel::onMoveCharacter,
-            onMapGeneration = gameScreenViewModel::newMap,
+            onCharacterMove = viewModel::onMoveCharacter,
+            onMapGeneration = viewModel::newMap,
         )
     }
 }
@@ -101,7 +105,6 @@ private fun Map(
 ) {
     val width = LocalDensity.current.run { maxWidth.toPx() }.toInt()
     val tileDimension = width / mapState.viewportWidth
-    val tileSize = IntSize(tileDimension, tileDimension)
 
     val view = LocalView.current
     val shakeHorizontalOffset = remember { Animatable(0f) }
@@ -137,40 +140,31 @@ private fun Map(
         .offset(shakeHorizontalOffset.value.dp, 0.dp)
     
     Box(
-        modifier = modifier.background(Color(0x1F000000))
+        modifier = modifier
+            .background(Color(0x1F000000))
             .pointerInput(Unit) {
-            detectTapGestures(
-                onTap = {
-                    onCharacterMove(
-                        when {
-                            it.x > it.y && it.x.toDp() > maxWidth - it.y.toDp() -> Direction.Right
-                            it.x > it.y -> Direction.Top
-                            it.x < it.y && it.y.toDp() > maxWidth - it.x.toDp() -> Direction.Bottom
-                            else -> Direction.Left
-                        }
-                    )
-                }
-            )
-        },
+                detectTapGestures(
+                    onTap = { onCharacterMove(it.toDirection(size = maxWidth)) }
+                )
+            },
     )
     
-    DrawMap(
-        modifier = modifier,
-        viewportWidth = mapState.viewportWidth,
-        tiles = mapState.tiles,
-        tileDimension = tileDimension,
-        tileSize = tileSize,
-        offset = horizontalOffset,
-    )
+    CompositionLocalProvider(
+        LocalTileSize provides IntSize(tileDimension, tileDimension),
+        LocalHorizontalOffset provides horizontalOffset,
+    ) {
+        DrawMap(
+            modifier = modifier,
+            viewportWidth = mapState.viewportWidth,
+            tiles = mapState.tiles,
+        )
     
-    DrawCharacter(
-        modifier = modifier,
-        viewportWidth = mapState.viewportWidth,
-        viewportHeight = mapState.viewportHeight,
-        tileDimension = tileDimension,
-        tileSize = tileSize,
-        offset = horizontalOffset,
-    )
+        DrawCharacter(
+            modifier = modifier,
+            viewportWidth = mapState.viewportWidth,
+            viewportHeight = mapState.viewportHeight,
+        )
+    }
     
     BaseTextButton(
         title = "New map",
@@ -179,15 +173,26 @@ private fun Map(
     )
 }
 
+context(Density)
+private fun Offset.toDirection(
+    size: Dp,
+): Direction = when {
+    x > y && x.toDp() > size - y.toDp() -> Direction.Right
+    x > y -> Direction.Top
+    x < y && y.toDp() > size - x.toDp() -> Direction.Bottom
+    else -> Direction.Left
+}
+
 @Composable
 private fun DrawMap(
     modifier: Modifier,
     viewportWidth: Int,
     tiles: List<MapRenderTile?>,
-    tileDimension: Int,
-    tileSize: IntSize,
-    offset: IntOffset,
 ) {
+    val tileSize = LocalTileSize.current
+    val offset = LocalHorizontalOffset.current
+    val tileDimension = LocalTileSize.current.width
+    
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
             val column = index % viewportWidth
@@ -269,16 +274,17 @@ private fun DrawCharacter(
     modifier: Modifier,
     viewportWidth: Int,
     viewportHeight: Int,
-    tileDimension: Int,
-    tileSize: IntSize,
-    offset: IntOffset,
-    characterIdleAnimationDirection: CharacterIdleAnimationDirection = CharacterIdleAnimationDirection.Left,
+    idleAnimationDirection: CharacterIdleAnimationDirection = CharacterIdleAnimationDirection.Left,
 ) {
+    val tileSize = LocalTileSize.current
+    val offset = LocalHorizontalOffset.current
+    val tileDimension = LocalTileSize.current.width
+    
     val infiniteTransition = rememberInfiniteTransition()
     
     val heroAnimationDirectionModifier by remember {
         mutableStateOf(
-            when (characterIdleAnimationDirection) {
+            when (idleAnimationDirection) {
                 CharacterIdleAnimationDirection.Left -> 0
                 CharacterIdleAnimationDirection.Right -> 2
             }

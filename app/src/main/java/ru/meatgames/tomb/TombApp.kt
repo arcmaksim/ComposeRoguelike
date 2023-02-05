@@ -38,7 +38,7 @@ fun TombApp(
             }
             composable(GameState.MainGame.id) {
                 GameScreen(
-                    gameScreenViewModel = hiltViewModel(),
+                    viewModel = hiltViewModel(),
                 ) {
                     navController.navigate(GameState.WinScreen.id)
                 }
