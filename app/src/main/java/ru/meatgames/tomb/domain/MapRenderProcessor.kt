@@ -3,47 +3,51 @@ package ru.meatgames.tomb.domain
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
 import ru.meatgames.tomb.model.temp.ThemeAssets
-import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
-import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.render.MapRenderTilesDecorator
 import ru.meatgames.tomb.render.RenderData
-import ru.meatgames.tomb.screen.compose.game.MapTile
+import ru.meatgames.tomb.screen.compose.game.MapTileWrapper
 import javax.inject.Inject
 
 typealias RenderTiles = Pair<FloorRenderTile, ObjectRenderTile?>
+typealias ScreenSpaceRenderTiles = Pair<MapTileWrapper, RenderTiles>
 
 class MapRenderProcessor @Inject constructor(
     private val themeAssets: ThemeAssets,
-    private val mapDecorators: Set<@JvmSuppressWildcards MapRenderTilesDecorator>,
+    private val decoratorsPipeline: MapDecoratorPipeline,
 ) {
-
+    
+    private var prevTiles: Set<Coordinates> = emptySet()
+    
     // Assumes tiles is a square
-    fun produceRenderTilesFrom(
-        tiles: List<MapTile?>,
+    fun runPipeline(
+        tiles: List<MapTileWrapper?>,
         tilesLineWidth: Int,
+        mapX: Int,
+        mapY: Int,
         shouldRenderTile: (Int) -> Boolean,
-    ): List<MapRenderTile> = tiles.mapToRenderTiles()
-        .applyDecorators(tilesLineWidth)
-        .filterExtendedTiles(tilesLineWidth)
-        .applyFOV(shouldRenderTile)
-
-    private fun List<MapTile?>.mapToRenderTiles(): List<RenderTiles?> = map {
-        it ?: return@map null
-        RenderTiles(
-            first = it.floorEntityTile.toFloorRenderTile(),
-            second = it.objectEntityTile?.toObjectRenderTile(),
+    ): PipelineRenderData {
+        // calc new and old
+        val coords = tiles.filterNotNull().map { it.x to it.y }.toSet()
+        val new = (coords - prevTiles).map { it.first - mapX to it.second - mapY }
+        val old = (prevTiles - coords).map { it.first - mapX to it.second - mapY }
+        prevTiles = coords
+        // run decorators
+        val renderTiles = decoratorsPipeline.produceRenderTilesFrom(
+            tiles = tiles,
+            tilesLineWidth = tilesLineWidth,
         )
-    }
-
-    private fun List<RenderTiles?>.applyDecorators(
-        tilesLineWidth: Int,
-    ): List<RenderTiles?> = run {
-        mapDecorators.fold(this) { tiles, decorator ->
-            decorator.processMapRenderTiles(tiles, tilesLineWidth)
-        }
+        // cull view
+        val processedRenderTiles = renderTiles.filterExtendedTiles(tilesLineWidth)
+        // calc fov
+            .applyFOV(shouldRenderTile)
+        
+        return PipelineRenderData(
+            tiles = processedRenderTiles,
+            newTiles = new,
+            exitTiles = old,
+        )
     }
 
     private fun List<RenderTiles?>.filterExtendedTiles(
@@ -76,7 +80,7 @@ class MapRenderProcessor @Inject constructor(
             )
         }
     }
-
+    
     private fun FloorRenderTile.toFloorRenderTileData(): RenderData =
         themeAssets.resolveFloorRenderData(
             floorRenderTile = this,
@@ -87,23 +91,16 @@ class MapRenderProcessor @Inject constructor(
             objectRenderTile = this,
         ).toMapRenderData()
 
-    private fun FloorEntityTile.toFloorRenderTile(): FloorRenderTile = when (this) {
-        FloorEntityTile.Floor -> FloorRenderTile.Floor
-    }
-
-    private fun ObjectEntityTile.toObjectRenderTile(): ObjectRenderTile = when (this) {
-        ObjectEntityTile.DoorClosed -> ObjectRenderTile.DoorClosed
-        ObjectEntityTile.DoorOpened -> ObjectRenderTile.DoorOpened
-        ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
-        ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
-        ObjectEntityTile.Gismo -> ObjectRenderTile.Gismo
-        ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
-    }
-
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =
         RenderData(
             asset = first,
             srcOffset = second,
         )
+    
+    data class PipelineRenderData(
+        val tiles: List<MapRenderTile>,
+        val newTiles: List<ScreenSpaceCoordinates>,
+        val exitTiles: List<ScreenSpaceCoordinates>,
+    )
 
 }

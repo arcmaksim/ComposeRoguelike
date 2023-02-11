@@ -21,9 +21,9 @@ const val MAP_WIDTH_KEY = "MAP_WIDTH"
 private const val MAP_HEIGHT = 32
 const val MAP_HEIGHT_KEY = "MAP_HEIGHT"
 
-private const val MAP_VIEWPORT_WIDTH = 11
+private const val MAP_VIEWPORT_WIDTH = 7
 const val MAP_VIEWPORT_WIDTH_KEY = "MAP_VIEWPORT_WIDTH"
-private const val MAP_VIEWPORT_HEIGHT = 11
+private const val MAP_VIEWPORT_HEIGHT = 7
 const val MAP_VIEWPORT_HEIGHT_KEY = "MAP_VIEWPORT_HEIGHT"
 
 @Module

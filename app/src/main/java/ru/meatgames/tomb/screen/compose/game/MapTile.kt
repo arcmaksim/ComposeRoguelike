@@ -16,3 +16,9 @@ data class MapTile(
     }
 
 }
+
+data class MapTileWrapper(
+    val x: Int,
+    val y: Int,
+    val tile: MapTile,
+)

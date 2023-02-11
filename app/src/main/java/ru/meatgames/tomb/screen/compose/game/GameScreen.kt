@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -27,6 +28,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -41,38 +43,46 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import ru.meatgames.tomb.NewAssets
+import androidx.compose.ui.unit.toOffset
+import androidx.compose.ui.unit.toSize
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h2TextStyle
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.domain.PlayerAnimationState
+import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.resolvedOffsets
+import ru.meatgames.tomb.toIntOffset
 
 private const val HERO_ANIMATION_FRAME_TIME = 600
 private const val HERO_ANIMATION_FRAMES = 2
+private const val HERO_MOVE_ANIMATION_TIME = 300
 
 @Composable
 fun GameScreen(
     viewModel: GameScreenViewModel,
     onWin: () -> Unit,
 ) {
-    val mapState by viewModel.mapState.collectAsState()
-    
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             event?.let { onWin() }
         }
     }
 
-    val animation by viewModel.animationState.collectAsState(initial = PlayerAnimationState.NoAnimation)
+    val gameScreenState by viewModel.state.collectAsState(GameScreenState())
 
-    when (val state = mapState) {
+    when (val mapState = gameScreenState.mapState) {
         is MapScreenController.MapScreenState.Loading -> Loading()
         is MapScreenController.MapScreenState.Ready -> Map(
-            mapState = state,
-            animation = animation,
+            mapState = mapState,
+            playerAnimation = gameScreenState.playerAnimation,
+            previousMoveDirection = gameScreenState.previousMoveDirection,
             onCharacterMove = viewModel::onMoveCharacter,
             onMapGeneration = viewModel::newMap,
         )
@@ -95,7 +105,8 @@ private fun Loading() {
 @Composable
 private fun Map(
     mapState: MapScreenController.MapScreenState.Ready,
-    animation: PlayerAnimationState,
+    playerAnimation: PlayerAnimationState,
+    previousMoveDirection: Direction?,
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
 ) = BoxWithConstraints(
@@ -112,13 +123,46 @@ private fun Map(
         x = (width - (tileDimension * mapState.viewportWidth)) / 2 + shakeHorizontalOffset.value.toInt(),
         y = 0,
     )
-
-    LaunchedEffect(animation) {
-        when (animation) {
+    
+    val revealedTilesIndexOffsets = (playerAnimation as? PlayerAnimationState.Scroll)?.direction?.resolvedOffsets ?: (0 to 0)
+    val initialOffset = previousMoveDirection?.toIntOffset(tileDimension) ?: IntOffset.Zero
+    var scrollingOffset by remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
+    var revealedTileAlpha by remember(playerAnimation) { mutableStateOf(0f) }
+    
+    LaunchedEffect(playerAnimation) {
+        when (playerAnimation) {
             is PlayerAnimationState.Shake -> {
                 shakeAnimation(
                     view = view,
                     offset = shakeHorizontalOffset,
+                )
+            }
+            is PlayerAnimationState.Scroll -> {
+                awaitAll(
+                    async {
+                        animate(
+                            initialValue = 1f,
+                            targetValue = 0f,
+                            typeConverter = Float.VectorConverter,
+                            animationSpec = tween(
+                                durationMillis = HERO_MOVE_ANIMATION_TIME,
+                            ),
+                        ) { value, _ ->
+                            revealedTileAlpha = value
+                        }
+                    },
+                    async {
+                        animate(
+                            initialValue = IntOffset.Zero,
+                            targetValue = -initialOffset,
+                            typeConverter = IntOffset.VectorConverter,
+                            animationSpec = tween(
+                                durationMillis = HERO_MOVE_ANIMATION_TIME,
+                            ),
+                        ) { value, _ ->
+                            scrollingOffset = value
+                        }
+                    },
                 )
             }
             else -> Unit
@@ -140,11 +184,13 @@ private fun Map(
         .offset(shakeHorizontalOffset.value.dp, 0.dp)
     
     Box(
-        modifier = modifier
-            .background(Color(0x1F000000))
+        modifier = Modifier.fillMaxWidth()
+            .aspectRatio(1F)
+            .align(Alignment.Center)
+            .background(LocalBackgroundColor.current)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = { onCharacterMove(it.toDirection(size = maxWidth)) }
+                    onTap = { onCharacterMove(it.toDirection(maxWidth)) },
                 )
             },
     )
@@ -152,11 +198,17 @@ private fun Map(
     CompositionLocalProvider(
         LocalTileSize provides IntSize(tileDimension, tileDimension),
         LocalHorizontalOffset provides horizontalOffset,
+        LocalBackgroundColor provides Color(0xFF212121),
     ) {
         DrawMap(
             modifier = modifier,
             viewportWidth = mapState.viewportWidth,
             tiles = mapState.tiles,
+            newTiles = mapState.newlyDiscoveredTiles,
+            animationOffset = revealedTilesIndexOffsets,
+            scrollOffset = scrollingOffset,
+            initialOffset = initialOffset,
+            revealAlpha = revealedTileAlpha,
         )
     
         DrawCharacter(
@@ -188,26 +240,37 @@ private fun DrawMap(
     modifier: Modifier,
     viewportWidth: Int,
     tiles: List<MapRenderTile?>,
+    newTiles: Set<ScreenSpaceCoordinates>,
+    animationOffset: Coordinates,
+    scrollOffset: IntOffset,
+    initialOffset: IntOffset,
+    revealAlpha: Float,
 ) {
     val tileSize = LocalTileSize.current
     val offset = LocalHorizontalOffset.current
     val tileDimension = LocalTileSize.current.width
+    val backgroundColor = LocalBackgroundColor.current
     
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
             val column = index % viewportWidth
             val row = index / viewportWidth
-            val dstOffset = offset + IntOffset(
+            val dstOffset = offset + initialOffset + scrollOffset + IntOffset(
                 column * tileDimension,
                 row * tileDimension,
             )
+    
+            val screenSpaceCoordinates = (column + animationOffset.first to row + animationOffset.second)
             
             when (renderTile) {
                 is MapRenderTile.Revealed -> {
+                    val alpha = revealAlpha.takeIf { newTiles.contains(screenSpaceCoordinates) }
                     drawRevealedTile(
                         renderTile = renderTile,
                         dstOffset = dstOffset,
                         tileSize = tileSize,
+                        alpha = alpha,
+                        backgroundColor = backgroundColor,
                     )
                 }
                 is MapRenderTile.Hidden -> {
@@ -227,6 +290,8 @@ private fun DrawScope.drawRevealedTile(
     renderTile: MapRenderTile.Revealed,
     dstOffset: IntOffset,
     tileSize: IntSize,
+    backgroundColor: Color,
+    alpha: Float?,
 ) {
     val filterQuality = FilterQuality.None
     
@@ -246,6 +311,14 @@ private fun DrawScope.drawRevealedTile(
             dstOffset = dstOffset,
             dstSize = tileSize,
             filterQuality = filterQuality,
+        )
+    }
+    alpha?.let {
+        drawRect(
+            topLeft = dstOffset.toOffset(),
+            color = backgroundColor,
+            alpha = it,
+            size = tileSize.toSize(),
         )
     }
 }

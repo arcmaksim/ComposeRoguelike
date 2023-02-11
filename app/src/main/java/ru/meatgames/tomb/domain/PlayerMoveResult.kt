@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 
 sealed class PlayerMoveResult {
 
@@ -8,7 +9,10 @@ sealed class PlayerMoveResult {
         val direction: Direction
     ) : PlayerMoveResult()
 
-    object Interaction : PlayerMoveResult()
+    data class Interaction(
+        val coordinates: Coordinates,
+        val tile: ObjectEntityTile,
+    ) : PlayerMoveResult()
 
     object Block : PlayerMoveResult()
 

@@ -12,7 +12,7 @@ import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
 import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.screen.compose.game.MapTile
+import ru.meatgames.tomb.screen.compose.game.MapTileWrapper
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -48,20 +48,38 @@ class MapScreenController @Inject constructor(
                 if (map !is State.MapAvailable) {
                     return@flatMapLatest flow { MapScreenState.Loading }
                 }
-
+                
                 map.mapWrapper.state.combine(
                     characterController.characterStateFlow
                 ) { tiles, character ->
                     if (character.mapX == -1 && character.mapY == -1) {
                         return@combine MapScreenState.Loading
                     }
-
-                    return@combine processNewTiles(
+                    
+                    val processedTiles = processNewTiles(
                         characterX = character.mapX,
                         characterY = character.mapY,
                         mapWidth = map.mapWrapper.width,
                         mapHeight = map.mapWrapper.height,
                         tiles = tiles,
+                    )
+                    
+                    val pipelineRenderData = mapRenderProcessor.runPipeline(
+                        tiles = processedTiles,
+                        tilesLineWidth = preProcessingViewportWidth,
+                        mapX = character.mapX - viewportWidth / 2,
+                        mapY = character.mapY - viewportHeight / 2,
+                        shouldRenderTile = { index ->
+                            cachedVisibilityMask[index]
+                        },
+                    )
+                    
+                    return@combine MapScreenState.Ready(
+                        viewportWidth = viewportWidth,
+                        viewportHeight = viewportHeight,
+                        tiles = pipelineRenderData.tiles,
+                        newlyDiscoveredTiles = pipelineRenderData.newTiles.toSet(),
+                        fadingTiles = pipelineRenderData.exitTiles.toSet(),
                         points = character.points,
                     )
                 }
@@ -70,13 +88,12 @@ class MapScreenController @Inject constructor(
     }
 
     private fun processNewTiles(
-        tiles: List<MapTile>,
+        tiles: List<MapTileWrapper>,
         characterX: Int,
         characterY: Int,
         mapWidth: Int,
         mapHeight: Int,
-        points: Int,
-    ): MapScreenState.Ready {
+    ): List<MapTileWrapper?> {
         cachedVisibilityMask.updateVisibilityMask()
 
         val filteredTiles = tiles.filterTiles(
@@ -96,37 +113,26 @@ class MapScreenController @Inject constructor(
             revealTile = { x, y -> cachedVisibilityMask[x + y * viewportWidth] = true },
             checkIfTileIsBlocking = { x, y ->
                 val index = (x + 1) + (y + 1) * preProcessingViewportWidth
-                val objectEntity = filteredTiles[index]?.objectEntityTile ?: return@computeFov false
+                val objectEntity = filteredTiles[index]?.tile?.objectEntityTile ?: return@computeFov false
                 !tilesController.isObjectEntityVisibleThrough(
                     objectEntity = objectEntity,
                 )
             }
         )
 
-        return MapScreenState.Ready(
-            viewportWidth = viewportWidth,
-            viewportHeight = viewportHeight,
-            tiles = mapRenderProcessor.produceRenderTilesFrom(
-                tiles = filteredTiles,
-                tilesLineWidth = preProcessingViewportWidth,
-                shouldRenderTile = { index ->
-                    cachedVisibilityMask[index]
-                },
-            ),
-            points = points,
-        )
+        return filteredTiles
     }
 
     private fun BooleanArray.updateVisibilityMask() {
         fill(false)
     }
 
-    private fun List<MapTile>.filterTiles(
+    private fun List<MapTileWrapper>.filterTiles(
         mapX: Int,
         mapY: Int,
         mapWidth: Int,
         mapHeight: Int,
-    ): List<MapTile?> = (0 until preProcessingViewportHeight).map { line ->
+    ): List<MapTileWrapper?> = (0 until preProcessingViewportHeight).map { line ->
         val start = (mapY + line) * mapWidth + mapX
         val end = start + preProcessingViewportWidth
         when {
@@ -162,6 +168,8 @@ class MapScreenController @Inject constructor(
             val viewportWidth: Int,
             val viewportHeight: Int,
             val tiles: List<MapRenderTile?>,
+            val newlyDiscoveredTiles: Set<Coordinates>,
+            val fadingTiles: Set<Coordinates>,
             val points: Int,
         ) : MapScreenState()
 
