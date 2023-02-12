@@ -34,9 +34,7 @@ class MapRenderProcessor @Inject constructor(
             tilesLineWidth = tilesLineWidth,
         )
         
-        val processedRenderTiles = renderTiles
-            .applyFOV(tilesLineWidth, shouldRenderTile)
-            .filterExtendedTiles(tilesLineWidth)
+        val processedRenderTiles = renderTiles.applyFOV(tilesLineWidth, shouldRenderTile)
         
         val mapRenderTiles = processedRenderTiles.map { it.second }
         
@@ -72,18 +70,6 @@ class MapRenderProcessor @Inject constructor(
             newTiles = newTiles.toList(),
             exitTiles = oldTiles.toList(),
         )
-    }
-    
-    private fun List<ScreenSpaceMapRenderTile>.filterExtendedTiles(
-        tilesLineWidth: Int,
-    ): List<ScreenSpaceMapRenderTile> = filterIndexed { index, _ ->
-        val x = index % tilesLineWidth
-        if (x == 0 || x == tilesLineWidth - 1) return@filterIndexed false
-        
-        val y = index / tilesLineWidth
-        if (y == 0 || y == (size / tilesLineWidth) - 1) return@filterIndexed false
-        
-        true
     }
     
     private fun List<ScreenSpaceRenderTiles?>.applyFOV(

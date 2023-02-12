@@ -75,8 +75,10 @@ class MapScreenController @Inject constructor(
                     )
                     
                     return@combine MapScreenState.Ready(
+                        dataWidth = preProcessingViewportWidth,
                         viewportWidth = viewportWidth,
                         viewportHeight = viewportHeight,
+                        viewportDataPadding = preProcessingBufferSizeModifier,
                         tiles = pipelineRenderData.tiles,
                         newlyDiscoveredTiles = pipelineRenderData.newTiles.toSet(),
                         fadingTiles = pipelineRenderData.exitTiles.toSet(),
@@ -165,8 +167,10 @@ class MapScreenController @Inject constructor(
     sealed class MapScreenState {
 
         data class Ready(
+            val dataWidth: Int,
             val viewportWidth: Int,
             val viewportHeight: Int,
+            val viewportDataPadding: Int,
             val tiles: List<MapRenderTile?>,
             val newlyDiscoveredTiles: Set<Coordinates>,
             val fadingTiles: Set<Coordinates>,

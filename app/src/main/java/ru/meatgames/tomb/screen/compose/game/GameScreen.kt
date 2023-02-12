@@ -197,7 +197,8 @@ private fun Map(
     ) {
         DrawMap(
             modifier = modifier,
-            viewportWidth = mapState.viewportWidth,
+            dataWidth = mapState.dataWidth,
+            viewportDataPadding = mapState.viewportDataPadding,
             tiles = mapState.tiles,
             newTiles = mapState.newlyDiscoveredTiles,
             oldTiles = mapState.fadingTiles,
@@ -234,7 +235,8 @@ private fun Offset.toDirection(
 @Composable
 private fun DrawMap(
     modifier: Modifier,
-    viewportWidth: Int,
+    dataWidth: Int,
+    viewportDataPadding: Int,
     tiles: List<MapRenderTile?>,
     newTiles: Set<ScreenSpaceCoordinates>,
     oldTiles: Set<ScreenSpaceCoordinates>,
@@ -250,8 +252,8 @@ private fun DrawMap(
     
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
-            val column = index % viewportWidth
-            val row = index / viewportWidth
+            val column = index % dataWidth - viewportDataPadding
+            val row = index / dataWidth - viewportDataPadding
             val dstOffset = offset + initialOffset + scrollOffset + IntOffset(
                 column * tileDimension,
                 row * tileDimension,
