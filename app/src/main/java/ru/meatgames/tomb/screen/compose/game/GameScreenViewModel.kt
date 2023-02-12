@@ -34,15 +34,15 @@ class GameScreenViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         GameScreenState(
             mapState = controller.state.value,
-            playerAnimation = PlayerAnimationState.NoAnimation,
+            playerAnimation = PlayerAnimationState.NoAnimation(),
         )
     )
     val state: Flow<GameScreenState> = _state
     
-    private var pendingAnimation: PlayerAnimationState = PlayerAnimationState.NoAnimation
+    private var pendingAnimation: PlayerAnimationState = PlayerAnimationState.NoAnimation()
         get() {
             val value = field
-            field = PlayerAnimationState.NoAnimation
+            field = PlayerAnimationState.NoAnimation()
             return value
         }
     private var previousModeDirection: Direction? = null
@@ -63,6 +63,7 @@ class GameScreenViewModel @Inject constructor(
                     playerAnimation = pendingAnimation,
                     previousMoveDirection = previousModeDirection,
                 )
+                
                 (state as? MapScreenController.MapScreenState.Ready)
                     ?.takeIf { it.points == TARGET_POINTS }
                     ?.let { _events.send(Any()) }
@@ -85,7 +86,7 @@ class GameScreenViewModel @Inject constructor(
         val animation = when (val result = mapInteractionController.makeMove(direction)) {
             is PlayerMoveResult.Block -> PlayerAnimationState.Shake()
             is PlayerMoveResult.Move -> PlayerAnimationState.Scroll(result.direction)
-            else -> PlayerAnimationState.NoAnimation
+            else -> PlayerAnimationState.NoAnimation()
         }
         
         pendingAnimation = animation
@@ -104,6 +105,6 @@ class GameScreenViewModel @Inject constructor(
 
 data class GameScreenState(
     val mapState: MapScreenController.MapScreenState = MapScreenController.MapScreenState.Loading,
-    val playerAnimation: PlayerAnimationState = PlayerAnimationState.NoAnimation,
+    val playerAnimation: PlayerAnimationState = PlayerAnimationState.NoAnimation(),
     val previousMoveDirection: Direction? = null,
 )

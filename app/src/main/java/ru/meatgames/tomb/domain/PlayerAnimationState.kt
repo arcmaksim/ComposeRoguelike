@@ -4,7 +4,7 @@ import ru.meatgames.tomb.Direction
 
 sealed class PlayerAnimationState {
 
-    object NoAnimation : PlayerAnimationState()
+    class NoAnimation : PlayerAnimationState()
 
     class Shake : PlayerAnimationState()
 

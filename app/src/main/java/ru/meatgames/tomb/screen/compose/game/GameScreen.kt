@@ -51,13 +51,11 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h2TextStyle
-import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.domain.PlayerAnimationState
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.resolvedOffsets
 import ru.meatgames.tomb.toIntOffset
 
 private const val HERO_ANIMATION_FRAME_TIME = 600
@@ -124,33 +122,21 @@ private fun Map(
         y = 0,
     )
     
-    val revealedTilesIndexOffsets = (playerAnimation as? PlayerAnimationState.Scroll)?.direction?.resolvedOffsets ?: (0 to 0)
     val initialOffset = previousMoveDirection?.toIntOffset(tileDimension) ?: IntOffset.Zero
     var scrollingOffset by remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
-    var revealedTileAlpha by remember(playerAnimation) { mutableStateOf(0f) }
+    val revealedTileAlpha = remember(playerAnimation) { mutableStateOf(1f) }
+    val hiddenTileAlpha = remember(playerAnimation) { mutableStateOf(0f) }
     
     LaunchedEffect(playerAnimation) {
-        when (playerAnimation) {
-            is PlayerAnimationState.Shake -> {
+        val specificAnimations = when (playerAnimation) {
+            /*is PlayerAnimationState.Shake -> {
                 shakeAnimation(
                     view = view,
                     offset = shakeHorizontalOffset,
                 )
-            }
+            }*/
             is PlayerAnimationState.Scroll -> {
-                awaitAll(
-                    async {
-                        animate(
-                            initialValue = 1f,
-                            targetValue = 0f,
-                            typeConverter = Float.VectorConverter,
-                            animationSpec = tween(
-                                durationMillis = HERO_MOVE_ANIMATION_TIME,
-                            ),
-                        ) { value, _ ->
-                            revealedTileAlpha = value
-                        }
-                    },
+                listOf(
                     async {
                         animate(
                             initialValue = IntOffset.Zero,
@@ -165,8 +151,16 @@ private fun Map(
                     },
                 )
             }
-            else -> Unit
+            else -> emptyList()
         }
+        
+        val regularAnimation = getTilesValuesAnimation(
+            animationTime = HERO_MOVE_ANIMATION_TIME,
+            revealedTileAlpha = revealedTileAlpha,
+            hiddenTileAlpha = hiddenTileAlpha,
+        ).toTypedArray()
+        
+        awaitAll(*regularAnimation, *specificAnimations.toTypedArray())
     }
     
     Text(
@@ -184,7 +178,8 @@ private fun Map(
         .offset(shakeHorizontalOffset.value.dp, 0.dp)
     
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .aspectRatio(1F)
             .align(Alignment.Center)
             .background(LocalBackgroundColor.current)
@@ -205,10 +200,11 @@ private fun Map(
             viewportWidth = mapState.viewportWidth,
             tiles = mapState.tiles,
             newTiles = mapState.newlyDiscoveredTiles,
-            animationOffset = revealedTilesIndexOffsets,
+            oldTiles = mapState.fadingTiles,
             scrollOffset = scrollingOffset,
             initialOffset = initialOffset,
-            revealAlpha = revealedTileAlpha,
+            revealAlpha = revealedTileAlpha.value,
+            hiddenAlpha = hiddenTileAlpha.value,
         )
     
         DrawCharacter(
@@ -241,10 +237,11 @@ private fun DrawMap(
     viewportWidth: Int,
     tiles: List<MapRenderTile?>,
     newTiles: Set<ScreenSpaceCoordinates>,
-    animationOffset: Coordinates,
+    oldTiles: Set<ScreenSpaceCoordinates>,
     scrollOffset: IntOffset,
     initialOffset: IntOffset,
     revealAlpha: Float,
+    hiddenAlpha: Float,
 ) {
     val tileSize = LocalTileSize.current
     val offset = LocalHorizontalOffset.current
@@ -260,34 +257,33 @@ private fun DrawMap(
                 row * tileDimension,
             )
     
-            val screenSpaceCoordinates = (column + animationOffset.first to row + animationOffset.second)
+            val screenSpaceCoordinates = (column to row)
             
-            when (renderTile) {
-                is MapRenderTile.Revealed -> {
-                    val alpha = revealAlpha.takeIf { newTiles.contains(screenSpaceCoordinates) }
-                    drawRevealedTile(
-                        renderTile = renderTile,
-                        dstOffset = dstOffset,
-                        tileSize = tileSize,
-                        alpha = alpha,
-                        backgroundColor = backgroundColor,
-                    )
-                }
-                is MapRenderTile.Hidden -> {
-                    drawHiddenTile(
-                        renderTile = renderTile,
-                        dstOffset = dstOffset,
-                        tileSize = tileSize,
-                    )
-                }
-                else -> Unit
+            if (renderTile is MapRenderTile.Content && renderTile.isVisible) {
+                val alpha = revealAlpha.takeIf { newTiles.contains(screenSpaceCoordinates) }
+                drawRevealedTile(
+                    renderTile = renderTile,
+                    dstOffset = dstOffset,
+                    tileSize = tileSize,
+                    alpha = alpha,
+                    backgroundColor = backgroundColor,
+                )
+            }
+            if (renderTile is MapRenderTile.Content && !renderTile.isVisible && oldTiles.contains(screenSpaceCoordinates)) {
+                drawRevealedTile(
+                    renderTile = renderTile,
+                    dstOffset = dstOffset,
+                    tileSize = tileSize,
+                    alpha = hiddenAlpha,
+                    backgroundColor = backgroundColor,
+                )
             }
         }
     }
 }
 
 private fun DrawScope.drawRevealedTile(
-    renderTile: MapRenderTile.Revealed,
+    renderTile: MapRenderTile.Content,
     dstOffset: IntOffset,
     tileSize: IntSize,
     backgroundColor: Color,
@@ -319,25 +315,6 @@ private fun DrawScope.drawRevealedTile(
             color = backgroundColor,
             alpha = it,
             size = tileSize.toSize(),
-        )
-    }
-}
-
-private fun DrawScope.drawHiddenTile(
-    renderTile: MapRenderTile.Hidden,
-    dstOffset: IntOffset,
-    tileSize: IntSize,
-) {
-    val filterQuality = FilterQuality.None
-    
-    renderTile.effectData?.let { effectData ->
-        drawImage(
-            image = effectData.asset,
-            srcOffset = effectData.srcOffset,
-            srcSize = NewAssets.tileSize,
-            dstOffset = dstOffset,
-            dstSize = tileSize,
-            filterQuality = filterQuality,
         )
     }
 }

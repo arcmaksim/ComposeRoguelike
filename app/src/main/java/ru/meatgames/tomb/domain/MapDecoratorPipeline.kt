@@ -16,20 +16,20 @@ class MapDecoratorPipeline @Inject constructor(
     fun produceRenderTilesFrom(
         tiles: List<MapTileWrapper?>,
         tilesLineWidth: Int,
-    ): List<RenderTiles?> = tiles.mapToRenderTiles()
+    ): List<ScreenSpaceRenderTiles?> = tiles.mapToRenderTiles()
         .applyDecorators(tilesLineWidth)
 
-    private fun List<MapTileWrapper?>.mapToRenderTiles(): List<RenderTiles?> = map {
+    private fun List<MapTileWrapper?>.mapToRenderTiles(): List<ScreenSpaceRenderTiles?> = map {
         val tile = it?.tile ?: return@map null
-        RenderTiles(
+        it to RenderTiles(
             first = tile.floorEntityTile.toFloorRenderTile(),
             second = tile.objectEntityTile?.toObjectRenderTile(),
         )
     }
     
-    private fun List<RenderTiles?>.applyDecorators(
+    private fun List<ScreenSpaceRenderTiles?>.applyDecorators(
         tilesLineWidth: Int,
-    ): List<RenderTiles?> = run {
+    ): List<ScreenSpaceRenderTiles?> = run {
         mapDecorators.fold(this) { tiles, decorator ->
             decorator.processMapRenderTiles(tiles, tilesLineWidth)
         }

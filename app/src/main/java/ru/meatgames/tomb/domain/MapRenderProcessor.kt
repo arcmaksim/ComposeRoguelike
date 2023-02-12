@@ -12,13 +12,14 @@ import javax.inject.Inject
 
 typealias RenderTiles = Pair<FloorRenderTile, ObjectRenderTile?>
 typealias ScreenSpaceRenderTiles = Pair<MapTileWrapper, RenderTiles>
+typealias ScreenSpaceMapRenderTile = Pair<MapTileWrapper?, MapRenderTile>
 
 class MapRenderProcessor @Inject constructor(
     private val themeAssets: ThemeAssets,
     private val decoratorsPipeline: MapDecoratorPipeline,
 ) {
     
-    private var prevTiles: Set<Coordinates> = emptySet()
+    private var prevTiles = mutableSetOf<Coordinates>()
     
     // Assumes tiles is a square
     fun runPipeline(
@@ -28,56 +29,85 @@ class MapRenderProcessor @Inject constructor(
         mapY: Int,
         shouldRenderTile: (Int) -> Boolean,
     ): PipelineRenderData {
-        // calc new and old
-        val coords = tiles.filterNotNull().map { it.x to it.y }.toSet()
-        val new = (coords - prevTiles).map { it.first - mapX to it.second - mapY }
-        val old = (prevTiles - coords).map { it.first - mapX to it.second - mapY }
-        prevTiles = coords
-        // run decorators
         val renderTiles = decoratorsPipeline.produceRenderTilesFrom(
             tiles = tiles,
             tilesLineWidth = tilesLineWidth,
         )
-        // cull view
-        val processedRenderTiles = renderTiles.filterExtendedTiles(tilesLineWidth)
-        // calc fov
-            .applyFOV(shouldRenderTile)
+        
+        val processedRenderTiles = renderTiles
+            .applyFOV(tilesLineWidth, shouldRenderTile)
+            .filterExtendedTiles(tilesLineWidth)
+        
+        val mapRenderTiles = processedRenderTiles.map { it.second }
+        
+        val newTiles = mutableSetOf<ScreenSpaceCoordinates>()
+        val oldTiles = mutableSetOf<ScreenSpaceCoordinates>()
+        
+        fun MapTileWrapper?.toCoords() = this?.let { it.x to it.y }
+        
+        processedRenderTiles.forEach { mapRenderTile ->
+            val tileWrapper = mapRenderTile.first ?: return@forEach
+            val newRenderTile = mapRenderTile.second
+            
+            val previousRenderTileWasVisible = prevTiles.contains(tileWrapper.toCoords())
+            
+            fun MapRenderTile?.isVisible() = this is MapRenderTile.Content && isVisible
+            
+            if (previousRenderTileWasVisible && !newRenderTile.isVisible()) {
+                oldTiles.add(tileWrapper.x - mapX to tileWrapper.y - mapY)
+            }
+            if (!previousRenderTileWasVisible && newRenderTile.isVisible()) {
+                newTiles.add(tileWrapper.x - mapX to tileWrapper.y - mapY)
+            }
+        }
+        
+        prevTiles.clear()
+        prevTiles.addAll(
+            processedRenderTiles.filter { (it.second as? MapRenderTile.Content)?.isVisible == true }
+                .map { it.first.toCoords()!! }
+        )
         
         return PipelineRenderData(
-            tiles = processedRenderTiles,
-            newTiles = new,
-            exitTiles = old,
+            tiles = mapRenderTiles,
+            newTiles = newTiles.toList(),
+            exitTiles = oldTiles.toList(),
         )
     }
-
-    private fun List<RenderTiles?>.filterExtendedTiles(
+    
+    private fun List<ScreenSpaceMapRenderTile>.filterExtendedTiles(
         tilesLineWidth: Int,
-    ): List<RenderTiles?> = filterIndexed { index, _ ->
+    ): List<ScreenSpaceMapRenderTile> = filterIndexed { index, _ ->
         val x = index % tilesLineWidth
         if (x == 0 || x == tilesLineWidth - 1) return@filterIndexed false
-
+        
         val y = index / tilesLineWidth
         if (y == 0 || y == (size / tilesLineWidth) - 1) return@filterIndexed false
-
+        
         true
     }
-
-    private fun List<RenderTiles?>.applyFOV(
+    
+    private fun List<ScreenSpaceRenderTiles?>.applyFOV(
+        tilesLineWidth: Int,
         shouldRenderTile: (Int) -> Boolean,
-    ): List<MapRenderTile> = mapIndexed { index, tile ->
-        when {
-            tile == null -> MapRenderTile.Hidden()
-
-            shouldRenderTile(index) -> MapRenderTile.Revealed(
-                floorData = tile.first.toFloorRenderTileData(),
-                objectData = tile.second?.toObjectRenderTileData(),
-            )
-
-            else -> MapRenderTile.Hidden(
-                effectData = tile.second
-                    ?.takeIf { it == ObjectRenderTile.Gismo }
-                    ?.toObjectRenderTileData(),
-            )
+    ): List<ScreenSpaceMapRenderTile> = mapIndexed { index, pair ->
+        when (pair) {
+            null -> null to MapRenderTile.Empty
+            else -> {
+                val x = index % tilesLineWidth
+                val y = index / tilesLineWidth
+                
+                val isVisible = if (x == 0 || x == tilesLineWidth - 1 || y == 0 || y == tilesLineWidth - 1) {
+                    false
+                } else {
+                    shouldRenderTile((y - 1) * (tilesLineWidth - 2) + x - 1)
+                }
+                
+                pair.first to MapRenderTile.Content(
+                    floorData = pair.second.first.toFloorRenderTileData(),
+                    objectData = pair.second.second?.toObjectRenderTileData(),
+                    isVisible = isVisible,
+                )
+            }
         }
     }
     
@@ -85,12 +115,12 @@ class MapRenderProcessor @Inject constructor(
         themeAssets.resolveFloorRenderData(
             floorRenderTile = this,
         ).toMapRenderData()
-
+    
     private fun ObjectRenderTile.toObjectRenderTileData(): RenderData =
         themeAssets.resolveObjectRenderData(
             objectRenderTile = this,
         ).toMapRenderData()
-
+    
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =
         RenderData(
             asset = first,
@@ -102,5 +132,5 @@ class MapRenderProcessor @Inject constructor(
         val newTiles: List<ScreenSpaceCoordinates>,
         val exitTiles: List<ScreenSpaceCoordinates>,
     )
-
+    
 }

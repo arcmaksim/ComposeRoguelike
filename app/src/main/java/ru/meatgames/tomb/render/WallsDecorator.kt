@@ -1,44 +1,45 @@
 package ru.meatgames.tomb.render
 
 import ru.meatgames.tomb.domain.RenderTiles
+import ru.meatgames.tomb.domain.ScreenSpaceRenderTiles
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import javax.inject.Inject
 
 class WallsDecorator @Inject constructor() : MapRenderTilesDecorator {
     
     override fun processMapRenderTiles(
-        mapRenderTiles: List<RenderTiles?>,
+        mapRenderTiles: List<ScreenSpaceRenderTiles?>,
         tileLineWidth: Int,
-    ): List<RenderTiles?> = mapRenderTiles.mapIndexed { index, tile ->
-        val objectRenderTile = tile?.second ?: return@mapIndexed tile
-        if (!objectRenderTile.isWall()) return@mapIndexed tile
+    ): List<ScreenSpaceRenderTiles?> = mapRenderTiles.mapIndexed { index, pair ->
+        val objectRenderTile = pair?.second?.second ?: return@mapIndexed pair
+        if (!objectRenderTile.isWall()) return@mapIndexed pair
 
         val updatedWallRenderTile = mapRenderTiles.calcWallsFlags(index, tileLineWidth)
             .filterAngles(index, tileLineWidth, mapRenderTiles.size)
         
-        RenderTiles(tile.first, updatedWallRenderTile)
+        pair.first to RenderTiles(pair.second.first, updatedWallRenderTile)
     }
 
-    private fun List<RenderTiles?>.calcWallsFlags(
+    private fun List<ScreenSpaceRenderTiles?>.calcWallsFlags(
         tileIndex: Int,
         tilesLineWidth: Int,
     ): Int {
         var wallFlags = 0
 
         // Top
-        if (getOrNull(tileIndex - tilesLineWidth)?.second?.isWall() == true) {
+        if (getOrNull(tileIndex - tilesLineWidth)?.second?.second?.isWall() == true) {
             wallFlags += 1
         }
         // Right
-        if (getOrNull(tileIndex + 1)?.second?.isWall() == true) {
+        if (getOrNull(tileIndex + 1)?.second?.second?.isWall() == true) {
             wallFlags += 2
         }
         // Bottom
-        if (getOrNull(tileIndex + tilesLineWidth)?.second?.isWall() == true) {
+        if (getOrNull(tileIndex + tilesLineWidth)?.second?.second?.isWall() == true) {
             wallFlags += 4
         }
         // Left
-        if (getOrNull(tileIndex - 1)?.second?.isWall() == true) {
+        if (getOrNull(tileIndex - 1)?.second?.second?.isWall() == true) {
             wallFlags += 8
         }
 
