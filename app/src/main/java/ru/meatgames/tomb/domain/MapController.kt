@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
-import ru.meatgames.tomb.screen.compose.game.MapTileWrapper
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -19,16 +18,16 @@ class MapControllerImpl @Inject constructor(
 
     private lateinit var levelMap: LevelMap
 
-    private val _mapFlow: MutableStateFlow<State> = MutableStateFlow(State.MapUnavailable)
-    override val mapFlow: StateFlow<State> = _mapFlow
+    private val _mapFlow: MutableStateFlow<MapState> = MutableStateFlow(MapState.MapUnavailable)
+    override val mapFlow: StateFlow<MapState> = _mapFlow
 
     override fun generateNewMap(): GeneratedMapConfiguration {
-        _mapFlow.value = State.MapUnavailable
+        _mapFlow.value = MapState.MapUnavailable
 
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
         val configuration = mapGenerator.generateMap(levelMap)
 
-        _mapFlow.value = State.MapAvailable(
+        _mapFlow.value = MapState.MapAvailable(
             LevelMapWrapper(
                 width = configuration.mapWidth,
                 height = configuration.mapHeight,
@@ -73,7 +72,7 @@ interface MapTerraformer {
 }
 
 interface MapController {
-    val mapFlow: StateFlow<State>
+    val mapFlow: StateFlow<MapState>
 
     fun getTile(
         x: Int,
@@ -97,12 +96,12 @@ data class LevelMapWrapper(
 
 }
 
-sealed class State {
+sealed class MapState {
 
     data class MapAvailable(
         val mapWrapper: LevelMapWrapper,
-    ) : State()
+    ) : MapState()
 
-    object MapUnavailable : State()
+    object MapUnavailable : MapState()
 
 }

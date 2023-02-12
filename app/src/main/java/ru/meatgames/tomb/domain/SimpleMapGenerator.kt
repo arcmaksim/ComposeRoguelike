@@ -11,7 +11,6 @@ import ru.meatgames.tomb.model.tile.data.FloorTileMapping
 import ru.meatgames.tomb.model.tile.data.ObjectTileMapping
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
-import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import kotlin.random.Random
 

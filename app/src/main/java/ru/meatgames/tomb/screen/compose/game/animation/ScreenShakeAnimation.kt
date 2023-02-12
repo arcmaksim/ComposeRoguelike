@@ -1,13 +1,17 @@
-package ru.meatgames.tomb.screen.compose.game
+package ru.meatgames.tomb.screen.compose.game.animation
 
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.View
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.keyframes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-val shakeKeyframes: AnimationSpec<Float> = keyframes {
+private val shakeKeyframes: AnimationSpec<Float> = keyframes {
     durationMillis = 300
     val easing = FastOutLinearInEasing
 
@@ -22,7 +26,7 @@ val shakeKeyframes: AnimationSpec<Float> = keyframes {
     }
 }
 
-fun CoroutineScope.shakeAnimation(
+fun CoroutineScope.screenShakeAnimation(
     offset: Animatable<Float, AnimationVector1D>,
     view: View? = null,
 ) {

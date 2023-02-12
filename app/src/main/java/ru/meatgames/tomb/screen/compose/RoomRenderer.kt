@@ -27,8 +27,8 @@ import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.WallsDecorator
-import ru.meatgames.tomb.screen.compose.game.MapTile
-import ru.meatgames.tomb.screen.compose.game.MapTileWrapper
+import ru.meatgames.tomb.domain.MapTile
+import ru.meatgames.tomb.domain.MapTileWrapper
 import kotlin.math.max
 
 @Preview

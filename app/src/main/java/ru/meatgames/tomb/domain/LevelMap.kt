@@ -3,8 +3,6 @@ package ru.meatgames.tomb.domain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.logMessage
-import ru.meatgames.tomb.screen.compose.game.MapTile
-import ru.meatgames.tomb.screen.compose.game.MapTileWrapper
 
 class LevelMap(
     val width: Int,

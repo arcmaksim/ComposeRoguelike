@@ -45,7 +45,7 @@ class GameScreenViewModel @Inject constructor(
             field = PlayerAnimationState.NoAnimation()
             return value
         }
-    private var previousModeDirection: Direction? = null
+    private var previousMoveDirection: Direction? = null
         get() {
             val value = field
             field = null
@@ -61,7 +61,7 @@ class GameScreenViewModel @Inject constructor(
                 _state.value = GameScreenState(
                     mapState = state,
                     playerAnimation = pendingAnimation,
-                    previousMoveDirection = previousModeDirection,
+                    previousMoveDirection = previousMoveDirection,
                 )
                 
                 (state as? MapScreenController.MapScreenState.Ready)
@@ -90,7 +90,7 @@ class GameScreenViewModel @Inject constructor(
         }
         
         pendingAnimation = animation
-        previousModeDirection = (animation as? PlayerAnimationState.Scroll)?.direction
+        previousMoveDirection = (animation as? PlayerAnimationState.Scroll)?.direction
         
         mapInteractionResolver.resolvePlayerMove(playerTurnResult)
         
@@ -102,9 +102,3 @@ class GameScreenViewModel @Inject constructor(
     }
     
 }
-
-data class GameScreenState(
-    val mapState: MapScreenController.MapScreenState = MapScreenController.MapScreenState.Loading,
-    val playerAnimation: PlayerAnimationState = PlayerAnimationState.NoAnimation(),
-    val previousMoveDirection: Direction? = null,
-)

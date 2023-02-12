@@ -56,6 +56,7 @@ import ru.meatgames.tomb.domain.PlayerAnimationState
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.screen.compose.game.animation.getGameScreenTilesValueAnimations
 import ru.meatgames.tomb.toIntOffset
 
 private const val HERO_ANIMATION_FRAME_TIME = 600
@@ -76,8 +77,8 @@ fun GameScreen(
     val gameScreenState by viewModel.state.collectAsState(GameScreenState())
 
     when (val mapState = gameScreenState.mapState) {
-        is MapScreenController.MapScreenState.Loading -> Loading()
-        is MapScreenController.MapScreenState.Ready -> Map(
+        is MapScreenController.MapScreenState.Loading -> MapLoading()
+        is MapScreenController.MapScreenState.Ready -> RenderMap(
             mapState = mapState,
             playerAnimation = gameScreenState.playerAnimation,
             previousMoveDirection = gameScreenState.previousMoveDirection,
@@ -88,7 +89,7 @@ fun GameScreen(
 }
 
 @Composable
-private fun Loading() {
+private fun MapLoading() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -101,7 +102,7 @@ private fun Loading() {
 }
 
 @Composable
-private fun Map(
+private fun RenderMap(
     mapState: MapScreenController.MapScreenState.Ready,
     playerAnimation: PlayerAnimationState,
     previousMoveDirection: Direction?,
@@ -112,20 +113,20 @@ private fun Map(
         .background(Color(0xFF212121))
         .fillMaxSize()
 ) {
-    val width = LocalDensity.current.run { maxWidth.toPx() }.toInt()
-    val tileDimension = width / mapState.viewportWidth
+    val screenWidth = LocalDensity.current.run { maxWidth.toPx() }.toInt()
+    val tileDimension = screenWidth / mapState.viewportWidth
 
     val view = LocalView.current
     val shakeHorizontalOffset = remember { Animatable(0f) }
     val horizontalOffset = IntOffset(
-        x = (width - (tileDimension * mapState.viewportWidth)) / 2 + shakeHorizontalOffset.value.toInt(),
+        x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeHorizontalOffset.value.toInt(),
         y = 0,
     )
     
     val initialOffset = previousMoveDirection?.toIntOffset(tileDimension) ?: IntOffset.Zero
-    var scrollingOffset by remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
-    val revealedTileAlpha = remember(playerAnimation) { mutableStateOf(1f) }
-    val hiddenTileAlpha = remember(playerAnimation) { mutableStateOf(0f) }
+    var animatedOffset by remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
+    val revealedTilesAlpha = remember(playerAnimation) { mutableStateOf(1f) }
+    val fadedTilesAlpha = remember(playerAnimation) { mutableStateOf(0f) }
     
     LaunchedEffect(playerAnimation) {
         val specificAnimations = when (playerAnimation) {
@@ -146,7 +147,7 @@ private fun Map(
                                 durationMillis = HERO_MOVE_ANIMATION_TIME,
                             ),
                         ) { value, _ ->
-                            scrollingOffset = value
+                            animatedOffset = value
                         }
                     },
                 )
@@ -154,13 +155,13 @@ private fun Map(
             else -> emptyList()
         }
         
-        val regularAnimation = getTilesValuesAnimation(
+        val tilesAnimations = getGameScreenTilesValueAnimations(
             animationTime = HERO_MOVE_ANIMATION_TIME,
-            revealedTileAlpha = revealedTileAlpha,
-            hiddenTileAlpha = hiddenTileAlpha,
+            revealedTilesAlpha = revealedTilesAlpha,
+            fadedTilesAlpha = fadedTilesAlpha,
         ).toTypedArray()
         
-        awaitAll(*regularAnimation, *specificAnimations.toTypedArray())
+        awaitAll(*tilesAnimations, *specificAnimations.toTypedArray())
     }
     
     Text(
@@ -197,15 +198,15 @@ private fun Map(
     ) {
         DrawMap(
             modifier = modifier,
-            dataWidth = mapState.dataWidth,
-            viewportDataPadding = mapState.viewportDataPadding,
             tiles = mapState.tiles,
-            newTiles = mapState.newlyDiscoveredTiles,
-            oldTiles = mapState.fadingTiles,
-            scrollOffset = scrollingOffset,
+            tilesWidth = mapState.tilesWidth,
+            tilesPadding = mapState.tilesPadding,
+            tilesToReveal = mapState.tilesToReveal,
+            tilesToFade = mapState.tilesToFade,
+            animatedOffset = animatedOffset,
             initialOffset = initialOffset,
-            revealAlpha = revealedTileAlpha.value,
-            hiddenAlpha = hiddenTileAlpha.value,
+            revealedTilesAlpha = revealedTilesAlpha.value,
+            fadedTilesAlpha = fadedTilesAlpha.value,
         )
     
         DrawCharacter(
@@ -235,15 +236,15 @@ private fun Offset.toDirection(
 @Composable
 private fun DrawMap(
     modifier: Modifier,
-    dataWidth: Int,
-    viewportDataPadding: Int,
     tiles: List<MapRenderTile?>,
-    newTiles: Set<ScreenSpaceCoordinates>,
-    oldTiles: Set<ScreenSpaceCoordinates>,
-    scrollOffset: IntOffset,
+    tilesWidth: Int,
+    tilesPadding: Int,
+    tilesToReveal: Set<ScreenSpaceCoordinates>,
+    tilesToFade: Set<ScreenSpaceCoordinates>,
     initialOffset: IntOffset,
-    revealAlpha: Float,
-    hiddenAlpha: Float,
+    animatedOffset: IntOffset,
+    revealedTilesAlpha: Float,
+    fadedTilesAlpha: Float,
 ) {
     val tileSize = LocalTileSize.current
     val offset = LocalHorizontalOffset.current
@@ -252,17 +253,17 @@ private fun DrawMap(
     
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
-            val column = index % dataWidth - viewportDataPadding
-            val row = index / dataWidth - viewportDataPadding
-            val dstOffset = offset + initialOffset + scrollOffset + IntOffset(
+            val column = index % tilesWidth - tilesPadding
+            val row = index / tilesWidth - tilesPadding
+            val dstOffset = offset + initialOffset + animatedOffset + IntOffset(
                 column * tileDimension,
                 row * tileDimension,
             )
     
-            val screenSpaceCoordinates = (column to row)
+            val tileScreenSpaceCoordinates = column to row
             
             if (renderTile is MapRenderTile.Content && renderTile.isVisible) {
-                val alpha = revealAlpha.takeIf { newTiles.contains(screenSpaceCoordinates) }
+                val alpha = revealedTilesAlpha.takeIf { tilesToReveal.contains(tileScreenSpaceCoordinates) }
                 drawRevealedTile(
                     renderTile = renderTile,
                     dstOffset = dstOffset,
@@ -271,12 +272,13 @@ private fun DrawMap(
                     backgroundColor = backgroundColor,
                 )
             }
-            if (renderTile is MapRenderTile.Content && !renderTile.isVisible && oldTiles.contains(screenSpaceCoordinates)) {
+            if (renderTile is MapRenderTile.Content && !renderTile.isVisible
+                && tilesToFade.contains(tileScreenSpaceCoordinates)) {
                 drawRevealedTile(
                     renderTile = renderTile,
                     dstOffset = dstOffset,
                     tileSize = tileSize,
-                    alpha = hiddenAlpha,
+                    alpha = fadedTilesAlpha,
                     backgroundColor = backgroundColor,
                 )
             }
