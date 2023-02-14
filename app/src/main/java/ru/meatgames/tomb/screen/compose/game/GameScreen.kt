@@ -1,10 +1,8 @@
 package ru.meatgames.tomb.screen.compose.game
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -28,7 +26,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -45,7 +42,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
-import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.NewAssets
@@ -56,7 +52,10 @@ import ru.meatgames.tomb.domain.PlayerAnimationState
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.screen.compose.game.animation.getGameScreenTilesValueAnimations
+import ru.meatgames.tomb.screen.compose.game.animation.asDeferredFadeAnimation
+import ru.meatgames.tomb.screen.compose.game.animation.asDeferredRevealAnimation
+import ru.meatgames.tomb.screen.compose.game.animation.asDeferredScreenShakeAnimation
+import ru.meatgames.tomb.screen.compose.game.animation.asDeferredScrollAnimation
 import ru.meatgames.tomb.toIntOffset
 
 private const val HERO_ANIMATION_FRAME_TIME = 600
@@ -117,51 +116,43 @@ private fun RenderMap(
     val tileDimension = screenWidth / mapState.viewportWidth
 
     val view = LocalView.current
-    val shakeHorizontalOffset = remember { Animatable(0f) }
+    val shakeHorizontalOffset = remember(playerAnimation) { mutableStateOf(0f) }
     val horizontalOffset = IntOffset(
         x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeHorizontalOffset.value.toInt(),
         y = 0,
     )
     
     val initialOffset = previousMoveDirection?.toIntOffset(tileDimension) ?: IntOffset.Zero
-    var animatedOffset by remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
+    val animatedOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
     val revealedTilesAlpha = remember(playerAnimation) { mutableStateOf(1f) }
     val fadedTilesAlpha = remember(playerAnimation) { mutableStateOf(0f) }
     
     LaunchedEffect(playerAnimation) {
         val specificAnimations = when (playerAnimation) {
-            /*is PlayerAnimationState.Shake -> {
-                shakeAnimation(
-                    view = view,
-                    offset = shakeHorizontalOffset,
-                )
-            }*/
-            is PlayerAnimationState.Scroll -> {
-                listOf(
-                    async {
-                        animate(
-                            initialValue = IntOffset.Zero,
-                            targetValue = -initialOffset,
-                            typeConverter = IntOffset.VectorConverter,
-                            animationSpec = tween(
-                                durationMillis = HERO_MOVE_ANIMATION_TIME,
-                            ),
-                        ) { value, _ ->
-                            animatedOffset = value
-                        }
-                    },
+            is PlayerAnimationState.Shake -> {
+                arrayOf(
+                    shakeHorizontalOffset.asDeferredScreenShakeAnimation(
+                        view = view,
+                    )
                 )
             }
-            else -> emptyList()
+            is PlayerAnimationState.Scroll -> {
+                arrayOf(
+                    animatedOffset.asDeferredScrollAnimation(
+                        animationTime = HERO_MOVE_ANIMATION_TIME,
+                        targetValue = -initialOffset,
+                    )
+                )
+            }
+            else -> emptyArray()
         }
         
-        val tilesAnimations = getGameScreenTilesValueAnimations(
-            animationTime = HERO_MOVE_ANIMATION_TIME,
-            revealedTilesAlpha = revealedTilesAlpha,
-            fadedTilesAlpha = fadedTilesAlpha,
-        ).toTypedArray()
+        val tilesAnimations = arrayOf(
+            revealedTilesAlpha.asDeferredRevealAnimation(HERO_MOVE_ANIMATION_TIME),
+            fadedTilesAlpha.asDeferredFadeAnimation(HERO_MOVE_ANIMATION_TIME),
+        )
         
-        awaitAll(*tilesAnimations, *specificAnimations.toTypedArray())
+        awaitAll(*specificAnimations, *tilesAnimations)
     }
     
     Text(
@@ -203,7 +194,7 @@ private fun RenderMap(
             tilesPadding = mapState.tilesPadding,
             tilesToReveal = mapState.tilesToReveal,
             tilesToFade = mapState.tilesToFade,
-            animatedOffset = animatedOffset,
+            animatedOffset = animatedOffset.value,
             initialOffset = initialOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,

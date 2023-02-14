@@ -4,42 +4,55 @@ import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 
 context(CoroutineScope)
-suspend fun getGameScreenTilesValueAnimations(
+suspend fun MutableState<Float>.asDeferredRevealAnimation(
     animationTime: Int,
-    revealedTilesAlpha: MutableState<Float>,
-    fadedTilesAlpha: MutableState<Float>,
-): List<Deferred<Unit>> = listOf(
-    async { revealedTilesAlpha.getRevealAnimation(animationTime) },
-    async { fadedTilesAlpha.getFadeAnimation(animationTime) },
-)
-
-private suspend fun MutableState<Float>.getRevealAnimation(
-    animationTime: Int,
-) = animate(
-    initialValue = 1f,
-    targetValue = 0f,
-    typeConverter = Float.VectorConverter,
-    animationSpec = tween(
-        durationMillis = animationTime,
-    ),
-) { animatedValue, _ ->
-    value = animatedValue
+) = async {
+    animate(
+        initialValue = 1f,
+        targetValue = 0f,
+        typeConverter = Float.VectorConverter,
+        animationSpec = tween(
+            durationMillis = animationTime,
+        ),
+    ) { animatedValue, _ ->
+        value = animatedValue
+    }
 }
 
-private suspend fun MutableState<Float>.getFadeAnimation(
+context(CoroutineScope)
+suspend fun MutableState<Float>.asDeferredFadeAnimation(
     animationTime: Int,
-) = animate(
-    initialValue = 0f,
-    targetValue = 1f,
-    typeConverter = Float.VectorConverter,
-    animationSpec = tween(
-        durationMillis = animationTime,
-    ),
-) { animatedValue, _ ->
-    value = animatedValue
+) = async {
+    animate(
+        initialValue = 0f,
+        targetValue = 1f,
+        typeConverter = Float.VectorConverter,
+        animationSpec = tween(
+            durationMillis = animationTime,
+        ),
+    ) { animatedValue, _ ->
+        value = animatedValue
+    }
+}
+
+context(CoroutineScope)
+suspend fun MutableState<IntOffset>.asDeferredScrollAnimation(
+    animationTime: Int,
+    targetValue: IntOffset,
+) = async {
+    animate(
+        initialValue = IntOffset.Zero,
+        targetValue = targetValue,
+        typeConverter = IntOffset.VectorConverter,
+        animationSpec = tween(
+            durationMillis = animationTime,
+        ),
+    ) { animatedValue, _ ->
+        value = animatedValue
+    }
 }

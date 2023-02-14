@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.GameController
@@ -83,17 +84,42 @@ class GameScreenViewModel @Inject constructor(
             return
         }
         
-        val animation = when (val result = mapInteractionController.makeMove(direction)) {
+        val animation = when (playerTurnResult) {
             is PlayerMoveResult.Block -> PlayerAnimationState.Shake()
-            is PlayerMoveResult.Move -> PlayerAnimationState.Scroll(result.direction)
+            is PlayerMoveResult.Move -> PlayerAnimationState.Scroll(playerTurnResult.direction)
             else -> PlayerAnimationState.NoAnimation()
         }
         
-        pendingAnimation = animation
-        previousMoveDirection = (animation as? PlayerAnimationState.Scroll)?.direction
-        
-        mapInteractionResolver.resolvePlayerMove(playerTurnResult)
-        
+        if (animation.isWithoutStateUpdate()) {
+            animation.consumeAnimationWithoutStateUpdate()
+        } else {
+            animation.consumeAnimationWithStateUpdate(playerTurnResult)
+        }
+    }
+    
+    private fun PlayerAnimationState.isWithoutStateUpdate(): Boolean = when (this) {
+        is PlayerAnimationState.Shake -> true
+        else -> false
+    }
+    
+    private fun PlayerAnimationState.consumeAnimationWithoutStateUpdate() {
+        _state.update {
+            it.copy(
+                previousMoveDirection = null,
+                playerAnimation = this,
+            )
+        }
+        _isIdle.value = true
+    }
+    
+    private fun PlayerAnimationState.consumeAnimationWithStateUpdate(
+        playerMoveResult: PlayerMoveResult,
+    ) {
+        pendingAnimation = this
+        previousMoveDirection = (this as? PlayerAnimationState.Scroll)?.direction
+    
+        mapInteractionResolver.resolvePlayerMove(playerMoveResult)
+    
         _isIdle.value = true
     }
     

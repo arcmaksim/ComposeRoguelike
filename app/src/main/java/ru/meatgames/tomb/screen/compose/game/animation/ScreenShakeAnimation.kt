@@ -3,15 +3,16 @@ package ru.meatgames.tomb.screen.compose.game.animation
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.View
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.keyframes
+import androidx.compose.runtime.MutableState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 
-private val shakeKeyframes: AnimationSpec<Float> = keyframes {
+private val keyframes: AnimationSpec<Float> = keyframes {
     durationMillis = 300
     val easing = FastOutLinearInEasing
 
@@ -26,21 +27,23 @@ private val shakeKeyframes: AnimationSpec<Float> = keyframes {
     }
 }
 
-fun CoroutineScope.screenShakeAnimation(
-    offset: Animatable<Float, AnimationVector1D>,
-    view: View? = null,
-) {
-    launch {
-        offset.animateTo(
-            targetValue = 0f,
-            animationSpec = shakeKeyframes,
-        )
-    }
+context(CoroutineScope)
+suspend fun MutableState<Float>.asDeferredScreenShakeAnimation(
+    view: View?,
+) = async {
     view?.let {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             view.performHapticFeedback(HapticFeedbackConstants.REJECT)
         } else {
             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         }
+    }
+    animate(
+        initialValue = 1f,
+        targetValue = 0f,
+        typeConverter = Float.VectorConverter,
+        animationSpec = keyframes,
+    ) { animatedValue, _ ->
+        value = animatedValue
     }
 }
