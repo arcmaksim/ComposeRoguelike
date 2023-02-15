@@ -28,54 +28,50 @@ const val MAP_VIEWPORT_HEIGHT_KEY = "MAP_VIEWPORT_HEIGHT"
 
 @Module
 @InstallIn(SingletonComponent::class)
-class SingletonModule {
-
-    @Named(MAP_WIDTH_KEY)
-    @Provides
-    fun mapWidthConst(): Int = MAP_WIDTH
-
-    @Named(MAP_HEIGHT_KEY)
-    @Provides
-    fun mapHeightConst(): Int = MAP_HEIGHT
-
-    @Named(MAP_VIEWPORT_WIDTH_KEY)
-    @Provides
-    fun mapViewportWidthConst(): Int = MAP_VIEWPORT_WIDTH
-
-    @Named(MAP_VIEWPORT_HEIGHT_KEY)
-    @Provides
-    fun mapViewportHeightConst(): Int = MAP_VIEWPORT_HEIGHT
-
-    @Provides
-    fun provideRoomsData(
-        roomsRepository: RoomsRepository,
-    ): RoomsData = roomsRepository.loadData()
-
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class BindingSingletonModule {
+interface SingletonModule {
 
     @Binds
-    abstract fun bindMapGenerator(
+    fun bindMapGenerator(
         controller: MapControllerImpl,
     ): MapGenerator
 
     @Binds
-    abstract fun bindMapTerraformer(
+    fun bindMapTerraformer(
         controller: MapControllerImpl,
     ): MapTerraformer
 
     @Binds
-    abstract fun bindMapController(
+    fun bindMapController(
         controller: MapControllerImpl,
     ): MapController
 
     @Binds
     @IntoSet
-    abstract fun bindWallsDecorator(
+    fun bindWallsDecorator(
         decorator: WallsDecorator,
     ): MapRenderTilesDecorator
 
+    companion object {
+        @Named(MAP_WIDTH_KEY)
+        @Provides
+        fun mapWidthConst(): Int = MAP_WIDTH
+    
+        @Named(MAP_HEIGHT_KEY)
+        @Provides
+        fun mapHeightConst(): Int = MAP_HEIGHT
+    
+        @Named(MAP_VIEWPORT_WIDTH_KEY)
+        @Provides
+        fun mapViewportWidthConst(): Int = MAP_VIEWPORT_WIDTH
+    
+        @Named(MAP_VIEWPORT_HEIGHT_KEY)
+        @Provides
+        fun mapViewportHeightConst(): Int = MAP_VIEWPORT_HEIGHT
+    
+        @Provides
+        fun provideRoomsData(
+            roomsRepository: RoomsRepository,
+        ): RoomsData = roomsRepository.loadData()
+    }
+    
 }
