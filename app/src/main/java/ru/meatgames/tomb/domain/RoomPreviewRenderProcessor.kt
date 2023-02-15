@@ -10,64 +10,65 @@ import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.MapRenderTilesDecorator
 import ru.meatgames.tomb.render.RenderData
-import ru.meatgames.tomb.screen.compose.game.MapTile
+import ru.meatgames.tomb.screen.compose.game.render.RenderTiles
+import ru.meatgames.tomb.screen.compose.game.render.ScreenSpaceMapRenderTile
+import ru.meatgames.tomb.screen.compose.game.render.ScreenSpaceRenderTiles
 import javax.inject.Inject
 
 class RoomPreviewRenderProcessor @Inject constructor(
     private val themeAssets: ThemeAssets,
     private val mapDecorators: Set<@JvmSuppressWildcards MapRenderTilesDecorator>,
 ) {
-
+    
     // Assumes tiles is a square
     fun produceRenderTilesFrom(
-        tiles: List<MapTile?>,
+        tiles: List<MapTileWrapper?>,
         tilesLineWidth: Int,
-    ): List<MapRenderTile> {
-        return tiles.mapToRenderTiles()
-            .applyDecorators(tilesLineWidth)
-            .revealAllTiles()
-    }
-
-    private fun List<MapTile?>.mapToRenderTiles(): List<RenderTiles?> = map {
+    ): List<ScreenSpaceMapRenderTile> = tiles.mapToRenderTiles()
+        .applyDecorators(tilesLineWidth)
+        .revealAllTiles()
+    
+    private fun List<MapTileWrapper?>.mapToRenderTiles(): List<ScreenSpaceRenderTiles?> = map {
         it ?: return@map null
-        RenderTiles(
-            first = it.floorEntityTile.toFloorRenderTile(),
-            second = it.objectEntityTile?.toObjectRenderTile(),
+        it to RenderTiles(
+            first = it.tile.floorEntityTile.toFloorRenderTile(),
+            second = it.tile.objectEntityTile?.toObjectRenderTile(),
         )
     }
-
-    private fun List<RenderTiles?>.applyDecorators(
+    
+    private fun List<ScreenSpaceRenderTiles?>.applyDecorators(
         tilesLineWidth: Int,
-    ): List<RenderTiles?> = run {
+    ): List<ScreenSpaceRenderTiles?> = run {
         mapDecorators.fold(this) { tiles, decorator ->
             decorator.processMapRenderTiles(tiles, tilesLineWidth)
         }
     }
-
-    private fun List<RenderTiles?>.revealAllTiles(): List<MapRenderTile> = map { tile ->
-        when (tile) {
-            null -> MapRenderTile.Hidden()
-            else -> MapRenderTile.Revealed(
-                floorData = tile.first.toFloorRenderTileData(),
-                objectData = tile.second?.toObjectRenderTileData(),
+    
+    private fun List<ScreenSpaceRenderTiles?>.revealAllTiles(): List<ScreenSpaceMapRenderTile> = map { pair ->
+        when (pair) {
+            null -> null to MapRenderTile.Empty
+            else -> pair.first to MapRenderTile.Content(
+                floorData = pair.second.first.toFloorRenderTileData(),
+                objectData = pair.second.second?.toObjectRenderTileData(),
+                isVisible = true,
             )
         }
     }
-
+    
     private fun FloorRenderTile.toFloorRenderTileData(): RenderData =
         themeAssets.resolveFloorRenderData(
             floorRenderTile = this,
         ).toMapRenderData()
-
+    
     private fun ObjectRenderTile.toObjectRenderTileData(): RenderData =
         themeAssets.resolveObjectRenderData(
             objectRenderTile = this,
         ).toMapRenderData()
-
+    
     private fun FloorEntityTile.toFloorRenderTile(): FloorRenderTile = when (this) {
         FloorEntityTile.Floor -> FloorRenderTile.Floor
     }
-
+    
     private fun ObjectEntityTile.toObjectRenderTile(): ObjectRenderTile? = when (this) {
         ObjectEntityTile.DoorClosed -> ObjectRenderTile.DoorClosed
         ObjectEntityTile.DoorOpened -> ObjectRenderTile.DoorOpened
@@ -76,11 +77,11 @@ class RoomPreviewRenderProcessor @Inject constructor(
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
         ObjectEntityTile.Gismo -> null
     }
-
+    
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =
         RenderData(
             asset = first,
             srcOffset = second,
         )
-
+    
 }

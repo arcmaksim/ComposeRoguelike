@@ -27,7 +27,8 @@ import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.WallsDecorator
-import ru.meatgames.tomb.screen.compose.game.MapTile
+import ru.meatgames.tomb.domain.MapTile
+import ru.meatgames.tomb.domain.MapTileWrapper
 import kotlin.math.max
 
 @Preview
@@ -44,18 +45,24 @@ private fun RoomRenderer() {
     val room = roomsData.rooms.random()
 
     val mapTiles = (0 until room.width * room.height).map { index ->
-        MapTile(
-            floorEntityTile = roomsData.floorMapping
-                .first { it.symbol == room.floor[index].toString() }.entity,
-            objectEntityTile = roomsData.objectMapping
-                .first { it.symbol == room.objects[index].toString() }.entity,
+        MapTileWrapper(
+            x = index % room.width,
+            y = index % room.height,
+            tile = MapTile(
+                floorEntityTile = roomsData.floorMapping
+                    .first { it.symbol == room.floor[index].toString() }
+                    .entity,
+                objectEntityTile = roomsData.objectMapping
+                    .first { it.symbol == room.objects[index].toString() }
+                    .entity,
+            ),
         )
     }
 
     val renderTiles = mapRenderProcessor.produceRenderTilesFrom(
         tiles = mapTiles,
         tilesLineWidth = room.width,
-    )
+    ).map { it.second }
 
     val roomPreviewData = RoomPreviewData(
         roomName = room.name,
@@ -122,7 +129,7 @@ private fun RoomRenderer(
         val tileSize = IntSize(tileDimension, tileDimension)
 
         roomPreviewData.tiles.mapIndexed { index, renderTile ->
-            if (renderTile is MapRenderTile.Revealed) {
+            if (renderTile is MapRenderTile.Content) {
                 val column = index % roomPreviewData.roomWidth
                 val row = index / roomPreviewData.roomWidth
                 val dstOffset = IntOffset(

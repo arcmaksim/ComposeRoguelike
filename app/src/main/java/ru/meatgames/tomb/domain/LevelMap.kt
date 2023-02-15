@@ -3,24 +3,23 @@ package ru.meatgames.tomb.domain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.logMessage
-import ru.meatgames.tomb.screen.compose.game.MapTile
 
 class LevelMap(
     val width: Int,
     val height: Int,
 ) {
-
+    
     private val array = Array(width * height) { MapTile.initialTile }
-
-    private val _state = MutableStateFlow(array.toList())
-    val state: StateFlow<List<MapTile>> = _state
-
+    
+    private val _state = MutableStateFlow(array.toWrappers())
+    val state: StateFlow<List<MapTileWrapper>> = _state
+    
     private val editor = EditorImpl()
-
+    
     fun getTile(
         x: Int,
         y: Int,
-    ): MapTile? {
+    ): MapTileWrapper? {
         val capturedState = state.value
         val index = calcIndex(x, y)
         if (index < 0 || index >= capturedState.size) {
@@ -32,7 +31,7 @@ class LevelMap(
         }
         return capturedState[calcIndex(x, y)]
     }
-
+    
     fun updateSingleTile(
         x: Int,
         y: Int,
@@ -40,9 +39,9 @@ class LevelMap(
     ) {
         val index = calcIndex(x, y)
         if (!updateTile(index, update)) return
-        _state.value = array.toList()
+        _state.value = array.toWrappers()
     }
-
+    
     private fun updateTile(
         index: Int,
         update: MapTile.() -> MapTile,
@@ -55,35 +54,43 @@ class LevelMap(
             )
             return false
         }
-
+        
         array[index] = array[index].update()
         return true
     }
-
+    
     fun updateBatch(
         updateFunc: (Editor.() -> Unit),
     ) {
         updateFunc.invoke(editor)
-        _state.value = array.toList()
+        _state.value = array.toWrappers()
     }
-
+    
     private fun calcIndex(
         x: Int,
         y: Int,
     ) = x + y * width
-
+    
+    private fun Array<MapTile>.toWrappers(): List<MapTileWrapper> = mapIndexed { index, tile ->
+        MapTileWrapper(
+            x = index % width,
+            y = index / width,
+            tile = tile,
+        )
+    }
+    
     interface Editor {
-
+        
         fun updateSingleTile(
             x: Int,
             y: Int,
             update: MapTile.() -> MapTile,
         )
-
+        
     }
-
+    
     inner class EditorImpl : Editor {
-
+        
         override fun updateSingleTile(
             x: Int,
             y: Int,
@@ -91,7 +98,7 @@ class LevelMap(
         ) {
             if (!updateTile(calcIndex(x, y), update)) return
         }
-
+        
     }
-
+    
 }

@@ -1,12 +1,12 @@
 package ru.meatgames.tomb.render
 
-import ru.meatgames.tomb.domain.RenderTiles
+import ru.meatgames.tomb.screen.compose.game.render.ScreenSpaceRenderTiles
 
 interface MapRenderTilesDecorator {
 
     fun processMapRenderTiles(
-        mapRenderTiles: List<RenderTiles?>,
+        mapRenderTiles: List<ScreenSpaceRenderTiles?>,
         tileLineWidth: Int,
-    ): List<RenderTiles?>
+    ): List<ScreenSpaceRenderTiles?>
 
 }

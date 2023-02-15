@@ -11,11 +11,11 @@ import ru.meatgames.tomb.model.tile.data.FloorTileMapping
 import ru.meatgames.tomb.model.tile.data.ObjectTileMapping
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
-import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import kotlin.random.Random
 
-private typealias MapCell = Pair<Int, Int>
+typealias Coordinates = Pair<Int, Int>
+typealias ScreenSpaceCoordinates = Coordinates
 
 class SimpleMapGenerator @Inject constructor(
     roomsData: RoomsData,
@@ -132,16 +132,16 @@ class SimpleMapGenerator @Inject constructor(
     
     private fun LevelMap.getRandomOuterWall(
         random: Random = Random,
-    ): Pair<MapCell, Direction>? {
+    ): Pair<Coordinates, Direction>? {
         val localOuterWallsPool = outerWallsPool.map { it.first to it.second }.toMutableSet()
         
         while (localOuterWallsPool.isNotEmpty()) {
             val wall = localOuterWallsPool.random(random)
             
-            val topTile = getTile(wall.first, wall.second - 1)
-            val bottomTile = getTile(wall.first, wall.second + 1)
-            val leftTile = getTile(wall.first - 1, wall.second)
-            val rightTile = getTile(wall.first + 1, wall.second)
+            val topTile = getTile(wall.first, wall.second - 1)?.tile
+            val bottomTile = getTile(wall.first, wall.second + 1)?.tile
+            val leftTile = getTile(wall.first - 1, wall.second)?.tile
+            val rightTile = getTile(wall.first + 1, wall.second)?.tile
             
             when {
                 topTile.isEmpty && bottomTile.isWall && leftTile.isWall && rightTile.isWall -> Direction.Bottom
@@ -160,10 +160,10 @@ class SimpleMapGenerator @Inject constructor(
     }
     
     private fun Room.findTile(
-        randomOuterWall: MapCell,
+        randomOuterWall: Coordinates,
         direction: Direction,
         random: Random,
-    ): MapCell? {
+    ): Coordinates? {
         log("Resolving room wall for $name, at ${randomOuterWall.first} ${randomOuterWall.second} with $direction")
         
         val wall = when (direction) {
@@ -218,7 +218,7 @@ class SimpleMapGenerator @Inject constructor(
             while (true) {
                 val x = random.nextInt(width)
                 val y = random.nextInt(height)
-                val tile = getTile(x, y)
+                val tile = getTile(x, y)?.tile
                 if (tile.isEmpty) {
                     updateSingleTile(x, y) {
                         copy(
@@ -249,7 +249,7 @@ class SimpleMapGenerator @Inject constructor(
         log("Checking zone at $mapX $mapY dimensions $roomWidth x $roomHeight")
         for (x in mapX until mapX + roomWidth) {
             for (y in mapY until mapY + roomHeight) {
-                val tile = getTile(x, y) ?: return false
+                val tile = getTile(x, y)?.tile ?: return false
                 if (!tile.isWall) return false
             }
         }

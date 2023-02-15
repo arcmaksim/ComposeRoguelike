@@ -35,7 +35,7 @@ fun WinScreen(
     
         BaseTextButton(
             title = "To main menu",
-            modifier = Modifier.align(Alignment.BottomEnd),
+            modifier = Modifier.align(Alignment.BottomStart),
             onClick = onNavigateToMainMenu,
         )
     }

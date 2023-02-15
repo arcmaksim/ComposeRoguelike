@@ -20,10 +20,10 @@ object NewAssets {
     fun loadAssets(
         context: Context,
     ) {
-        val charactedAnimationSheet = context.getBitmapFromAsset("character_animation_sheet")
+        val characterAnimationSheet = context.getBitmapFromAsset("character_animation_sheet")
         val heroSprites = Array(4) { i ->
             Bitmap.createBitmap(
-                charactedAnimationSheet,
+                characterAnimationSheet,
                 i * originalTileSize,
                 0,
                 originalTileSize,
