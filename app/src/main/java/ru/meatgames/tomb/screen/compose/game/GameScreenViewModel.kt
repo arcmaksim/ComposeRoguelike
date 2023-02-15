@@ -8,56 +8,123 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.PlayerAnimationState
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
+import ru.meatgames.tomb.domain.PlayerMapInteractionResolver
+import ru.meatgames.tomb.domain.PlayerMoveResult
 import javax.inject.Inject
 
 private const val TARGET_POINTS = 10
 
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
-    controller: MapScreenController,
+    private val controller: MapScreenController,
     private val mapInteractionController: PlayerMapInteractionController,
+    private val mapInteractionResolver: PlayerMapInteractionResolver,
     private val gameController: GameController,
 ) : ViewModel() {
     
     private val _events = Channel<Any?>()
     val events: Flow<Any?> = _events.receiveAsFlow()
-
-    private val _mapState = MutableStateFlow(controller.state.value)
-    val mapState: StateFlow<MapScreenController.MapScreenState> = controller.state
-
+    
+    private val _state = MutableStateFlow(
+        GameScreenState(
+            mapState = controller.state.value,
+            playerAnimation = null,
+        )
+    )
+    val state: Flow<GameScreenState> = _state
+    
+    private var pendingAnimation: PlayerAnimationState? = null
+        get() {
+            val value = field
+            field = null
+            return value
+        }
+    private var previousMoveDirection: Direction? = null
+        get() {
+            val value = field
+            field = null
+            return value
+        }
+    
     private val _isIdle = MutableStateFlow(true)
     val isIdle: StateFlow<Boolean> = _isIdle
     
     init {
         viewModelScope.launch {
             controller.state.collect { state ->
-                _mapState.value = state
+                _state.value = GameScreenState(
+                    mapState = state,
+                    playerAnimation = pendingAnimation,
+                    previousMoveDirection = previousMoveDirection,
+                )
+                
                 (state as? MapScreenController.MapScreenState.Ready)
                     ?.takeIf { it.points == TARGET_POINTS }
                     ?.let { _events.send(Any()) }
             }
         }
     }
-
+    
     fun onMoveCharacter(
-        moveDirection: Direction,
+        direction: Direction,
     ) {
         if (!isIdle.value) return
-
+        
         _isIdle.value = false
-
-        mapInteractionController.makeMove(moveDirection)
-
+        
+        val playerTurnResult = mapInteractionController.makeMove(direction) ?: let {
+            _isIdle.value = true
+            return
+        }
+        
+        val animation = when (playerTurnResult) {
+            is PlayerMoveResult.Block -> PlayerAnimationState.Shake()
+            is PlayerMoveResult.Move -> PlayerAnimationState.Scroll(playerTurnResult.direction)
+            else -> null
+        }
+        
+        if (animation.isWithoutStateUpdate()) {
+            animation.consumeAnimationWithoutStateUpdate()
+        } else {
+            animation.consumeAnimationWithStateUpdate(playerTurnResult)
+        }
+    }
+    
+    private fun PlayerAnimationState?.isWithoutStateUpdate(): Boolean = when (this) {
+        is PlayerAnimationState.Shake -> true
+        else -> false
+    }
+    
+    private fun PlayerAnimationState?.consumeAnimationWithoutStateUpdate() {
+        _state.update {
+            it.copy(
+                previousMoveDirection = null,
+                playerAnimation = this,
+            )
+        }
+        _isIdle.value = true
+    }
+    
+    private fun PlayerAnimationState?.consumeAnimationWithStateUpdate(
+        playerMoveResult: PlayerMoveResult,
+    ) {
+        pendingAnimation = this
+        previousMoveDirection = (this as? PlayerAnimationState.Scroll)?.direction
+    
+        mapInteractionResolver.resolvePlayerMove(playerMoveResult)
+    
         _isIdle.value = true
     }
     
     fun newMap() {
         gameController.generateNewMap()
     }
-
+    
 }

@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
-import ru.meatgames.tomb.screen.compose.game.MapTile
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -19,16 +18,16 @@ class MapControllerImpl @Inject constructor(
 
     private lateinit var levelMap: LevelMap
 
-    private val _mapFlow: MutableStateFlow<State> = MutableStateFlow(State.MapUnavailable)
-    override val mapFlow: StateFlow<State> = _mapFlow
+    private val _mapFlow: MutableStateFlow<MapState> = MutableStateFlow(MapState.MapUnavailable)
+    override val mapFlow: StateFlow<MapState> = _mapFlow
 
     override fun generateNewMap(): GeneratedMapConfiguration {
-        _mapFlow.value = State.MapUnavailable
+        _mapFlow.value = MapState.MapUnavailable
 
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
         val configuration = mapGenerator.generateMap(levelMap)
 
-        _mapFlow.value = State.MapAvailable(
+        _mapFlow.value = MapState.MapAvailable(
             LevelMapWrapper(
                 width = configuration.mapWidth,
                 height = configuration.mapHeight,
@@ -42,7 +41,7 @@ class MapControllerImpl @Inject constructor(
     override fun getTile(
         x: Int,
         y: Int,
-    ): MapTile? = levelMap.getTile(x, y)
+    ): MapTileWrapper? = levelMap.getTile(x, y)
 
     override fun changeObject(
         x: Int,
@@ -73,36 +72,36 @@ interface MapTerraformer {
 }
 
 interface MapController {
-    val mapFlow: StateFlow<State>
+    val mapFlow: StateFlow<MapState>
 
     fun getTile(
         x: Int,
         y: Int,
-    ): MapTile?
+    ): MapTileWrapper?
 }
 
 data class LevelMapWrapper(
     val width: Int,
     val height: Int,
-    val state: StateFlow<List<MapTile>>,
+    val state: StateFlow<List<MapTileWrapper>>,
 ) {
 
     override fun toString(): String {
         val flowValue = state.value
         return flowValue.mapIndexed { index, value ->
             val nextLinePostfix = if (index % width == width - 1) "\n" else ""
-            if (value.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
+            if (value.tile.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
         }.fold("") { acc, item -> acc + item }
     }
 
 }
 
-sealed class State {
+sealed class MapState {
 
     data class MapAvailable(
         val mapWrapper: LevelMapWrapper,
-    ) : State()
+    ) : MapState()
 
-    object MapUnavailable : State()
+    object MapUnavailable : MapState()
 
 }

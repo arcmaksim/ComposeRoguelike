@@ -59,7 +59,8 @@ class MainActivity : AppCompatActivity() {
             GameController.mHero.interruptAllActions();
             Assets.INSTANCE.getMapview().setMDrawExitDialog(!Assets.INSTANCE.getMapview().getMDrawExitDialog());
         }*/
-        showExitDialog()
+        //showExitDialog()
+        finish()
     }
 
     fun exitGame() {

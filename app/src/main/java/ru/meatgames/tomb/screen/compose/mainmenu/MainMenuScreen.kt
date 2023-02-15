@@ -43,12 +43,12 @@ fun MainMenuScreen(
             style = h1TextStyle,
         )
         BaseTextButton(
-            title = "Новая игра",
+            title = "New game",
             modifier = Modifier.align(Alignment.BottomStart),
             onClick = viewModel::newGame,
         )
         BaseTextButton(
-            title = "Выход",
+            title = "Exit",
             modifier = Modifier.align(Alignment.BottomEnd),
             onClick = viewModel::exitGame,
         )
