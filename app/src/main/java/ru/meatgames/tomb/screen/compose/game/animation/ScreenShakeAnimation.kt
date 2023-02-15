@@ -15,7 +15,7 @@ import kotlinx.coroutines.async
 private val keyframes: AnimationSpec<Float> = keyframes {
     durationMillis = 300
     val easing = FastOutLinearInEasing
-
+    
     // generate 8 keyframes
     for (i in 1..8) {
         val x = when (i % 3) {
@@ -28,16 +28,7 @@ private val keyframes: AnimationSpec<Float> = keyframes {
 }
 
 context(CoroutineScope)
-suspend fun MutableState<Float>.asDeferredScreenShakeAnimation(
-    view: View?,
-) = async {
-    view?.let {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            view.performHapticFeedback(HapticFeedbackConstants.REJECT)
-        } else {
-            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-        }
-    }
+suspend fun MutableState<Float>.asDeferredScreenShakeAnimationAsync() = async {
     animate(
         initialValue = 1f,
         targetValue = 0f,
@@ -45,5 +36,14 @@ suspend fun MutableState<Float>.asDeferredScreenShakeAnimation(
         animationSpec = keyframes,
     ) { animatedValue, _ ->
         value = animatedValue
+    }
+}
+
+context(CoroutineScope)
+fun View.asDeferredVibrationAsync() = async {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        performHapticFeedback(HapticFeedbackConstants.REJECT)
+    } else {
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
     }
 }

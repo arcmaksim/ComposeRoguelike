@@ -50,12 +50,10 @@ import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.domain.PlayerAnimationState
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
+import ru.meatgames.tomb.domain.isStateless
 import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.screen.compose.game.animation.asDeferredFadeAnimation
-import ru.meatgames.tomb.screen.compose.game.animation.asDeferredRevealAnimation
-import ru.meatgames.tomb.screen.compose.game.animation.asDeferredScreenShakeAnimation
-import ru.meatgames.tomb.screen.compose.game.animation.asDeferredScrollAnimation
+import ru.meatgames.tomb.screen.compose.game.animation.assembleGameScreenAnimations
 import ru.meatgames.tomb.toIntOffset
 
 private const val HERO_ANIMATION_FRAME_TIME = 600
@@ -72,9 +70,9 @@ fun GameScreen(
             event?.let { onWin() }
         }
     }
-
+    
     val gameScreenState by viewModel.state.collectAsState(GameScreenState())
-
+    
     when (val mapState = gameScreenState.mapState) {
         is MapScreenController.MapScreenState.Loading -> MapLoading()
         is MapScreenController.MapScreenState.Ready -> RenderMap(
@@ -103,7 +101,7 @@ private fun MapLoading() {
 @Composable
 private fun RenderMap(
     mapState: MapScreenController.MapScreenState.Ready,
-    playerAnimation: PlayerAnimationState,
+    playerAnimation: PlayerAnimationState?,
     previousMoveDirection: Direction?,
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
@@ -112,9 +110,11 @@ private fun RenderMap(
         .background(Color(0xFF212121))
         .fillMaxSize()
 ) {
+    val isPlayerAnimationStateless = playerAnimation.isStateless
+    
     val screenWidth = LocalDensity.current.run { maxWidth.toPx() }.toInt()
     val tileDimension = screenWidth / mapState.viewportWidth
-
+    
     val view = LocalView.current
     val shakeHorizontalOffset = remember(playerAnimation) { mutableStateOf(0f) }
     val horizontalOffset = IntOffset(
@@ -124,35 +124,21 @@ private fun RenderMap(
     
     val initialOffset = previousMoveDirection?.toIntOffset(tileDimension) ?: IntOffset.Zero
     val animatedOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
-    val revealedTilesAlpha = remember(playerAnimation) { mutableStateOf(1f) }
-    val fadedTilesAlpha = remember(playerAnimation) { mutableStateOf(0f) }
+    val revealedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f) }
+    val fadedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f) }
     
     LaunchedEffect(playerAnimation) {
-        val specificAnimations = when (playerAnimation) {
-            is PlayerAnimationState.Shake -> {
-                arrayOf(
-                    shakeHorizontalOffset.asDeferredScreenShakeAnimation(
-                        view = view,
-                    )
-                )
-            }
-            is PlayerAnimationState.Scroll -> {
-                arrayOf(
-                    animatedOffset.asDeferredScrollAnimation(
-                        animationTime = HERO_MOVE_ANIMATION_TIME,
-                        targetValue = -initialOffset,
-                    )
-                )
-            }
-            else -> emptyArray()
-        }
-        
-        val tilesAnimations = arrayOf(
-            revealedTilesAlpha.asDeferredRevealAnimation(HERO_MOVE_ANIMATION_TIME),
-            fadedTilesAlpha.asDeferredFadeAnimation(HERO_MOVE_ANIMATION_TIME),
+        awaitAll(
+            *playerAnimation.assembleGameScreenAnimations(
+                animationTime = HERO_MOVE_ANIMATION_TIME,
+                view = view,
+                shakeHorizontalOffset = shakeHorizontalOffset,
+                animatedOffset = animatedOffset,
+                initialAnimatedOffset = -initialOffset,
+                revealedTilesAlpha = revealedTilesAlpha,
+                fadedTilesAlpha = fadedTilesAlpha,
+            )
         )
-        
-        awaitAll(*specificAnimations, *tilesAnimations)
     }
     
     Text(
@@ -199,7 +185,7 @@ private fun RenderMap(
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,
         )
-    
+        
         DrawCharacter(
             modifier = modifier,
             viewportWidth = mapState.viewportWidth,
@@ -215,7 +201,7 @@ private fun RenderMap(
 }
 
 context(Density)
-private fun Offset.toDirection(
+    private fun Offset.toDirection(
     size: Dp,
 ): Direction = when {
     x > y && x.toDp() > size - y.toDp() -> Direction.Right
@@ -250,7 +236,7 @@ private fun DrawMap(
                 column * tileDimension,
                 row * tileDimension,
             )
-    
+            
             val tileScreenSpaceCoordinates = column to row
             
             if (renderTile is MapRenderTile.Content && renderTile.isVisible) {
@@ -264,7 +250,8 @@ private fun DrawMap(
                 )
             }
             if (renderTile is MapRenderTile.Content && !renderTile.isVisible
-                && tilesToFade.contains(tileScreenSpaceCoordinates)) {
+                && tilesToFade.contains(tileScreenSpaceCoordinates)
+            ) {
                 drawRevealedTile(
                     renderTile = renderTile,
                     dstOffset = dstOffset,

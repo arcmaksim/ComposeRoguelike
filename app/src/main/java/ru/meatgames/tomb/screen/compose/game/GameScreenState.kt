@@ -13,6 +13,6 @@ import ru.meatgames.tomb.domain.PlayerAnimationState
  */
 data class GameScreenState(
     val mapState: MapScreenController.MapScreenState = MapScreenController.MapScreenState.Loading,
-    val playerAnimation: PlayerAnimationState = PlayerAnimationState.NoAnimation(),
+    val playerAnimation: PlayerAnimationState? = null,
     val previousMoveDirection: Direction? = null,
 )

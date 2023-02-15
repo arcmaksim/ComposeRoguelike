@@ -35,15 +35,15 @@ class GameScreenViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         GameScreenState(
             mapState = controller.state.value,
-            playerAnimation = PlayerAnimationState.NoAnimation(),
+            playerAnimation = null,
         )
     )
     val state: Flow<GameScreenState> = _state
     
-    private var pendingAnimation: PlayerAnimationState = PlayerAnimationState.NoAnimation()
+    private var pendingAnimation: PlayerAnimationState? = null
         get() {
             val value = field
-            field = PlayerAnimationState.NoAnimation()
+            field = null
             return value
         }
     private var previousMoveDirection: Direction? = null
@@ -87,7 +87,7 @@ class GameScreenViewModel @Inject constructor(
         val animation = when (playerTurnResult) {
             is PlayerMoveResult.Block -> PlayerAnimationState.Shake()
             is PlayerMoveResult.Move -> PlayerAnimationState.Scroll(playerTurnResult.direction)
-            else -> PlayerAnimationState.NoAnimation()
+            else -> null
         }
         
         if (animation.isWithoutStateUpdate()) {
@@ -97,12 +97,12 @@ class GameScreenViewModel @Inject constructor(
         }
     }
     
-    private fun PlayerAnimationState.isWithoutStateUpdate(): Boolean = when (this) {
+    private fun PlayerAnimationState?.isWithoutStateUpdate(): Boolean = when (this) {
         is PlayerAnimationState.Shake -> true
         else -> false
     }
     
-    private fun PlayerAnimationState.consumeAnimationWithoutStateUpdate() {
+    private fun PlayerAnimationState?.consumeAnimationWithoutStateUpdate() {
         _state.update {
             it.copy(
                 previousMoveDirection = null,
@@ -112,7 +112,7 @@ class GameScreenViewModel @Inject constructor(
         _isIdle.value = true
     }
     
-    private fun PlayerAnimationState.consumeAnimationWithStateUpdate(
+    private fun PlayerAnimationState?.consumeAnimationWithStateUpdate(
         playerMoveResult: PlayerMoveResult,
     ) {
         pendingAnimation = this

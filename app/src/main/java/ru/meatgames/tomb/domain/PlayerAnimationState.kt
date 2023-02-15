@@ -4,8 +4,6 @@ import ru.meatgames.tomb.Direction
 
 sealed class PlayerAnimationState {
 
-    class NoAnimation : PlayerAnimationState()
-
     class Shake : PlayerAnimationState()
 
     class Scroll(
@@ -13,3 +11,9 @@ sealed class PlayerAnimationState {
     ) : PlayerAnimationState()
 
 }
+
+val PlayerAnimationState?.isStateless: Boolean
+    get() = when (this) {
+        is PlayerAnimationState.Shake -> true
+        else -> false
+    }

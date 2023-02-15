@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 
 context(CoroutineScope)
-suspend fun MutableState<Float>.asDeferredRevealAnimation(
+suspend fun MutableState<Float>.asDeferredRevealAnimationAsync(
     animationTime: Int,
 ) = async {
     animate(
@@ -25,7 +25,7 @@ suspend fun MutableState<Float>.asDeferredRevealAnimation(
 }
 
 context(CoroutineScope)
-suspend fun MutableState<Float>.asDeferredFadeAnimation(
+suspend fun MutableState<Float>.asDeferredFadeAnimationAsync(
     animationTime: Int,
 ) = async {
     animate(
@@ -41,7 +41,7 @@ suspend fun MutableState<Float>.asDeferredFadeAnimation(
 }
 
 context(CoroutineScope)
-suspend fun MutableState<IntOffset>.asDeferredScrollAnimation(
+suspend fun MutableState<IntOffset>.asDeferredScrollAnimationAsync(
     animationTime: Int,
     targetValue: IntOffset,
 ) = async {
