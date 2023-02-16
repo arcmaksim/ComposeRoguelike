@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import dagger.hilt.android.AndroidEntryPoint
 import ru.meatgames.tomb.GameController.getMap2
-import ru.meatgames.tomb.GameController.showExitDialog
 import ru.meatgames.tomb.model.provider.GameDataProvider
 import javax.inject.Inject
 
@@ -52,15 +51,6 @@ class MainActivity : AppCompatActivity() {
          * 2.2. Save inventory content and it's state
          * 3. Save game state and current game screen state
          */
-    }
-
-    override fun onBackPressed() {
-        /*if (!Assets.INSTANCE.getMapview().getMDrawProgressBar()) {
-            GameController.mHero.interruptAllActions();
-            Assets.INSTANCE.getMapview().setMDrawExitDialog(!Assets.INSTANCE.getMapview().getMDrawExitDialog());
-        }*/
-        //showExitDialog()
-        finish()
     }
 
     fun exitGame() {

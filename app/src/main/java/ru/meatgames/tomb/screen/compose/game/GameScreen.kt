@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.compose.game
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
@@ -65,6 +66,7 @@ fun GameScreen(
     viewModel: GameScreenViewModel,
     onWin: () -> Unit,
     onInventory: () -> Unit,
+    onExit: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -75,6 +77,8 @@ fun GameScreen(
             }
         }
     }
+    
+    BackHandler(onBack = onExit)
     
     val gameScreenState by viewModel.state.collectAsState(GameScreenState())
     

@@ -40,6 +40,7 @@ fun TombApp(
                     viewModel = hiltViewModel(),
                     onWin = { navController.navigate(GameState.WinScreen.id) },
                     onInventory = { navController.navigate(GameState.Inventory.id) },
+                    onExit = onCloseApp,
                 )
             }
             composable(GameState.WinScreen.id) {
