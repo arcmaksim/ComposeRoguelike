@@ -4,6 +4,11 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.domain.PlayerAnimationState
 
+enum class GameScreenEvent {
+    Win,
+    Inventory,
+}
+
 /**
  * Class to represent state fot the [GameScreen].
  *

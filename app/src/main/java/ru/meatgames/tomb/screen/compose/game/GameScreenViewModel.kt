@@ -29,8 +29,8 @@ class GameScreenViewModel @Inject constructor(
     private val gameController: GameController,
 ) : ViewModel() {
     
-    private val _events = Channel<Any?>()
-    val events: Flow<Any?> = _events.receiveAsFlow()
+    private val _events = Channel<GameScreenEvent?>()
+    val events: Flow<GameScreenEvent?> = _events.receiveAsFlow()
     
     private val _state = MutableStateFlow(
         GameScreenState(
@@ -67,7 +67,7 @@ class GameScreenViewModel @Inject constructor(
                 
                 (state as? MapScreenController.MapScreenState.Ready)
                     ?.takeIf { it.points == TARGET_POINTS }
-                    ?.let { _events.send(Any()) }
+                    ?.let { _events.send(GameScreenEvent.Win) }
             }
         }
     }
@@ -125,6 +125,10 @@ class GameScreenViewModel @Inject constructor(
     
     fun newMap() {
         gameController.generateNewMap()
+    }
+    
+    fun openInventory() {
+        _events.trySend(GameScreenEvent.Inventory)
     }
     
 }

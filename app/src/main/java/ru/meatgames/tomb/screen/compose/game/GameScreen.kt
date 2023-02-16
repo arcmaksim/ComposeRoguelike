@@ -64,10 +64,15 @@ private const val HERO_MOVE_ANIMATION_TIME = 300
 fun GameScreen(
     viewModel: GameScreenViewModel,
     onWin: () -> Unit,
+    onInventory: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
-            event?.let { onWin() }
+            when (event) {
+                GameScreenEvent.Win -> onWin()
+                GameScreenEvent.Inventory -> onInventory()
+                else -> Unit
+            }
         }
     }
     
@@ -81,6 +86,7 @@ fun GameScreen(
             previousMoveDirection = gameScreenState.previousMoveDirection,
             onCharacterMove = viewModel::onMoveCharacter,
             onMapGeneration = viewModel::newMap,
+            onInventory = viewModel::openInventory,
         )
     }
 }
@@ -105,6 +111,7 @@ private fun RenderMap(
     previousMoveDirection: Direction?,
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
+    onInventory: () -> Unit,
 ) = BoxWithConstraints(
     modifier = Modifier
         .background(Color(0xFF212121))
@@ -192,6 +199,12 @@ private fun RenderMap(
             viewportHeight = mapState.viewportHeight,
         )
     }
+    
+    BaseTextButton(
+        title = "Inventory",
+        modifier = Modifier.align(Alignment.BottomStart),
+        onClick = onInventory,
+    )
     
     BaseTextButton(
         title = "New map",

@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.resolvedOffsets
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -62,4 +63,5 @@ data class CharacterState(
     val mapX: Int,
     val mapY: Int,
     val points: Int = 0,
+    val inventory: List<Item> = emptyList(),
 )

@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
+import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
 
 @ExperimentalMaterialApi
 @Composable
@@ -30,23 +31,27 @@ fun TombApp(
             composable(GameState.MainMenu.id) {
                 MainMenuScreen(
                     viewModel = hiltViewModel(),
-                    onNewGame = {
-                        navController.navigate(GameState.MainGame.id)
-                    },
+                    onNewGame = { navController.navigate(GameState.MainGame.id) },
                     onCloseApp = onCloseApp,
                 )
             }
             composable(GameState.MainGame.id) {
                 GameScreen(
                     viewModel = hiltViewModel(),
-                ) {
-                    navController.navigate(GameState.WinScreen.id)
-                }
+                    onWin = { navController.navigate(GameState.WinScreen.id) },
+                    onInventory = { navController.navigate(GameState.Inventory.id) },
+                )
             }
             composable(GameState.WinScreen.id) {
-                WinScreen {
-                    navController.navigate(GameState.MainMenu.id)
-                }
+                WinScreen(
+                    onNavigateToMainMenu = { navController.navigate(GameState.MainMenu.id) },
+                )
+            }
+            composable(GameState.Inventory.id) {
+                InventoryScreen(
+                    viewModel = hiltViewModel(),
+                    onBack = { navController.navigate(GameState.MainGame.id) },
+                )
             }
         }
     }
