@@ -4,7 +4,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.model.temp.TilesController
-import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.resolvedOffsets
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,17 +36,18 @@ class PlayerMapInteractionController @Inject constructor(
             x = mapX,
             y = mapY,
         )?.tile ?: return null
+        val mapObject = (tile.mapObject as? MapTile.MapObject.Object)?.objectEntityTile
 
         return when {
-            tile.objectEntityTile?.let(tilesController::hasObjectEntityInteraction) == true -> {
+            mapObject?.let(tilesController::hasObjectEntityInteraction) == true -> {
                 PlayerMoveResult.Interaction(
                     coordinates = mapX to mapY,
-                    tile = tile.objectEntityTile,
+                    tile = mapObject,
                 )
             }
-
-            tile.objectEntityTile?.let(tilesController::hasObjectEntityNoInteraction) == true
-                    || tile.objectEntityTile == null -> {
+    
+            mapObject?.let(tilesController::hasObjectEntityNoInteraction) == true
+                || mapObject == null -> {
                 PlayerMoveResult.Move(direction)
             }
 

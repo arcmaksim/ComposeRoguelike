@@ -32,7 +32,7 @@ class RoomPreviewRenderProcessor @Inject constructor(
         it ?: return@map null
         it to RenderTiles(
             first = it.tile.floorEntityTile.toFloorRenderTile(),
-            second = it.tile.objectEntityTile?.toObjectRenderTile(),
+            second = (it.tile.mapObject as? MapTile.MapObject.Object)?.objectEntityTile?.toObjectRenderTile(),
         )
     }
     

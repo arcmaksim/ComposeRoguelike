@@ -121,7 +121,7 @@ class MapScreenController @Inject constructor(
             revealTile = { x, y -> cachedVisibilityMask[x + y * viewportWidth] = true },
             checkIfTileIsBlocking = { x, y ->
                 val index = (x + 1) + (y + 1) * preProcessingViewportWidth
-                val objectEntity = this[index]?.tile?.objectEntityTile
+                val objectEntity = (this[index]?.tile?.mapObject as? MapTile.MapObject.Object)?.objectEntityTile
                     ?: return@computeFov false
                 !tilesController.isObjectEntityVisibleThrough(
                     objectEntity = objectEntity,

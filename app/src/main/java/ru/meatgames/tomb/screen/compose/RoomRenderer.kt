@@ -52,9 +52,9 @@ private fun RoomRenderer() {
                 floorEntityTile = roomsData.floorMapping
                     .first { it.symbol == room.floor[index].toString() }
                     .entity,
-                objectEntityTile = roomsData.objectMapping
+                mapObject = roomsData.objectMapping
                     .first { it.symbol == room.objects[index].toString() }
-                    .entity,
+                    .let { MapTile.MapObject.Object(it.entity!!) },
             ),
         )
     }

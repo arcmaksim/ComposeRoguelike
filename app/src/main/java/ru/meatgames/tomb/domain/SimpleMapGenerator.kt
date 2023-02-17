@@ -72,7 +72,7 @@ class SimpleMapGenerator @Inject constructor(
                     ) {
                         copy(
                             floorEntityTile = FloorEntityTile.Floor,
-                            objectEntityTile = ObjectEntityTile.Wall,
+                            mapObject = ObjectEntityTile.Wall.toMapTileObject(),
                         )
                     }
                 }
@@ -120,7 +120,7 @@ class SimpleMapGenerator @Inject constructor(
                     y = randomOuterWall.second,
                 ) {
                     copy(
-                        objectEntityTile = ObjectEntityTile.DoorClosed,
+                        mapObject = ObjectEntityTile.DoorClosed.toMapTileObject(),
                     )
                 }
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
@@ -197,7 +197,7 @@ class SimpleMapGenerator @Inject constructor(
                 ) {
                     copy(
                         floorEntityTile = room.floor[i].toFloorEntity(),
-                        objectEntityTile = room.objects[i].toObjectEntity(),
+                        mapObject = room.objects[i].toObjectEntity()?.toMapTileObject(),
                     )
                 }
             }
@@ -222,7 +222,7 @@ class SimpleMapGenerator @Inject constructor(
                 if (tile.isEmpty) {
                     updateSingleTile(x, y) {
                         copy(
-                            objectEntityTile = ObjectEntityTile.Gismo,
+                            mapObject = ObjectEntityTile.Gismo.toMapTileObject(),
                         )
                     }
                     break
@@ -289,11 +289,11 @@ data class GeneratedMapConfiguration(
 private val MapTile?.isWall: Boolean
     get() {
         this ?: return false
-        return objectEntityTile == ObjectEntityTile.Wall
+        return (mapObject as? MapTile.MapObject.Object)?.objectEntityTile == ObjectEntityTile.Wall
     }
 
 private val MapTile?.isEmpty: Boolean
     get() {
         this ?: return false
-        return objectEntityTile == null
+        return mapObject == null
     }

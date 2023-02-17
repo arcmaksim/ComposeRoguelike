@@ -24,7 +24,7 @@ class MapDecoratorPipeline @Inject constructor(
         val tile = it?.tile ?: return@map null
         it to RenderTiles(
             first = tile.floorEntityTile.toFloorRenderTile(),
-            second = tile.objectEntityTile?.toObjectRenderTile(),
+            second = (tile.mapObject as? MapTile.MapObject.Object)?.objectEntityTile?.toObjectRenderTile(),
         )
     }
     

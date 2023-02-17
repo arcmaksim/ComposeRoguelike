@@ -53,7 +53,7 @@ class MapControllerImpl @Inject constructor(
             y = y,
         ) {
             copy(
-                objectEntityTile = objectEntityTile,
+                mapObject = objectEntityTile?.toMapTileObject(),
             )
         }
     }
@@ -90,7 +90,7 @@ data class LevelMapWrapper(
         val flowValue = state.value
         return flowValue.mapIndexed { index, value ->
             val nextLinePostfix = if (index % width == width - 1) "\n" else ""
-            if (value.tile.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
+            if (value.tile.mapObject == null) ".$nextLinePostfix" else "#$nextLinePostfix"
         }.fold("") { acc, item -> acc + item }
     }
 
