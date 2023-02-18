@@ -33,9 +33,7 @@ fun TombApp(
                     viewModel = hiltViewModel(),
                     onNewGame = {
                         navController.navigate(GameState.MainGame.id) {
-                            popUpTo(GameState.MainMenu.id) {
-                                inclusive = true
-                            }
+                            popUpToTop(navController)
                         }
                     },
                     onCloseApp = onCloseApp,
@@ -44,19 +42,27 @@ fun TombApp(
             composable(GameState.MainGame.id) {
                 GameScreen(
                     viewModel = hiltViewModel(),
-                    onWin = { navController.navigate(GameState.WinScreen.id) },
+                    onWin = {
+                        navController.navigate(GameState.WinScreen.id) {
+                            popUpToTop(navController)
+                        }
+                    },
                     onInventory = { navController.navigate(GameState.Inventory.id) },
                 )
             }
             composable(GameState.WinScreen.id) {
                 WinScreen(
-                    onNavigateToMainMenu = { navController.navigate(GameState.MainMenu.id) },
+                    onNavigateToMainMenu = {
+                        navController.navigate(GameState.MainMenu.id) {
+                            popUpToTop(navController)
+                        }
+                    },
                 )
             }
             composable(GameState.Inventory.id) {
                 InventoryScreen(
                     viewModel = hiltViewModel(),
-                    onBack = { navController.navigate(GameState.MainGame.id) },
+                    onBack = { navController.popBackStack() },
                 )
             }
         }
