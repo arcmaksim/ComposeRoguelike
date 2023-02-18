@@ -1,6 +1,5 @@
 package ru.meatgames.tomb.screen.compose.game
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,7 +18,6 @@ internal fun GameScreen(
     viewModel: GameScreenViewModel,
     onWin: () -> Unit,
     onInventory: () -> Unit,
-    onExit: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -30,8 +28,6 @@ internal fun GameScreen(
             }
         }
     }
-    
-    BackHandler(onBack = onExit)
     
     val state by viewModel.state.collectAsState(GameScreenState())
     
