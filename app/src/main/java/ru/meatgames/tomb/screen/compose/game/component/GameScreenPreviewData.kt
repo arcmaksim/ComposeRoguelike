@@ -75,5 +75,4 @@ internal fun gameScreenMapContainerPreviewMapReadyState(
     viewportHeight = gameScreenMapContainerPreviewMapSize,
     tilesToFade = emptySet(),
     tilesToReveal = emptySet(),
-    points = 0,
 )

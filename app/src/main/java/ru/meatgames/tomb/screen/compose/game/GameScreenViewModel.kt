@@ -19,8 +19,6 @@ import ru.meatgames.tomb.domain.PlayerMapInteractionResolver
 import ru.meatgames.tomb.domain.PlayerMoveResult
 import javax.inject.Inject
 
-private const val TARGET_POINTS = 10
-
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
     private val controller: MapScreenController,
@@ -64,10 +62,6 @@ class GameScreenViewModel @Inject constructor(
                     playerAnimation = pendingAnimation,
                     previousMoveDirection = previousMoveDirection,
                 )
-                
-                (state as? MapScreenController.MapScreenState.Ready)
-                    ?.takeIf { it.points == TARGET_POINTS }
-                    ?.let { _events.send(GameScreenEvent.Win) }
             }
         }
     }

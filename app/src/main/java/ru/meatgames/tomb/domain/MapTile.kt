@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.domain
 
+import ru.meatgames.tomb.domain.item.ItemBag
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 
@@ -15,7 +16,7 @@ data class MapTile(
         ) : MapObject()
         
         data class Item(
-            val item: ru.meatgames.tomb.domain.item.Item,
+            val item: ItemBag,
         ) : MapObject()
         
     }

@@ -24,7 +24,7 @@ class MapDecoratorPipeline @Inject constructor(
         val tile = it?.tile ?: return@map null
         it to RenderTiles(
             first = tile.floorEntityTile.toFloorRenderTile(),
-            second = (tile.mapObject as? MapTile.MapObject.Object)?.objectEntityTile?.toObjectRenderTile(),
+            second = tile.mapObject?.toObjectRenderTile(),
         )
     }
     
@@ -39,13 +39,17 @@ class MapDecoratorPipeline @Inject constructor(
     private fun FloorEntityTile.toFloorRenderTile(): FloorRenderTile = when (this) {
         FloorEntityTile.Floor -> FloorRenderTile.Floor
     }
+    
+    private fun MapTile.MapObject.toObjectRenderTile(): ObjectRenderTile = when (this) {
+        is MapTile.MapObject.Object -> objectEntityTile.toObjectRenderTile()
+        is MapTile.MapObject.Item -> ObjectRenderTile.ItemBag
+    }
 
     private fun ObjectEntityTile.toObjectRenderTile(): ObjectRenderTile = when (this) {
         ObjectEntityTile.DoorClosed -> ObjectRenderTile.DoorClosed
         ObjectEntityTile.DoorOpened -> ObjectRenderTile.DoorOpened
         ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
         ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
-        ObjectEntityTile.Gismo -> ObjectRenderTile.Gismo
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
     }
 

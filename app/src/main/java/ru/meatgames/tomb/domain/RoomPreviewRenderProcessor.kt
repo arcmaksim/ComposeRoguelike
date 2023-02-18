@@ -75,7 +75,6 @@ class RoomPreviewRenderProcessor @Inject constructor(
         ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
         ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
-        ObjectEntityTile.Gismo -> null
     }
     
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =

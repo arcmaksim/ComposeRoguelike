@@ -112,14 +112,6 @@ internal fun GameScreenMapContainer(
         )
     }
     
-    Text(
-        modifier = Modifier
-            .align(Alignment.TopEnd)
-            .padding(top = 16.dp, end = 16.dp),
-        text = "${mapState.points}",
-        style = h2TextStyle,
-    )
-    
     val modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1F)

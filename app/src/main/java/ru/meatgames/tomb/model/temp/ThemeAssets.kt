@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import ru.meatgames.tomb.domain.MapTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import java.io.IOException
@@ -166,7 +167,7 @@ class ThemeAssets @Inject constructor(
             stairsThemes.atlas to currentTheme.stairsTheme.map.getValue(objectRenderTile)
         }
         
-        ObjectRenderTile.Gismo -> gismo to IntOffset(0, 0)
+        ObjectRenderTile.ItemBag -> gismo to IntOffset(0, 0)
 
         ObjectRenderTile.Wall0,
         ObjectRenderTile.Wall1,

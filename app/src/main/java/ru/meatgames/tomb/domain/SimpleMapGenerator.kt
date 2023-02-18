@@ -1,6 +1,8 @@
 package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.item.Item
+import ru.meatgames.tomb.domain.item.ItemBag
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
@@ -49,7 +51,7 @@ class SimpleMapGenerator @Inject constructor(
             maxRoomPlacementAttempts = 50,
         )
         
-        map.placeGismos(
+        map.placeItems(
             amount = 10,
             random = random,
         )
@@ -90,9 +92,9 @@ class SimpleMapGenerator @Inject constructor(
             log("Attempting to place ${i + 1} room of $maxRoomsAttempts")
             val room = rooms.random(random).rotate(random)
             log("Selected room ${room.name} - ${room.width}x${room.height}")
-        
+            
             log("Outer walls pool - $outerWallsPool")
-        
+            
             for (roomPlacementAttempt in 0 until maxRoomPlacementAttempts) {
                 val (randomOuterWall, direction) = getRandomOuterWall(random) ?: break@roomLoop
                 val (mapX, mapY) = room.findTile(
@@ -100,20 +102,20 @@ class SimpleMapGenerator @Inject constructor(
                     direction = direction,
                     random = random,
                 ) ?: continue
-            
+                
                 log("Attempt ${roomPlacementAttempt + 1} - selected outer wall ${randomOuterWall.first} ${randomOuterWall.second}")
                 log("mapX: $mapX, mapY: $mapY")
                 log("Direction was resolved - $direction")
-            
+                
                 val isZoneEmpty = checkZone(
                     mapX = mapX,
                     mapY = mapY,
                     roomWidth = room.width,
                     roomHeight = room.height,
                 )
-            
+                
                 if (!isZoneEmpty) continue
-            
+                
                 placeRoom(mapX, mapY, room)
                 updateSingleTile(
                     x = randomOuterWall.first,
@@ -152,7 +154,7 @@ class SimpleMapGenerator @Inject constructor(
             }?.let {
                 return wall to it
             }
-    
+            
             localOuterWallsPool.remove(wall)
         }
         
@@ -172,7 +174,7 @@ class SimpleMapGenerator @Inject constructor(
             Direction.Left -> outerWalls.filter { it.first == width - 1 }.randomOrNull(random)
             Direction.Right -> outerWalls.filter { it.first == 0 }.randomOrNull(random)
         } ?: return null
-    
+        
         return when (direction) {
             Direction.Top -> randomOuterWall.first - wall.first to randomOuterWall.second - wall.second
             Direction.Bottom -> randomOuterWall.first - wall.first to randomOuterWall.second
@@ -210,7 +212,7 @@ class SimpleMapGenerator @Inject constructor(
         log("Placed room at $x $y with dimensions ${room.width} x ${room.height}")
     }
     
-    private fun LevelMap.placeGismos(
+    private fun LevelMap.placeItems(
         amount: Int,
         random: Random,
     ) {
@@ -222,7 +224,11 @@ class SimpleMapGenerator @Inject constructor(
                 if (tile.isEmpty) {
                     updateSingleTile(x, y) {
                         copy(
-                            mapObject = ObjectEntityTile.Gismo.toMapTileObject(),
+                            mapObject = MapTile.MapObject.Item(
+                                ItemBag(
+                                    listOf(Item("Item $i")),
+                                ),
+                            ),
                         )
                     }
                     break

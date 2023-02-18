@@ -101,7 +101,6 @@ class MapScreenController @Inject constructor(
             tiles = pipelineRenderData.tiles,
             tilesToReveal = pipelineRenderData.tilesToReveal.toSet(),
             tilesToFade = pipelineRenderData.tilesToFade.toSet(),
-            points = characterState.points,
         )
     }
     
@@ -179,7 +178,6 @@ class MapScreenController @Inject constructor(
             val viewportHeight: Int,
             val tilesToReveal: Set<ScreenSpaceCoordinates>,
             val tilesToFade: Set<ScreenSpaceCoordinates>,
-            val points: Int,
         ) : MapScreenState()
         
         object Loading : MapScreenState()

@@ -46,10 +46,6 @@ class PlayerMapInteractionResolver @Inject constructor(
 
     private fun ObjectEntityTile.resolveTileReplacementOnUse(): ObjectEntityTile? = when (this) {
         ObjectEntityTile.DoorClosed -> ObjectEntityTile.DoorOpened
-        ObjectEntityTile.Gismo -> {
-            characterController.increasePoint()
-            null
-        }
         else -> null
     }
 
