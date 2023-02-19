@@ -15,7 +15,7 @@ sealed class PlayerMoveResult {
         val tile: ObjectEntityTile,
     ) : PlayerMoveResult()
     
-    data class ItemBagInteraction(
+    data class ContainerInteraction(
         val itemBag: ItemBag,
     ) : PlayerMoveResult()
 

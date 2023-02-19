@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.domain.PlayerAnimationState
+import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
 import ru.meatgames.tomb.domain.PlayerMapInteractionResolver
 import ru.meatgames.tomb.domain.PlayerMoveResult
@@ -38,7 +38,7 @@ class GameScreenViewModel @Inject constructor(
     )
     val state: Flow<GameScreenState> = _state
     
-    private var pendingAnimation: PlayerAnimationState? = null
+    private var pendingAnimation: GameScreenAnimationState? = null
         get() {
             val value = field
             field = null
@@ -78,42 +78,61 @@ class GameScreenViewModel @Inject constructor(
             return
         }
         
-        val animation = when (playerTurnResult) {
-            is PlayerMoveResult.Block -> PlayerAnimationState.Shake()
-            is PlayerMoveResult.Move -> PlayerAnimationState.Scroll(playerTurnResult.direction)
-            else -> null
-        }
+        val animation = playerTurnResult.resolveGameScreenAnimationState()
+        val interactionState = playerTurnResult.resolvePlayerInteractionState()
         
-        if (animation.isWithoutStateUpdate()) {
-            animation.consumeAnimationWithoutStateUpdate()
+        if (animation.requiresManualUpdate() || interactionState != null) {
+            updateStateNow(
+                gameScreenAnimationState = animation,
+                playerInteractionState = interactionState,
+            )
         } else {
-            animation.consumeAnimationWithStateUpdate(playerTurnResult)
+            animation.cacheState(playerTurnResult)
         }
     }
     
-    private fun PlayerAnimationState?.isWithoutStateUpdate(): Boolean = when (this) {
-        is PlayerAnimationState.Shake -> true
+    private fun PlayerMoveResult.resolveGameScreenAnimationState(): GameScreenAnimationState? =
+        when (this) {
+            is PlayerMoveResult.Block -> GameScreenAnimationState.Shake()
+            is PlayerMoveResult.Move -> GameScreenAnimationState.Scroll(direction)
+            else -> null
+        }
+    
+    private fun PlayerMoveResult.resolvePlayerInteractionState(): GameScreenInteractionState? =
+        when (this) {
+            is PlayerMoveResult.ContainerInteraction -> {
+                GameScreenInteractionState.SearchingContainer(itemBag)
+            }
+            else -> null
+        }
+    
+    private fun GameScreenAnimationState?.requiresManualUpdate(): Boolean = when (this) {
+        is GameScreenAnimationState.Shake -> true
         else -> false
     }
     
-    private fun PlayerAnimationState?.consumeAnimationWithoutStateUpdate() {
+    private fun updateStateNow(
+        gameScreenAnimationState: GameScreenAnimationState?,
+        playerInteractionState: GameScreenInteractionState?,
+    ) {
         _state.update {
             it.copy(
                 previousMoveDirection = null,
-                playerAnimation = this,
+                playerAnimation = gameScreenAnimationState,
+                interactionState = playerInteractionState,
             )
         }
         _isIdle.value = true
     }
     
-    private fun PlayerAnimationState?.consumeAnimationWithStateUpdate(
+    private fun GameScreenAnimationState?.cacheState(
         playerMoveResult: PlayerMoveResult,
     ) {
         pendingAnimation = this
-        previousMoveDirection = (this as? PlayerAnimationState.Scroll)?.direction
-    
+        previousMoveDirection = (this as? GameScreenAnimationState.Scroll)?.direction
+        
         mapInteractionResolver.resolvePlayerMove(playerMoveResult)
-    
+        
         _isIdle.value = true
     }
     

@@ -43,7 +43,7 @@ class PlayerMapInteractionController @Inject constructor(
                 direction = direction,
                 characterState = capturedFlow,
             )
-            is MapTile.MapObject.Item -> PlayerMoveResult.ItemBagInteraction(mapObject.item)
+            is MapTile.MapObject.Item -> PlayerMoveResult.ContainerInteraction(mapObject.item)
             else -> PlayerMoveResult.Move(direction)
         }
     }

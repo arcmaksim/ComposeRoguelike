@@ -5,11 +5,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import ru.meatgames.tomb.domain.PlayerAnimationState
-import ru.meatgames.tomb.domain.isStateless
 
 context(CoroutineScope)
-suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
+suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
     animationTime: Int,
     view: View,
     shakeHorizontalOffset: MutableState<Float>,
@@ -19,13 +17,13 @@ suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
     fadedTilesAlpha: MutableState<Float>,
 ): Array<Deferred<Any>> {
     val specificAnimations = when (this) {
-        is PlayerAnimationState.Shake -> {
+        is GameScreenAnimationState.Shake -> {
             listOf(
                 shakeHorizontalOffset.asDeferredScreenShakeAnimationAsync(),
                 view.asDeferredVibrationAsync(),
             )
         }
-        is PlayerAnimationState.Scroll -> {
+        is GameScreenAnimationState.Scroll -> {
             listOf(
                 animatedOffset.asDeferredScrollAnimationAsync(
                     animationTime = animationTime,
