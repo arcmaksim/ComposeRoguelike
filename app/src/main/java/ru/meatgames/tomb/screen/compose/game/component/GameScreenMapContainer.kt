@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,9 +34,10 @@ import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.domain.PlayerAnimationState
-import ru.meatgames.tomb.domain.isStateless
+import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
+import ru.meatgames.tomb.screen.compose.game.animation.isStateless
 import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionState
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
@@ -55,6 +55,7 @@ private fun GameScreenMapContainerPreview() {
     GameScreenMapContainer(
         mapState = gameScreenMapContainerPreviewMapReadyState(themeAssets),
         playerAnimation = null,
+        interactionState = null,
         previousMoveDirection = null,
         animationTime = 300,
         heroIdleAnimationFrames = 2,
@@ -68,7 +69,8 @@ private fun GameScreenMapContainerPreview() {
 @Composable
 internal fun GameScreenMapContainer(
     mapState: MapScreenController.MapScreenState.Ready,
-    playerAnimation: PlayerAnimationState?,
+    playerAnimation: GameScreenAnimationState?,
+    interactionState: GameScreenInteractionState?,
     previousMoveDirection: Direction?,
     animationTime: Int,
     heroIdleAnimationFrames: Int,
@@ -130,6 +132,15 @@ internal fun GameScreenMapContainer(
                 )
             },
     )
+    
+    interactionState?.let {
+        Text(
+            modifier = Modifier.fillMaxWidth()
+                .align(Alignment.TopCenter),
+            text = "$it",
+            style = h2TextStyle,
+        )
+    }
     
     CompositionLocalProvider(
         LocalTileSize provides IntSize(tileDimension, tileDimension),

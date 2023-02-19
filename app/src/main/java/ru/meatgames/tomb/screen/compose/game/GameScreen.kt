@@ -51,6 +51,7 @@ private fun GameScreenContent(
         is MapScreenController.MapScreenState.Ready -> GameScreenMapContainer(
             mapState = mapState,
             playerAnimation = state.playerAnimation,
+            interactionState = state.interactionState,
             previousMoveDirection = state.previousMoveDirection,
             animationTime = ANIMATION_TIME,
             heroIdleAnimationFrames = HERO_IDLE_ANIMATION_FRAMES,
