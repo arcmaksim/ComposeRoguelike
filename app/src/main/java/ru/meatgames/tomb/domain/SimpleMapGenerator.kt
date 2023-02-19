@@ -45,6 +45,12 @@ class SimpleMapGenerator @Inject constructor(
             y = initialRoomPositionY,
             room = initialRoom,
         )
+    
+        map.placeItem(
+            x = initialRoomPositionX + 2,
+            y = initialRoomPositionY + 1,
+            item = Item("Initial item"),
+        )
         
         map.generateRooms(
             maxRoomsAttempts = 25,
@@ -222,18 +228,24 @@ class SimpleMapGenerator @Inject constructor(
                 val y = random.nextInt(height)
                 val tile = getTile(x, y)?.tile
                 if (tile.isEmpty) {
-                    updateSingleTile(x, y) {
-                        copy(
-                            mapObject = MapTile.MapObject.Item(
-                                ItemBag(
-                                    listOf(Item("Item $i")),
-                                ),
-                            ),
-                        )
-                    }
+                    placeItem(x, y, Item("Item $i"))
                     break
                 }
             }
+        }
+    }
+    
+    private fun LevelMap.placeItem(
+        x: Int,
+        y: Int,
+        item: Item,
+    ) {
+        updateSingleTile(x, y) {
+            copy(
+                mapObject = MapTile.MapObject.Item(
+                    ItemBag(listOf(item)),
+                ),
+            )
         }
     }
     
