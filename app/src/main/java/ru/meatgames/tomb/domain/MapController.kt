@@ -83,14 +83,14 @@ interface MapController {
 data class LevelMapWrapper(
     val width: Int,
     val height: Int,
-    val state: StateFlow<List<MapTileWrapper>>,
+    val state: StateFlow<List<MapTile>>,
 ) {
 
     override fun toString(): String {
         val flowValue = state.value
         return flowValue.mapIndexed { index, value ->
             val nextLinePostfix = if (index % width == width - 1) "\n" else ""
-            if (value.tile.mapObject == null) ".$nextLinePostfix" else "#$nextLinePostfix"
+            if (value.mapObject == null) ".$nextLinePostfix" else "#$nextLinePostfix"
         }.fold("") { acc, item -> acc + item }
     }
 

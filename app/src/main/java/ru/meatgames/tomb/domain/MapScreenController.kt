@@ -62,7 +62,7 @@ class MapScreenController @Inject constructor(
         }
     }
     
-    private fun List<MapTileWrapper>.toMapState(
+    private fun List<MapTile>.toMapState(
         mapWidth: Int,
         mapHeight: Int,
         characterState: CharacterState,
@@ -133,7 +133,7 @@ class MapScreenController @Inject constructor(
         fill(false)
     }
     
-    private fun List<MapTileWrapper>.reduceToViewportSize(
+    private fun List<MapTile>.reduceToViewportSize(
         mapX: Int,
         mapY: Int,
         mapWidth: Int,
@@ -147,24 +147,45 @@ class MapScreenController @Inject constructor(
             }
             
             mapX < 0 -> {
-                List(preProcessingViewportWidth) {
+                List(preProcessingViewportWidth) { index ->
+                    val tileIndex = start + index
                     when {
-                        mapX + it < 0 -> null
-                        else -> this[start + it]
+                        mapX + index < 0 -> null
+                        else -> this[tileIndex]
+                    }?.let {
+                        MapTileWrapper(
+                            x = tileIndex % mapWidth,
+                            y = tileIndex / mapWidth,
+                            tile = it,
+                        )
                     }
                 }
             }
             
             mapX + preProcessingViewportWidth > mapWidth -> {
-                List(preProcessingViewportWidth) {
+                List(preProcessingViewportWidth) { index ->
+                    val tileIndex = start + index
                     when {
-                        mapX + it < mapWidth -> this[start + it]
+                        mapX + index < mapWidth -> this[tileIndex]
                         else -> null
+                    }?.let {
+                        MapTileWrapper(
+                            x = tileIndex % mapWidth,
+                            y = tileIndex / mapWidth,
+                            tile = it,
+                        )
                     }
                 }
             }
             
-            else -> this.subList(start, end)
+            else -> this.subList(start, end).mapIndexed { index, tile ->
+                val tileIndex = start + index
+                MapTileWrapper(
+                    x = tileIndex % mapWidth,
+                    y = tileIndex / mapWidth,
+                    tile = tile,
+                )
+            }
         }
     }.fold(emptyList()) { acc, item -> acc + item }
     
