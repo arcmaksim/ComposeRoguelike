@@ -14,7 +14,7 @@ val fontFamily = FontFamily(
     ),
 )
 
-val baseTextStyle: TextStyle
+private val baseTextStyle: TextStyle
     get() = TextStyle(
         fontFamily = fontFamily,
         color = Color.White,

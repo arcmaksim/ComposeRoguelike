@@ -1,22 +1,31 @@
 package ru.meatgames.tomb.design
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
+
+@Preview
+@Composable
+private fun BaseTextButtonPreview() {
+    BaseTextButton(
+        title = "Title",
+        onClick = { Unit },
+    )
+}
 
 @Composable
 fun BaseTextButton(
     title: String,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = h3TextStyle,
     onClick: () -> Unit,
 ) = Button(
-    modifier = modifier.padding(16.dp),
+    modifier = modifier,
     elevation = null,
     colors = ButtonDefaults.buttonColors(
         backgroundColor = Color.Transparent,
@@ -26,8 +35,6 @@ fun BaseTextButton(
 ) {
     Text(
         text = title,
-        style = baseTextStyle.copy(
-            fontSize = 12.sp,
-        ),
+        style = textStyle,
     )
 }
