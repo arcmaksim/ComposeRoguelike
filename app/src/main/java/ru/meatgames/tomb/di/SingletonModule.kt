@@ -6,6 +6,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import ru.meatgames.tomb.domain.ItemsController
+import ru.meatgames.tomb.domain.ItemsControllerImpl
+import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.MapController
 import ru.meatgames.tomb.domain.MapControllerImpl
 import ru.meatgames.tomb.domain.MapGenerator
@@ -44,6 +47,16 @@ interface SingletonModule {
     fun bindMapController(
         controller: MapControllerImpl,
     ): MapController
+    
+    @Binds
+    fun bindItemsHolder(
+        itemsHolder: ItemsControllerImpl,
+    ): ItemsHolder
+    
+    @Binds
+    fun bindItemsController(
+        itemsController: ItemsControllerImpl,
+    ): ItemsController
 
     @Binds
     @IntoSet
