@@ -32,7 +32,7 @@ class RoomPreviewRenderProcessor @Inject constructor(
         it ?: return@map null
         it to RenderTiles(
             first = it.tile.floorEntityTile.toFloorRenderTile(),
-            second = (it.tile.mapObject as? MapTile.MapObject.Object)?.objectEntityTile?.toObjectRenderTile(),
+            second = it.tile.objectEntityTile?.toObjectRenderTile(),
         )
     }
     
@@ -50,6 +50,7 @@ class RoomPreviewRenderProcessor @Inject constructor(
             else -> pair.first to MapRenderTile.Content(
                 floorData = pair.second.first.toFloorRenderTileData(),
                 objectData = pair.second.second?.toObjectRenderTileData(),
+                itemData = null,
                 isVisible = true,
             )
         }

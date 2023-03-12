@@ -1,36 +1,21 @@
 package ru.meatgames.tomb.domain
 
-import ru.meatgames.tomb.domain.item.ItemBag
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 
 data class MapTile(
     val floorEntityTile: FloorEntityTile,
-    val mapObject: MapObject? = null,
+    val objectEntityTile: ObjectEntityTile? = null,
 ) {
-
-    sealed class MapObject {
-        
-        data class Object(
-            val objectEntityTile: ObjectEntityTile
-        ) : MapObject()
-        
-        data class Item(
-            val item: ItemBag,
-        ) : MapObject()
-        
-    }
     
     companion object {
         val initialTile = MapTile(
             floorEntityTile = FloorEntityTile.Floor,
-            mapObject = null,
+            objectEntityTile = null,
         )
     }
 
 }
-
-fun ObjectEntityTile.toMapTileObject(): MapTile.MapObject.Object = MapTile.MapObject.Object(this)
 
 data class MapTileWrapper(
     val x: Int,
