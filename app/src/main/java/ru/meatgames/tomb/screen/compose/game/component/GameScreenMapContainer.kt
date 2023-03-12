@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -32,16 +32,18 @@ import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.design.BaseTextButton
-import ru.meatgames.tomb.design.h2TextStyle
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
-import ru.meatgames.tomb.screen.compose.game.animation.isStateless
+import ru.meatgames.tomb.domain.item.ItemContainerId
+import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionState
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
+import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleGameScreenAnimations
+import ru.meatgames.tomb.screen.compose.game.animation.isStateless
 import ru.meatgames.tomb.toIntOffset
 
 @Preview
@@ -63,9 +65,12 @@ private fun GameScreenMapContainerPreview() {
         onCharacterMove = { Unit },
         onMapGeneration = { Unit },
         onInventory = { Unit },
+        onCloseInteractionMenu = { Unit },
+        onItemSelected = { _, _, _ -> Unit },
     )
 }
 
+// TODO add interface for container interactions
 @Composable
 internal fun GameScreenMapContainer(
     mapState: MapScreenController.MapScreenState.Ready,
@@ -78,6 +83,8 @@ internal fun GameScreenMapContainer(
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
     onInventory: () -> Unit,
+    onCloseInteractionMenu: () -> Unit,
+    onItemSelected: (Coordinates, ItemContainerId, ItemId) -> Unit,
 ) = BoxWithConstraints(
     modifier = Modifier
         .background(Color(0xFF212121))
@@ -128,19 +135,14 @@ internal fun GameScreenMapContainer(
             .background(LocalBackgroundColor.current)
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = { onCharacterMove(it.toDirection(maxWidth)) },
+                    onTap = {
+                        if (interactionState == null) {
+                            onCharacterMove(it.toDirection(maxWidth))
+                        }
+                    },
                 )
             },
     )
-    
-    interactionState?.let {
-        Text(
-            modifier = Modifier.fillMaxWidth()
-                .align(Alignment.TopCenter),
-            text = "$it",
-            style = h2TextStyle,
-        )
-    }
     
     CompositionLocalProvider(
         LocalTileSize provides IntSize(tileDimension, tileDimension),
@@ -180,6 +182,22 @@ internal fun GameScreenMapContainer(
         modifier = Modifier.align(Alignment.BottomEnd),
         onClick = onMapGeneration,
     )
+    
+    interactionState?.let { state ->
+        when (state) {
+            is GameScreenInteractionState.SearchingContainer -> {
+                GameScreenContainerWindow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.Center),
+                    interactionState = state,
+                    onClose = onCloseInteractionMenu,
+                    onItemClick = onItemSelected,
+                )
+            }
+        }
+    }
 }
 
 context(Density)

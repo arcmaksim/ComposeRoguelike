@@ -5,7 +5,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.item.ItemContainerId
+import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenLoading
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
 
@@ -36,6 +39,8 @@ internal fun GameScreen(
         onCharacterMove = viewModel::onMoveCharacter,
         onMapGeneration = viewModel::newMap,
         onInventory = viewModel::openInventory,
+        onCloseInteractionMenu = viewModel::closeInteractionMenu,
+        onItemSelected = viewModel::pickUpItem,
     )
 }
 
@@ -45,6 +50,8 @@ private fun GameScreenContent(
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
     onInventory: () -> Unit,
+    onCloseInteractionMenu: () -> Unit,
+    onItemSelected: (Coordinates, ItemContainerId, ItemId) -> Unit,
 ) {
     when (val mapState = state.mapState) {
         is MapScreenController.MapScreenState.Loading -> GameScreenLoading()
@@ -59,6 +66,8 @@ private fun GameScreenContent(
             onCharacterMove = onCharacterMove,
             onMapGeneration = onMapGeneration,
             onInventory = onInventory,
+            onCloseInteractionMenu = onCloseInteractionMenu,
+            onItemSelected = onItemSelected,
         )
     }
 }

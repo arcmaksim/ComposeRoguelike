@@ -11,12 +11,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
 import ru.meatgames.tomb.domain.PlayerMapInteractionResolver
-import ru.meatgames.tomb.domain.PlayerMoveResult
+import ru.meatgames.tomb.domain.PlayerTurnResult
+import ru.meatgames.tomb.domain.item.ItemContainerId
+import ru.meatgames.tomb.domain.item.ItemId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +29,7 @@ class GameScreenViewModel @Inject constructor(
     private val mapInteractionController: PlayerMapInteractionController,
     private val mapInteractionResolver: PlayerMapInteractionResolver,
     private val gameController: GameController,
+    private val itemsHolder: ItemsHolder,
 ) : ViewModel() {
     
     private val _events = Channel<GameScreenEvent?>()
@@ -50,6 +55,12 @@ class GameScreenViewModel @Inject constructor(
             field = null
             return value
         }
+    private var clearInteractionState: Unit? = null
+        get() {
+            val value = field
+            field = null
+            return value
+        }
     
     private val _isIdle = MutableStateFlow(true)
     val isIdle: StateFlow<Boolean> = _isIdle
@@ -61,6 +72,7 @@ class GameScreenViewModel @Inject constructor(
                     mapState = state,
                     playerAnimation = pendingAnimation,
                     previousMoveDirection = previousMoveDirection,
+                    interactionState = _state.value.interactionState?.takeIf { clearInteractionState == null },
                 )
             }
         }
@@ -77,31 +89,40 @@ class GameScreenViewModel @Inject constructor(
             _isIdle.value = true
             return
         }
-        
-        val animation = playerTurnResult.resolveGameScreenAnimationState()
-        val interactionState = playerTurnResult.resolvePlayerInteractionState()
-        
+    
+        playerTurnResult.process()
+    }
+    
+    private fun PlayerTurnResult.process() {
+        val animation = resolveGameScreenAnimationState()
+        val interactionState = resolvePlayerInteractionState()
+    
         if (animation.requiresManualUpdate() || interactionState != null) {
             updateStateNow(
                 gameScreenAnimationState = animation,
                 playerInteractionState = interactionState,
             )
         } else {
-            animation.cacheState(playerTurnResult)
+            animation.cacheState(this)
         }
     }
     
-    private fun PlayerMoveResult.resolveGameScreenAnimationState(): GameScreenAnimationState? =
+    private fun PlayerTurnResult.resolveGameScreenAnimationState(): GameScreenAnimationState? =
         when (this) {
-            is PlayerMoveResult.Block -> GameScreenAnimationState.Shake()
-            is PlayerMoveResult.Move -> GameScreenAnimationState.Scroll(direction)
+            is PlayerTurnResult.Block -> GameScreenAnimationState.Shake()
+            is PlayerTurnResult.Move -> GameScreenAnimationState.Scroll(direction)
             else -> null
         }
     
-    private fun PlayerMoveResult.resolvePlayerInteractionState(): GameScreenInteractionState? =
+    private fun PlayerTurnResult.resolvePlayerInteractionState(): GameScreenInteractionState? =
         when (this) {
-            is PlayerMoveResult.ContainerInteraction -> {
-                GameScreenInteractionState.SearchingContainer(itemBag)
+            is PlayerTurnResult.ContainerInteraction -> {
+                clearInteractionState = Unit
+                GameScreenInteractionState.SearchingContainer(
+                    coordinates = coordinates,
+                    itemContainerId = itemContainerId,
+                    items = itemsHolder.getItems(itemIds),
+                )
             }
             else -> null
         }
@@ -126,12 +147,17 @@ class GameScreenViewModel @Inject constructor(
     }
     
     private fun GameScreenAnimationState?.cacheState(
-        playerMoveResult: PlayerMoveResult,
+        playerTurnResult: PlayerTurnResult,
     ) {
         pendingAnimation = this
         previousMoveDirection = (this as? GameScreenAnimationState.Scroll)?.direction
         
-        mapInteractionResolver.resolvePlayerMove(playerMoveResult)
+        val resolveResult = mapInteractionResolver.resolvePlayerMove(playerTurnResult)
+        
+        if (playerTurnResult is PlayerTurnResult.PickupItem &&
+            resolveResult == PlayerMapInteractionResolver.ResolveResult.Clear) {
+            clearInteractionState = Unit
+        }
         
         _isIdle.value = true
     }
@@ -142,6 +168,26 @@ class GameScreenViewModel @Inject constructor(
     
     fun openInventory() {
         _events.trySend(GameScreenEvent.Inventory)
+    }
+    
+    fun closeInteractionMenu() {
+        _state.update {
+            it.copy(
+                interactionState = null,
+            )
+        }
+    }
+    
+    fun pickUpItem(
+        coordinates: Coordinates,
+        itemContainerId: ItemContainerId,
+        itemId: ItemId,
+    ) {
+        mapInteractionController.pickItem(
+            coordinates = coordinates,
+            itemContainerId = itemContainerId,
+            itemId = itemId,
+        ).process()
     }
     
 }

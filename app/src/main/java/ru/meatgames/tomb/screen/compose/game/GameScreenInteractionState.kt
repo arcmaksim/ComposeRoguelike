@@ -1,11 +1,15 @@
 package ru.meatgames.tomb.screen.compose.game
 
-import ru.meatgames.tomb.domain.item.ItemBag
+import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.item.Item
+import ru.meatgames.tomb.domain.item.ItemContainerId
 
 sealed class GameScreenInteractionState {
     
     data class SearchingContainer(
-        val itemBag: ItemBag,
+        val coordinates: Coordinates,
+        val itemContainerId: ItemContainerId,
+        val items: Set<Item>,
     ) : GameScreenInteractionState()
     
 }

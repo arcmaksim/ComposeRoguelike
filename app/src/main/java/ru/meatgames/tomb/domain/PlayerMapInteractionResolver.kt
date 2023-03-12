@@ -8,26 +8,49 @@ import javax.inject.Singleton
 class PlayerMapInteractionResolver @Inject constructor(
     private val characterController: CharacterController,
     private val mapTerraformer: MapTerraformer,
+    private val itemsController: ItemsController,
+    private val itemsHolder: ItemsHolder,
 ) {
 
     fun resolvePlayerMove(
-        result: PlayerMoveResult,
-    ) {
-        when (result) {
-            is PlayerMoveResult.Interaction -> {
+        result: PlayerTurnResult,
+    ): ResolveResult {
+        return when (result) {
+            is PlayerTurnResult.Interaction -> {
                 useTile(
                     mapX = result.coordinates.first,
                     mapY = result.coordinates.second,
                     objectEntityTile = result.tile,
                 )
+                ResolveResult.None
             }
         
-            is PlayerMoveResult.Move -> {
+            is PlayerTurnResult.Move -> {
                 characterController.move(result.direction)
+                ResolveResult.None
             }
         
-            else -> Unit
+            is PlayerTurnResult.PickupItem -> {
+                val item = itemsController.takeItem(
+                    coordinates = result.coordinates,
+                    itemContainerId = result.itemContainerId,
+                    itemId = result.itemId,
+                ) ?: return ResolveResult.None
+            
+                characterController.addItem(item)
+            
+                itemsHolder.getMapContainerId(result.coordinates)
+                    ?.let { ResolveResult.None }
+                    ?: ResolveResult.Clear
+            }
+        
+            else -> ResolveResult.None
         }
+    }
+    
+    enum class ResolveResult {
+        None,
+        Clear,
     }
 
     private fun useTile(
