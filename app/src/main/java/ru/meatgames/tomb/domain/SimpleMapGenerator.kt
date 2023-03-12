@@ -2,7 +2,6 @@ package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.item.Item
-import ru.meatgames.tomb.domain.item.ItemBag
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
@@ -21,6 +20,7 @@ typealias ScreenSpaceCoordinates = Coordinates
 
 class SimpleMapGenerator @Inject constructor(
     roomsData: RoomsData,
+    private val itemsController: ItemsController,
 ) {
     
     private val random = Random(System.currentTimeMillis())
@@ -46,10 +46,9 @@ class SimpleMapGenerator @Inject constructor(
             room = initialRoom,
         )
     
-        map.placeItem(
+        Item("Initial item ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(
             x = initialRoomPositionX + 2,
             y = initialRoomPositionY + 1,
-            item = Item("Initial item"),
         )
         
         map.generateRooms(
@@ -80,7 +79,7 @@ class SimpleMapGenerator @Inject constructor(
                     ) {
                         copy(
                             floorEntityTile = FloorEntityTile.Floor,
-                            mapObject = ObjectEntityTile.Wall.toMapTileObject(),
+                            objectEntityTile = ObjectEntityTile.Wall,
                         )
                     }
                 }
@@ -128,7 +127,7 @@ class SimpleMapGenerator @Inject constructor(
                     y = randomOuterWall.second,
                 ) {
                     copy(
-                        mapObject = ObjectEntityTile.DoorClosed.toMapTileObject(),
+                        objectEntityTile = ObjectEntityTile.DoorClosed,
                     )
                 }
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
@@ -205,7 +204,7 @@ class SimpleMapGenerator @Inject constructor(
                 ) {
                     copy(
                         floorEntityTile = room.floor[i].toFloorEntity(),
-                        mapObject = room.objects[i].toObjectEntity()?.toMapTileObject(),
+                        objectEntityTile = room.objects[i].toObjectEntity(),
                     )
                 }
             }
@@ -228,25 +227,21 @@ class SimpleMapGenerator @Inject constructor(
                 val y = random.nextInt(height)
                 val tile = getTile(x, y)?.tile
                 if (tile.isEmpty) {
-                    placeItem(x, y, Item("Item $i"))
+                    Item("Item $i ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(x, y)
                     break
                 }
             }
         }
     }
     
-    private fun LevelMap.placeItem(
+    private fun Item.placeItem(
         x: Int,
         y: Int,
-        item: Item,
     ) {
-        updateSingleTile(x, y) {
-            copy(
-                mapObject = MapTile.MapObject.Item(
-                    ItemBag(listOf(item)),
-                ),
-            )
-        }
+        itemsController.addItem(
+            coordinates = Coordinates(x, y),
+            item = this,
+        )
     }
     
     private fun Char.toFloorEntity(): FloorEntityTile = floorMapping.first {
@@ -307,11 +302,11 @@ data class GeneratedMapConfiguration(
 private val MapTile?.isWall: Boolean
     get() {
         this ?: return false
-        return (mapObject as? MapTile.MapObject.Object)?.objectEntityTile == ObjectEntityTile.Wall
+        return objectEntityTile == ObjectEntityTile.Wall
     }
 
 private val MapTile?.isEmpty: Boolean
     get() {
         this ?: return false
-        return mapObject == null
+        return objectEntityTile == null
     }
