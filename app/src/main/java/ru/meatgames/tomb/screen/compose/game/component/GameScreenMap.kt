@@ -136,6 +136,16 @@ private fun DrawScope.drawRevealedTile(
             filterQuality = filterQuality,
         )
     }
+    renderTile.itemData?.let { itemData ->
+        drawImage(
+            image = itemData.asset,
+            srcOffset = itemData.srcOffset,
+            srcSize = NewAssets.tileSize,
+            dstOffset = dstOffset,
+            dstSize = tileSize,
+            filterQuality = filterQuality,
+        )
+    }
     alpha?.let {
         drawRect(
             topLeft = dstOffset.toOffset(),

@@ -7,6 +7,7 @@ sealed class MapRenderTile {
     data class Content(
         val floorData: RenderData,
         val objectData: RenderData?,
+        val itemData: RenderData?,
         val isVisible: Boolean,
     ) : MapRenderTile()
 

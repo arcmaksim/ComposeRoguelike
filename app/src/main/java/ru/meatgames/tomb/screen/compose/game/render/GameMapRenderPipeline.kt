@@ -3,6 +3,7 @@ package ru.meatgames.tomb.screen.compose.game.render
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.MapDecoratorPipeline
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.model.temp.ThemeAssets
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class GameMapRenderPipeline @Inject constructor(
     private val themeAssets: ThemeAssets,
     private val decoratorsPipeline: MapDecoratorPipeline,
+    private val itemsHolder: ItemsHolder,
 ) {
     
     private var prevTiles = setOf<Coordinates>()
@@ -24,8 +26,7 @@ class GameMapRenderPipeline @Inject constructor(
     fun run(
         tiles: List<MapTileWrapper?>,
         tilesLineWidth: Int,
-        mapX: Int,
-        mapY: Int,
+        startCoordinates: Coordinates,
         shouldRenderTile: (Int) -> Boolean,
     ): GameMapPipelineRenderData {
         val renderTiles = decoratorsPipeline.produceRenderTilesFrom(
@@ -33,7 +34,10 @@ class GameMapRenderPipeline @Inject constructor(
             tilesLineWidth = tilesLineWidth,
         )
         
-        val processedRenderTiles = renderTiles.applyFOV(tilesLineWidth, shouldRenderTile)
+        val processedRenderTiles = renderTiles.applyFOV(
+            tilesLineWidth,
+            shouldRenderTile,
+        )
         
         val tilesToReveal = mutableSetOf<ScreenSpaceCoordinates>()
         val tilesToFade = mutableSetOf<ScreenSpaceCoordinates>()
@@ -49,10 +53,10 @@ class GameMapRenderPipeline @Inject constructor(
             val isCurrentTileVisible = (newRenderTile as? MapRenderTile.Content)?.isVisible ?: false
             
             if (previousTileWasVisible && !isCurrentTileVisible) {
-                tilesToFade.add(tileWrapper.x - mapX to tileWrapper.y - mapY)
+                tilesToFade.add(tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second)
             }
             if (!previousTileWasVisible && isCurrentTileVisible) {
-                tilesToReveal.add(tileWrapper.x - mapX to tileWrapper.y - mapY)
+                tilesToReveal.add(tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second)
             }
         }
         
@@ -88,6 +92,8 @@ class GameMapRenderPipeline @Inject constructor(
                 pair.first to MapRenderTile.Content(
                     floorData = pair.second.first.toFloorRenderTileData(),
                     objectData = pair.second.second?.toObjectRenderTileData(),
+                    itemData = itemsHolder.getItemContainer(pair.first.x to pair.first.y)
+                        ?.let { themeAssets.resolveItemRenderData() },
                     isVisible = isVisible,
                 )
             }

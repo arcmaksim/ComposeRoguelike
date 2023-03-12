@@ -44,7 +44,11 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         FloorRenderTile.Floor to ObjectRenderTile.Wall9,
     )
     
-    return renderTiles.map { tilesPair ->
+    val items = mapOf(
+        17 to themeAssets.resolveItemRenderData(),
+    )
+    
+    return renderTiles.mapIndexed { index, tilesPair ->
         val floorData = themeAssets.resolveFloorRenderData(tilesPair.first)
         val objectData = tilesPair.second?.let {
             themeAssets.resolveObjectRenderData(it)
@@ -60,6 +64,7 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
                     srcOffset = it.second,
                 )
             },
+            itemData = items[index],
             isVisible = true,
         )
     }
