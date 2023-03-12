@@ -86,8 +86,7 @@ class MapScreenController @Inject constructor(
         val pipelineRenderData = gameMapRenderPipeline.run(
             tiles = reducedTiles,
             tilesLineWidth = preProcessingViewportWidth,
-            mapX = characterState.mapX - viewportWidth / 2,
-            mapY = characterState.mapY - viewportHeight / 2,
+            startCoordinates = characterState.mapX - viewportWidth / 2 to characterState.mapY - viewportHeight / 2,
             shouldRenderTile = { index ->
                 cachedVisibilityMask[index]
             },
@@ -112,7 +111,7 @@ class MapScreenController @Inject constructor(
         
         val characterScreenSpaceX = viewportWidth / 2
         val characterScreenSpaceY = viewportHeight / 2
-    
+        
         computeFov(
             originX = characterScreenSpaceX,
             originY = characterScreenSpaceY,
@@ -120,8 +119,7 @@ class MapScreenController @Inject constructor(
             revealTile = { x, y -> cachedVisibilityMask[x + y * viewportWidth] = true },
             checkIfTileIsBlocking = { x, y ->
                 val index = (x + 1) + (y + 1) * preProcessingViewportWidth
-                val objectEntity = (this[index]?.tile?.mapObject as? MapTile.MapObject.Object)?.objectEntityTile
-                    ?: return@computeFov false
+                val objectEntity = this[index]?.tile?.objectEntityTile ?: return@computeFov false
                 !tilesController.isObjectEntityVisibleThrough(
                     objectEntity = objectEntity,
                 )
@@ -152,13 +150,10 @@ class MapScreenController @Inject constructor(
                     when {
                         mapX + index < 0 -> null
                         else -> this[tileIndex]
-                    }?.let {
-                        MapTileWrapper(
-                            x = tileIndex % mapWidth,
-                            y = tileIndex / mapWidth,
-                            tile = it,
-                        )
-                    }
+                    }?.toMapTileWrapper(
+                        tileIndex = tileIndex,
+                        mapWidth = mapWidth,
+                    )
                 }
             }
             
@@ -168,26 +163,30 @@ class MapScreenController @Inject constructor(
                     when {
                         mapX + index < mapWidth -> this[tileIndex]
                         else -> null
-                    }?.let {
-                        MapTileWrapper(
-                            x = tileIndex % mapWidth,
-                            y = tileIndex / mapWidth,
-                            tile = it,
-                        )
-                    }
+                    }?.toMapTileWrapper(
+                        tileIndex = tileIndex,
+                        mapWidth = mapWidth,
+                    )
                 }
             }
             
             else -> this.subList(start, end).mapIndexed { index, tile ->
-                val tileIndex = start + index
-                MapTileWrapper(
-                    x = tileIndex % mapWidth,
-                    y = tileIndex / mapWidth,
-                    tile = tile,
+                tile.toMapTileWrapper(
+                    tileIndex = start + index,
+                    mapWidth = mapWidth,
                 )
             }
         }
     }.fold(emptyList()) { acc, item -> acc + item }
+    
+    private fun MapTile.toMapTileWrapper(
+        tileIndex: Int,
+        mapWidth: Int,
+    ): MapTileWrapper = MapTileWrapper(
+        x = tileIndex % mapWidth,
+        y = tileIndex / mapWidth,
+        tile = this,
+    )
     
     sealed class MapScreenState {
         
