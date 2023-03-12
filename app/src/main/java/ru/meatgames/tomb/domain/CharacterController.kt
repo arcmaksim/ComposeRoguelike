@@ -15,16 +15,6 @@ class CharacterController @Inject constructor() {
     private val _characterStateFlow = MutableStateFlow(CharacterState(-1, -1))
     val characterStateFlow: StateFlow<CharacterState> = _characterStateFlow
 
-    fun setInitialState(
-        mapX: Int,
-        mapY: Int,
-    ) {
-        _characterStateFlow.value = CharacterState(
-            mapX = mapX,
-            mapY = mapY,
-        )
-    }
-    
     fun setPosition(
         mapX: Int,
         mapY: Int,
@@ -45,6 +35,16 @@ class CharacterController @Inject constructor() {
             it.copy(
                 mapX = it.mapX + x,
                 mapY = it.mapY + y,
+            )
+        }
+    }
+    
+    fun addItem(
+        item: Item,
+    ) {
+        _characterStateFlow.update {
+            it.copy(
+                inventory = it.inventory + item,
             )
         }
     }
