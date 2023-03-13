@@ -1,19 +1,18 @@
 package ru.meatgames.tomb.screen.compose.inventory
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.design.h3TextStyle
+import ru.meatgames.tomb.screen.compose.container.ContainerItem
 import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview(widthDp = 320, heightDp = 640, showBackground = true, backgroundColor = 0xFF212121)
@@ -60,15 +59,16 @@ fun InventoryScreenContent(
             navigationIconResId = R.drawable.ic_arrow_back,
             onNavigationIcon = onBack,
         )
-        Box(
+        LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = "Items: ${state.items.size}",
-                style = h3TextStyle,
-                textAlign = TextAlign.Center,
-            )
+            items(state.items) {
+                ContainerItem(
+                    modifier = Modifier.fillMaxWidth(),
+                    item = it,
+                    onClick = { _ -> Unit },
+                )
+            }
         }
     }
 }
