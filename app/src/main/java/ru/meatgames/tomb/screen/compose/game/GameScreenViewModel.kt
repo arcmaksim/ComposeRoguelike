@@ -167,6 +167,12 @@ class GameScreenViewModel @Inject constructor(
     }
     
     fun openInventory() {
+        _state.update {
+            it.copy(
+                playerAnimation = null,
+                previousMoveDirection = null,
+            )
+        }
         _events.trySend(GameScreenEvent.Inventory)
     }
     
