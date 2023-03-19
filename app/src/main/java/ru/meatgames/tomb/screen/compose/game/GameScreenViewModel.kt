@@ -167,13 +167,8 @@ class GameScreenViewModel @Inject constructor(
     }
     
     fun openInventory() {
-        _state.update {
-            it.copy(
-                playerAnimation = null,
-                previousMoveDirection = null,
-            )
-        }
-        _events.trySend(GameScreenEvent.Inventory)
+        clearAnimations()
+        _events.trySend(GameScreenEvent.NavigateToInventory)
     }
     
     fun closeInteractionMenu() {
@@ -194,6 +189,20 @@ class GameScreenViewModel @Inject constructor(
             itemContainerId = itemContainerId,
             itemId = itemId,
         ).process()
+    }
+    
+    fun openCharacterSheet() {
+        clearAnimations()
+        _events.trySend(GameScreenEvent.NavigateToCharacterSheet)
+    }
+    
+    private fun clearAnimations() {
+        _state.update {
+            it.copy(
+                playerAnimation = null,
+                previousMoveDirection = null,
+            )
+        }
     }
     
 }

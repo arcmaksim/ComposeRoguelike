@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.WinScreen
+import ru.meatgames.tomb.screen.compose.charactersheet.CharacterSheetScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
 import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
 
@@ -48,6 +49,7 @@ fun TombApp(
                         }
                     },
                     onInventory = { navController.navigate(GameState.Inventory.id) },
+                    onCharacterSheet = { navController.navigate(GameState.Stats.id) },
                 )
             }
             composable(GameState.WinScreen.id) {
@@ -62,7 +64,13 @@ fun TombApp(
             composable(GameState.Inventory.id) {
                 InventoryScreen(
                     viewModel = hiltViewModel(),
-                    onBack = { navController.popBackStack() },
+                    onBack = navController::popBackStack,
+                )
+            }
+            composable(GameState.Stats.id) {
+                CharacterSheetScreen(
+                    viewModel = hiltViewModel(),
+                    onBack = navController::popBackStack,
                 )
             }
         }

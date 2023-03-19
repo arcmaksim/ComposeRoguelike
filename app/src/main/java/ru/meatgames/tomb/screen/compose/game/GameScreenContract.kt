@@ -5,8 +5,9 @@ import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 
 enum class GameScreenEvent {
-    Win,
-    Inventory,
+    NavigateToWinScreen,
+    NavigateToInventory,
+    NavigateToCharacterSheet,
 }
 
 /**
