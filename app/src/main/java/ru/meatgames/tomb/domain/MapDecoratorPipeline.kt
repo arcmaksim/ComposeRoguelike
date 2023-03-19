@@ -45,7 +45,6 @@ class MapDecoratorPipeline @Inject constructor(
         ObjectEntityTile.DoorOpened -> ObjectRenderTile.DoorOpened
         ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
         ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
-        ObjectEntityTile.Gismo -> ObjectRenderTile.Gismo
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
     }
 

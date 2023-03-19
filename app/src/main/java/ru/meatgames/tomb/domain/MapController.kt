@@ -14,6 +14,7 @@ class MapControllerImpl @Inject constructor(
     @Named(MAP_WIDTH_KEY) private val mapWidth: Int,
     @Named(MAP_HEIGHT_KEY) private val mapHeight: Int,
     private val mapGenerator: SimpleMapGenerator,
+    private val itemsHolder: ItemsHolder,
 ) : MapGenerator, MapTerraformer, MapController {
 
     private lateinit var levelMap: LevelMap
@@ -23,7 +24,8 @@ class MapControllerImpl @Inject constructor(
 
     override fun generateNewMap(): GeneratedMapConfiguration {
         _mapFlow.value = MapState.MapUnavailable
-
+    
+        itemsHolder.clearContainers()
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
         val configuration = mapGenerator.generateMap(levelMap)
 
@@ -39,9 +41,8 @@ class MapControllerImpl @Inject constructor(
     }
 
     override fun getTile(
-        x: Int,
-        y: Int,
-    ): MapTileWrapper? = levelMap.getTile(x, y)
+        coordinates: Coordinates,
+    ): MapTileWrapper? = levelMap.getTile(coordinates.first, coordinates.second)
 
     override fun changeObject(
         x: Int,
@@ -75,22 +76,21 @@ interface MapController {
     val mapFlow: StateFlow<MapState>
 
     fun getTile(
-        x: Int,
-        y: Int,
+        coordinates: Coordinates,
     ): MapTileWrapper?
 }
 
 data class LevelMapWrapper(
     val width: Int,
     val height: Int,
-    val state: StateFlow<List<MapTileWrapper>>,
+    val state: StateFlow<List<MapTile>>,
 ) {
 
     override fun toString(): String {
         val flowValue = state.value
         return flowValue.mapIndexed { index, value ->
             val nextLinePostfix = if (index % width == width - 1) "\n" else ""
-            if (value.tile.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
+            if (value.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
         }.fold("") { acc, item -> acc + item }
     }
 

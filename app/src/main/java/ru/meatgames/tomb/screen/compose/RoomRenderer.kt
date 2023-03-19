@@ -54,7 +54,7 @@ private fun RoomRenderer() {
                     .entity,
                 objectEntityTile = roomsData.objectMapping
                     .first { it.symbol == room.objects[index].toString() }
-                    .entity,
+                    .let { it.entity!! },
             ),
         )
     }

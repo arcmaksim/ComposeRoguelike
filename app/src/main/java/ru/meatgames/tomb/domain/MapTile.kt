@@ -7,7 +7,7 @@ data class MapTile(
     val floorEntityTile: FloorEntityTile,
     val objectEntityTile: ObjectEntityTile? = null,
 ) {
-
+    
     companion object {
         val initialTile = MapTile(
             floorEntityTile = FloorEntityTile.Floor,

@@ -12,13 +12,14 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
+import ru.meatgames.tomb.render.RenderData
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
 
-private const val tileSize = 24
+private const val TILE_SIZE = 24
 
 @OptIn(ExperimentalSerializationApi::class)
 @Singleton
@@ -74,11 +75,11 @@ class ThemeAssets @Inject constructor(
         return WallsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * tileSize
+                val verticalOffset = theme.verticalOffset * TILE_SIZE
                 WallsThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(tileSize * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -94,11 +95,11 @@ class ThemeAssets @Inject constructor(
         return FloorThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * tileSize
+                val verticalOffset = theme.verticalOffset * TILE_SIZE
                 FloorThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(tileSize * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -114,11 +115,11 @@ class ThemeAssets @Inject constructor(
         return DoorsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * tileSize
+                val verticalOffset = theme.verticalOffset * TILE_SIZE
                 DoorsThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(tileSize * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -134,11 +135,11 @@ class ThemeAssets @Inject constructor(
         return StairsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * tileSize
+                val verticalOffset = theme.verticalOffset * TILE_SIZE
                 StairsThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(tileSize * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -166,8 +167,6 @@ class ThemeAssets @Inject constructor(
             stairsThemes.atlas to currentTheme.stairsTheme.map.getValue(objectRenderTile)
         }
         
-        ObjectRenderTile.Gismo -> gismo to IntOffset(0, 0)
-
         ObjectRenderTile.Wall0,
         ObjectRenderTile.Wall1,
         ObjectRenderTile.Wall2,
@@ -187,5 +186,10 @@ class ThemeAssets @Inject constructor(
             wallsThemes.atlas to currentTheme.wallsTheme.map.getValue(objectRenderTile)
         }
     }
+    
+    fun resolveItemRenderData(): RenderData = RenderData(
+        asset = gismo,
+        srcOffset = IntOffset(0, 0),
+    )
 
 }

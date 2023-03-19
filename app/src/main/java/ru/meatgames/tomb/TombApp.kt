@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
+import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
 
 @ExperimentalMaterialApi
 @Composable
@@ -31,7 +32,9 @@ fun TombApp(
                 MainMenuScreen(
                     viewModel = hiltViewModel(),
                     onNewGame = {
-                        navController.navigate(GameState.MainGame.id)
+                        navController.navigate(GameState.MainGame.id) {
+                            popUpToTop(navController)
+                        }
                     },
                     onCloseApp = onCloseApp,
                 )
@@ -39,14 +42,28 @@ fun TombApp(
             composable(GameState.MainGame.id) {
                 GameScreen(
                     viewModel = hiltViewModel(),
-                ) {
-                    navController.navigate(GameState.WinScreen.id)
-                }
+                    onWin = {
+                        navController.navigate(GameState.WinScreen.id) {
+                            popUpToTop(navController)
+                        }
+                    },
+                    onInventory = { navController.navigate(GameState.Inventory.id) },
+                )
             }
             composable(GameState.WinScreen.id) {
-                WinScreen {
-                    navController.navigate(GameState.MainMenu.id)
-                }
+                WinScreen(
+                    onNavigateToMainMenu = {
+                        navController.navigate(GameState.MainMenu.id) {
+                            popUpToTop(navController)
+                        }
+                    },
+                )
+            }
+            composable(GameState.Inventory.id) {
+                InventoryScreen(
+                    viewModel = hiltViewModel(),
+                    onBack = { navController.popBackStack() },
+                )
             }
         }
     }

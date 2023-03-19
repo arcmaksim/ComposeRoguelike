@@ -11,8 +11,8 @@ class LevelMap(
     
     private val array = Array(width * height) { MapTile.initialTile }
     
-    private val _state = MutableStateFlow(array.toWrappers())
-    val state: StateFlow<List<MapTileWrapper>> = _state
+    private val _state = MutableStateFlow(array.toList())
+    val state: StateFlow<List<MapTile>> = _state
     
     private val editor = EditorImpl()
     
@@ -29,7 +29,11 @@ class LevelMap(
             )
             return null
         }
-        return capturedState[calcIndex(x, y)]
+        return MapTileWrapper(
+            tile = capturedState[calcIndex(x, y)],
+            x = x,
+            y = y,
+        )
     }
     
     fun updateSingleTile(
@@ -39,7 +43,7 @@ class LevelMap(
     ) {
         val index = calcIndex(x, y)
         if (!updateTile(index, update)) return
-        _state.value = array.toWrappers()
+        _state.value = array.toList()
     }
     
     private fun updateTile(
@@ -63,7 +67,7 @@ class LevelMap(
         updateFunc: (Editor.() -> Unit),
     ) {
         updateFunc.invoke(editor)
-        _state.value = array.toWrappers()
+        _state.value = array.toList()
     }
     
     private fun calcIndex(
@@ -71,13 +75,6 @@ class LevelMap(
         y: Int,
     ) = x + y * width
     
-    private fun Array<MapTile>.toWrappers(): List<MapTileWrapper> = mapIndexed { index, tile ->
-        MapTileWrapper(
-            x = index % width,
-            y = index / width,
-            tile = tile,
-        )
-    }
     
     interface Editor {
         

@@ -50,6 +50,7 @@ class RoomPreviewRenderProcessor @Inject constructor(
             else -> pair.first to MapRenderTile.Content(
                 floorData = pair.second.first.toFloorRenderTileData(),
                 objectData = pair.second.second?.toObjectRenderTileData(),
+                itemData = null,
                 isVisible = true,
             )
         }
@@ -75,7 +76,6 @@ class RoomPreviewRenderProcessor @Inject constructor(
         ObjectEntityTile.StairsDown -> ObjectRenderTile.StairsDown
         ObjectEntityTile.StairsUp -> ObjectRenderTile.StairsUp
         ObjectEntityTile.Wall -> ObjectRenderTile.Wall0
-        ObjectEntityTile.Gismo -> null
     }
     
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =

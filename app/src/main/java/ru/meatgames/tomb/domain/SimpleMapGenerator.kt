@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
@@ -19,6 +20,7 @@ typealias ScreenSpaceCoordinates = Coordinates
 
 class SimpleMapGenerator @Inject constructor(
     roomsData: RoomsData,
+    private val itemsController: ItemsController,
 ) {
     
     private val random = Random(System.currentTimeMillis())
@@ -43,13 +45,18 @@ class SimpleMapGenerator @Inject constructor(
             y = initialRoomPositionY,
             room = initialRoom,
         )
+    
+        Item("Initial item ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(
+            x = initialRoomPositionX + 2,
+            y = initialRoomPositionY + 1,
+        )
         
         map.generateRooms(
             maxRoomsAttempts = 25,
             maxRoomPlacementAttempts = 50,
         )
         
-        map.placeGismos(
+        map.placeItems(
             amount = 10,
             random = random,
         )
@@ -90,9 +97,9 @@ class SimpleMapGenerator @Inject constructor(
             log("Attempting to place ${i + 1} room of $maxRoomsAttempts")
             val room = rooms.random(random).rotate(random)
             log("Selected room ${room.name} - ${room.width}x${room.height}")
-        
+            
             log("Outer walls pool - $outerWallsPool")
-        
+            
             for (roomPlacementAttempt in 0 until maxRoomPlacementAttempts) {
                 val (randomOuterWall, direction) = getRandomOuterWall(random) ?: break@roomLoop
                 val (mapX, mapY) = room.findTile(
@@ -100,20 +107,20 @@ class SimpleMapGenerator @Inject constructor(
                     direction = direction,
                     random = random,
                 ) ?: continue
-            
+                
                 log("Attempt ${roomPlacementAttempt + 1} - selected outer wall ${randomOuterWall.first} ${randomOuterWall.second}")
                 log("mapX: $mapX, mapY: $mapY")
                 log("Direction was resolved - $direction")
-            
+                
                 val isZoneEmpty = checkZone(
                     mapX = mapX,
                     mapY = mapY,
                     roomWidth = room.width,
                     roomHeight = room.height,
                 )
-            
+                
                 if (!isZoneEmpty) continue
-            
+                
                 placeRoom(mapX, mapY, room)
                 updateSingleTile(
                     x = randomOuterWall.first,
@@ -152,7 +159,7 @@ class SimpleMapGenerator @Inject constructor(
             }?.let {
                 return wall to it
             }
-    
+            
             localOuterWallsPool.remove(wall)
         }
         
@@ -172,7 +179,7 @@ class SimpleMapGenerator @Inject constructor(
             Direction.Left -> outerWalls.filter { it.first == width - 1 }.randomOrNull(random)
             Direction.Right -> outerWalls.filter { it.first == 0 }.randomOrNull(random)
         } ?: return null
-    
+        
         return when (direction) {
             Direction.Top -> randomOuterWall.first - wall.first to randomOuterWall.second - wall.second
             Direction.Bottom -> randomOuterWall.first - wall.first to randomOuterWall.second
@@ -210,7 +217,7 @@ class SimpleMapGenerator @Inject constructor(
         log("Placed room at $x $y with dimensions ${room.width} x ${room.height}")
     }
     
-    private fun LevelMap.placeGismos(
+    private fun LevelMap.placeItems(
         amount: Int,
         random: Random,
     ) {
@@ -220,15 +227,21 @@ class SimpleMapGenerator @Inject constructor(
                 val y = random.nextInt(height)
                 val tile = getTile(x, y)?.tile
                 if (tile.isEmpty) {
-                    updateSingleTile(x, y) {
-                        copy(
-                            objectEntityTile = ObjectEntityTile.Gismo,
-                        )
-                    }
+                    Item("Item $i ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(x, y)
                     break
                 }
             }
         }
+    }
+    
+    private fun Item.placeItem(
+        x: Int,
+        y: Int,
+    ) {
+        itemsController.addItem(
+            coordinates = Coordinates(x, y),
+            item = this,
+        )
     }
     
     private fun Char.toFloorEntity(): FloorEntityTile = floorMapping.first {

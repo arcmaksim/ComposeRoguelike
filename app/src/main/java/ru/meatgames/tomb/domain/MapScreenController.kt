@@ -62,7 +62,7 @@ class MapScreenController @Inject constructor(
         }
     }
     
-    private fun List<MapTileWrapper>.toMapState(
+    private fun List<MapTile>.toMapState(
         mapWidth: Int,
         mapHeight: Int,
         characterState: CharacterState,
@@ -86,8 +86,7 @@ class MapScreenController @Inject constructor(
         val pipelineRenderData = gameMapRenderPipeline.run(
             tiles = reducedTiles,
             tilesLineWidth = preProcessingViewportWidth,
-            mapX = characterState.mapX - viewportWidth / 2,
-            mapY = characterState.mapY - viewportHeight / 2,
+            startCoordinates = characterState.mapX - viewportWidth / 2 to characterState.mapY - viewportHeight / 2,
             shouldRenderTile = { index ->
                 cachedVisibilityMask[index]
             },
@@ -101,7 +100,6 @@ class MapScreenController @Inject constructor(
             tiles = pipelineRenderData.tiles,
             tilesToReveal = pipelineRenderData.tilesToReveal.toSet(),
             tilesToFade = pipelineRenderData.tilesToFade.toSet(),
-            points = characterState.points,
         )
     }
     
@@ -113,7 +111,7 @@ class MapScreenController @Inject constructor(
         
         val characterScreenSpaceX = viewportWidth / 2
         val characterScreenSpaceY = viewportHeight / 2
-    
+        
         computeFov(
             originX = characterScreenSpaceX,
             originY = characterScreenSpaceY,
@@ -121,8 +119,7 @@ class MapScreenController @Inject constructor(
             revealTile = { x, y -> cachedVisibilityMask[x + y * viewportWidth] = true },
             checkIfTileIsBlocking = { x, y ->
                 val index = (x + 1) + (y + 1) * preProcessingViewportWidth
-                val objectEntity = this[index]?.tile?.objectEntityTile
-                    ?: return@computeFov false
+                val objectEntity = this[index]?.tile?.objectEntityTile ?: return@computeFov false
                 !tilesController.isObjectEntityVisibleThrough(
                     objectEntity = objectEntity,
                 )
@@ -134,7 +131,7 @@ class MapScreenController @Inject constructor(
         fill(false)
     }
     
-    private fun List<MapTileWrapper>.reduceToViewportSize(
+    private fun List<MapTile>.reduceToViewportSize(
         mapX: Int,
         mapY: Int,
         mapWidth: Int,
@@ -148,26 +145,48 @@ class MapScreenController @Inject constructor(
             }
             
             mapX < 0 -> {
-                List(preProcessingViewportWidth) {
+                List(preProcessingViewportWidth) { index ->
+                    val tileIndex = start + index
                     when {
-                        mapX + it < 0 -> null
-                        else -> this[start + it]
-                    }
+                        mapX + index < 0 -> null
+                        else -> this[tileIndex]
+                    }?.toMapTileWrapper(
+                        tileIndex = tileIndex,
+                        mapWidth = mapWidth,
+                    )
                 }
             }
             
             mapX + preProcessingViewportWidth > mapWidth -> {
-                List(preProcessingViewportWidth) {
+                List(preProcessingViewportWidth) { index ->
+                    val tileIndex = start + index
                     when {
-                        mapX + it < mapWidth -> this[start + it]
+                        mapX + index < mapWidth -> this[tileIndex]
                         else -> null
-                    }
+                    }?.toMapTileWrapper(
+                        tileIndex = tileIndex,
+                        mapWidth = mapWidth,
+                    )
                 }
             }
             
-            else -> this.subList(start, end)
+            else -> this.subList(start, end).mapIndexed { index, tile ->
+                tile.toMapTileWrapper(
+                    tileIndex = start + index,
+                    mapWidth = mapWidth,
+                )
+            }
         }
     }.fold(emptyList()) { acc, item -> acc + item }
+    
+    private fun MapTile.toMapTileWrapper(
+        tileIndex: Int,
+        mapWidth: Int,
+    ): MapTileWrapper = MapTileWrapper(
+        x = tileIndex % mapWidth,
+        y = tileIndex / mapWidth,
+        tile = this,
+    )
     
     sealed class MapScreenState {
         
@@ -179,7 +198,6 @@ class MapScreenController @Inject constructor(
             val viewportHeight: Int,
             val tilesToReveal: Set<ScreenSpaceCoordinates>,
             val tilesToFade: Set<ScreenSpaceCoordinates>,
-            val points: Int,
         ) : MapScreenState()
         
         object Loading : MapScreenState()
