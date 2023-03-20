@@ -1,36 +1,25 @@
 package ru.meatgames.tomb.screen.compose.charactersheet
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.design.h1TextStyle
-import ru.meatgames.tomb.design.h3TextStyle
-import ru.meatgames.tomb.domain.stat.Cunning
-import ru.meatgames.tomb.domain.stat.Power
-import ru.meatgames.tomb.domain.stat.Speed
-import ru.meatgames.tomb.domain.stat.Technique
 import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview(widthDp = 320, heightDp = 640, showBackground = true, backgroundColor = 0xFF212121)
 @Composable
 private fun InventoryScreenPreview() {
     CharacterSheetScreenContent(
-        state = CharacterSheetState(
-            power = Power(5),
-            speed = Speed(3),
-            cunning = Cunning(2),
-            technique = Technique(4),
-        ),
+        state = characterSheetStatePreview,
         onBack = { Unit },
     )
 }
@@ -70,67 +59,25 @@ private fun CharacterSheetScreenContent(
             navigationIconResId = R.drawable.ic_arrow_back,
             onNavigationIcon = onBack,
         )
-    
-        Stats(
-            power = state.power,
-            speed = state.speed,
-            cunning = state.cunning,
-            technique = state.technique,
-        )
-    }
-}
-
-@Composable
-private fun Stats(
-    power: Power,
-    speed: Speed,
-    cunning: Cunning,
-    technique: Technique,
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column {
-            Stat(
-                statValue = power.value,
-                statName = "Power",
+        
+        val scrollableState = rememberScrollState()
+        
+        Column(
+            modifier = Modifier
+                .verticalScroll(scrollableState)
+                .padding(horizontal = 8.dp),
+        ) {
+            Stats(
+                power = state.power,
+                speed = state.speed,
+                cunning = state.cunning,
+                technique = state.technique,
             )
-            Stat(
-                statValue = speed.value,
-                statName = "Speed",
-            )
-            Stat(
-                statValue = cunning.value,
-                statName = "Cunning",
-            )
-            Stat(
-                statValue = technique.value,
-                statName = "Technique",
+            BehaviorCards(
+                offenseBehaviorCard = state.offensiveBehaviorCard,
+                defenceBehaviorCard = state.defensiveBehaviorCard,
+                supportBehaviorCard = state.supportBehaviorCard,
             )
         }
-    }
-    
-    
-}
-
-@Composable
-private fun Stat(
-    statValue: Int,
-    statName: String,
-) {
-    Row(
-        verticalAlignment = Alignment.Bottom,
-    ) {
-        Text(
-            modifier = Modifier.alignByBaseline(),
-            text = "$statValue",
-            style = h1TextStyle,
-        )
-        Text(
-            modifier = Modifier.alignByBaseline(),
-            text = "$statName",
-            style = h3TextStyle,
-        )
     }
 }

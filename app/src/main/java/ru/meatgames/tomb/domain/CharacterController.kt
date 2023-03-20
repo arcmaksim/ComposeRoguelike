@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.behaviorcard.BehaviorCard
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.domain.stat.Cunning
 import ru.meatgames.tomb.domain.stat.Power
@@ -62,5 +63,9 @@ data class CharacterState(
     val speed: Speed = Speed(3),
     val cunning: Cunning = Cunning(3),
     val technique: Technique = Technique(3),
+    val offenseBehaviorCard: BehaviorCard? = null,
+    val defenceBehaviorCard: BehaviorCard? = null,
+    val supportBehaviorCard: BehaviorCard? = null,
+    val allBehaviorCards: List<BehaviorCard> = emptyList(),
     val inventory: List<Item> = emptyList(),
 )

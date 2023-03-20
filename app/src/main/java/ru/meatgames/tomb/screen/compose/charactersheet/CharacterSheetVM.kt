@@ -27,6 +27,9 @@ class CharacterSheetVM @Inject constructor(
                 speed = speed,
                 cunning = cunning,
                 technique = technique,
+                offensiveBehaviorCard = offenseBehaviorCard,
+                defensiveBehaviorCard = defenceBehaviorCard,
+                supportBehaviorCard = supportBehaviorCard,
             )
         }
     )
@@ -40,6 +43,9 @@ class CharacterSheetVM @Inject constructor(
                     speed = it.speed,
                     cunning = it.cunning,
                     technique = it.technique,
+                    offensiveBehaviorCard = it.offenseBehaviorCard,
+                    defensiveBehaviorCard = it.defenceBehaviorCard,
+                    supportBehaviorCard = it.supportBehaviorCard,
                 )
             }
         }
