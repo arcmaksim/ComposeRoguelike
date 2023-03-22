@@ -11,6 +11,9 @@ import ru.meatgames.tomb.domain.stat.Power
 import ru.meatgames.tomb.domain.stat.Speed
 import ru.meatgames.tomb.domain.stat.Technique
 import ru.meatgames.tomb.resolvedOffsets
+import ru.meatgames.tomb.screen.compose.charactersheet.alertnessBehaviorCardPreview
+import ru.meatgames.tomb.screen.compose.charactersheet.mightBehaviorCardPreview
+import ru.meatgames.tomb.screen.compose.charactersheet.resilienceBehaviorCardPreview
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -59,13 +62,13 @@ class CharacterController @Inject constructor() {
 data class CharacterState(
     val mapX: Int,
     val mapY: Int,
-    val power: Power = Power(3),
-    val speed: Speed = Speed(3),
-    val cunning: Cunning = Cunning(3),
-    val technique: Technique = Technique(3),
-    val offenseBehaviorCard: BehaviorCard? = null,
-    val defenceBehaviorCard: BehaviorCard? = null,
-    val supportBehaviorCard: BehaviorCard? = null,
+    val power: Power = Power(10),
+    val speed: Speed = Speed(1),
+    val cunning: Cunning = Cunning(1),
+    val technique: Technique = Technique(8),
+    val offenseBehaviorCard: BehaviorCard? = mightBehaviorCardPreview,
+    val defenceBehaviorCard: BehaviorCard? = resilienceBehaviorCardPreview,
+    val supportBehaviorCard: BehaviorCard? = alertnessBehaviorCardPreview,
     val allBehaviorCards: List<BehaviorCard> = emptyList(),
     val inventory: List<Item> = emptyList(),
 )

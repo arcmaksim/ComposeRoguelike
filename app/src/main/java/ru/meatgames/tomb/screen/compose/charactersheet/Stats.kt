@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -58,7 +57,8 @@ internal fun Stats(
     ) {
         Column {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 Stat(
@@ -78,7 +78,8 @@ internal fun Stats(
             Spacer(modifier = Modifier.height(16.dp))
     
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 Stat(
@@ -108,8 +109,7 @@ private fun Stat(
 ) {
     Box(
         modifier = modifier.then(
-            Modifier.padding(horizontal = 32.dp)
-                .height(96.dp).width(100.dp),
+            Modifier.size(width = 104.dp, height = 96.dp),
         ),
         contentAlignment = Alignment.CenterStart,
     ) {
