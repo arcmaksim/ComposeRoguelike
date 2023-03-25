@@ -15,14 +15,14 @@ class MapControllerImpl @Inject constructor(
     @Named(MAP_HEIGHT_KEY) private val mapHeight: Int,
     private val mapGenerator: SimpleMapGenerator,
     private val itemsHolder: ItemsHolder,
-) : MapGenerator, MapTerraformer, MapController {
+) : MapCreator, MapTerraformer, MapController {
 
     private lateinit var levelMap: LevelMap
 
     private val _mapFlow: MutableStateFlow<MapState> = MutableStateFlow(MapState.MapUnavailable)
     override val mapFlow: StateFlow<MapState> = _mapFlow
 
-    override fun generateNewMap(): GeneratedMapConfiguration {
+    override fun createNewMap(): MapConfiguration {
         _mapFlow.value = MapState.MapUnavailable
     
         itemsHolder.clearContainers()
@@ -60,8 +60,8 @@ class MapControllerImpl @Inject constructor(
     }
 }
 
-interface MapGenerator {
-    fun generateNewMap(): GeneratedMapConfiguration
+interface MapCreator {
+    fun createNewMap(): MapConfiguration
 }
 
 interface MapTerraformer {

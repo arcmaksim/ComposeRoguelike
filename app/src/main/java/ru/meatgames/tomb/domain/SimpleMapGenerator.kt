@@ -33,7 +33,7 @@ class SimpleMapGenerator @Inject constructor(
     
     fun generateMap(
         map: LevelMap,
-    ): GeneratedMapConfiguration {
+    ): MapConfiguration {
         val initialRoomPositionX = 10
         val initialRoomPositionY = 3
         val initialRoom = rooms.first()
@@ -61,7 +61,7 @@ class SimpleMapGenerator @Inject constructor(
             random = random,
         )
         
-        return GeneratedMapConfiguration(
+        return MapConfiguration(
             mapWidth = map.width,
             mapHeight = map.height,
             startCoordinates = initialRoomPositionX + 2 to initialRoomPositionY + 2,
@@ -291,7 +291,7 @@ class SimpleMapGenerator @Inject constructor(
     
 }
 
-data class GeneratedMapConfiguration(
+data class MapConfiguration(
     val mapWidth: Int,
     val mapHeight: Int,
     val startCoordinates: Coordinates,

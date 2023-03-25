@@ -5,12 +5,12 @@ import javax.inject.Singleton
 
 @Singleton
 class GameController @Inject constructor(
-    private val mapGenerator: MapGenerator,
+    private val mapCreator: MapCreator,
     private val characterController: CharacterController,
 ) {
 
     fun generateNewMap() {
-        val configuration = mapGenerator.generateNewMap()
+        val configuration = mapCreator.createNewMap()
         characterController.setPosition(
             coordinates = configuration.startCoordinates,
         )

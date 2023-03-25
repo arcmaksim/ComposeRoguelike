@@ -11,7 +11,7 @@ import ru.meatgames.tomb.domain.ItemsControllerImpl
 import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.MapController
 import ru.meatgames.tomb.domain.MapControllerImpl
-import ru.meatgames.tomb.domain.MapGenerator
+import ru.meatgames.tomb.domain.MapCreator
 import ru.meatgames.tomb.domain.MapTerraformer
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.data.RoomsRepository
@@ -36,7 +36,7 @@ interface SingletonModule {
     @Binds
     fun bindMapGenerator(
         controller: MapControllerImpl,
-    ): MapGenerator
+    ): MapCreator
 
     @Binds
     fun bindMapTerraformer(
