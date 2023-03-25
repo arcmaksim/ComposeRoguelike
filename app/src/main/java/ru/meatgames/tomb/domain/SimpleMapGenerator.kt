@@ -15,9 +15,6 @@ import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import javax.inject.Inject
 import kotlin.random.Random
 
-typealias Coordinates = Pair<Int, Int>
-typealias ScreenSpaceCoordinates = Coordinates
-
 class SimpleMapGenerator @Inject constructor(
     roomsData: RoomsData,
     private val itemsController: ItemsController,
