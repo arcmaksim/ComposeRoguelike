@@ -13,7 +13,7 @@ import javax.inject.Singleton
 class MapControllerImpl @Inject constructor(
     @Named(MAP_WIDTH_KEY) private val mapWidth: Int,
     @Named(MAP_HEIGHT_KEY) private val mapHeight: Int,
-    private val mapGenerator: SimpleMapGenerator,
+    private val mapGenerator: MainMapGenerator,
     private val itemsHolder: ItemsHolder,
 ) : MapCreator, MapTerraformer, MapController {
 

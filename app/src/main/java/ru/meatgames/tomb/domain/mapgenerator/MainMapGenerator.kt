@@ -2,6 +2,7 @@ package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.item.Item
+import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
@@ -15,10 +16,10 @@ import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import javax.inject.Inject
 import kotlin.random.Random
 
-class SimpleMapGenerator @Inject constructor(
+class MainMapGenerator @Inject constructor(
     roomsData: RoomsData,
     private val itemsController: ItemsController,
-) {
+) : MapGenerator {
     
     private val random = Random(System.currentTimeMillis())
     
@@ -28,7 +29,7 @@ class SimpleMapGenerator @Inject constructor(
     
     private val outerWallsPool: MutableSet<Pair<Int, Int>> = mutableSetOf()
     
-    fun generateMap(
+    override fun generateMap(
         map: LevelMap,
     ): MapConfiguration {
         val initialRoomPositionX = 10
