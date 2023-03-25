@@ -33,7 +33,7 @@ import ru.meatgames.tomb.domain.stat.Technique
 
 @Preview
 @Composable
-private fun InventoryScreenPreview() {
+private fun StatsPreview() {
     Stats(
         power = Power(5),
         speed = Speed(3),
