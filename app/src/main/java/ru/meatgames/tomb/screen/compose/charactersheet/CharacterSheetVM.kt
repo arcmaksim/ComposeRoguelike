@@ -24,6 +24,7 @@ class CharacterSheetVM @Inject constructor(
         characterController.characterStateFlow.value.run {
             CharacterSheetState(
                 stats = stats,
+                health = health,
                 offensiveBehaviorCard = offenseBehaviorCard,
                 defensiveBehaviorCard = defenceBehaviorCard,
                 supportBehaviorCard = supportBehaviorCard,
@@ -37,6 +38,7 @@ class CharacterSheetVM @Inject constructor(
             characterController.characterStateFlow.collect {
                 _state.value = CharacterSheetState(
                     stats = it.stats,
+                    health = it.health,
                     offensiveBehaviorCard = it.offenseBehaviorCard,
                     defensiveBehaviorCard = it.defenceBehaviorCard,
                     supportBehaviorCard = it.supportBehaviorCard,
