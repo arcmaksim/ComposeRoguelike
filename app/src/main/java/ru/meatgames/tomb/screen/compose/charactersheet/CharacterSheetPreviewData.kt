@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.screen.compose.charactersheet
 
 import ru.meatgames.tomb.domain.behaviorcard.BehaviorCard
+import ru.meatgames.tomb.domain.component.StatsComponent
 import ru.meatgames.tomb.domain.stat.Cunning
 import ru.meatgames.tomb.domain.stat.Power
 import ru.meatgames.tomb.domain.stat.Speed
@@ -24,10 +25,12 @@ internal val alertnessBehaviorCardPreview = BehaviorCard(
 )
 
 internal val characterSheetStatePreview = CharacterSheetState(
-    power = Power(5),
-    speed = Speed(3),
-    cunning = Cunning(2),
-    technique = Technique(4),
+    stats = StatsComponent(
+        power = Power(5),
+        speed = Speed(3),
+        cunning = Cunning(2),
+        technique = Technique(4),
+    ),
     offensiveBehaviorCard = mightBehaviorCardPreview,
     defensiveBehaviorCard = resilienceBehaviorCardPreview,
     supportBehaviorCard = alertnessBehaviorCardPreview,

@@ -68,10 +68,10 @@ private fun CharacterSheetScreenContent(
                 .padding(horizontal = 8.dp),
         ) {
             Stats(
-                power = state.power,
-                speed = state.speed,
-                cunning = state.cunning,
-                technique = state.technique,
+                power = state.stats.power,
+                speed = state.stats.speed,
+                cunning = state.stats.cunning,
+                technique = state.stats.technique,
             )
             BehaviorCards(
                 offenseBehaviorCard = state.offensiveBehaviorCard,

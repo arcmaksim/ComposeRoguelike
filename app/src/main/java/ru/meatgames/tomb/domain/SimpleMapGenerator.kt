@@ -64,8 +64,7 @@ class SimpleMapGenerator @Inject constructor(
         return GeneratedMapConfiguration(
             mapWidth = map.width,
             mapHeight = map.height,
-            startingPositionX = initialRoomPositionX + 2,
-            startingPositionY = initialRoomPositionY + 2,
+            startCoordinates = initialRoomPositionX + 2 to initialRoomPositionY + 2,
         )
     }
     
@@ -295,8 +294,7 @@ class SimpleMapGenerator @Inject constructor(
 data class GeneratedMapConfiguration(
     val mapWidth: Int,
     val mapHeight: Int,
-    val startingPositionX: Int,
-    val startingPositionY: Int,
+    val startCoordinates: Coordinates,
 )
 
 private val MapTile?.isWall: Boolean
