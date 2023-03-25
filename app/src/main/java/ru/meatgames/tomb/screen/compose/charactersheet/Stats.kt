@@ -50,9 +50,7 @@ internal fun Stats(
     technique: Technique,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.CenterStart,
     ) {
         Column {
