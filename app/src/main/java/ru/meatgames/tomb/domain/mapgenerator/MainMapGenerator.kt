@@ -292,12 +292,6 @@ class MainMapGenerator @Inject constructor(
     
 }
 
-data class MapConfiguration(
-    val mapWidth: Int,
-    val mapHeight: Int,
-    val startCoordinates: Coordinates,
-)
-
 private val MapTile?.isWall: Boolean
     get() {
         this ?: return false
