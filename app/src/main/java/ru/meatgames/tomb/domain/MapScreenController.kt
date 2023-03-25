@@ -67,13 +67,13 @@ class MapScreenController @Inject constructor(
         mapHeight: Int,
         characterState: CharacterState,
     ): MapScreenState {
-        if (characterState.mapX == -1 && characterState.mapY == -1) {
+        if (characterState.position.x == -1 && characterState.position.y == -1) {
             return MapScreenState.Loading
         }
         
         val reducedTiles = reduceToViewportSize(
-            mapX = characterState.mapX - preProcessingViewportWidth / 2,
-            mapY = characterState.mapY - preProcessingViewportHeight / 2,
+            mapX = characterState.position.x - preProcessingViewportWidth / 2,
+            mapY = characterState.position.y - preProcessingViewportHeight / 2,
             mapWidth = mapWidth,
             mapHeight = mapHeight,
         )
@@ -86,7 +86,7 @@ class MapScreenController @Inject constructor(
         val pipelineRenderData = gameMapRenderPipeline.run(
             tiles = reducedTiles,
             tilesLineWidth = preProcessingViewportWidth,
-            startCoordinates = characterState.mapX - viewportWidth / 2 to characterState.mapY - viewportHeight / 2,
+            startCoordinates = characterState.position.x - viewportWidth / 2 to characterState.position.y - viewportHeight / 2,
             shouldRenderTile = { index ->
                 cachedVisibilityMask[index]
             },

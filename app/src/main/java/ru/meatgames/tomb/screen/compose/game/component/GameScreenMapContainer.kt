@@ -65,6 +65,7 @@ private fun GameScreenMapContainerPreview() {
         onCharacterMove = { Unit },
         onMapGeneration = { Unit },
         onInventory = { Unit },
+        onCharacterSheet = { Unit },
         onCloseInteractionMenu = { Unit },
         onItemSelected = { _, _, _ -> Unit },
     )
@@ -83,6 +84,7 @@ internal fun GameScreenMapContainer(
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
     onInventory: () -> Unit,
+    onCharacterSheet: () -> Unit,
     onCloseInteractionMenu: () -> Unit,
     onItemSelected: (Coordinates, ItemContainerId, ItemId) -> Unit,
 ) = BoxWithConstraints(
@@ -170,6 +172,12 @@ internal fun GameScreenMapContainer(
             viewportHeight = mapState.viewportHeight,
         )
     }
+    
+    BaseTextButton(
+        title = "Character Sheet",
+        modifier = Modifier.align(Alignment.TopEnd),
+        onClick = onCharacterSheet,
+    )
     
     BaseTextButton(
         title = "Inventory",

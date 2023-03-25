@@ -7,7 +7,7 @@ import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
-import ru.meatgames.tomb.resolvedOffsets
+import ru.meatgames.tomb.resolvedOffset
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,9 +31,9 @@ class PlayerMapInteractionController @Inject constructor(
     fun makeMove(
         direction: Direction,
     ): PlayerTurnResult? {
-        val (offsetX, offsetY) = direction.resolvedOffsets
+        val (offsetX, offsetY) = direction.resolvedOffset
         val capturedFlow = characterStateFlow.value
-        val coordinates = (capturedFlow.mapX + offsetX) to (capturedFlow.mapY + offsetY)
+        val coordinates = (capturedFlow.position.x + offsetX) to (capturedFlow.position.y + offsetY)
         
         val tile = mapController.getTile(coordinates)?.tile ?: return null
         

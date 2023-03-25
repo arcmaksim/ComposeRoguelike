@@ -21,12 +21,14 @@ internal fun GameScreen(
     viewModel: GameScreenViewModel,
     onWin: () -> Unit,
     onInventory: () -> Unit,
+    onCharacterSheet: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
-                GameScreenEvent.Win -> onWin()
-                GameScreenEvent.Inventory -> onInventory()
+                GameScreenEvent.NavigateToWinScreen -> onWin()
+                GameScreenEvent.NavigateToInventory -> onInventory()
+                GameScreenEvent.NavigateToCharacterSheet -> onCharacterSheet()
                 else -> Unit
             }
         }
@@ -39,6 +41,7 @@ internal fun GameScreen(
         onCharacterMove = viewModel::onMoveCharacter,
         onMapGeneration = viewModel::newMap,
         onInventory = viewModel::openInventory,
+        onCharacterSheet = viewModel::openCharacterSheet,
         onCloseInteractionMenu = viewModel::closeInteractionMenu,
         onItemSelected = viewModel::pickUpItem,
     )
@@ -50,6 +53,7 @@ private fun GameScreenContent(
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
     onInventory: () -> Unit,
+    onCharacterSheet: () -> Unit,
     onCloseInteractionMenu: () -> Unit,
     onItemSelected: (Coordinates, ItemContainerId, ItemId) -> Unit,
 ) {
@@ -66,6 +70,7 @@ private fun GameScreenContent(
             onCharacterMove = onCharacterMove,
             onMapGeneration = onMapGeneration,
             onInventory = onInventory,
+            onCharacterSheet = onCharacterSheet,
             onCloseInteractionMenu = onCloseInteractionMenu,
             onItemSelected = onItemSelected,
         )

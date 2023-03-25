@@ -1,6 +1,7 @@
 package ru.meatgames.tomb
 
 import androidx.compose.ui.unit.IntOffset
+import ru.meatgames.tomb.domain.Offset
 
 enum class Direction {
     Left,
@@ -9,7 +10,7 @@ enum class Direction {
     Bottom,
 }
 
-val Direction.resolvedOffsets: Pair<Int, Int>
+val Direction.resolvedOffset: Offset
     get() = when (this) {
         Direction.Left -> -1 to 0
         Direction.Right -> 1 to 0
@@ -20,6 +21,6 @@ val Direction.resolvedOffsets: Pair<Int, Int>
 fun Direction.toIntOffset(
     dimension: Int,
 ): IntOffset {
-    val (x, y) = resolvedOffsets
+    val (x, y) = resolvedOffset
     return IntOffset(x * dimension, y * dimension)
 }
