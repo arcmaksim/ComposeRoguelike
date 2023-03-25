@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
+import ru.meatgames.tomb.domain.mapgenerator.MainMapGenerator
+import ru.meatgames.tomb.domain.mapgenerator.MapConfiguration
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import javax.inject.Inject
 import javax.inject.Named

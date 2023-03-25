@@ -1,8 +1,11 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.ItemsController
+import ru.meatgames.tomb.domain.LevelMap
+import ru.meatgames.tomb.domain.MapTile
 import ru.meatgames.tomb.domain.item.Item
-import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
