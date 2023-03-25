@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
@@ -126,6 +127,7 @@ private fun Stat(
             horizontalAlignment = Alignment.Start,
         ) {
             Text(
+                modifier = Modifier.offset(y = 8.dp),
                 text = "$statValue",
                 style = h1TextStyle,
                 color = color,
