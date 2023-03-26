@@ -6,6 +6,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import ru.meatgames.tomb.domain.EnemyController
+import ru.meatgames.tomb.domain.EnemiesControllerImpl
+import ru.meatgames.tomb.domain.EnemiesHolder
 import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.ItemsControllerImpl
 import ru.meatgames.tomb.domain.ItemsHolder
@@ -63,6 +66,16 @@ interface SingletonModule {
     fun bindItemsController(
         itemsController: ItemsControllerImpl,
     ): ItemsController
+    
+    @Binds
+    fun bindEnemiesHolder(
+        enemiesHolder: EnemiesControllerImpl,
+    ): EnemiesHolder
+    
+    @Binds
+    fun bindEnemiesController(
+        enemiesController: EnemiesControllerImpl,
+    ): EnemyController
 
     @Binds
     @IntoSet
