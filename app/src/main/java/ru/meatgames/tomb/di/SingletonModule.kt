@@ -13,6 +13,9 @@ import ru.meatgames.tomb.domain.MapController
 import ru.meatgames.tomb.domain.MapControllerImpl
 import ru.meatgames.tomb.domain.MapCreator
 import ru.meatgames.tomb.domain.MapTerraformer
+import ru.meatgames.tomb.domain.mapgenerator.MainMapGenerator
+import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
+import ru.meatgames.tomb.domain.mapgenerator.PlaygroundMapGenerator
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.render.MapRenderTilesDecorator
@@ -28,6 +31,9 @@ private const val MAP_VIEWPORT_WIDTH = 7
 const val MAP_VIEWPORT_WIDTH_KEY = "MAP_VIEWPORT_WIDTH"
 private const val MAP_VIEWPORT_HEIGHT = 7
 const val MAP_VIEWPORT_HEIGHT_KEY = "MAP_VIEWPORT_HEIGHT"
+
+const val MAIN_MAP_GENERATOR = "MAIN_MAP_GENERATOR"
+const val PLAYGROUND_MAP_GENERATOR = "PLAYGROUND_MAP_GENERATOR"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -63,6 +69,18 @@ interface SingletonModule {
     fun bindWallsDecorator(
         decorator: WallsDecorator,
     ): MapRenderTilesDecorator
+    
+    @Binds
+    @Named(MAIN_MAP_GENERATOR)
+    fun bindMainMapGenerator(
+        mainMapGenerator: MainMapGenerator,
+    ): MapGenerator
+    
+    @Binds
+    @Named(PLAYGROUND_MAP_GENERATOR)
+    fun bindPlaygroundMapGenerator(
+        playgroundMapGenerator: PlaygroundMapGenerator,
+    ): MapGenerator
 
     companion object {
         @Named(MAP_WIDTH_KEY)

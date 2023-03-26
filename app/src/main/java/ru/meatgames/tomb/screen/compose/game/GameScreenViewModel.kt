@@ -14,6 +14,7 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.ItemsHolder
+import ru.meatgames.tomb.domain.MapCreator
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
@@ -163,7 +164,7 @@ class GameScreenViewModel @Inject constructor(
     }
     
     fun newMap() {
-        gameController.generateNewMap()
+        gameController.generateNewMap(MapCreator.MapType.MAIN)
     }
     
     fun openInventory() {

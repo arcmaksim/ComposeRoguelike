@@ -9,8 +9,10 @@ class GameController @Inject constructor(
     private val characterController: CharacterController,
 ) {
 
-    fun generateNewMap() {
-        val configuration = mapCreator.createNewMap()
+    fun generateNewMap(
+        mapType: MapCreator.MapType,
+    ) {
+        val configuration = mapCreator.createNewMap(mapType)
         characterController.setPosition(
             coordinates = configuration.startCoordinates,
         )

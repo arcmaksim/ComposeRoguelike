@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.domain.MapCreator
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,8 +17,13 @@ class MainMenuScreenViewModel @Inject constructor(
     private val _events = Channel<Event?>()
     val events: Flow<Event?> = _events.receiveAsFlow()
     
-    fun newGame() {
-        gameController.generateNewMap()
+    fun launchNewGame() {
+        gameController.generateNewMap(MapCreator.MapType.MAIN)
+        _events.trySend(Event.NewGame)
+    }
+    
+    fun lunchPlayground() {
+        gameController.generateNewMap(MapCreator.MapType.PLAYGROUND)
         _events.trySend(Event.NewGame)
     }
     
@@ -28,7 +34,6 @@ class MainMenuScreenViewModel @Inject constructor(
     enum class Event {
         NewGame,
         Exit,
-        ;
     }
 
 }
