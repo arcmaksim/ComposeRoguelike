@@ -15,12 +15,12 @@ import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
 import ru.meatgames.tomb.domain.PlayerMapInteractionResolver
 import ru.meatgames.tomb.domain.PlayerTurnResult
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
+import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import javax.inject.Inject
 
 @HiltViewModel
@@ -163,7 +163,7 @@ class GameScreenViewModel @Inject constructor(
     }
     
     fun newMap() {
-        gameController.generateNewMap()
+        gameController.generateNewMap(gameController.lastMapType)
     }
     
     fun openInventory() {

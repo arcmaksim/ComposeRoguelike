@@ -1,6 +1,10 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.ItemsController
+import ru.meatgames.tomb.domain.LevelMap
+import ru.meatgames.tomb.domain.MapTile
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
@@ -15,13 +19,10 @@ import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import javax.inject.Inject
 import kotlin.random.Random
 
-typealias Coordinates = Pair<Int, Int>
-typealias ScreenSpaceCoordinates = Coordinates
-
-class SimpleMapGenerator @Inject constructor(
+class MainMapGenerator @Inject constructor(
     roomsData: RoomsData,
     private val itemsController: ItemsController,
-) {
+) : MapGenerator {
     
     private val random = Random(System.currentTimeMillis())
     
@@ -31,9 +32,9 @@ class SimpleMapGenerator @Inject constructor(
     
     private val outerWallsPool: MutableSet<Pair<Int, Int>> = mutableSetOf()
     
-    fun generateMap(
+    override fun generateMap(
         map: LevelMap,
-    ): GeneratedMapConfiguration {
+    ): MapConfiguration {
         val initialRoomPositionX = 10
         val initialRoomPositionY = 3
         val initialRoom = rooms.first()
@@ -61,7 +62,7 @@ class SimpleMapGenerator @Inject constructor(
             random = random,
         )
         
-        return GeneratedMapConfiguration(
+        return MapConfiguration(
             mapWidth = map.width,
             mapHeight = map.height,
             startCoordinates = initialRoomPositionX + 2 to initialRoomPositionY + 2,
@@ -290,12 +291,6 @@ class SimpleMapGenerator @Inject constructor(
     )
     
 }
-
-data class GeneratedMapConfiguration(
-    val mapWidth: Int,
-    val mapHeight: Int,
-    val startCoordinates: Coordinates,
-)
 
 private val MapTile?.isWall: Boolean
     get() {

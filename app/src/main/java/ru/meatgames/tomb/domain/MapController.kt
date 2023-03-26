@@ -2,8 +2,12 @@ package ru.meatgames.tomb.domain
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ru.meatgames.tomb.di.MAIN_MAP_GENERATOR
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
+import ru.meatgames.tomb.di.PLAYGROUND_MAP_GENERATOR
+import ru.meatgames.tomb.domain.mapgenerator.MapConfiguration
+import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import javax.inject.Inject
 import javax.inject.Named
@@ -13,21 +17,27 @@ import javax.inject.Singleton
 class MapControllerImpl @Inject constructor(
     @Named(MAP_WIDTH_KEY) private val mapWidth: Int,
     @Named(MAP_HEIGHT_KEY) private val mapHeight: Int,
-    private val mapGenerator: SimpleMapGenerator,
+    @Named(MAIN_MAP_GENERATOR) private val mainMapGenerator: MapGenerator,
+    @Named(PLAYGROUND_MAP_GENERATOR) private val playgroundMapGenerator: MapGenerator,
     private val itemsHolder: ItemsHolder,
-) : MapGenerator, MapTerraformer, MapController {
+) : MapCreator, MapTerraformer, MapController {
 
     private lateinit var levelMap: LevelMap
 
     private val _mapFlow: MutableStateFlow<MapState> = MutableStateFlow(MapState.MapUnavailable)
     override val mapFlow: StateFlow<MapState> = _mapFlow
 
-    override fun generateNewMap(): GeneratedMapConfiguration {
+    override fun createNewMap(
+        type: MapCreator.MapType,
+    ): MapConfiguration {
         _mapFlow.value = MapState.MapUnavailable
     
         itemsHolder.clearContainers()
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
-        val configuration = mapGenerator.generateMap(levelMap)
+        val configuration = when (type) {
+            MapCreator.MapType.MAIN -> mainMapGenerator.generateMap(levelMap)
+            MapCreator.MapType.PLAYGROUND -> playgroundMapGenerator.generateMap(levelMap)
+        }
 
         _mapFlow.value = MapState.MapAvailable(
             LevelMapWrapper(
@@ -60,8 +70,15 @@ class MapControllerImpl @Inject constructor(
     }
 }
 
-interface MapGenerator {
-    fun generateNewMap(): GeneratedMapConfiguration
+interface MapCreator {
+    fun createNewMap(
+        type: MapType,
+    ): MapConfiguration
+    
+    enum class MapType {
+        MAIN,
+        PLAYGROUND,
+    }
 }
 
 interface MapTerraformer {
