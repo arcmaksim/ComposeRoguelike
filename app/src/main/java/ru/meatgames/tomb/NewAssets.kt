@@ -11,9 +11,16 @@ import java.io.InputStream
 
 private const val originalTileSize: Int = 24
 
+enum class ShadowSize {
+    Small,
+    Medium,
+    Big,
+}
+
 object NewAssets {
 
     private lateinit var heroBitmaps: Array<ImageBitmap>
+    private lateinit var shadowsBitmaps: Array<ImageBitmap>
 
     val tileSize: IntSize = IntSize(24, 24)
 
@@ -21,21 +28,40 @@ object NewAssets {
         context: Context,
     ) {
         val characterAnimationSheet = context.getBitmapFromAsset("character_animation_sheet")
-        val heroSprites = Array(4) { i ->
+        heroBitmaps = Array(4) { i ->
             Bitmap.createBitmap(
                 characterAnimationSheet,
                 i * originalTileSize,
                 0,
                 originalTileSize,
                 originalTileSize,
-            )
+            ).asImageBitmap()
         }
-        heroBitmaps = heroSprites.map { it.asImageBitmap() }.toTypedArray()
+        
+        val shadows = context.getBitmapFromAsset("shadows")
+        shadowsBitmaps = Array(3) { i ->
+            Bitmap.createBitmap(
+                shadows,
+                // ignoring first 3 "flying" shadows for now
+                (i + 3) * originalTileSize,
+                0,
+                originalTileSize,
+                originalTileSize,
+            ).asImageBitmap()
+        }
     }
 
     fun getHeroBitmap(
         frame: Int,
     ): ImageBitmap = heroBitmaps[frame]
+    
+    fun getShadow(
+        size: ShadowSize,
+    ) = when (size) {
+        ShadowSize.Small -> shadowsBitmaps[0]
+        ShadowSize.Medium -> shadowsBitmaps[1]
+        ShadowSize.Big -> shadowsBitmaps[2]
+    }
 
     private fun Context.getBitmapFromAsset(
         bitmapName: String,
@@ -48,5 +74,7 @@ object NewAssets {
         }
         return BitmapFactory.decodeStream(inputStream)
     }
+    
+    fun Int.getOriginalTileSinglePixelOffset() = this / originalTileSize
 
 }

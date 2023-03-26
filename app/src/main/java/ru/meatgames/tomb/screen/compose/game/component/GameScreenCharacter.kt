@@ -24,6 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import ru.meatgames.tomb.NewAssets
+import ru.meatgames.tomb.NewAssets.getOriginalTileSinglePixelOffset
+import ru.meatgames.tomb.ShadowSize
 import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
@@ -98,11 +100,22 @@ internal fun GameScreenCharacter(
     }
     
     Canvas(modifier = modifier) {
+        val originalTileSinglePixelOffset = tileDimension.getOriginalTileSinglePixelOffset()
+        val verticalOffset = originalTileSinglePixelOffset * 3
+        drawImage(
+            image = NewAssets.getShadow(ShadowSize.Medium),
+            dstOffset = offset + IntOffset(
+                x = tileDimension * (viewportWidth / 2),
+                y = tileDimension * (viewportHeight / 2) + originalTileSinglePixelOffset - verticalOffset,
+            ),
+            dstSize = tileSize,
+            filterQuality = FilterQuality.None,
+        )
         drawImage(
             image = NewAssets.getHeroBitmap(resultHeroFrame),
             dstOffset = offset + IntOffset(
                 x = tileDimension * (viewportWidth / 2),
-                y = tileDimension * (viewportHeight / 2)
+                y = tileDimension * (viewportHeight / 2) - verticalOffset,
             ),
             dstSize = tileSize,
             filterQuality = FilterQuality.None,
