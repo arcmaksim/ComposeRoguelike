@@ -60,8 +60,7 @@ private fun GameScreenMapContainerPreview() {
         interactionState = null,
         previousMoveDirection = null,
         animationTime = 300,
-        heroIdleAnimationFrames = 2,
-        heroIdleAnimationFrameTime = 600,
+        characterAnimationFrameTime = 600,
         onCharacterMove = { Unit },
         onMapGeneration = { Unit },
         onInventory = { Unit },
@@ -79,8 +78,7 @@ internal fun GameScreenMapContainer(
     interactionState: GameScreenInteractionState?,
     previousMoveDirection: Direction?,
     animationTime: Int,
-    heroIdleAnimationFrames: Int,
-    heroIdleAnimationFrameTime: Int,
+    characterAnimationFrameTime: Int,
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
     onInventory: () -> Unit,
@@ -166,10 +164,10 @@ internal fun GameScreenMapContainer(
         
         GameScreenCharacter(
             modifier = modifier,
-            heroAnimationFrames = heroIdleAnimationFrames,
-            heroAnimationFrameTime = heroIdleAnimationFrameTime,
+            animationFrameTime = characterAnimationFrameTime,
             viewportWidth = mapState.viewportWidth,
             viewportHeight = mapState.viewportHeight,
+            characterData = CharacterData.Player,
         )
     }
     

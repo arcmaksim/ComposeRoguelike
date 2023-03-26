@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntSize
+import ru.meatgames.tomb.domain.enemy.EnemyType
+import ru.meatgames.tomb.screen.compose.game.component.CharacterData
 import java.io.IOException
 import java.io.InputStream
 
@@ -21,6 +23,7 @@ object NewAssets {
 
     private lateinit var heroBitmaps: Array<ImageBitmap>
     private lateinit var shadowsBitmaps: Array<ImageBitmap>
+    private lateinit var enemiesBitmaps: Array<ImageBitmap>
 
     val tileSize: IntSize = IntSize(24, 24)
 
@@ -49,6 +52,25 @@ object NewAssets {
                 originalTileSize,
             ).asImageBitmap()
         }
+    
+        val enemies = context.getBitmapFromAsset("enemies")
+        enemiesBitmaps = Array(8) { i ->
+            Bitmap.createBitmap(
+                enemies,
+                i * originalTileSize,
+                0,
+                originalTileSize,
+                originalTileSize,
+            ).asImageBitmap()
+        }
+    }
+    
+    fun getCharacterBitmap(
+        characterData: CharacterData,
+        animationFrame: Int,
+    ): ImageBitmap = when (characterData) {
+        is CharacterData.Player -> getHeroBitmap(animationFrame)
+        is CharacterData.Enemy -> getEnemyBitmap(characterData.enemyType, animationFrame)
     }
 
     fun getHeroBitmap(
@@ -61,6 +83,20 @@ object NewAssets {
         ShadowSize.Small -> shadowsBitmaps[0]
         ShadowSize.Medium -> shadowsBitmaps[1]
         ShadowSize.Big -> shadowsBitmaps[2]
+    }
+    
+    // TODO: enemy frames alternate between two frames, initial frame means first, otherwise - second
+    fun getEnemyBitmap(
+        enemyType: EnemyType,
+        animationFrame: Int,
+    ): ImageBitmap {
+        val index = when (enemyType) {
+            EnemyType.Skeleton -> 0
+            EnemyType.SkeletonArcher -> 2
+            EnemyType.SkeletonWarrior -> 4
+            EnemyType.SkeletonNecromancer -> 6
+        }
+        return enemiesBitmaps[index + animationFrame]
     }
 
     private fun Context.getBitmapFromAsset(

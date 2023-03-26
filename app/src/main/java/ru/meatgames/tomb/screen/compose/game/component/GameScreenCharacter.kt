@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
@@ -26,10 +23,13 @@ import androidx.compose.ui.unit.IntSize
 import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.NewAssets.getOriginalTileSinglePixelOffset
 import ru.meatgames.tomb.ShadowSize
-import ru.meatgames.tomb.render.CharacterIdleAnimationDirection
+import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
+
+const val ANIMATION_FRAMES = 2
+const val CHARACTER_IDLE_ANIMATION_TIME = 2
 
 @Preview(widthDp = 270, heightDp = 270,)
 @Composable
@@ -49,23 +49,31 @@ private fun GameScreenCharacterPreview() {
     ) {
         GameScreenCharacter(
             modifier = modifier,
-            heroAnimationFrames = 2,
-            heroAnimationFrameTime = 600,
+            animationFrameTime = CHARACTER_IDLE_ANIMATION_TIME,
+            characterData = CharacterData.Player,
             viewportWidth = 3,
             viewportHeight = 3,
-            idleAnimationDirection = CharacterIdleAnimationDirection.Left,
         )
     }
+}
+
+sealed class CharacterData {
+
+    object Player : CharacterData()
+    
+    data class Enemy(
+        val enemyType: EnemyType,
+    ) : CharacterData()
+
 }
 
 @Composable
 internal fun GameScreenCharacter(
     modifier: Modifier,
-    heroAnimationFrames: Int,
-    heroAnimationFrameTime: Int,
+    characterData: CharacterData,
+    animationFrameTime: Int,
     viewportWidth: Int,
     viewportHeight: Int,
-    idleAnimationDirection: CharacterIdleAnimationDirection = CharacterIdleAnimationDirection.Left,
 ) {
     val tileSize = LocalTileSize.current
     val offset = LocalHorizontalOffset.current
@@ -73,31 +81,18 @@ internal fun GameScreenCharacter(
     
     val infiniteTransition = rememberInfiniteTransition()
     
-    val heroAnimationDirectionModifier by remember {
-        mutableStateOf(
-            when (idleAnimationDirection) {
-                CharacterIdleAnimationDirection.Left -> 0
-                CharacterIdleAnimationDirection.Right -> 2
-            }
-        )
-    }
-    
-    val heroAnimationFrame by infiniteTransition.animateValue(
+    val characterAnimationFrame by infiniteTransition.animateValue(
         initialValue = 0,
-        targetValue = heroAnimationFrames,
+        targetValue = ANIMATION_FRAMES,
         typeConverter = Int.VectorConverter,
         animationSpec = infiniteRepeatable(
             repeatMode = RepeatMode.Restart,
             animation = tween(
-                durationMillis = heroAnimationFrameTime * heroAnimationFrames,
+                durationMillis = animationFrameTime * ANIMATION_FRAMES,
                 easing = LinearEasing,
             ),
         )
     )
-    
-    val resultHeroFrame by remember {
-        derivedStateOf { heroAnimationDirectionModifier + heroAnimationFrame }
-    }
     
     Canvas(modifier = modifier) {
         val originalTileSinglePixelOffset = tileDimension.getOriginalTileSinglePixelOffset()
@@ -112,7 +107,7 @@ internal fun GameScreenCharacter(
             filterQuality = FilterQuality.None,
         )
         drawImage(
-            image = NewAssets.getHeroBitmap(resultHeroFrame),
+            image = NewAssets.getCharacterBitmap(characterData, characterAnimationFrame),
             dstOffset = offset + IntOffset(
                 x = tileDimension * (viewportWidth / 2),
                 y = tileDimension * (viewportHeight / 2) - verticalOffset,
