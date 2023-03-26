@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
@@ -51,7 +50,6 @@ import ru.meatgames.tomb.toIntOffset
 private fun GameScreenMapContainerPreview() {
     val context = LocalContext.current
     
-    NewAssets.loadAssets(context)
     val themeAssets = ThemeAssets(context)
     
     GameScreenMapContainer(
@@ -167,7 +165,7 @@ internal fun GameScreenMapContainer(
             animationFrameTime = characterAnimationFrameTime,
             viewportWidth = mapState.viewportWidth,
             viewportHeight = mapState.viewportHeight,
-            characterData = CharacterData.Player,
+            characterRenderData = mapState.characterRenderData,
         )
     }
     

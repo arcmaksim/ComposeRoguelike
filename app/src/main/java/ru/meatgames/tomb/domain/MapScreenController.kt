@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
+import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.temp.TilesController
+import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.render.GameMapRenderPipeline
 import javax.inject.Inject
@@ -18,6 +20,7 @@ import javax.inject.Singleton
 
 @Singleton
 class MapScreenController @Inject constructor(
+    themeAssets: ThemeAssets,
     @Named(MAP_VIEWPORT_WIDTH_KEY)
     private val viewportWidth: Int,
     @Named(MAP_VIEWPORT_HEIGHT_KEY)
@@ -27,6 +30,8 @@ class MapScreenController @Inject constructor(
     private val tilesController: TilesController,
     private val gameMapRenderPipeline: GameMapRenderPipeline,
 ) {
+    
+    private val characterRenderData = themeAssets.characterRenderData
     
     private val _state = MutableStateFlow<MapScreenState>(MapScreenState.Loading)
     val state: StateFlow<MapScreenState> = _state
@@ -100,6 +105,7 @@ class MapScreenController @Inject constructor(
             tiles = pipelineRenderData.tiles,
             tilesToReveal = pipelineRenderData.tilesToReveal.toSet(),
             tilesToFade = pipelineRenderData.tilesToFade.toSet(),
+            characterRenderData = characterRenderData,
         )
     }
     
@@ -191,6 +197,7 @@ class MapScreenController @Inject constructor(
     sealed class MapScreenState {
         
         data class Ready(
+            val characterRenderData: AnimationRenderData,
             val tiles: List<MapRenderTile?>,
             val tilesWidth: Int,
             val tilesPadding: Int,
