@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
@@ -48,6 +49,10 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         17 to themeAssets.resolveItemRenderData(),
     )
     
+    val enemies = mapOf(
+        7 to EnemyType.SkeletonWarrior.let(themeAssets::getEnemyRenderData),
+    )
+    
     return renderTiles.mapIndexed { index, tilesPair ->
         val floorData = themeAssets.resolveFloorRenderData(tilesPair.first)
         val objectData = tilesPair.second?.let {
@@ -56,15 +61,16 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         MapRenderTile.Content(
             floorData = RenderData(
                 asset = floorData.first,
-                srcOffset = floorData.second,
+                offset = floorData.second,
             ),
             objectData = objectData?.let {
                 RenderData(
                     asset = it.first,
-                    srcOffset = it.second,
+                    offset = it.second,
                 )
             },
             itemData = items[index],
+            enemyData = enemies[index],
             isVisible = true,
         )
     }
@@ -80,4 +86,6 @@ internal fun gameScreenMapContainerPreviewMapReadyState(
     viewportHeight = gameScreenMapContainerPreviewMapSize,
     tilesToFade = emptySet(),
     tilesToReveal = emptySet(),
+    characterRenderData = themeAssets.characterRenderData,
+    
 )

@@ -3,6 +3,7 @@ package ru.meatgames.tomb.screen.compose.game.render
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.EnemiesHolder
 import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.MapDecoratorPipeline
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
@@ -18,6 +19,7 @@ class GameMapRenderPipeline @Inject constructor(
     private val themeAssets: ThemeAssets,
     private val decoratorsPipeline: MapDecoratorPipeline,
     private val itemsHolder: ItemsHolder,
+    private val enemiesHolder: EnemiesHolder,
 ) {
     
     private var prevTiles = setOf<Coordinates>()
@@ -89,11 +91,16 @@ class GameMapRenderPipeline @Inject constructor(
                     shouldRenderTile((y - 1) * (tilesLineWidth - 2) + x - 1)
                 }
                 
+                val coordinates = pair.first.x to pair.first.y
+                
+                val enemy = enemiesHolder.getEnemy(coordinates)
+                
                 pair.first to MapRenderTile.Content(
                     floorData = pair.second.first.toFloorRenderTileData(),
                     objectData = pair.second.second?.toObjectRenderTileData(),
-                    itemData = itemsHolder.getItemContainer(pair.first.x to pair.first.y)
+                    itemData = itemsHolder.getItemContainer(coordinates)
                         ?.let { themeAssets.resolveItemRenderData() },
+                    enemyData = enemy?.let { themeAssets.getEnemyRenderData(it.type) },
                     isVisible = isVisible,
                 )
             }
@@ -113,7 +120,7 @@ class GameMapRenderPipeline @Inject constructor(
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =
         RenderData(
             asset = first,
-            srcOffset = second,
+            offset = second,
         )
     
 }

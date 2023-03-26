@@ -51,6 +51,7 @@ class RoomPreviewRenderProcessor @Inject constructor(
                 floorData = pair.second.first.toFloorRenderTileData(),
                 objectData = pair.second.second?.toObjectRenderTileData(),
                 itemData = null,
+                enemyData = null,
                 isVisible = true,
             )
         }
@@ -81,7 +82,7 @@ class RoomPreviewRenderProcessor @Inject constructor(
     private fun Pair<ImageBitmap, IntOffset>.toMapRenderData(): RenderData =
         RenderData(
             asset = first,
-            srcOffset = second,
+            offset = second,
         )
     
 }

@@ -5,5 +5,11 @@ import androidx.compose.ui.unit.IntOffset
 
 data class RenderData(
     val asset: ImageBitmap,
-    val srcOffset: IntOffset,
+    val offset: IntOffset,
+)
+
+data class AnimationRenderData(
+    val asset: ImageBitmap,
+    val offsets: List<IntOffset>,
+    val shadowRenderData: RenderData,
 )

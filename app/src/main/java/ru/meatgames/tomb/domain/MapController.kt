@@ -20,6 +20,7 @@ class MapControllerImpl @Inject constructor(
     @Named(MAIN_MAP_GENERATOR) private val mainMapGenerator: MapGenerator,
     @Named(PLAYGROUND_MAP_GENERATOR) private val playgroundMapGenerator: MapGenerator,
     private val itemsHolder: ItemsHolder,
+    private val enemiesHolder: EnemiesHolder,
 ) : MapCreator, MapTerraformer, MapController {
 
     private lateinit var levelMap: LevelMap
@@ -33,6 +34,8 @@ class MapControllerImpl @Inject constructor(
         _mapFlow.value = MapState.MapUnavailable
     
         itemsHolder.clearContainers()
+        enemiesHolder.clearEnemies()
+        
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
         val configuration = when (type) {
             MapCreator.MapType.MAIN -> mainMapGenerator.generateMap(levelMap)
@@ -52,7 +55,13 @@ class MapControllerImpl @Inject constructor(
 
     override fun getTile(
         coordinates: Coordinates,
-    ): MapTileWrapper? = levelMap.getTile(coordinates.first, coordinates.second)
+    ): MapTileWrapper? = levelMap.getTile(coordinates.first, coordinates.second)?.let {
+        MapTileWrapper(
+            tile = it,
+            x = coordinates.first,
+            y = coordinates.second,
+        )
+    }
 
     override fun changeObject(
         x: Int,

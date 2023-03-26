@@ -15,15 +15,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import ru.meatgames.tomb.NewAssets
-import ru.meatgames.tomb.NewAssets.getOriginalTileSinglePixelOffset
-import ru.meatgames.tomb.ShadowSize
 import ru.meatgames.tomb.domain.enemy.EnemyType
+import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
@@ -36,7 +34,9 @@ const val CHARACTER_IDLE_ANIMATION_TIME = 2
 private fun GameScreenCharacterPreview() {
     val context = LocalContext.current
     
-    NewAssets.loadAssets(context)
+    val themeAssets = ThemeAssets(context)
+    
+    val enemyType = EnemyType.SkeletonWarrior
     
     val modifier = Modifier
         .fillMaxWidth()
@@ -49,8 +49,8 @@ private fun GameScreenCharacterPreview() {
     ) {
         GameScreenCharacter(
             modifier = modifier,
+            characterRenderData = themeAssets.getEnemyRenderData(enemyType),
             animationFrameTime = CHARACTER_IDLE_ANIMATION_TIME,
-            characterData = CharacterData.Player,
             viewportWidth = 3,
             viewportHeight = 3,
         )
@@ -70,7 +70,7 @@ sealed class CharacterData {
 @Composable
 internal fun GameScreenCharacter(
     modifier: Modifier,
-    characterData: CharacterData,
+    characterRenderData: AnimationRenderData,
     animationFrameTime: Int,
     viewportWidth: Int,
     viewportHeight: Int,
@@ -95,25 +95,17 @@ internal fun GameScreenCharacter(
     )
     
     Canvas(modifier = modifier) {
-        val originalTileSinglePixelOffset = tileDimension.getOriginalTileSinglePixelOffset()
-        val verticalOffset = originalTileSinglePixelOffset * 3
-        drawImage(
-            image = NewAssets.getShadow(ShadowSize.Medium),
+        drawCharacter(
+            tileDimension = tileDimension,
+            shadowRenderData = characterRenderData.shadowRenderData,
+            frameIndex = characterAnimationFrame,
+            characterRenderData = characterRenderData,
+            dstSize = tileSize,
             dstOffset = offset + IntOffset(
                 x = tileDimension * (viewportWidth / 2),
-                y = tileDimension * (viewportHeight / 2) + originalTileSinglePixelOffset - verticalOffset,
+                y = tileDimension * (viewportHeight / 2),
             ),
-            dstSize = tileSize,
-            filterQuality = FilterQuality.None,
-        )
-        drawImage(
-            image = NewAssets.getCharacterBitmap(characterData, characterAnimationFrame),
-            dstOffset = offset + IntOffset(
-                x = tileDimension * (viewportWidth / 2),
-                y = tileDimension * (viewportHeight / 2) - verticalOffset,
-            ),
-            dstSize = tileSize,
-            filterQuality = FilterQuality.None,
         )
     }
 }
+

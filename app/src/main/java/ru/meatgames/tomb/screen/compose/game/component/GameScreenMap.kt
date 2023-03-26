@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,7 +14,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
-import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
@@ -28,7 +26,6 @@ import ru.meatgames.tomb.screen.compose.game.LocalTileSize
 private fun GameScreenMapPreview() {
     val context = LocalContext.current
     
-    NewAssets.loadAssets(context)
     val themeAssets = ThemeAssets(context)
     
     val modifier = Modifier
@@ -90,6 +87,7 @@ internal fun GameScreenMap(
                     renderTile = renderTile,
                     dstOffset = dstOffset,
                     tileSize = tileSize,
+                    tileDimension = tileDimension,
                     alpha = alpha,
                     backgroundColor = backgroundColor,
                 )
@@ -101,6 +99,7 @@ internal fun GameScreenMap(
                     renderTile = renderTile,
                     dstOffset = dstOffset,
                     tileSize = tileSize,
+                    tileDimension = tileDimension,
                     alpha = fadedTilesAlpha,
                     backgroundColor = backgroundColor,
                 )
@@ -113,37 +112,30 @@ private fun DrawScope.drawRevealedTile(
     renderTile: MapRenderTile.Content,
     dstOffset: IntOffset,
     tileSize: IntSize,
+    tileDimension: Int,
     backgroundColor: Color,
     alpha: Float?,
 ) {
-    val filterQuality = FilterQuality.None
-    
-    drawImage(
-        image = renderTile.floorData.asset,
-        srcOffset = renderTile.floorData.srcOffset,
-        srcSize = NewAssets.tileSize,
+    renderTile.floorData.drawImage(
         dstOffset = dstOffset,
         dstSize = tileSize,
-        filterQuality = filterQuality,
     )
-    renderTile.objectData?.let { objectTile ->
-        drawImage(
-            image = objectTile.asset,
-            srcOffset = objectTile.srcOffset,
-            srcSize = NewAssets.tileSize,
-            dstOffset = dstOffset,
+    renderTile.objectData?.drawImage(
+        dstOffset = dstOffset,
+        dstSize = tileSize,
+    )
+    renderTile.itemData?.drawImage(
+        dstOffset = dstOffset,
+        dstSize = tileSize,
+    )
+    renderTile.enemyData?.let {
+        drawCharacter(
+            tileDimension = tileDimension,
+            shadowRenderData = it.shadowRenderData,
+            frameIndex = 0,
+            characterRenderData = it,
             dstSize = tileSize,
-            filterQuality = filterQuality,
-        )
-    }
-    renderTile.itemData?.let { itemData ->
-        drawImage(
-            image = itemData.asset,
-            srcOffset = itemData.srcOffset,
-            srcSize = NewAssets.tileSize,
             dstOffset = dstOffset,
-            dstSize = tileSize,
-            filterQuality = filterQuality,
         )
     }
     alpha?.let {

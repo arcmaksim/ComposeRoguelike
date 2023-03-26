@@ -1,16 +1,22 @@
 package ru.meatgames.tomb.domain.mapgenerator
 
+import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.EnemyController
 import ru.meatgames.tomb.domain.LevelMap
+import ru.meatgames.tomb.domain.enemy.Enemy
+import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
 import ru.meatgames.tomb.model.tile.data.FloorTileMapping
 import ru.meatgames.tomb.model.tile.data.ObjectTileMapping
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
+import timber.log.Timber
 import javax.inject.Inject
 
 class PlaygroundMapGenerator @Inject constructor(
     roomsData: RoomsData,
+    private val enemyController: EnemyController,
 ) : MapGenerator {
     
     private val rooms: List<Room> = roomsData.rooms
@@ -32,6 +38,12 @@ class PlaygroundMapGenerator @Inject constructor(
             x = initialRoomPositionX,
             y = initialRoomPositionY,
             room = initialRoom,
+        )
+        
+        enemyController.placeEnemy(
+            enemyType = EnemyType.Skeleton,
+            coordinates = initialRoomPositionX + initialRoom.width / 2 to initialRoomPositionY + 2,
+            levelMap = map,
         )
         
         return MapConfiguration(
@@ -85,6 +97,30 @@ class PlaygroundMapGenerator @Inject constructor(
         for (wall in room.outerWalls) {
             outerWallsPool.add(x + wall.first to y + wall.second)
         }
+    }
+    
+    private fun EnemyController.placeEnemy(
+        enemyType: EnemyType,
+        coordinates: Coordinates,
+        levelMap: LevelMap,
+    ) {
+        val tile = levelMap.getTile(coordinates.first, coordinates.second) ?: let {
+            Timber.d("Enemy type $enemyType at $coordinates didn't spawn - incorrect coordinates")
+            return
+        }
+        
+        if (tile.objectEntityTile != null) {
+            Timber.d("Enemy type $enemyType at $coordinates didn't spawn - space was blocked")
+            return
+        }
+        
+        addEnemy(
+            coordinates = coordinates,
+            enemy = Enemy(
+                type = enemyType,
+                position = coordinates,
+            )
+        )
     }
     
     private fun Char.toFloorEntity(): FloorEntityTile = floorMapping.first {
