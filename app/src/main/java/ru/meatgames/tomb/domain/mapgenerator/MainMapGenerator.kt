@@ -145,10 +145,10 @@ class MainMapGenerator @Inject constructor(
         while (localOuterWallsPool.isNotEmpty()) {
             val wall = localOuterWallsPool.random(random)
             
-            val topTile = getTile(wall.first, wall.second - 1)?.tile
-            val bottomTile = getTile(wall.first, wall.second + 1)?.tile
-            val leftTile = getTile(wall.first - 1, wall.second)?.tile
-            val rightTile = getTile(wall.first + 1, wall.second)?.tile
+            val topTile = getTile(wall.first, wall.second - 1)
+            val bottomTile = getTile(wall.first, wall.second + 1)
+            val leftTile = getTile(wall.first - 1, wall.second)
+            val rightTile = getTile(wall.first + 1, wall.second)
             
             when {
                 topTile.isEmpty && bottomTile.isWall && leftTile.isWall && rightTile.isWall -> Direction.Bottom
@@ -225,7 +225,7 @@ class MainMapGenerator @Inject constructor(
             while (true) {
                 val x = random.nextInt(width)
                 val y = random.nextInt(height)
-                val tile = getTile(x, y)?.tile
+                val tile = getTile(x, y)
                 if (tile.isEmpty) {
                     Item("Item $i ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(x, y)
                     break
@@ -262,7 +262,7 @@ class MainMapGenerator @Inject constructor(
         log("Checking zone at $mapX $mapY dimensions $roomWidth x $roomHeight")
         for (x in mapX until mapX + roomWidth) {
             for (y in mapY until mapY + roomHeight) {
-                val tile = getTile(x, y)?.tile ?: return false
+                val tile = getTile(x, y) ?: return false
                 if (!tile.isWall) return false
             }
         }

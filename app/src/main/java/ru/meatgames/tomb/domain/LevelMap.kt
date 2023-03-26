@@ -19,7 +19,7 @@ class LevelMap(
     fun getTile(
         x: Int,
         y: Int,
-    ): MapTileWrapper? {
+    ): MapTile? {
         val capturedState = state.value
         val index = calcIndex(x, y)
         if (index < 0 || index >= capturedState.size) {
@@ -29,11 +29,7 @@ class LevelMap(
             )
             return null
         }
-        return MapTileWrapper(
-            tile = capturedState[calcIndex(x, y)],
-            x = x,
-            y = y,
-        )
+        return capturedState[calcIndex(x, y)]
     }
     
     fun updateSingleTile(
