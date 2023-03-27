@@ -2,9 +2,12 @@ package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.EnemiesController
+import ru.meatgames.tomb.domain.EnemiesHolder
 import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.LevelMap
 import ru.meatgames.tomb.domain.MapTile
+import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
@@ -22,6 +25,8 @@ import kotlin.random.Random
 class MainMapGenerator @Inject constructor(
     roomsData: RoomsData,
     private val itemsController: ItemsController,
+    private val enemiesHolder: EnemiesHolder,
+    private val enemiesController: EnemiesController,
 ) : MapGenerator {
     
     private val random = Random(System.currentTimeMillis())
@@ -59,6 +64,11 @@ class MainMapGenerator @Inject constructor(
         
         map.placeItems(
             amount = 10,
+            random = random,
+        )
+        
+        map.placeEnemies(
+            amount = 20,
             random = random,
         )
         
@@ -228,6 +238,28 @@ class MainMapGenerator @Inject constructor(
                 val tile = getTile(x, y)
                 if (tile.isEmpty) {
                     Item("Item $i ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(x, y)
+                    break
+                }
+            }
+        }
+    }
+    
+    private fun LevelMap.placeEnemies(
+        amount: Int,
+        random: Random,
+    ) {
+        for (i in 0 until amount) {
+            while (true) {
+                val x = random.nextInt(width)
+                val y = random.nextInt(height)
+                val tile = getTile(x, y)
+                val coordinates = Coordinates(x, y)
+                if (tile.isEmpty && enemiesHolder.getEnemy(coordinates) == null) {
+                    enemiesController.placeEnemy(
+                        enemyType = EnemyType.values().random(random),
+                        coordinates = coordinates,
+                        levelMap = this,
+                    )
                     break
                 }
             }

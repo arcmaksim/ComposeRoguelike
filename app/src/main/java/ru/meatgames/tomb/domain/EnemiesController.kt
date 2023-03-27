@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EnemiesControllerImpl @Inject constructor() : EnemyController, EnemiesHolder {
+class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHolder {
     
     private val enemies = mutableMapOf<EnemyId, Enemy>()
     private val enemyMapping = mutableMapOf<Coordinates, EnemyId>()
@@ -39,7 +39,7 @@ class EnemiesControllerImpl @Inject constructor() : EnemyController, EnemiesHold
 }
 
 // write interface
-interface EnemyController {
+interface EnemiesController {
     
     fun addEnemy(
         coordinates: Coordinates,
