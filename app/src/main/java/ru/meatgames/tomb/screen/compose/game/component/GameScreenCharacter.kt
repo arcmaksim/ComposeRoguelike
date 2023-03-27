@@ -91,6 +91,7 @@ internal fun GameScreenCharacter(
                 x = tileDimension * (viewportWidth / 2),
                 y = tileDimension * (viewportHeight / 2),
             ),
+            alpha = 1f,
         )
     }
 }

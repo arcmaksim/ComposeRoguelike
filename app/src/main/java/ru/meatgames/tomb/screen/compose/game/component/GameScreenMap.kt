@@ -133,14 +133,15 @@ private fun DrawScope.drawRevealedTile(
         dstOffset = dstOffset,
         dstSize = tileSize,
     )
-    renderTile.enemyData?.let {
+    renderTile.enemyData?.let { data ->
         drawCharacter(
             tileDimension = tileDimension,
-            shadowRenderData = it.shadowRenderData,
+            shadowRenderData = data.shadowRenderData,
             frameIndex = characterFrameIndex,
-            characterRenderData = it,
+            characterRenderData = data,
             dstSize = tileSize,
             dstOffset = dstOffset,
+            alpha = alpha?.let { 1f - it } ?: 1f,
         )
     }
     alpha?.let {

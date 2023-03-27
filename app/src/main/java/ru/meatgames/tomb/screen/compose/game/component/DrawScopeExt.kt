@@ -16,8 +16,10 @@ context(DrawScope)
 fun RenderData.drawImage(
     dstSize: IntSize,
     dstOffset: IntOffset,
+    alpha: Float = 1f,
 ) {
     drawImage(
+        alpha = alpha,
         image = asset,
         srcOffset = offset,
         srcSize = ASSETS_TILE_SIZE,
@@ -34,6 +36,7 @@ fun DrawScope.drawCharacter(
     characterRenderData: AnimationRenderData,
     dstSize: IntSize,
     dstOffset: IntOffset,
+    alpha: Float,
 ) {
     val originalTileSinglePixelOffset = tileDimension.getOriginalTileSinglePixelOffset()
     val verticalOffset = originalTileSinglePixelOffset * 3
@@ -41,11 +44,13 @@ fun DrawScope.drawCharacter(
     if (characterRenderData.healthRatio != 0f) {
         val toLeftOffset = (dstOffset + IntOffset(x = 0, y = -verticalOffset * 2)).toOffset()
         drawRect(
+            alpha = alpha,
             color = Color.White,
             topLeft = toLeftOffset,
             size = Size(width = dstSize.width.toFloat(), height = verticalOffset.toFloat()),
         )
         drawRect(
+            alpha = alpha,
             color = Color.Red,
             topLeft = toLeftOffset,
             size = Size(width = dstSize.width * characterRenderData.healthRatio, height = verticalOffset.toFloat()),
@@ -58,8 +63,10 @@ fun DrawScope.drawCharacter(
             x = characterRenderData.shadowHorizontalOffset * originalTileSinglePixelOffset,
             y = originalTileSinglePixelOffset - verticalOffset,
         ),
+        alpha = alpha,
     )
     drawImage(
+        alpha = alpha,
         image = characterRenderData.asset,
         srcOffset = characterRenderData.offsets[frameIndex],
         srcSize = ASSETS_TILE_SIZE,
