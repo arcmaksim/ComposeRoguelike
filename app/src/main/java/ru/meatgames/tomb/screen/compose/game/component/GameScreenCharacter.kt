@@ -3,6 +3,7 @@ package ru.meatgames.tomb.screen.compose.game.component
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -11,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.toPositionComponent
@@ -22,7 +24,10 @@ import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
 
-@Preview(widthDp = 270, heightDp = 270,)
+/**
+ * There are bunch of magic numbers just to make preview look nice
+ */
+@Preview(widthDp = 140, heightDp = 140)
 @Composable
 private fun GameScreenCharacterPreview() {
     val context = LocalContext.current
@@ -44,11 +49,11 @@ private fun GameScreenCharacterPreview() {
         LocalBackgroundColor provides Color(0xFF212121),
     ) {
         GameScreenCharacter(
-            modifier = modifier,
+            modifier = modifier.offset(24.dp, 40.dp),
             characterRenderData = themeAssets.getEnemyRenderData(enemyType),
             frameIndex = 0,
-            viewportWidth = 3,
-            viewportHeight = 3,
+            viewportWidth = 1,
+            viewportHeight = 1,
         )
     }
 }
