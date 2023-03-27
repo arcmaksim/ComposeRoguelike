@@ -12,4 +12,5 @@ data class AnimationRenderData(
     val asset: ImageBitmap,
     val offsets: List<IntOffset>,
     val shadowRenderData: RenderData,
+    val shadowHorizontalOffset: Int = 0,
 )

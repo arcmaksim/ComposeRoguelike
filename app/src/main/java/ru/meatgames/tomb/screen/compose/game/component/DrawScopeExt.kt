@@ -38,7 +38,7 @@ fun DrawScope.drawCharacter(
     shadowRenderData.drawImage(
         dstSize = dstSize,
         dstOffset = dstOffset + IntOffset(
-            x = 0,
+            x = characterRenderData.shadowHorizontalOffset * originalTileSinglePixelOffset,
             y = originalTileSinglePixelOffset - verticalOffset,
         ),
     )

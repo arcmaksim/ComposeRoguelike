@@ -230,20 +230,26 @@ class ThemeAssets @Inject constructor(
                 IntOffset((index + 1) * ASSETS_TILE_DIMENSION, 0),
             ),
             shadowRenderData = enemyType.getEnemyShadowRenderData(),
+            shadowHorizontalOffset = enemyType.getShadowHorizontalOffset(),
         )
     }
     
     private fun EnemyType.getEnemyShadowRenderData(): RenderData {
         val index = when (this) {
-            EnemyType.Skeleton, EnemyType.SkeletonArcher,
-            EnemyType.SkeletonWarrior, EnemyType.SkeletonNecromancer -> 5
+            EnemyType.Skeleton, EnemyType.SkeletonArcher, EnemyType.SkeletonWarrior -> 4
+            EnemyType.SkeletonNecromancer -> 5
         }
         return RenderData(
             asset = shadowsTileset,
             offset = IntOffset(index * ASSETS_TILE_DIMENSION, 0),
         )
     }
-
+    
+    private fun EnemyType.getShadowHorizontalOffset(): Int = when (this) {
+        EnemyType.Skeleton, EnemyType.SkeletonArcher, EnemyType.SkeletonWarrior -> 2
+        EnemyType.SkeletonNecromancer -> 1
+    }
+    
 }
 
 fun Int.getOriginalTileSinglePixelOffset() = this / ASSETS_TILE_DIMENSION
