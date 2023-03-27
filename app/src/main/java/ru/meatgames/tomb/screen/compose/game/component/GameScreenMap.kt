@@ -48,6 +48,7 @@ private fun GameScreenMapPreview() {
             animatedOffset = IntOffset.Zero,
             revealedTilesAlpha = 1f,
             fadedTilesAlpha = 0f,
+            characterFrameIndex = 0,
         )
     }
 }
@@ -64,6 +65,7 @@ internal fun GameScreenMap(
     animatedOffset: IntOffset,
     revealedTilesAlpha: Float,
     fadedTilesAlpha: Float,
+    characterFrameIndex: Int,
 ) {
     val tileSize = LocalTileSize.current
     val offset = LocalHorizontalOffset.current
@@ -89,6 +91,7 @@ internal fun GameScreenMap(
                     tileSize = tileSize,
                     tileDimension = tileDimension,
                     alpha = alpha,
+                    characterFrameIndex = characterFrameIndex,
                     backgroundColor = backgroundColor,
                 )
             }
@@ -101,6 +104,7 @@ internal fun GameScreenMap(
                     tileSize = tileSize,
                     tileDimension = tileDimension,
                     alpha = fadedTilesAlpha,
+                    characterFrameIndex = characterFrameIndex,
                     backgroundColor = backgroundColor,
                 )
             }
@@ -114,6 +118,7 @@ private fun DrawScope.drawRevealedTile(
     tileSize: IntSize,
     tileDimension: Int,
     backgroundColor: Color,
+    characterFrameIndex: Int,
     alpha: Float?,
 ) {
     renderTile.floorData.drawImage(
@@ -132,7 +137,7 @@ private fun DrawScope.drawRevealedTile(
         drawCharacter(
             tileDimension = tileDimension,
             shadowRenderData = it.shadowRenderData,
-            frameIndex = 0,
+            frameIndex = characterFrameIndex,
             characterRenderData = it,
             dstSize = tileSize,
             dstOffset = dstOffset,

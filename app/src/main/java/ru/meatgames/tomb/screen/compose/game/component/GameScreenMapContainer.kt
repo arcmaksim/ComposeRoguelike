@@ -1,5 +1,12 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateValue
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -12,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,6 +52,9 @@ import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleGameScreenAnimations
 import ru.meatgames.tomb.screen.compose.game.animation.isStateless
 import ru.meatgames.tomb.toIntOffset
+
+const val ANIMATION_FRAMES = 2
+private const val CHARACTER_IDLE_ANIMATION_TIME = 600
 
 @Preview
 @Composable
@@ -105,6 +116,20 @@ internal fun GameScreenMapContainer(
     val revealedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f) }
     val fadedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f) }
     
+    val characterIdleTransition = rememberInfiniteTransition()
+    val characterAnimationFrame by characterIdleTransition.animateValue(
+        initialValue = 0,
+        targetValue = ANIMATION_FRAMES,
+        typeConverter = Int.VectorConverter,
+        animationSpec = infiniteRepeatable(
+            repeatMode = RepeatMode.Restart,
+            animation = tween(
+                durationMillis = CHARACTER_IDLE_ANIMATION_TIME * ANIMATION_FRAMES,
+                easing = LinearEasing,
+            ),
+        )
+    )
+    
     LaunchedEffect(playerAnimation) {
         awaitAll(
             *playerAnimation.assembleGameScreenAnimations(
@@ -155,6 +180,7 @@ internal fun GameScreenMapContainer(
             tilesToReveal = mapState.tilesToReveal,
             tilesToFade = mapState.tilesToFade,
             animatedOffset = animatedOffset.value,
+            characterFrameIndex = characterAnimationFrame,
             initialOffset = initialOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,
@@ -162,7 +188,7 @@ internal fun GameScreenMapContainer(
         
         GameScreenCharacter(
             modifier = modifier,
-            animationFrameTime = characterAnimationFrameTime,
+            frameIndex = characterAnimationFrame,
             viewportWidth = mapState.viewportWidth,
             viewportHeight = mapState.viewportHeight,
             characterRenderData = mapState.characterRenderData,
