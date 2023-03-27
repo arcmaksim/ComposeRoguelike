@@ -1,6 +1,8 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
@@ -50,7 +52,10 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
     )
     
     val enemies = mapOf(
-        7 to EnemyType.SkeletonWarrior.let(themeAssets::getEnemyRenderData),
+        7 to Enemy(
+            type = EnemyType.SkeletonWarrior,
+            position = Coordinates(0, 0),
+        ).let(themeAssets::getEnemyRenderData),
     )
     
     return renderTiles.mapIndexed { index, tilesPair ->

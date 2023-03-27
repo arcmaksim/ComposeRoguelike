@@ -1,9 +1,12 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.toOffset
 import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.temp.getOriginalTileSinglePixelOffset
 import ru.meatgames.tomb.render.AnimationRenderData
@@ -34,6 +37,20 @@ fun DrawScope.drawCharacter(
 ) {
     val originalTileSinglePixelOffset = tileDimension.getOriginalTileSinglePixelOffset()
     val verticalOffset = originalTileSinglePixelOffset * 3
+    
+    if (characterRenderData.healthRatio != 0f) {
+        val toLeftOffset = (dstOffset + IntOffset(x = 0, y = -verticalOffset * 2)).toOffset()
+        drawRect(
+            color = Color.White,
+            topLeft = toLeftOffset,
+            size = Size(width = dstSize.width.toFloat(), height = verticalOffset.toFloat()),
+        )
+        drawRect(
+            color = Color.Red,
+            topLeft = toLeftOffset,
+            size = Size(width = dstSize.width * characterRenderData.healthRatio, height = verticalOffset.toFloat()),
+        )
+    }
     
     shadowRenderData.drawImage(
         dstSize = dstSize,

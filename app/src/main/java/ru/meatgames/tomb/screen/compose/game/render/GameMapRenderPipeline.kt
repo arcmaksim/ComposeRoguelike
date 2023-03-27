@@ -100,7 +100,7 @@ class GameMapRenderPipeline @Inject constructor(
                     objectData = pair.second.second?.toObjectRenderTileData(),
                     itemData = itemsHolder.getItemContainer(coordinates)
                         ?.let { themeAssets.resolveItemRenderData() },
-                    enemyData = enemy?.let { themeAssets.getEnemyRenderData(it.type) },
+                    enemyData = enemy?.let { themeAssets.getEnemyRenderData(it) },
                     isVisible = isVisible,
                 )
             }

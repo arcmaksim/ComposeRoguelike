@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
@@ -74,6 +75,7 @@ class ThemeAssets @Inject constructor(
             asset = shadowsTileset,
             offset = IntOffset(ASSETS_TILE_DIMENSION * 4, 0),
         ),
+        healthRatio = 0f,
     )
 
     private fun Context.getBitmapFromAsset(
@@ -215,9 +217,9 @@ class ThemeAssets @Inject constructor(
     )
     
     fun getEnemyRenderData(
-        enemyType: EnemyType,
+        enemy: Enemy,
     ): AnimationRenderData {
-        val index = when (enemyType) {
+        val index = when (enemy.type) {
             EnemyType.Skeleton -> 0
             EnemyType.SkeletonArcher -> 2
             EnemyType.SkeletonWarrior -> 4
@@ -229,8 +231,9 @@ class ThemeAssets @Inject constructor(
                 IntOffset(index * ASSETS_TILE_DIMENSION, 0),
                 IntOffset((index + 1) * ASSETS_TILE_DIMENSION, 0),
             ),
-            shadowRenderData = enemyType.getEnemyShadowRenderData(),
-            shadowHorizontalOffset = enemyType.getShadowHorizontalOffset(),
+            shadowRenderData = enemy.type.getEnemyShadowRenderData(),
+            shadowHorizontalOffset = enemy.type.getShadowHorizontalOffset(),
+            healthRatio = enemy.health.ratio,
         )
     }
     
