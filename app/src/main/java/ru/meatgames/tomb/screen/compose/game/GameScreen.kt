@@ -13,7 +13,6 @@ import ru.meatgames.tomb.screen.compose.game.component.GameScreenLoading
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
 
 private const val ANIMATION_TIME = 300
-private const val CHARACTER_IDLE_ANIMATION_FRAME_TIME = 600
 
 @Composable
 internal fun GameScreen(
@@ -64,7 +63,6 @@ private fun GameScreenContent(
             interactionState = state.interactionState,
             previousMoveDirection = state.previousMoveDirection,
             animationTime = ANIMATION_TIME,
-            characterAnimationFrameTime = CHARACTER_IDLE_ANIMATION_FRAME_TIME,
             onCharacterMove = onCharacterMove,
             onMapGeneration = onMapGeneration,
             onInventory = onInventory,

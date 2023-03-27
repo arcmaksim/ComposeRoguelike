@@ -111,6 +111,7 @@ class GameScreenViewModel @Inject constructor(
         when (this) {
             is PlayerTurnResult.Block -> GameScreenAnimationState.Shake()
             is PlayerTurnResult.Move -> GameScreenAnimationState.Scroll(direction)
+            is PlayerTurnResult.Attack -> GameScreenAnimationState.Attack(direction)
             else -> null
         }
     
@@ -128,7 +129,8 @@ class GameScreenViewModel @Inject constructor(
         }
     
     private fun GameScreenAnimationState?.requiresManualUpdate(): Boolean = when (this) {
-        is GameScreenAnimationState.Shake -> true
+        is GameScreenAnimationState.Shake,
+        is GameScreenAnimationState.Attack -> true
         else -> false
     }
     

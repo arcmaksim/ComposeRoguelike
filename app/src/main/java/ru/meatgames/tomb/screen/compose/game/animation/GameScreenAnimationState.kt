@@ -9,11 +9,16 @@ sealed class GameScreenAnimationState {
     class Scroll(
         val direction: Direction,
     ) : GameScreenAnimationState()
+    
+    class Attack(
+        val direction: Direction,
+    ) : GameScreenAnimationState()
 
 }
 
 val GameScreenAnimationState?.isStateless: Boolean
     get() = when (this) {
-        is GameScreenAnimationState.Shake -> true
+        is GameScreenAnimationState.Shake,
+        is GameScreenAnimationState.Attack -> true
         else -> false
     }

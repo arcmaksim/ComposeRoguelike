@@ -17,6 +17,7 @@ class PlayerMapInteractionController @Inject constructor(
     private val mapController: MapController,
     private val tilesController: TilesController,
     private val itemsHolder: ItemsHolder,
+    private val enemiesHolder: EnemiesHolder,
 ) {
     
     private val characterStateFlow = characterController.characterStateFlow
@@ -38,12 +39,18 @@ class PlayerMapInteractionController @Inject constructor(
         val tile = mapController.getTile(coordinates)?.tile ?: return null
         
         val itemContainer = itemsHolder.getItemContainer(coordinates)
+        val enemy = enemiesHolder.getEnemy(coordinates)
         
         return when {
             itemContainer != null -> PlayerTurnResult.ContainerInteraction(
                 coordinates = coordinates,
                 itemContainerId = itemContainer.id,
                 itemIds = itemContainer.itemIds,
+            )
+            
+            enemy != null -> PlayerTurnResult.Attack(
+                direction = direction,
+                enemyId = enemy.id,
             )
     
             tile.objectEntityTile != null -> tile.objectEntityTile.resolveMoveResult(

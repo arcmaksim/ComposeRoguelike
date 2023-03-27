@@ -69,7 +69,6 @@ private fun GameScreenMapContainerPreview() {
         interactionState = null,
         previousMoveDirection = null,
         animationTime = 300,
-        characterAnimationFrameTime = 600,
         onCharacterMove = { Unit },
         onMapGeneration = { Unit },
         onInventory = { Unit },
@@ -87,7 +86,6 @@ internal fun GameScreenMapContainer(
     interactionState: GameScreenInteractionState?,
     previousMoveDirection: Direction?,
     animationTime: Int,
-    characterAnimationFrameTime: Int,
     onCharacterMove: (Direction) -> Unit,
     onMapGeneration: () -> Unit,
     onInventory: () -> Unit,
@@ -105,9 +103,9 @@ internal fun GameScreenMapContainer(
     val tileDimension = screenWidth / mapState.viewportWidth
     
     val view = LocalView.current
-    val shakeHorizontalOffset = remember(playerAnimation) { mutableStateOf(0f) }
+    val shakeOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
     val horizontalOffset = IntOffset(
-        x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeHorizontalOffset.value.toInt(),
+        x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeOffset.value.x,
         y = 0,
     )
     
@@ -135,7 +133,7 @@ internal fun GameScreenMapContainer(
             *playerAnimation.assembleGameScreenAnimations(
                 animationTime = animationTime,
                 view = view,
-                shakeHorizontalOffset = shakeHorizontalOffset,
+                shakeOffset = shakeOffset,
                 animatedOffset = animatedOffset,
                 initialAnimatedOffset = -initialOffset,
                 revealedTilesAlpha = revealedTilesAlpha,
@@ -148,7 +146,7 @@ internal fun GameScreenMapContainer(
         .fillMaxWidth()
         .aspectRatio(1F)
         .align(Alignment.Center)
-        .offset(shakeHorizontalOffset.value.dp, 0.dp)
+        .offset { shakeOffset.value }
     
     Box(
         modifier = Modifier

@@ -5,12 +5,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import ru.meatgames.tomb.Direction
 
 context(CoroutineScope)
 suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
     animationTime: Int,
     view: View,
-    shakeHorizontalOffset: MutableState<Float>,
+    shakeOffset: MutableState<IntOffset>,
     animatedOffset: MutableState<IntOffset>,
     initialAnimatedOffset: IntOffset,
     revealedTilesAlpha: MutableState<Float>,
@@ -19,8 +20,11 @@ suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
     val specificAnimations = when (this) {
         is GameScreenAnimationState.Shake -> {
             listOf(
-                shakeHorizontalOffset.asDeferredScreenShakeAnimationAsync(),
-                view.asDeferredVibrationAsync(),
+                shakeOffset.asDeferredOneDirectionAnimationAsync(
+                    screenShakeKeyframes,
+                    Direction.Right,
+                ),
+                view.asDeferredRejectVibrationAsync(),
             )
         }
         is GameScreenAnimationState.Scroll -> {
@@ -29,6 +33,15 @@ suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
                     animationTime = animationTime,
                     targetValue = initialAnimatedOffset,
                 ),
+            )
+        }
+        is GameScreenAnimationState.Attack -> {
+            listOf(
+                shakeOffset.asDeferredOneDirectionAnimationAsync(
+                    attackKeyframes,
+                    direction,
+                ),
+                view.asDeferredConfirmVibrationAsync(250L),
             )
         }
         else -> emptyList()

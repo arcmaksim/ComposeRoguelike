@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.domain
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
@@ -30,5 +31,8 @@ sealed class PlayerTurnResult {
 
     object Block : PlayerTurnResult()
 
-    //Attack
+    data class Attack(
+        val direction: Direction,
+        val enemyId: EnemyId,
+    ) : PlayerTurnResult()
 }
