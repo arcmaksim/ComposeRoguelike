@@ -10,7 +10,7 @@ import javax.inject.Inject
 @JvmInline
 value class EnemyId(val id: UUID = UUID.randomUUID())
 
-class Enemy @Inject constructor(
+data class Enemy @Inject constructor(
     val id: EnemyId = EnemyId(),
     val type: EnemyType,
     val health: HealthComponent,

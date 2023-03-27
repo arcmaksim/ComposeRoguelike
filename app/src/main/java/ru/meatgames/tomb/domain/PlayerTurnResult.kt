@@ -33,6 +33,5 @@ sealed class PlayerTurnResult {
 
     data class Attack(
         val direction: Direction,
-        val enemyId: EnemyId,
     ) : PlayerTurnResult()
 }
