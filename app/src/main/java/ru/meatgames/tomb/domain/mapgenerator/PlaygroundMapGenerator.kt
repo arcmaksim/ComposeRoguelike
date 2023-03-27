@@ -45,6 +45,24 @@ class PlaygroundMapGenerator @Inject constructor(
             coordinates = initialRoomPositionX + initialRoom.width / 2 to initialRoomPositionY + 2,
             levelMap = map,
         )
+    
+        enemyController.placeEnemy(
+            enemyType = EnemyType.SkeletonArcher,
+            coordinates = initialRoomPositionX + initialRoom.width / 2 to initialRoomPositionY + initialRoom.height - 3,
+            levelMap = map,
+        )
+    
+        enemyController.placeEnemy(
+            enemyType = EnemyType.SkeletonWarrior,
+            coordinates = initialRoomPositionX + 2 to initialRoomPositionY + initialRoom.height / 2,
+            levelMap = map,
+        )
+    
+        enemyController.placeEnemy(
+            enemyType = EnemyType.SkeletonNecromancer,
+            coordinates = initialRoomPositionX + initialRoom.width - 3 to initialRoomPositionY + initialRoom.height / 2,
+            levelMap = map,
+        )
         
         return MapConfiguration(
             mapWidth = map.width,
