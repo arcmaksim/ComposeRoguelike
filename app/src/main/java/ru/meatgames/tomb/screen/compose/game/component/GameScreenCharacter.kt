@@ -36,7 +36,7 @@ private fun GameScreenCharacterPreview() {
     val enemyType = Enemy(
         type = EnemyType.SkeletonWarrior,
         position = Coordinates(0, 0).toPositionComponent(),
-        health = HealthComponent(maxHealth = 12, currentHealth = 10),
+        health = HealthComponent(maxHealth = 12, currentHealth = 12),
     )
     
     val modifier = Modifier
