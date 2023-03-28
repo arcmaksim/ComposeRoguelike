@@ -1,7 +1,10 @@
 package ru.meatgames.tomb.screen.compose.game
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.item.ItemContainerId
+import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 
 enum class GameScreenEvent {
@@ -24,3 +27,27 @@ data class GameScreenState(
     val previousMoveDirection: Direction? = null,
     val interactionState: GameScreenInteractionState? = null,
 )
+
+interface GameScreenNavigator {
+    
+    fun onNewMapRequest()
+    
+    fun navigateToInventory()
+    
+    fun navigateToCharacterSheet()
+    
+}
+
+interface GameScreenInteractionController {
+    
+    fun processCharacterMoveInput(direction: Direction)
+    
+    fun closeInteractionMenu()
+    
+    fun itemSelected(
+        coordinates: Coordinates,
+        itemContainerId: ItemContainerId,
+        itemId: ItemId,
+    )
+    
+}

@@ -30,7 +30,7 @@ class GameScreenViewModel @Inject constructor(
     private val mapInteractionResolver: PlayerMapInteractionResolver,
     private val gameController: GameController,
     private val itemsHolder: ItemsHolder,
-) : ViewModel() {
+) : ViewModel(), GameScreenNavigator, GameScreenInteractionController {
     
     private val _events = Channel<GameScreenEvent?>()
     val events: Flow<GameScreenEvent?> = _events.receiveAsFlow()
@@ -78,7 +78,7 @@ class GameScreenViewModel @Inject constructor(
         }
     }
     
-    fun onMoveCharacter(
+    override fun processCharacterMoveInput(
         direction: Direction,
     ) {
         if (!isIdle.value) return
@@ -164,16 +164,21 @@ class GameScreenViewModel @Inject constructor(
         _isIdle.value = true
     }
     
-    fun newMap() {
+    override fun onNewMapRequest() {
         gameController.generateNewMap(gameController.lastMapType)
     }
     
-    fun openInventory() {
+    override fun navigateToInventory() {
         clearAnimations()
         _events.trySend(GameScreenEvent.NavigateToInventory)
     }
     
-    fun closeInteractionMenu() {
+    override fun navigateToCharacterSheet() {
+        clearAnimations()
+        _events.trySend(GameScreenEvent.NavigateToCharacterSheet)
+    }
+    
+    override fun closeInteractionMenu() {
         _state.update {
             it.copy(
                 interactionState = null,
@@ -181,7 +186,7 @@ class GameScreenViewModel @Inject constructor(
         }
     }
     
-    fun pickUpItem(
+    override fun itemSelected(
         coordinates: Coordinates,
         itemContainerId: ItemContainerId,
         itemId: ItemId,
@@ -193,11 +198,6 @@ class GameScreenViewModel @Inject constructor(
         ).process()
     }
     
-    fun openCharacterSheet() {
-        clearAnimations()
-        _events.trySend(GameScreenEvent.NavigateToCharacterSheet)
-    }
-    
     private fun clearAnimations() {
         _state.update {
             it.copy(
@@ -206,5 +206,4 @@ class GameScreenViewModel @Inject constructor(
             )
         }
     }
-    
 }

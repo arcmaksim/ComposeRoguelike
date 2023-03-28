@@ -39,18 +39,19 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.design.BaseTextButton
-import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.domain.item.ItemContainerId
-import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionState
+import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
 import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleGameScreenAnimations
 import ru.meatgames.tomb.screen.compose.game.animation.isStateless
+import ru.meatgames.tomb.screen.compose.game.interactionControllerPreviewStub
+import ru.meatgames.tomb.screen.compose.game.navigatorPreviewStub
 import ru.meatgames.tomb.toIntOffset
 
 const val ANIMATION_FRAMES = 2
@@ -69,12 +70,8 @@ private fun GameScreenMapContainerPreview() {
         interactionState = null,
         previousMoveDirection = null,
         animationTime = 300,
-        onCharacterMove = { Unit },
-        onMapGeneration = { Unit },
-        onInventory = { Unit },
-        onCharacterSheet = { Unit },
-        onCloseInteractionMenu = { Unit },
-        onItemSelected = { _, _, _ -> Unit },
+        navigator = navigatorPreviewStub,
+        interactionController = interactionControllerPreviewStub,
     )
 }
 
@@ -86,12 +83,8 @@ internal fun GameScreenMapContainer(
     interactionState: GameScreenInteractionState?,
     previousMoveDirection: Direction?,
     animationTime: Int,
-    onCharacterMove: (Direction) -> Unit,
-    onMapGeneration: () -> Unit,
-    onInventory: () -> Unit,
-    onCharacterSheet: () -> Unit,
-    onCloseInteractionMenu: () -> Unit,
-    onItemSelected: (Coordinates, ItemContainerId, ItemId) -> Unit,
+    navigator: GameScreenNavigator,
+    interactionController: GameScreenInteractionController,
 ) = BoxWithConstraints(
     modifier = Modifier
         .background(Color(0xFF212121))
@@ -158,7 +151,7 @@ internal fun GameScreenMapContainer(
                 detectTapGestures(
                     onTap = {
                         if (interactionState == null) {
-                            onCharacterMove(it.toDirection(maxWidth))
+                            (interactionController::processCharacterMoveInput)(it.toDirection(maxWidth))
                         }
                     },
                 )
@@ -196,19 +189,19 @@ internal fun GameScreenMapContainer(
     BaseTextButton(
         title = "Character Sheet",
         modifier = Modifier.align(Alignment.TopEnd),
-        onClick = onCharacterSheet,
+        onClick = navigator::navigateToCharacterSheet,
     )
     
     BaseTextButton(
         title = "Inventory",
         modifier = Modifier.align(Alignment.BottomStart),
-        onClick = onInventory,
+        onClick = navigator::navigateToInventory,
     )
     
     BaseTextButton(
         title = "New map",
         modifier = Modifier.align(Alignment.BottomEnd),
-        onClick = onMapGeneration,
+        onClick = navigator::onNewMapRequest,
     )
     
     interactionState?.let { state ->
@@ -220,8 +213,8 @@ internal fun GameScreenMapContainer(
                         .padding(16.dp)
                         .align(Alignment.Center),
                     interactionState = state,
-                    onClose = onCloseInteractionMenu,
-                    onItemClick = onItemSelected,
+                    onClose = interactionController::closeInteractionMenu,
+                    onItemClick = interactionController::itemSelected,
                 )
             }
         }
@@ -229,7 +222,7 @@ internal fun GameScreenMapContainer(
 }
 
 context(Density)
-private fun Offset.toDirection(
+    private fun Offset.toDirection(
     size: Dp,
 ): Direction = when {
     x > y && x.toDp() > size - y.toDp() -> Direction.Right
