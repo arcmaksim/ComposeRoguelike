@@ -3,8 +3,8 @@ package ru.meatgames.tomb.domain.mapgenerator
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.EnemiesController
 import ru.meatgames.tomb.domain.LevelMap
-import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyType
+import ru.meatgames.tomb.domain.enemy.produceEnemy
 import timber.log.Timber
 
 internal fun EnemiesController.placeEnemy(
@@ -24,9 +24,6 @@ internal fun EnemiesController.placeEnemy(
     
     addEnemy(
         coordinates = coordinates,
-        enemy = Enemy(
-            type = enemyType,
-            position = coordinates,
-        )
+        enemy = enemyType.produceEnemy(coordinates),
     )
 }

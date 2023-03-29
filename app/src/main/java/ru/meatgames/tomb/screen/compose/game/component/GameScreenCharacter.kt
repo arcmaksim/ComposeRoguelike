@@ -13,11 +13,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import ru.meatgames.tomb.domain.Coordinates
-import ru.meatgames.tomb.domain.component.HealthComponent
-import ru.meatgames.tomb.domain.component.toPositionComponent
-import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyType
+import ru.meatgames.tomb.domain.enemy.produceEnemy
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -33,11 +30,7 @@ private fun GameScreenCharacterPreview() {
     val context = LocalContext.current
     
     val themeAssets = ThemeAssets(context)
-    val enemyType = Enemy(
-        type = EnemyType.SkeletonWarrior,
-        position = Coordinates(0, 0).toPositionComponent(),
-        health = HealthComponent(maxHealth = 12, currentHealth = 12),
-    )
+    val enemyType = EnemyType.SkeletonWarrior.produceEnemy(0 to 0)
     
     val modifier = Modifier
         .fillMaxWidth()

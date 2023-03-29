@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.behaviorcard.BehaviorCard
 import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.component.Initiative
 import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.component.StatsComponent
 import ru.meatgames.tomb.domain.component.toPositionComponent
@@ -66,6 +67,7 @@ class CharacterController @Inject constructor() {
 data class CharacterState(
     val position: PositionComponent,
     val health: HealthComponent = HealthComponent(10),
+    val initiative: Initiative = Initiative.Medium,
     val stats: StatsComponent = StatsComponent(
         power = Power(10),
         speed = Speed(1),
