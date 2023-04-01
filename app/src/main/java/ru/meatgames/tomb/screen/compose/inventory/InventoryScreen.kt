@@ -9,11 +9,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.screen.compose.container.ContainerItem
@@ -42,7 +42,7 @@ fun InventoryScreen(
         }
     }
     
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     
     InventoryScreenContent(
         state = state,
