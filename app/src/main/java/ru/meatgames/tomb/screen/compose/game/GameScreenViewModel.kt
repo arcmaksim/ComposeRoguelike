@@ -7,12 +7,15 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.domain.GameState
 import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.domain.PlayerMapInteractionController
@@ -41,7 +44,7 @@ class GameScreenViewModel @Inject constructor(
             playerAnimation = null,
         )
     )
-    val state: Flow<GameScreenState> = _state
+    val state: StateFlow<GameScreenState> = _state
     
     private var pendingAnimation: GameScreenAnimationState? = null
         get() {
@@ -67,14 +70,20 @@ class GameScreenViewModel @Inject constructor(
     
     init {
         viewModelScope.launch {
-            controller.state.collect { state ->
+            gameController.state.onEach {
+                if (it == GameState.WaitingForPlayer) {
+                    _isIdle.value = true
+                }
+            }.launchIn(this)
+            controller.state.onEach { state ->
                 _state.value = GameScreenState(
                     mapState = state,
                     playerAnimation = pendingAnimation,
                     previousMoveDirection = previousMoveDirection,
-                    interactionState = _state.value.interactionState?.takeIf { clearInteractionState == null },
+                    interactionState = _state.value
+                        .interactionState?.takeIf { clearInteractionState == null },
                 )
-            }
+            }.launchIn(this)
         }
     }
     
@@ -89,14 +98,14 @@ class GameScreenViewModel @Inject constructor(
             _isIdle.value = true
             return
         }
-    
+        
         playerTurnResult.process()
     }
     
     private fun PlayerTurnResult.process() {
         val animation = resolveGameScreenAnimationState()
         val interactionState = resolvePlayerInteractionState()
-    
+        
         if (animation.requiresManualUpdate() || interactionState != null) {
             updateStateNow(
                 gameScreenAnimationState = animation,
@@ -104,6 +113,12 @@ class GameScreenViewModel @Inject constructor(
             )
         } else {
             animation.cacheState(this)
+        }
+        
+        if (isTurnSpent()) {
+            viewModelScope.launch { gameController.finishPlayerTurn() }
+        } else {
+            _isIdle.value = true
         }
     }
     
@@ -125,7 +140,15 @@ class GameScreenViewModel @Inject constructor(
                     items = itemsHolder.getItems(itemIds),
                 )
             }
+            
             else -> null
+        }
+    
+    private fun PlayerTurnResult.isTurnSpent(): Boolean =
+        when (this) {
+            is PlayerTurnResult.Block,
+            is PlayerTurnResult.ContainerInteraction -> false
+            else -> true
         }
     
     private fun GameScreenAnimationState?.requiresManualUpdate(): Boolean = when (this) {
@@ -145,7 +168,6 @@ class GameScreenViewModel @Inject constructor(
                 interactionState = playerInteractionState,
             )
         }
-        _isIdle.value = true
     }
     
     private fun GameScreenAnimationState?.cacheState(
@@ -160,12 +182,12 @@ class GameScreenViewModel @Inject constructor(
             resolveResult == PlayerMapInteractionResolver.ResolveResult.Clear) {
             clearInteractionState = Unit
         }
-        
-        _isIdle.value = true
     }
     
     override fun onNewMapRequest() {
-        gameController.generateNewMap(gameController.lastMapType)
+        viewModelScope.launch {
+            gameController.generateNewMap(gameController.lastMapType)
+        }
     }
     
     override fun navigateToInventory() {

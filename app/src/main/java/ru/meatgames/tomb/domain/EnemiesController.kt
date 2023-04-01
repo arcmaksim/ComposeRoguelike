@@ -31,6 +31,8 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         Timber.d("Enemy with id ${enemy.id.id} at $coordinates was spawn")
     }
     
+    override fun getEnemies(): List<Enemy> = enemies.values.toList()
+    
     override fun clearEnemies() {
         enemyMapping.clear()
         enemies.clear()
@@ -79,6 +81,8 @@ interface EnemiesHolder {
         coordinates: Coordinates,
         damage: Int,
     ): Boolean
+    
+    fun getEnemies(): List<Enemy>
     
     fun clearEnemies()
     

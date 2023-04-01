@@ -2,8 +2,8 @@ package ru.meatgames.tomb.screen.compose.game
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenLoading
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
@@ -28,10 +28,12 @@ internal fun GameScreen(
         }
     }
     
-    val state by viewModel.state.collectAsState(GameScreenState())
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val isIdle by viewModel.isIdle.collectAsStateWithLifecycle()
     
     GameScreenContent(
         state = state,
+        isIdle = isIdle,
         navigator = viewModel,
         interactionController = viewModel,
     )
@@ -40,6 +42,7 @@ internal fun GameScreen(
 @Composable
 private fun GameScreenContent(
     state: GameScreenState,
+    isIdle: Boolean,
     navigator: GameScreenNavigator,
     interactionController: GameScreenInteractionController,
 ) {
@@ -47,6 +50,7 @@ private fun GameScreenContent(
         is MapScreenController.MapScreenState.Loading -> GameScreenLoading()
         is MapScreenController.MapScreenState.Ready -> GameScreenMapContainer(
             mapState = mapState,
+            isIdle = isIdle,
             playerAnimation = state.playerAnimation,
             interactionState = state.interactionState,
             previousMoveDirection = state.previousMoveDirection,

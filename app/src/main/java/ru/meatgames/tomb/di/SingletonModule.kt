@@ -9,6 +9,8 @@ import dagger.multibindings.IntoSet
 import ru.meatgames.tomb.domain.EnemiesController
 import ru.meatgames.tomb.domain.EnemiesControllerImpl
 import ru.meatgames.tomb.domain.EnemiesHolder
+import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.domain.GameControllerImpl
 import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.ItemsControllerImpl
 import ru.meatgames.tomb.domain.ItemsHolder
@@ -94,6 +96,11 @@ interface SingletonModule {
     fun bindPlaygroundMapGenerator(
         playgroundMapGenerator: PlaygroundMapGenerator,
     ): MapGenerator
+    
+    @Binds
+    fun bindGameController(
+        gameController: GameControllerImpl,
+    ): GameController
 
     companion object {
         @Named(MAP_WIDTH_KEY)

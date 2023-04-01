@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.design.BaseTextButton
+import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
@@ -66,6 +68,7 @@ private fun GameScreenMapContainerPreview() {
     
     GameScreenMapContainer(
         mapState = gameScreenMapContainerPreviewMapReadyState(themeAssets),
+        isIdle = true,
         playerAnimation = null,
         interactionState = null,
         previousMoveDirection = null,
@@ -79,6 +82,7 @@ private fun GameScreenMapContainerPreview() {
 @Composable
 internal fun GameScreenMapContainer(
     mapState: MapScreenController.MapScreenState.Ready,
+    isIdle: Boolean,
     playerAnimation: GameScreenAnimationState?,
     interactionState: GameScreenInteractionState?,
     previousMoveDirection: Direction?,
@@ -150,7 +154,7 @@ internal fun GameScreenMapContainer(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-                        if (interactionState == null) {
+                        if (isIdle && interactionState == null) {
                             (interactionController::processCharacterMoveInput)(it.toDirection(maxWidth))
                         }
                     },
@@ -202,6 +206,13 @@ internal fun GameScreenMapContainer(
         title = "New map",
         modifier = Modifier.align(Alignment.BottomEnd),
         onClick = navigator::onNewMapRequest,
+    )
+    
+    Text(
+        modifier = Modifier.align(Alignment.TopStart),
+        text = if (isIdle) "Idle" else "Processing",
+        style = h3TextStyle,
+        color = if (isIdle) Color.White else Color.Red,
     )
     
     interactionState?.let { state ->
