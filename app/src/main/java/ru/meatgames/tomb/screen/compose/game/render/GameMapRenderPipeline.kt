@@ -69,8 +69,8 @@ class GameMapRenderPipeline @Inject constructor(
         
         return GameMapPipelineRenderData(
             tiles = processedRenderTiles.map { it.second },
-            tilesToReveal = tilesToReveal.toList(),
-            tilesToFade = tilesToFade.toList(),
+            tilesToFadeIn = tilesToReveal.toList(),
+            tilesToFadeOut = tilesToFade.toList(),
         )
     }
     

@@ -5,6 +5,6 @@ import ru.meatgames.tomb.render.MapRenderTile
 
 data class GameMapPipelineRenderData(
     val tiles: List<MapRenderTile>,
-    val tilesToReveal: List<ScreenSpaceCoordinates>,
-    val tilesToFade: List<ScreenSpaceCoordinates>,
+    val tilesToFadeIn: List<ScreenSpaceCoordinates>,
+    val tilesToFadeOut: List<ScreenSpaceCoordinates>,
 )
