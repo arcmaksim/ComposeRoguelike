@@ -1,7 +1,7 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.turn
 
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.domain.enemy.EnemyId
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
@@ -34,4 +34,11 @@ sealed class PlayerTurnResult {
     data class Attack(
         val direction: Direction,
     ) : PlayerTurnResult()
+    
+}
+
+fun PlayerTurnResult.finishesPlayerTurn(): Boolean = when (this) {
+    is PlayerTurnResult.Block,
+    is PlayerTurnResult.ContainerInteraction -> false
+    else -> true
 }

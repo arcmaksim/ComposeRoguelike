@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.domain
 
+import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import javax.inject.Inject
 import javax.inject.Singleton
