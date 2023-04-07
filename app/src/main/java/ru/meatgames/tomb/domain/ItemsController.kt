@@ -63,16 +63,15 @@ class ItemsControllerImpl @Inject constructor() : ItemsController, ItemsHolder {
     }
     
     override fun takeItem(
-        coordinates: Coordinates,
         itemContainerId: ItemContainerId,
         itemId: ItemId,
-    ): Item? {
+    ): Pair<Item, Boolean>? {
         val container = itemContainers[itemContainerId] ?: return null
         val item = items[itemId] ?: return null
         if (!container.itemIds.contains(itemId)) return null
         
-        val remainingItemIds = container.itemIds - itemId
-        if (remainingItemIds.isEmpty()) {
+        val isContainerEmpty = (container.itemIds - itemId).isEmpty()
+        if (isContainerEmpty) {
             itemContainers.remove(itemContainerId)
             itemContainersMapping.filterValues { it == itemContainerId }
                 .forEach { itemContainersMapping.remove(it.key) }
@@ -82,7 +81,7 @@ class ItemsControllerImpl @Inject constructor() : ItemsController, ItemsHolder {
             )
         }
         
-        return item
+        return item to isContainerEmpty
     }
     
     override fun clearContainers() {
@@ -109,10 +108,9 @@ interface ItemsController {
     )
     
     fun takeItem(
-        coordinates: Coordinates,
         itemContainerId: ItemContainerId,
         itemId: ItemId,
-    ): Item?
+    ): Pair<Item, Boolean>?
     
 }
 

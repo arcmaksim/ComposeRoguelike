@@ -24,7 +24,6 @@ sealed class PlayerTurnResult {
     ) : PlayerTurnResult()
     
     data class PickupItem(
-        val coordinates: Coordinates,
         val itemContainerId: ItemContainerId,
         val itemId: ItemId,
     ) : PlayerTurnResult()
@@ -40,5 +39,10 @@ sealed class PlayerTurnResult {
 fun PlayerTurnResult.finishesPlayerTurn(): Boolean = when (this) {
     is PlayerTurnResult.Block,
     is PlayerTurnResult.ContainerInteraction -> false
+    else -> true
+}
+
+fun PlayerTurnResult.hasAnimation(): Boolean = when (this) {
+    is PlayerTurnResult.PickupItem -> false
     else -> true
 }

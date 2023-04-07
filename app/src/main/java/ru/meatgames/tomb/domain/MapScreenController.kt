@@ -9,6 +9,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
+import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.turn.EnemyTurnResult
+import ru.meatgames.tomb.domain.turn.PlayerTurnResult
+import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.render.AnimationRenderData
@@ -29,6 +33,7 @@ class MapScreenController @Inject constructor(
     private val characterController: CharacterController,
     private val tilesController: TilesController,
     private val gameMapRenderPipeline: GameMapRenderPipeline,
+    private val gameController: GameController,
 ) {
     
     private val characterRenderData = themeAssets.characterRenderData
@@ -44,6 +49,10 @@ class MapScreenController @Inject constructor(
     private val preProcessingViewportHeight: Int =
         viewportHeight + 2 * preProcessingBufferSizeModifier
     
+    private var cachedMapState: MapScreenState = MapScreenState.Loading
+    
+    private var latestGameState: GameState = GameState.Loading
+    
     init {
         GlobalScope.launch {
             mapController.mapFlow.flatMapLatest { map ->
@@ -53,24 +62,46 @@ class MapScreenController @Inject constructor(
                 
                 val mapWidth = map.mapWrapper.width
                 val mapHeight = map.mapWrapper.height
-                
-                map.mapWrapper.state.combine(
-                    characterController.characterStateFlow
-                ) { streamedTiles, characterState ->
-                    streamedTiles.toMapState(
-                        mapWidth = mapWidth,
-                        mapHeight = mapHeight,
-                        characterState = characterState,
-                    )
+    
+                combine(
+                    map.mapWrapper.state,
+                    characterController.characterStateFlow,
+                    gameController.state,
+                ) { streamedTiles, characterState, gameState ->
+                    logMessage("ZXC", "$gameState -> ${gameState.updatesState()}")
+                    if (latestGameState == gameState) {
+                        logMessage("ZXC", "Game state gated")
+                        return@combine cachedMapState
+                    }
+                    
+                    latestGameState = gameState
+                    if (gameState.updatesState()) {
+                        return@combine streamedTiles.toMapState(
+                            mapWidth = mapWidth,
+                            mapHeight = mapHeight,
+                            characterState = characterState,
+                            gameState = gameState,
+                        ).also {
+                            cachedMapState = it
+                        }
+                    }
+                    
+                    cachedMapState
                 }
             }.collect(_state::emit)
         }
+    }
+    
+    private fun GameState.updatesState(): Boolean {
+        return this is GameState.AnimatingCharacter || this is GameState.AnimatingEnemies ||
+            this is GameState.PrepareForEnemies || this is GameState.WaitingForInput
     }
     
     private fun List<MapTile>.toMapState(
         mapWidth: Int,
         mapHeight: Int,
         characterState: CharacterState,
+        gameState: GameState,
     ): MapScreenState {
         if (characterState.position.x == -1 && characterState.position.y == -1) {
             return MapScreenState.Loading
@@ -103,9 +134,16 @@ class MapScreenController @Inject constructor(
             viewportHeight = viewportHeight,
             tilesPadding = preProcessingBufferSizeModifier,
             tiles = pipelineRenderData.tiles,
-            tilesToReveal = pipelineRenderData.tilesToReveal.toSet(),
-            tilesToFade = pipelineRenderData.tilesToFade.toSet(),
+            tilesToFadeIn = pipelineRenderData.tilesToFadeIn.toSet(),
+            tilesToFadeOut = pipelineRenderData.tilesToFadeOut.toSet(),
             characterRenderData = characterRenderData,
+            playerHealth = characterState.health,
+            turnResultsToAnimate = when (gameState) {
+                is GameState.AnimatingCharacter -> MapScreenCharacterTurnResults.Player(gameState.turnResult)
+                is GameState.AnimatingEnemies -> MapScreenCharacterTurnResults.Enemies(gameState.results)
+                is GameState.WaitingForInput, is GameState.PrepareForEnemies -> null
+                else -> throw IllegalArgumentException("Unexpected game state: $gameState")
+            },
         )
     }
     
@@ -203,11 +241,25 @@ class MapScreenController @Inject constructor(
             val tilesPadding: Int,
             val viewportWidth: Int,
             val viewportHeight: Int,
-            val tilesToReveal: Set<ScreenSpaceCoordinates>,
-            val tilesToFade: Set<ScreenSpaceCoordinates>,
+            val tilesToFadeIn: Set<ScreenSpaceCoordinates>,
+            val tilesToFadeOut: Set<ScreenSpaceCoordinates>,
+            val playerHealth: HealthComponent,
+            val turnResultsToAnimate: MapScreenCharacterTurnResults?,
         ) : MapScreenState()
         
         object Loading : MapScreenState()
+        
+    }
+    
+    sealed class MapScreenCharacterTurnResults {
+        
+        data class Player(
+            val turnResult: PlayerTurnResult,
+        ) : MapScreenCharacterTurnResults()
+        
+        data class Enemies(
+            val turnResults: List<EnemyTurnResult>,
+        ) : MapScreenCharacterTurnResults()
         
     }
     

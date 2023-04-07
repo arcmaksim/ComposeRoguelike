@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
@@ -33,7 +32,7 @@ private fun GameScreenContainerWindowPreview() {
             ),
         ),
         onClose = { Unit },
-        onItemClick = { _, _, _ -> Unit },
+        onItemClick = { _, _ -> Unit },
     )
 }
 
@@ -42,7 +41,7 @@ internal fun GameScreenContainerWindow(
     modifier: Modifier,
     interactionState: GameScreenInteractionState.SearchingContainer,
     onClose: () -> Unit,
-    onItemClick: (Coordinates, ItemContainerId, ItemId) -> Unit,
+    onItemClick: (ItemContainerId, ItemId) -> Unit,
 ) {
     BackHandler(onBack = onClose)
     
@@ -65,7 +64,6 @@ internal fun GameScreenContainerWindow(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     onItemClick(
-                        interactionState.coordinates,
                         interactionState.itemContainerId,
                         it.id,
                     )

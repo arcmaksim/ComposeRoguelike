@@ -1,8 +1,10 @@
 package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.domain.EnemiesController
+import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.LevelMap
 import ru.meatgames.tomb.domain.enemy.EnemyType
+import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
 import ru.meatgames.tomb.model.tile.data.FloorTileMapping
@@ -14,6 +16,7 @@ import javax.inject.Inject
 class PlaygroundMapGenerator @Inject constructor(
     roomsData: RoomsData,
     private val enemiesController: EnemiesController,
+    private val itemsController: ItemsController,
 ) : MapGenerator {
     
     private val rooms: List<Room> = roomsData.rooms
@@ -37,15 +40,20 @@ class PlaygroundMapGenerator @Inject constructor(
             room = initialRoom,
         )
         
+        listOf(
+            Item("Item1"),
+            Item("Item2"),
+            Item("Item3"),
+        ).forEach {
+            itemsController.addItem(
+                coordinates = initialRoomPositionX + initialRoom.width / 2 to initialRoomPositionY + initialRoom.height - 3,
+                item = it,
+            )
+        }
+    
         enemiesController.placeEnemy(
             enemyType = EnemyType.Skeleton,
             coordinates = initialRoomPositionX + initialRoom.width / 2 to initialRoomPositionY + 2,
-            levelMap = map,
-        )
-    
-        enemiesController.placeEnemy(
-            enemyType = EnemyType.SkeletonArcher,
-            coordinates = initialRoomPositionX + initialRoom.width / 2 to initialRoomPositionY + initialRoom.height - 3,
             levelMap = map,
         )
     

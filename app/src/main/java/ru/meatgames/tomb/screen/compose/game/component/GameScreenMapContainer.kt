@@ -42,7 +42,9 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.screen.compose.charactersheet.Health
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionState
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
@@ -69,9 +71,9 @@ private fun GameScreenMapContainerPreview() {
     GameScreenMapContainer(
         mapState = gameScreenMapContainerPreviewMapReadyState(themeAssets),
         isIdle = true,
+        playerHealth = HealthComponent(10),
         playerAnimation = null,
         interactionState = null,
-        previousMoveDirection = null,
         animationTime = 300,
         navigator = navigatorPreviewStub,
         interactionController = interactionControllerPreviewStub,
@@ -83,9 +85,9 @@ private fun GameScreenMapContainerPreview() {
 internal fun GameScreenMapContainer(
     mapState: MapScreenController.MapScreenState.Ready,
     isIdle: Boolean,
+    playerHealth: HealthComponent,
     playerAnimation: GameScreenAnimationState?,
     interactionState: GameScreenInteractionState?,
-    previousMoveDirection: Direction?,
     animationTime: Int,
     navigator: GameScreenNavigator,
     interactionController: GameScreenInteractionController,
@@ -106,7 +108,7 @@ internal fun GameScreenMapContainer(
         y = 0,
     )
     
-    val initialOffset = previousMoveDirection?.toIntOffset(tileDimension) ?: IntOffset.Zero
+    val initialOffset = (playerAnimation as? GameScreenAnimationState.Scroll)?.direction?.toIntOffset(tileDimension) ?: IntOffset.Zero
     val animatedOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
     val revealedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f) }
     val fadedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f) }
@@ -137,6 +139,7 @@ internal fun GameScreenMapContainer(
                 fadedTilesAlpha = fadedTilesAlpha,
             )
         )
+        if (playerAnimation != null) interactionController.finishPlayerAnimation()
     }
     
     val modifier = Modifier
@@ -172,8 +175,8 @@ internal fun GameScreenMapContainer(
             tiles = mapState.tiles,
             tilesWidth = mapState.tilesWidth,
             tilesPadding = mapState.tilesPadding,
-            tilesToReveal = mapState.tilesToReveal,
-            tilesToFade = mapState.tilesToFade,
+            tilesToReveal = mapState.tilesToFadeIn,
+            tilesToFade = mapState.tilesToFadeOut,
             animatedOffset = animatedOffset.value,
             characterFrameIndex = characterAnimationFrame,
             initialOffset = initialOffset,
@@ -187,6 +190,13 @@ internal fun GameScreenMapContainer(
             viewportWidth = mapState.viewportWidth,
             viewportHeight = mapState.viewportHeight,
             characterRenderData = mapState.characterRenderData,
+        )
+    
+        Health(
+            modifier = Modifier.align(Alignment.BottomCenter)
+                .padding(bottom = 64.dp),
+            currentHealth = playerHealth.currentHealth,
+            maxHealth = playerHealth.maxHealth,
         )
     }
     

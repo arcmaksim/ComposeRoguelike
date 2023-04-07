@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
+import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.resolvedOffset
@@ -29,7 +30,7 @@ class PlayerMapInteractionController @Inject constructor(
         }
     }
     
-    fun makeMove(
+    fun resolveMoveResult(
         direction: Direction,
     ): PlayerTurnResult? {
         val (offsetX, offsetY) = direction.resolvedOffset
@@ -39,7 +40,7 @@ class PlayerMapInteractionController @Inject constructor(
         val tile = mapController.getTile(coordinates)?.tile ?: return null
         
         val itemContainer = itemsHolder.getItemContainer(coordinates)
-        val attachWasMade = enemiesHolder.tryToInflictDamage(coordinates, 1)
+        val enemy = enemiesHolder.getEnemy(coordinates)
         
         return when {
             itemContainer != null -> PlayerTurnResult.ContainerInteraction(
@@ -48,7 +49,7 @@ class PlayerMapInteractionController @Inject constructor(
                 itemIds = itemContainer.itemIds,
             )
     
-            attachWasMade -> PlayerTurnResult.Attack(direction = direction)
+            enemy != null -> PlayerTurnResult.Attack(direction = direction)
     
             tile.objectEntityTile != null -> tile.objectEntityTile.resolveMoveResult(
                 direction = direction,
@@ -78,11 +79,9 @@ class PlayerMapInteractionController @Inject constructor(
     }
     
     fun pickItem(
-        coordinates: Coordinates,
         itemContainerId: ItemContainerId,
         itemId: ItemId,
     ): PlayerTurnResult = PlayerTurnResult.PickupItem(
-        coordinates = coordinates,
         itemContainerId = itemContainerId,
         itemId = itemId,
     )

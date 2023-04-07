@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
 import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
 import ru.meatgames.tomb.model.temp.ThemeAssets
@@ -85,7 +86,9 @@ internal fun gameScreenMapContainerPreviewMapReadyState(
     tilesPadding = 0,
     viewportWidth = gameScreenMapContainerPreviewMapSize,
     viewportHeight = gameScreenMapContainerPreviewMapSize,
-    tilesToFade = emptySet(),
-    tilesToReveal = emptySet(),
+    tilesToFadeOut = emptySet(),
+    tilesToFadeIn = emptySet(),
     characterRenderData = themeAssets.characterRenderData,
+    playerHealth = HealthComponent(10),
+    turnResultsToAnimate = null,
 )

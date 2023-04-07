@@ -61,6 +61,15 @@ class CharacterController @Inject constructor() {
             )
         }
     }
+    fun modifyHealth(
+        modifier: Int,
+    ) {
+        _characterStateFlow.update {
+            it.copy(
+                health = it.health.updateHealth(modifier),
+            )
+        }
+    }
     
 }
 
