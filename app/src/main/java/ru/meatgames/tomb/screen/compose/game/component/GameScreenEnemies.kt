@@ -37,7 +37,7 @@ private fun GameScreenMapPreview() {
         LocalHorizontalOffset provides IntOffset.Zero,
         LocalBackgroundColor provides Color(0xFF212121),
     ) {
-        GameScreenMap(
+        GameScreenEnemies(
             modifier = modifier,
             tiles = gameScreenMapContainerPreviewRenderTiles(themeAssets),
             tilesWidth = gameScreenMapContainerPreviewMapSize,
@@ -48,12 +48,13 @@ private fun GameScreenMapPreview() {
             animatedOffset = IntOffset.Zero,
             revealedTilesAlpha = 1f,
             fadedTilesAlpha = 0f,
+            characterFrameIndex = 0,
         )
     }
 }
 
 @Composable
-internal fun GameScreenMap(
+internal fun GameScreenEnemies(
     modifier: Modifier,
     tiles: List<MapRenderTile?>,
     tilesWidth: Int,
@@ -64,6 +65,7 @@ internal fun GameScreenMap(
     animatedOffset: IntOffset,
     revealedTilesAlpha: Float,
     fadedTilesAlpha: Float,
+    characterFrameIndex: Int,
 ) {
     val tileSize = LocalTileSize.current
     val offset = LocalHorizontalOffset.current
@@ -87,7 +89,9 @@ internal fun GameScreenMap(
                     renderTile = renderTile,
                     dstOffset = dstOffset,
                     tileSize = tileSize,
+                    tileDimension = tileDimension,
                     alpha = alpha,
+                    characterFrameIndex = characterFrameIndex,
                     backgroundColor = backgroundColor,
                 )
             }
@@ -98,7 +102,9 @@ internal fun GameScreenMap(
                     renderTile = renderTile,
                     dstOffset = dstOffset,
                     tileSize = tileSize,
+                    tileDimension = tileDimension,
                     alpha = fadedTilesAlpha,
+                    characterFrameIndex = characterFrameIndex,
                     backgroundColor = backgroundColor,
                 )
             }
@@ -110,28 +116,28 @@ private fun DrawScope.drawRevealedTile(
     renderTile: MapRenderTile.Content,
     dstOffset: IntOffset,
     tileSize: IntSize,
+    tileDimension: Int,
     backgroundColor: Color,
+    characterFrameIndex: Int,
     alpha: Float?,
 ) {
-    renderTile.floorData.drawImage(
-        dstOffset = dstOffset,
-        dstSize = tileSize,
-    )
-    renderTile.objectData?.drawImage(
-        dstOffset = dstOffset,
-        dstSize = tileSize,
-    )
-    renderTile.itemData?.drawImage(
-        dstOffset = dstOffset,
-        dstSize = tileSize,
-    )
-    // will be rendered with enemy rendering (if present)
-    alpha?.takeIf { renderTile.enemyData == null }?.let {
-        drawRect(
-            topLeft = dstOffset.toOffset(),
-            color = backgroundColor,
-            alpha = it,
-            size = tileSize.toSize(),
+    renderTile.enemyData?.let { data ->
+        drawCharacter(
+            tileDimension = tileDimension,
+            shadowRenderData = data.shadowRenderData,
+            frameIndex = characterFrameIndex,
+            characterRenderData = data,
+            dstSize = tileSize,
+            dstOffset = dstOffset,
+            alpha = alpha?.let { 1f - it } ?: 1f,
         )
+        alpha?.let {
+            drawRect(
+                topLeft = dstOffset.toOffset(),
+                color = backgroundColor,
+                alpha = it,
+                size = tileSize.toSize(),
+            )
+        }
     }
 }

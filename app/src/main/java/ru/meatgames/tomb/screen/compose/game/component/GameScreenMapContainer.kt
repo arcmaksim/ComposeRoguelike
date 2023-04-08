@@ -178,7 +178,6 @@ internal fun GameScreenMapContainer(
             tilesToReveal = mapState.tilesToFadeIn,
             tilesToFade = mapState.tilesToFadeOut,
             animatedOffset = animatedOffset.value,
-            characterFrameIndex = characterAnimationFrame,
             initialOffset = initialOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,
@@ -191,9 +190,24 @@ internal fun GameScreenMapContainer(
             viewportHeight = mapState.viewportHeight,
             characterRenderData = mapState.characterRenderData,
         )
+        
+        GameScreenEnemies(
+            modifier = modifier,
+            tiles = mapState.tiles,
+            tilesWidth = mapState.tilesWidth,
+            tilesPadding = mapState.tilesPadding,
+            tilesToReveal = mapState.tilesToFadeIn,
+            tilesToFade = mapState.tilesToFadeOut,
+            animatedOffset = animatedOffset.value,
+            initialOffset = initialOffset,
+            revealedTilesAlpha = revealedTilesAlpha.value,
+            fadedTilesAlpha = fadedTilesAlpha.value,
+            characterFrameIndex = characterAnimationFrame,
+        )
     
         Health(
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
                 .padding(bottom = 64.dp),
             currentHealth = playerHealth.currentHealth,
             maxHealth = playerHealth.maxHealth,
