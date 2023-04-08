@@ -80,7 +80,6 @@ private fun GameScreenMapContainerPreview() {
     )
 }
 
-// TODO add interface for container interactions
 @Composable
 internal fun GameScreenMapContainer(
     mapState: MapScreenController.MapScreenState.Ready,
@@ -108,11 +107,21 @@ internal fun GameScreenMapContainer(
         y = 0,
     )
     
-    val initialOffset = (playerAnimation as? GameScreenAnimationState.Scroll)?.direction?.toIntOffset(tileDimension) ?: IntOffset.Zero
-    val animatedOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
-    val revealedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f) }
-    val fadedTilesAlpha = remember(playerAnimation) { mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f) }
+    // Movement offsets
+    val initialMovementOffset = (playerAnimation as? GameScreenAnimationState.Scroll)?.direction
+        ?.toIntOffset(tileDimension)
+        ?: IntOffset.Zero
+    val animatedMovementOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
     
+    // Reveal offsets
+    val revealedTilesAlpha = remember(playerAnimation) {
+        mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f)
+    }
+    val fadedTilesAlpha = remember(playerAnimation) {
+        mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f)
+    }
+    
+    // Pose animation
     val characterIdleTransition = rememberInfiniteTransition()
     val characterAnimationFrame by characterIdleTransition.animateValue(
         initialValue = 0,
@@ -133,8 +142,8 @@ internal fun GameScreenMapContainer(
                 animationTime = animationTime,
                 view = view,
                 shakeOffset = shakeOffset,
-                animatedOffset = animatedOffset,
-                initialAnimatedOffset = -initialOffset,
+                animatedOffset = animatedMovementOffset,
+                initialAnimatedOffset = -initialMovementOffset,
                 revealedTilesAlpha = revealedTilesAlpha,
                 fadedTilesAlpha = fadedTilesAlpha,
             )
@@ -177,8 +186,8 @@ internal fun GameScreenMapContainer(
             tilesPadding = mapState.tilesPadding,
             tilesToReveal = mapState.tilesToFadeIn,
             tilesToFade = mapState.tilesToFadeOut,
-            animatedOffset = animatedOffset.value,
-            initialOffset = initialOffset,
+            animatedOffset = animatedMovementOffset.value,
+            initialOffset = initialMovementOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,
         )
@@ -198,8 +207,8 @@ internal fun GameScreenMapContainer(
             tilesPadding = mapState.tilesPadding,
             tilesToReveal = mapState.tilesToFadeIn,
             tilesToFade = mapState.tilesToFadeOut,
-            animatedOffset = animatedOffset.value,
-            initialOffset = initialOffset,
+            animatedOffset = animatedMovementOffset.value,
+            initialOffset = initialMovementOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,
             characterFrameIndex = characterAnimationFrame,
