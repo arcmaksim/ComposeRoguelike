@@ -1,7 +1,11 @@
 package ru.meatgames.tomb.domain
 
+import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.component.toCoordinates
+import ru.meatgames.tomb.domain.component.toPositionComponent
 import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyId
+import ru.meatgames.tomb.resolvedOffset
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,6 +20,10 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         coordinates: Coordinates,
     ): Enemy? = enemyMapping[coordinates]?.let { enemies[it] }
     
+    override fun getEnemy(
+        enemyId: EnemyId,
+    ): Enemy? = enemies[enemyId]
+    
     override fun addEnemy(
         coordinates: Coordinates,
         enemy: Enemy,
@@ -29,6 +37,23 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         enemyMapping[coordinates] = enemy.id
     
         Timber.d("Enemy with id ${enemy.id.id} at $coordinates was spawn")
+    }
+    
+    override fun moveEnemy(
+        enemyId: EnemyId,
+        direction: Direction,
+    ): Boolean {
+        val enemy = enemies[enemyId] ?: return false
+        val newPosition = (enemy.position + direction.resolvedOffset).toCoordinates()
+        
+        if (enemyMapping[newPosition] == null) {
+            enemyMapping.remove(enemy.position.toCoordinates())
+            enemyMapping[newPosition] = enemyId
+            enemies[enemyId] = enemy.copy(position = newPosition.toPositionComponent())
+            return true
+        }
+        
+        return false
     }
     
     override fun getEnemies(): List<Enemy> = enemies.values.toList()
@@ -68,6 +93,11 @@ interface EnemiesController {
         enemy: Enemy,
     )
     
+    fun moveEnemy(
+        enemyId: EnemyId,
+        direction: Direction,
+    ): Boolean
+    
 }
 
 // readonly interface
@@ -75,6 +105,10 @@ interface EnemiesHolder {
     
     fun getEnemy(
         coordinates: Coordinates,
+    ): Enemy?
+    
+    fun getEnemy(
+        enemyId: EnemyId,
     ): Enemy?
     
     fun tryToInflictDamage(
