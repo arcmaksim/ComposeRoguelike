@@ -3,6 +3,7 @@ package ru.meatgames.tomb.domain.component
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.Offset
+import kotlin.math.abs
 
 data class PositionComponent(
     val x: Int,
@@ -25,16 +26,26 @@ fun Coordinates.toPositionComponent(): PositionComponent = PositionComponent(
 
 fun PositionComponent.toCoordinates(): Coordinates = x to y
 
-fun PositionComponent.resolveDirectionTo(
+typealias Vector = Pair<Int, Int>
+
+fun PositionComponent.calculateVectorTo(
     otherComponent: PositionComponent,
-): Direction? {
-    val xDelta = x - otherComponent.x
-    val yDelta = y - otherComponent.y
+): Vector = (x - otherComponent.x) to (y - otherComponent.y)
+
+fun Vector.asDirections(): List<Direction> {
+    fun Int.horizontalDirection(): Direction = if (this > 0) Direction.Left else Direction.Right
+    fun Int.verticalDirection(): Direction = if (this > 0) Direction.Top else Direction.Bottom
+    
     return when {
-        xDelta == -1 && yDelta == 0 -> Direction.Right
-        xDelta == 1 && yDelta == 0 -> Direction.Left
-        yDelta == -1 && xDelta == 0 -> Direction.Bottom
-        yDelta == 1 && xDelta == 0 -> Direction.Top
-        else -> null
+        first == 0 && second != 0 -> listOf(second.verticalDirection())
+        second == 0 && first != 0 -> listOf(first.horizontalDirection())
+        abs(second) == abs(first) -> listOf(second.verticalDirection(), first.horizontalDirection())
+        else -> listOf(first.horizontalDirection(), second.verticalDirection())
     }
+}
+
+fun Vector.isNextTo(): Boolean = when {
+    (first == 1 || first == -1) && second == 0 -> true
+    (second == 1 || second == -1) && first == 0 -> true
+    else -> false
 }
