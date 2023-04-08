@@ -47,7 +47,7 @@ class CharacterController @Inject constructor() {
     ) {
         _characterStateFlow.update { state ->
             state.copy(
-                position = state.position + direction.resolvedOffset
+                position = state.position + direction.resolvedOffset,
             )
         }
     }

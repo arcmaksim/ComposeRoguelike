@@ -3,13 +3,18 @@ package ru.meatgames.tomb.domain
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import ru.meatgames.tomb.domain.component.resolveDirectionTo
+import ru.meatgames.tomb.domain.component.asDirections
+import ru.meatgames.tomb.domain.component.calculateVectorTo
+import ru.meatgames.tomb.domain.component.isNextTo
+import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
 import ru.meatgames.tomb.domain.turn.hasAnimation
 import ru.meatgames.tomb.logMessage
+import ru.meatgames.tomb.model.temp.TilesController
+import ru.meatgames.tomb.resolvedOffset
 import java.util.Queue
 import java.util.concurrent.LinkedTransferQueue
 import javax.inject.Inject
@@ -44,8 +49,11 @@ interface GameController {
 @Singleton
 class GameControllerImpl @Inject constructor(
     private val mapCreator: MapCreator,
+    private val mapController: MapController,
+    private val tilesController: TilesController,
     private val characterController: CharacterController,
     private val enemiesHolder: EnemiesHolder,
+    private val enemiesController: EnemiesController,
     private val charactersTurnScheduler: CharactersTurnScheduler,
     private val mapInteractionResolver: PlayerMapInteractionResolver,
 ) : GameController {
@@ -89,17 +97,38 @@ class GameControllerImpl @Inject constructor(
         }
     }
     
-    private fun CharactersTurnScheduler.InitiativePosition.Enemy.takeTurn(
+    private fun Enemy.takeTurn(
         player: CharacterState,
     ): EnemyTurnResult? {
-        val directionToThePlayer = enemy.position.resolveDirectionTo(player.position) ?: return null
+        val vectorToPlayer = position.calculateVectorTo(player.position)
+    
+        if (vectorToPlayer.isNextTo()) {
+            val damage = 1
+            attackPlayer(damage)
         
-        val damage = 1
-        enemy.attackPlayer(damage)
-        return EnemyTurnResult.Attack(
-            direction = directionToThePlayer,
-            amount = damage,
-        )
+            return EnemyTurnResult.Attack(
+                enemyId = id,
+                direction = vectorToPlayer.asDirections().first(),
+                amount = damage,
+            )
+        }
+        
+        val directionsToPlayer = vectorToPlayer.asDirections()
+    
+        directionsToPlayer.forEach { direction ->
+            val newPosition = (position + direction.resolvedOffset).toCoordinates()
+            mapController.getTile(newPosition)?.tile?.let {  tile ->
+                val tileInteraction = tile.objectEntityTile?.let(tilesController::hasObjectEntityNoInteraction) ?: true
+                if (tileInteraction && enemiesController.moveEnemy(id, direction)) {
+                    return EnemyTurnResult.Move(
+                        enemyId = id,
+                        direction = direction,
+                    )
+                }
+            }
+        }
+        
+        return null
     }
     
     private fun Enemy.attackPlayer(
@@ -152,10 +181,9 @@ class GameControllerImpl @Inject constructor(
                 break
             }
             
-            logMessage("TURN", "${element.enemy.type} at ${element.enemy.position}")
-            element.takeTurn(characterController.characterStateFlow.value)?.let {
-                results.add(it)
-            }
+            val enemy = enemiesHolder.getEnemy(element.enemyId) ?: continue
+            logMessage("TURN", "${enemy.type} at ${enemy.position}")
+            enemy.takeTurn(characterController.characterStateFlow.value)?.let(results::add)
         }
         
         calcTurnQueue()
