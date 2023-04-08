@@ -37,10 +37,16 @@ fun Vector.asDirections(): List<Direction> {
     fun Int.verticalDirection(): Direction = if (this > 0) Direction.Top else Direction.Bottom
     
     return when {
-        first == 0 && second != 0 -> listOf(second.verticalDirection())
-        second == 0 && first != 0 -> listOf(first.horizontalDirection())
-        abs(second) == abs(first) -> listOf(second.verticalDirection(), first.horizontalDirection())
-        else -> listOf(first.horizontalDirection(), second.verticalDirection())
+        first == 0 && second != 0 -> listOf(
+            second.verticalDirection(),
+            *listOf(Direction.Right, Direction.Left).shuffled().toTypedArray(),
+        )
+        second == 0 && first != 0 -> listOf(
+            first.horizontalDirection(),
+            *listOf(Direction.Top, Direction.Bottom).shuffled().toTypedArray(),
+        )
+        abs(second) == abs(first) -> listOf(second.verticalDirection(), first.horizontalDirection()).shuffled()
+        else -> listOf(first.horizontalDirection(), second.verticalDirection()).shuffled()
     }
 }
 
