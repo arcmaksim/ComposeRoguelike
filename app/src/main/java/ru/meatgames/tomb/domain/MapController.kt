@@ -19,8 +19,6 @@ class MapControllerImpl @Inject constructor(
     @Named(MAP_HEIGHT_KEY) private val mapHeight: Int,
     @Named(MAIN_MAP_GENERATOR) private val mainMapGenerator: MapGenerator,
     @Named(PLAYGROUND_MAP_GENERATOR) private val playgroundMapGenerator: MapGenerator,
-    private val itemsHolder: ItemsHolder,
-    private val enemiesHolder: EnemiesHolder,
 ) : MapCreator, MapTerraformer, MapController {
 
     private lateinit var levelMap: LevelMap
@@ -33,9 +31,6 @@ class MapControllerImpl @Inject constructor(
     ): MapConfiguration {
         _mapFlow.value = MapState.MapUnavailable
     
-        itemsHolder.clearContainers()
-        enemiesHolder.clearEnemies()
-        
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
         val configuration = when (type) {
             MapCreator.MapType.MAIN -> mainMapGenerator.generateMap(levelMap)

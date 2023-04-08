@@ -1,7 +1,9 @@
 package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.domain.EnemiesController
+import ru.meatgames.tomb.domain.EnemiesHolder
 import ru.meatgames.tomb.domain.ItemsController
+import ru.meatgames.tomb.domain.ItemsHolder
 import ru.meatgames.tomb.domain.LevelMap
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.item.Item
@@ -15,8 +17,10 @@ import javax.inject.Inject
 
 class PlaygroundMapGenerator @Inject constructor(
     roomsData: RoomsData,
-    private val enemiesController: EnemiesController,
+    private val itemsHolder: ItemsHolder,
     private val itemsController: ItemsController,
+    private val enemiesHolder: EnemiesHolder,
+    private val enemiesController: EnemiesController,
 ) : MapGenerator {
     
     private val rooms: List<Room> = roomsData.rooms
@@ -28,6 +32,9 @@ class PlaygroundMapGenerator @Inject constructor(
     override fun generateMap(
         map: LevelMap,
     ): MapConfiguration {
+        itemsHolder.clearContainers()
+        enemiesHolder.clearEnemies()
+        
         val initialRoomPositionX = 10
         val initialRoomPositionY = 3
         val initialRoom = rooms.first { it.name == "Playground" }
