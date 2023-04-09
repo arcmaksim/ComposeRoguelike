@@ -15,6 +15,8 @@ internal val navigatorPreviewStub = object : GameScreenNavigator {
 internal val interactionControllerPreviewStub = object : GameScreenInteractionController {
     override suspend fun finishPlayerAnimation() = Unit
     
+    override suspend fun finishEnemiesAnimation() = Unit
+    
     override fun processCharacterMoveInput(
         direction: Direction,
     ) = Unit

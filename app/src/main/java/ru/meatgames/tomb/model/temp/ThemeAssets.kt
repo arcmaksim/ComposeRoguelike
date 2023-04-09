@@ -234,6 +234,7 @@ class ThemeAssets @Inject constructor(
             shadowRenderData = enemy.type.getEnemyShadowRenderData(),
             shadowHorizontalOffset = enemy.type.getShadowHorizontalOffset(),
             healthRatio = enemy.health.ratio,
+            enemyId = enemy.id,
         )
     }
     

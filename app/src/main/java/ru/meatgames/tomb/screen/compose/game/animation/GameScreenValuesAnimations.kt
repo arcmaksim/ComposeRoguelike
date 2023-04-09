@@ -41,7 +41,7 @@ suspend fun MutableState<Float>.asDeferredFadeAnimationAsync(
 }
 
 context(CoroutineScope)
-suspend fun MutableState<IntOffset>.asDeferredScrollAnimationAsync(
+suspend fun MutableState<IntOffset>.asDeferredMoveAnimationAsync(
     animationTime: Int,
     targetValue: IntOffset,
 ) = async {

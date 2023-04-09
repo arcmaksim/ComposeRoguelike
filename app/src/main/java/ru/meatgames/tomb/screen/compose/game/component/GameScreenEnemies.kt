@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
+import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -44,6 +45,7 @@ private fun GameScreenMapPreview() {
             tilesPadding = 0,
             tilesToReveal = emptySet(),
             tilesToFade = emptySet(),
+            offsets = mutableMapOf(),
             initialOffset = IntOffset.Zero,
             animatedOffset = IntOffset.Zero,
             revealedTilesAlpha = 1f,
@@ -61,6 +63,7 @@ internal fun GameScreenEnemies(
     tilesPadding: Int,
     tilesToReveal: Set<ScreenSpaceCoordinates>,
     tilesToFade: Set<ScreenSpaceCoordinates>,
+    offsets: MutableMap<EnemyId, IntOffset>,
     initialOffset: IntOffset,
     animatedOffset: IntOffset,
     revealedTilesAlpha: Float,
@@ -73,40 +76,46 @@ internal fun GameScreenEnemies(
     val backgroundColor = LocalBackgroundColor.current
     
     Canvas(modifier = modifier) {
-        tiles.forEachIndexed { index, renderTile ->
+        tiles.mapIndexedNotNull { index, mapRenderTile ->
+            (mapRenderTile as? MapRenderTile.Content)
+                ?.enemyData
+                ?.enemyId
+                ?.let { index to mapRenderTile }
+        }.forEach { (index, renderTile) ->
             val column = index % tilesWidth - tilesPadding
             val row = index / tilesWidth - tilesPadding
-            val dstOffset = offset + initialOffset + animatedOffset + IntOffset(
+            val animationOffset = offsets.getOrDefault(renderTile.enemyData!!.enemyId, IntOffset.Zero)
+            val dstOffset = offset + initialOffset + animatedOffset + animationOffset + IntOffset(
                 column * tileDimension,
                 row * tileDimension,
             )
             
             val tileScreenSpaceCoordinates = column to row
             
-            if (renderTile is MapRenderTile.Content && renderTile.isVisible) {
-                val alpha = revealedTilesAlpha.takeIf { tilesToReveal.contains(tileScreenSpaceCoordinates) }
-                drawRevealedTile(
-                    renderTile = renderTile,
-                    dstOffset = dstOffset,
-                    tileSize = tileSize,
-                    tileDimension = tileDimension,
-                    alpha = alpha,
-                    characterFrameIndex = characterFrameIndex,
-                    backgroundColor = backgroundColor,
-                )
-            }
-            if (renderTile is MapRenderTile.Content && !renderTile.isVisible
-                && tilesToFade.contains(tileScreenSpaceCoordinates)
-            ) {
-                drawRevealedTile(
-                    renderTile = renderTile,
-                    dstOffset = dstOffset,
-                    tileSize = tileSize,
-                    tileDimension = tileDimension,
-                    alpha = fadedTilesAlpha,
-                    characterFrameIndex = characterFrameIndex,
-                    backgroundColor = backgroundColor,
-                )
+            when {
+                renderTile.isVisible -> {
+                    val alpha = revealedTilesAlpha.takeIf { tilesToReveal.contains(tileScreenSpaceCoordinates) }
+                    drawRevealedTile(
+                        renderTile = renderTile,
+                        dstOffset = dstOffset,
+                        tileSize = tileSize,
+                        tileDimension = tileDimension,
+                        alpha = alpha,
+                        characterFrameIndex = characterFrameIndex,
+                        backgroundColor = backgroundColor,
+                    )
+                }
+                tilesToFade.contains(tileScreenSpaceCoordinates) -> {
+                    drawRevealedTile(
+                        renderTile = renderTile,
+                        dstOffset = dstOffset,
+                        tileSize = tileSize,
+                        tileDimension = tileDimension,
+                        alpha = fadedTilesAlpha,
+                        characterFrameIndex = characterFrameIndex,
+                        backgroundColor = backgroundColor,
+                    )
+                }
             }
         }
     }

@@ -43,15 +43,18 @@ import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
 import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.screen.compose.charactersheet.Health
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
-import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionState
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
-import ru.meatgames.tomb.screen.compose.game.animation.GameScreenAnimationState
+import ru.meatgames.tomb.screen.compose.game.PlayerInteractionState
+import ru.meatgames.tomb.screen.compose.game.animation.EnemiesAnimationState
+import ru.meatgames.tomb.screen.compose.game.animation.PlayerAnimationState
+import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations
 import ru.meatgames.tomb.screen.compose.game.animation.assembleGameScreenAnimations
 import ru.meatgames.tomb.screen.compose.game.animation.isStateless
 import ru.meatgames.tomb.screen.compose.game.interactionControllerPreviewStub
@@ -73,6 +76,7 @@ private fun GameScreenMapContainerPreview() {
         isIdle = true,
         playerHealth = HealthComponent(10),
         playerAnimation = null,
+        enemiesAnimations = emptyList(),
         interactionState = null,
         animationTime = 300,
         navigator = navigatorPreviewStub,
@@ -85,8 +89,9 @@ internal fun GameScreenMapContainer(
     mapState: MapScreenController.MapScreenState.Ready,
     isIdle: Boolean,
     playerHealth: HealthComponent,
-    playerAnimation: GameScreenAnimationState?,
-    interactionState: GameScreenInteractionState?,
+    playerAnimation: PlayerAnimationState?,
+    enemiesAnimations: List<Pair<EnemyId, EnemiesAnimationState>>?,
+    interactionState: PlayerInteractionState?,
     animationTime: Int,
     navigator: GameScreenNavigator,
     interactionController: GameScreenInteractionController,
@@ -102,13 +107,22 @@ internal fun GameScreenMapContainer(
     
     val view = LocalView.current
     val shakeOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
+    val enemiesOffsets = remember(enemiesAnimations) {
+        mutableStateOf(
+        enemiesAnimations?.associate { (id, animation) ->
+            when (animation) {
+                is EnemiesAnimationState.Move -> id to -animation.direction.toIntOffset(tileDimension)
+                else -> id to IntOffset.Zero
+            }
+        }?.toMutableMap() ?: mutableMapOf())
+    }
     val horizontalOffset = IntOffset(
         x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeOffset.value.x,
         y = 0,
     )
     
     // Movement offsets
-    val initialMovementOffset = (playerAnimation as? GameScreenAnimationState.Scroll)?.direction
+    val initialMovementOffset = (playerAnimation as? PlayerAnimationState.Scroll)?.direction
         ?.toIntOffset(tileDimension)
         ?: IntOffset.Zero
     val animatedMovementOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
@@ -151,6 +165,27 @@ internal fun GameScreenMapContainer(
         if (playerAnimation != null) interactionController.finishPlayerAnimation()
     }
     
+    LaunchedEffect(enemiesAnimations) {
+        when {
+            enemiesAnimations == null -> return@LaunchedEffect
+            enemiesAnimations.isEmpty() -> {
+                interactionController.finishEnemiesAnimation()
+                return@LaunchedEffect
+            }
+            else -> {
+                awaitAll(
+                    *enemiesAnimations.assembleEnemiesAnimations(
+                        scope = this,
+                        animationTime = animationTime,
+                        animatedState = enemiesOffsets,
+                        dimension = tileDimension,
+                    )
+                )
+                interactionController.finishEnemiesAnimation()
+            }
+        }
+    }
+    
     val modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1F)
@@ -163,7 +198,7 @@ internal fun GameScreenMapContainer(
             .aspectRatio(1F)
             .align(Alignment.Center)
             .background(LocalBackgroundColor.current)
-            .pointerInput(Unit) {
+            .pointerInput(isIdle) {
                 detectTapGestures(
                     onTap = {
                         if (isIdle && interactionState == null) {
@@ -207,6 +242,7 @@ internal fun GameScreenMapContainer(
             tilesPadding = mapState.tilesPadding,
             tilesToReveal = mapState.tilesToFadeIn,
             tilesToFade = mapState.tilesToFadeOut,
+            offsets = enemiesOffsets.value,
             animatedOffset = animatedMovementOffset.value,
             initialOffset = initialMovementOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
@@ -250,7 +286,7 @@ internal fun GameScreenMapContainer(
     
     interactionState?.let { state ->
         when (state) {
-            is GameScreenInteractionState.SearchingContainer -> {
+            is PlayerInteractionState.SearchingContainer -> {
                 GameScreenContainerWindow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -266,7 +302,7 @@ internal fun GameScreenMapContainer(
 }
 
 context(Density)
-    private fun Offset.toDirection(
+private fun Offset.toDirection(
     size: Dp,
 ): Direction = when {
     x > y && x.toDp() > size - y.toDp() -> Direction.Right

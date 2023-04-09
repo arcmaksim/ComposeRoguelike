@@ -15,7 +15,7 @@ import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.screen.compose.container.ContainerItem
-import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionState
+import ru.meatgames.tomb.screen.compose.game.PlayerInteractionState
 import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview
@@ -23,7 +23,7 @@ import ru.meatgames.tomb.screen.compose.system.Toolbar
 private fun GameScreenContainerWindowPreview() {
     GameScreenContainerWindow(
         modifier = Modifier,
-        interactionState = GameScreenInteractionState.SearchingContainer(
+        interactionState = PlayerInteractionState.SearchingContainer(
             coordinates = 0 to 0,
             itemContainerId = ItemContainerId(),
             items = setOf(
@@ -39,7 +39,7 @@ private fun GameScreenContainerWindowPreview() {
 @Composable
 internal fun GameScreenContainerWindow(
     modifier: Modifier,
-    interactionState: GameScreenInteractionState.SearchingContainer,
+    interactionState: PlayerInteractionState.SearchingContainer,
     onClose: () -> Unit,
     onItemClick: (ItemContainerId, ItemId) -> Unit,
 ) {

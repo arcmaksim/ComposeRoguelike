@@ -53,6 +53,7 @@ private fun GameScreenContent(
             isIdle = isIdle,
             playerHealth = mapState.playerHealth,
             playerAnimation = state.playerAnimation,
+            enemiesAnimations = state.enemiesAnimations,
             interactionState = state.interactionState,
             animationTime = ANIMATION_TIME,
             navigator = navigator,

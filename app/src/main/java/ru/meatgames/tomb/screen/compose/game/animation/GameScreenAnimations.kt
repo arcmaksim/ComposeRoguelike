@@ -5,10 +5,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.enemy.EnemyId
+import ru.meatgames.tomb.model.temp.ASSETS_TILE_DIMENSION
+import ru.meatgames.tomb.toIntOffset
 
 context(CoroutineScope)
-suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
+    suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
     animationTime: Int,
     view: View,
     shakeOffset: MutableState<IntOffset>,
@@ -18,7 +22,7 @@ suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
     fadedTilesAlpha: MutableState<Float>,
 ): Array<Deferred<Any>> {
     val specificAnimations = when (this) {
-        is GameScreenAnimationState.Shake -> {
+        is PlayerAnimationState.Shake -> {
             listOf(
                 shakeOffset.asDeferredOneDirectionAnimationAsync(
                     screenShakeKeyframes,
@@ -27,15 +31,17 @@ suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
                 view.asDeferredRejectVibrationAsync(),
             )
         }
-        is GameScreenAnimationState.Scroll -> {
+        
+        is PlayerAnimationState.Scroll -> {
             listOf(
-                animatedOffset.asDeferredScrollAnimationAsync(
+                animatedOffset.asDeferredMoveAnimationAsync(
                     animationTime = animationTime,
                     targetValue = initialAnimatedOffset,
                 ),
             )
         }
-        is GameScreenAnimationState.Attack -> {
+        
+        is PlayerAnimationState.Attack -> {
             listOf(
                 shakeOffset.asDeferredOneDirectionAnimationAsync(
                     attackKeyframes,
@@ -44,6 +50,7 @@ suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
                 view.asDeferredConfirmVibrationAsync(250L),
             )
         }
+        
         else -> emptyList()
     }
     
@@ -58,3 +65,32 @@ suspend fun GameScreenAnimationState?.assembleGameScreenAnimations(
     
     return (specificAnimations + tilesAnimations).toTypedArray()
 }
+
+suspend fun List<Pair<EnemyId, EnemiesAnimationState>>.assembleEnemiesAnimations(
+    scope: CoroutineScope,
+    animationTime: Int,
+    dimension: Int,
+    animatedState: MutableState<MutableMap<EnemyId, IntOffset>>,
+): Array<Deferred<Any>> = map { (enemyId, animationState) ->
+    when (animationState) {
+        is EnemiesAnimationState.Move -> {
+            animatedState.asDeferredEnemiesAnimationAsync(
+                scope = scope,
+                animationTimeInMillis = animationTime,
+                initialValue = -animationState.direction.toIntOffset(dimension),
+                targetValue = IntOffset.Zero,
+                enemyId = enemyId,
+            )
+        }
+        
+        is EnemiesAnimationState.Attack -> {
+            animatedState.asDeferredEnemiesAttackAnimationAsync(
+                scope = scope,
+                tileDimension = ASSETS_TILE_DIMENSION,
+                //animationTimeInMillis = animationTime,
+                direction = animationState.direction,
+                enemyId = enemyId,
+            )
+        }
+    }
+}.toTypedArray()
