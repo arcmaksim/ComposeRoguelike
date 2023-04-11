@@ -43,13 +43,13 @@ class PlayerMapInteractionController @Inject constructor(
         val enemy = enemiesHolder.getEnemy(coordinates)
         
         return when {
+            enemy != null -> PlayerTurnResult.Attack(direction = direction)
+            
             itemContainer != null -> PlayerTurnResult.ContainerInteraction(
                 coordinates = coordinates,
                 itemContainerId = itemContainer.id,
                 itemIds = itemContainer.itemIds,
             )
-    
-            enemy != null -> PlayerTurnResult.Attack(direction = direction)
     
             tile.objectEntityTile != null -> tile.objectEntityTile.resolveMoveResult(
                 direction = direction,
