@@ -5,14 +5,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.enemy.EnemyId
-import ru.meatgames.tomb.model.temp.ASSETS_TILE_DIMENSION
-import ru.meatgames.tomb.toIntOffset
 
 context(CoroutineScope)
-    suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
+suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
     animationTime: Int,
     view: View,
     shakeOffset: MutableState<IntOffset>,
@@ -32,7 +29,7 @@ context(CoroutineScope)
             )
         }
         
-        is PlayerAnimationState.Scroll -> {
+        is PlayerAnimationState.Move -> {
             listOf(
                 animatedOffset.asDeferredMoveAnimationAsync(
                     animationTime = animationTime,
@@ -44,7 +41,7 @@ context(CoroutineScope)
         is PlayerAnimationState.Attack -> {
             listOf(
                 shakeOffset.asDeferredOneDirectionAnimationAsync(
-                    attackKeyframes,
+                    defaultAttackKeyframes,
                     direction,
                 ),
                 view.asDeferredConfirmVibrationAsync(250L),
@@ -69,16 +66,16 @@ context(CoroutineScope)
 suspend fun List<Pair<EnemyId, EnemiesAnimationState>>.assembleEnemiesAnimations(
     scope: CoroutineScope,
     animationTime: Int,
-    dimension: Int,
+    tileDimension: Int,
     animatedState: MutableState<MutableMap<EnemyId, IntOffset>>,
 ): Array<Deferred<Any>> = map { (enemyId, animationState) ->
     when (animationState) {
         is EnemiesAnimationState.Move -> {
-            animatedState.asDeferredEnemiesAnimationAsync(
+            animatedState.asDeferredEnemiesMoveAnimationAsync(
                 scope = scope,
-                animationTimeInMillis = animationTime,
-                initialValue = -animationState.direction.toIntOffset(dimension),
-                targetValue = IntOffset.Zero,
+                tileDimension = tileDimension,
+                durationInMillis = animationTime,
+                direction = animationState.direction,
                 enemyId = enemyId,
             )
         }
@@ -86,8 +83,7 @@ suspend fun List<Pair<EnemyId, EnemiesAnimationState>>.assembleEnemiesAnimations
         is EnemiesAnimationState.Attack -> {
             animatedState.asDeferredEnemiesAttackAnimationAsync(
                 scope = scope,
-                tileDimension = ASSETS_TILE_DIMENSION,
-                //animationTimeInMillis = animationTime,
+                tileDimension = tileDimension,
                 direction = animationState.direction,
                 enemyId = enemyId,
             )

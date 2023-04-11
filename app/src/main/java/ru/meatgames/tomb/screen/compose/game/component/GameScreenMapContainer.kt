@@ -25,20 +25,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
-import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.domain.MapScreenController
@@ -59,6 +55,7 @@ import ru.meatgames.tomb.screen.compose.game.animation.assembleGameScreenAnimati
 import ru.meatgames.tomb.screen.compose.game.animation.isStateless
 import ru.meatgames.tomb.screen.compose.game.interactionControllerPreviewStub
 import ru.meatgames.tomb.screen.compose.game.navigatorPreviewStub
+import ru.meatgames.tomb.toDirection
 import ru.meatgames.tomb.toIntOffset
 
 const val ANIMATION_FRAMES = 2
@@ -122,7 +119,7 @@ internal fun GameScreenMapContainer(
     )
     
     // Movement offsets
-    val initialMovementOffset = (playerAnimation as? PlayerAnimationState.Scroll)?.direction
+    val initialMovementOffset = (playerAnimation as? PlayerAnimationState.Move)?.direction
         ?.toIntOffset(tileDimension)
         ?: IntOffset.Zero
     val animatedMovementOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
@@ -178,7 +175,7 @@ internal fun GameScreenMapContainer(
                         scope = this,
                         animationTime = animationTime,
                         animatedState = enemiesOffsets,
-                        dimension = tileDimension,
+                        tileDimension = tileDimension,
                     )
                 )
                 interactionController.finishEnemiesAnimation()
@@ -299,14 +296,4 @@ internal fun GameScreenMapContainer(
             }
         }
     }
-}
-
-context(Density)
-private fun Offset.toDirection(
-    size: Dp,
-): Direction = when {
-    x > y && x.toDp() > size - y.toDp() -> Direction.Right
-    x > y -> Direction.Top
-    x < y && y.toDp() > size - x.toDp() -> Direction.Bottom
-    else -> Direction.Left
 }

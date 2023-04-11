@@ -114,7 +114,7 @@ class GameScreenViewModel @Inject constructor(
     private fun PlayerTurnResult.resolvePlayerAnimationState(): PlayerAnimationState? =
         when (this) {
             is PlayerTurnResult.Block -> PlayerAnimationState.Shake
-            is PlayerTurnResult.Move -> PlayerAnimationState.Scroll(direction)
+            is PlayerTurnResult.Move -> PlayerAnimationState.Move(direction)
             is PlayerTurnResult.Attack -> PlayerAnimationState.Attack(direction)
             else -> null
         }

@@ -6,7 +6,7 @@ sealed class PlayerAnimationState {
 
     object Shake : PlayerAnimationState()
 
-    data class Scroll(
+    data class Move(
         val direction: Direction,
     ) : PlayerAnimationState()
     
