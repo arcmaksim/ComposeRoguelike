@@ -63,7 +63,7 @@ internal fun GameScreenEnemies(
     tilesPadding: Int,
     tilesToReveal: Set<ScreenSpaceCoordinates>,
     tilesToFade: Set<ScreenSpaceCoordinates>,
-    offsets: MutableMap<EnemyId, IntOffset>,
+    offsets: Map<EnemyId, IntOffset>,
     initialOffset: IntOffset,
     animatedOffset: IntOffset,
     revealedTilesAlpha: Float,

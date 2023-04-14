@@ -10,7 +10,7 @@ import ru.meatgames.tomb.domain.enemy.EnemyId
 
 context(CoroutineScope)
 suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
-    animationTime: Int,
+    animationDurationMillis: Int,
     view: View,
     shakeOffset: MutableState<IntOffset>,
     animatedOffset: MutableState<IntOffset>,
@@ -32,7 +32,7 @@ suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
         is PlayerAnimationState.Move -> {
             listOf(
                 animatedOffset.asDeferredMoveAnimationAsync(
-                    animationTime = animationTime,
+                    durationMillis = animationDurationMillis,
                     targetValue = initialAnimatedOffset,
                 ),
             )
@@ -55,8 +55,8 @@ suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
         emptyList<Deferred<Any>>()
     } else {
         listOf(
-            revealedTilesAlpha.asDeferredRevealAnimationAsync(animationTime),
-            fadedTilesAlpha.asDeferredFadeAnimationAsync(animationTime),
+            revealedTilesAlpha.asDeferredRevealAnimationAsync(animationDurationMillis),
+            fadedTilesAlpha.asDeferredFadeAnimationAsync(animationDurationMillis),
         )
     }
     
@@ -65,27 +65,32 @@ suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
 
 suspend fun List<Pair<EnemyId, EnemiesAnimationState>>.assembleEnemiesAnimations(
     scope: CoroutineScope,
-    animationTime: Int,
+    animationDurationMillis: Int,
     tileDimension: Int,
-    animatedState: MutableState<MutableMap<EnemyId, IntOffset>>,
-): Array<Deferred<Any>> = map { (enemyId, animationState) ->
+    update: (EnemyId, IntOffset) -> Unit,
+): Array<Deferred<Any>> = mapIndexed { index, (enemyId, animationState) ->
+    val delayMillis = animationDurationMillis / 2 * index
     when (animationState) {
         is EnemiesAnimationState.Move -> {
-            animatedState.asDeferredEnemiesMoveAnimationAsync(
+            asDeferredEnemiesMoveAnimationAsync(
                 scope = scope,
                 tileDimension = tileDimension,
-                durationInMillis = animationTime,
+                durationMillis = animationDurationMillis,
+                delayMillis = delayMillis,
                 direction = animationState.direction,
                 enemyId = enemyId,
+                update = update,
             )
         }
-        
+    
         is EnemiesAnimationState.Attack -> {
-            animatedState.asDeferredEnemiesAttackAnimationAsync(
+            asDeferredEnemiesAttackAnimationAsync(
                 scope = scope,
                 tileDimension = tileDimension,
+                delayMillis = delayMillis,
                 direction = animationState.direction,
                 enemyId = enemyId,
+                update = update,
             )
         }
     }

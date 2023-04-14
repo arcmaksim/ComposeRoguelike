@@ -42,16 +42,14 @@ suspend fun MutableState<Float>.asDeferredFadeAnimationAsync(
 
 context(CoroutineScope)
 suspend fun MutableState<IntOffset>.asDeferredMoveAnimationAsync(
-    animationTime: Int,
+    durationMillis: Int,
     targetValue: IntOffset,
 ) = async {
     animate(
         initialValue = IntOffset.Zero,
         targetValue = targetValue,
         typeConverter = IntOffset.VectorConverter,
-        animationSpec = tween(
-            durationMillis = animationTime,
-        ),
+        animationSpec = tween(durationMillis),
     ) { animatedValue, _ ->
         value = animatedValue
     }

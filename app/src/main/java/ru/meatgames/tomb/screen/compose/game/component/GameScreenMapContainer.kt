@@ -75,7 +75,7 @@ private fun GameScreenMapContainerPreview() {
         playerAnimation = null,
         enemiesAnimations = emptyList(),
         interactionState = null,
-        animationTime = 300,
+        animationDurationMillis = 300,
         navigator = navigatorPreviewStub,
         interactionController = interactionControllerPreviewStub,
     )
@@ -89,7 +89,7 @@ internal fun GameScreenMapContainer(
     playerAnimation: PlayerAnimationState?,
     enemiesAnimations: List<Pair<EnemyId, EnemiesAnimationState>>?,
     interactionState: PlayerInteractionState?,
-    animationTime: Int,
+    animationDurationMillis: Int,
     navigator: GameScreenNavigator,
     interactionController: GameScreenInteractionController,
 ) = BoxWithConstraints(
@@ -111,7 +111,8 @@ internal fun GameScreenMapContainer(
                 is EnemiesAnimationState.Move -> id to -animation.direction.toIntOffset(tileDimension)
                 else -> id to IntOffset.Zero
             }
-        }?.toMutableMap() ?: mutableMapOf())
+        //}?.toMutableMap() ?: mutableMapOf())
+        } ?: emptyMap())
     }
     val horizontalOffset = IntOffset(
         x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeOffset.value.x,
@@ -150,7 +151,7 @@ internal fun GameScreenMapContainer(
     LaunchedEffect(playerAnimation) {
         awaitAll(
             *playerAnimation.assembleGameScreenAnimations(
-                animationTime = animationTime,
+                animationDurationMillis = animationDurationMillis,
                 view = view,
                 shakeOffset = shakeOffset,
                 animatedOffset = animatedMovementOffset,
@@ -173,10 +174,13 @@ internal fun GameScreenMapContainer(
                 awaitAll(
                     *enemiesAnimations.assembleEnemiesAnimations(
                         scope = this,
-                        animationTime = animationTime,
-                        animatedState = enemiesOffsets,
+                        animationDurationMillis = animationDurationMillis,
                         tileDimension = tileDimension,
-                    )
+                    ) { it, offset ->
+                        enemiesOffsets.value = enemiesOffsets.value.toMutableMap().apply {
+                            this[it] = offset
+                        }
+                    },
                 )
                 interactionController.finishEnemiesAnimation()
             }

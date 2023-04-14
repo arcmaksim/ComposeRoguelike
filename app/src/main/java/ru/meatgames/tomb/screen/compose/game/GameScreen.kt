@@ -55,7 +55,7 @@ private fun GameScreenContent(
             playerAnimation = state.playerAnimation,
             enemiesAnimations = state.enemiesAnimations,
             interactionState = state.interactionState,
-            animationTime = ANIMATION_TIME,
+            animationDurationMillis = ANIMATION_TIME,
             navigator = navigator,
             interactionController = interactionController,
         )
