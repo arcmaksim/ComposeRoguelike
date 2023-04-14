@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.config.Config
 import ru.meatgames.tomb.domain.enemy.EnemyId
 
 context(CoroutineScope)
@@ -18,6 +19,8 @@ suspend fun PlayerAnimationState?.assembleGameScreenAnimations(
     revealedTilesAlpha: MutableState<Float>,
     fadedTilesAlpha: MutableState<Float>,
 ): Array<Deferred<Any>> {
+    if (Config.skipPlayerAnimations) return emptyArray()
+    
     val specificAnimations = when (this) {
         is PlayerAnimationState.Shake -> {
             listOf(
@@ -68,7 +71,9 @@ suspend fun List<Pair<EnemyId, EnemiesAnimationState>>.assembleEnemiesAnimations
     animationDurationMillis: Int,
     tileDimension: Int,
     update: (EnemyId, IntOffset) -> Unit,
-): Array<Deferred<Any>> = mapIndexed { index, (enemyId, animationState) ->
+): Array<Deferred<Any>> = mapIndexedNotNull { index, (enemyId, animationState) ->
+    if (Config.skipEnemiesAnimations) return@mapIndexedNotNull null
+    
     val delayMillis = animationDurationMillis / 2 * index
     when (animationState) {
         is EnemiesAnimationState.Move -> {
