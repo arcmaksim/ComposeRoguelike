@@ -48,6 +48,8 @@ import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
 import ru.meatgames.tomb.screen.compose.game.PlayerInteractionState
+import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_DURATION_MILLIS
+import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_FRAMES
 import ru.meatgames.tomb.screen.compose.game.animation.EnemiesAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.PlayerAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations
@@ -57,9 +59,6 @@ import ru.meatgames.tomb.screen.compose.game.interactionControllerPreviewStub
 import ru.meatgames.tomb.screen.compose.game.navigatorPreviewStub
 import ru.meatgames.tomb.toDirection
 import ru.meatgames.tomb.toIntOffset
-
-const val ANIMATION_FRAMES = 2
-private const val CHARACTER_IDLE_ANIMATION_TIME = 600
 
 @Preview
 @Composable
@@ -111,7 +110,6 @@ internal fun GameScreenMapContainer(
                 is EnemiesAnimationState.Move -> id to -animation.direction.toIntOffset(tileDimension)
                 else -> id to IntOffset.Zero
             }
-        //}?.toMutableMap() ?: mutableMapOf())
         } ?: emptyMap())
     }
     val horizontalOffset = IntOffset(
@@ -137,12 +135,12 @@ internal fun GameScreenMapContainer(
     val characterIdleTransition = rememberInfiniteTransition()
     val characterAnimationFrame by characterIdleTransition.animateValue(
         initialValue = 0,
-        targetValue = ANIMATION_FRAMES,
+        targetValue = CHARACTER_IDLE_ANIMATION_FRAMES,
         typeConverter = Int.VectorConverter,
         animationSpec = infiniteRepeatable(
             repeatMode = RepeatMode.Restart,
             animation = tween(
-                durationMillis = CHARACTER_IDLE_ANIMATION_TIME * ANIMATION_FRAMES,
+                durationMillis = CHARACTER_IDLE_ANIMATION_DURATION_MILLIS * CHARACTER_IDLE_ANIMATION_FRAMES,
                 easing = LinearEasing,
             ),
         )
