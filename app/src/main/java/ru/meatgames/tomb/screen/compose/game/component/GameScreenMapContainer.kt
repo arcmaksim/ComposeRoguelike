@@ -37,7 +37,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h3TextStyle
-import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.map.EnemiesAnimations
+import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.model.temp.ThemeAssets
@@ -47,14 +48,15 @@ import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
-import ru.meatgames.tomb.screen.compose.game.PlayerInteractionState
+import ru.meatgames.tomb.domain.player.PlayerInteraction
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_FRAMES
-import ru.meatgames.tomb.screen.compose.game.animation.EnemiesAnimationState
-import ru.meatgames.tomb.screen.compose.game.animation.PlayerAnimationState
+import ru.meatgames.tomb.domain.enemy.EnemyAnimation
+import ru.meatgames.tomb.domain.player.PlayerAnimation
+import ru.meatgames.tomb.domain.player.isStateless
+import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations
-import ru.meatgames.tomb.screen.compose.game.animation.assembleGameScreenAnimations
-import ru.meatgames.tomb.screen.compose.game.animation.isStateless
+import ru.meatgames.tomb.screen.compose.game.animation.assemblePlayerInputAnimations
 import ru.meatgames.tomb.screen.compose.game.interactionControllerPreviewStub
 import ru.meatgames.tomb.screen.compose.game.navigatorPreviewStub
 import ru.meatgames.tomb.toDirection
@@ -85,16 +87,16 @@ internal fun GameScreenMapContainer(
     mapState: MapScreenController.MapScreenState.Ready,
     isIdle: Boolean,
     playerHealth: HealthComponent,
-    playerAnimation: PlayerAnimationState?,
-    enemiesAnimations: List<Pair<EnemyId, EnemiesAnimationState>>?,
-    interactionState: PlayerInteractionState?,
+    playerAnimation: PlayerAnimation?,
+    enemiesAnimations: List<Pair<EnemyId, EnemyAnimation>>?,
+    interactionState: PlayerInteraction?,
     animationDurationMillis: Int,
     navigator: GameScreenNavigator,
     interactionController: GameScreenInteractionController,
 ) = BoxWithConstraints(
     modifier = Modifier
         .background(Color(0xFF212121))
-        .fillMaxSize()
+        .fillMaxSize(),
 ) {
     val isPlayerAnimationStateless = playerAnimation.isStateless
     
@@ -104,13 +106,7 @@ internal fun GameScreenMapContainer(
     val view = LocalView.current
     val shakeOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
     val enemiesOffsets = remember(enemiesAnimations) {
-        mutableStateOf(
-        enemiesAnimations?.associate { (id, animation) ->
-            when (animation) {
-                is EnemiesAnimationState.Move -> id to -animation.direction.toIntOffset(tileDimension)
-                else -> id to IntOffset.Zero
-            }
-        } ?: emptyMap())
+        mutableStateOf(enemiesAnimations?.toMap(tileDimension) ?: emptyMap())
     }
     val horizontalOffset = IntOffset(
         x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeOffset.value.x,
@@ -118,17 +114,17 @@ internal fun GameScreenMapContainer(
     )
     
     // Movement offsets
-    val initialMovementOffset = (playerAnimation as? PlayerAnimationState.Move)?.direction
+    val initialMovementOffset = (playerAnimation as? PlayerAnimation.Move)?.direction
         ?.toIntOffset(tileDimension)
         ?: IntOffset.Zero
     val animatedMovementOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
     
     // Reveal offsets
     val revealedTilesAlpha = remember(playerAnimation) {
-        mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f)
+        mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f)
     }
     val fadedTilesAlpha = remember(playerAnimation) {
-        mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f)
+        mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f)
     }
     
     // Pose animation
@@ -148,15 +144,15 @@ internal fun GameScreenMapContainer(
     
     LaunchedEffect(playerAnimation) {
         awaitAll(
-            *playerAnimation.assembleGameScreenAnimations(
+            *playerAnimation.assemblePlayerInputAnimations(
                 animationDurationMillis = animationDurationMillis,
                 view = view,
                 shakeOffset = shakeOffset,
                 animatedOffset = animatedMovementOffset,
                 initialAnimatedOffset = -initialMovementOffset,
-                revealedTilesAlpha = revealedTilesAlpha,
-                fadedTilesAlpha = fadedTilesAlpha,
-            )
+                fadeInTilesAlpha = revealedTilesAlpha,
+                fadeOutTilesAlpha = fadedTilesAlpha,
+            ),
         )
         if (playerAnimation != null) interactionController.finishPlayerAnimation()
     }
@@ -168,15 +164,15 @@ internal fun GameScreenMapContainer(
                 interactionController.finishEnemiesAnimation()
                 return@LaunchedEffect
             }
+            
             else -> {
                 awaitAll(
                     *enemiesAnimations.assembleEnemiesAnimations(
-                        scope = this,
                         animationDurationMillis = animationDurationMillis,
                         tileDimension = tileDimension,
-                    ) { it, offset ->
+                    ) { it, state ->
                         enemiesOffsets.value = enemiesOffsets.value.toMutableMap().apply {
-                            this[it] = offset
+                            this[it] = state
                         }
                     },
                 )
@@ -185,17 +181,13 @@ internal fun GameScreenMapContainer(
         }
     }
     
-    val modifier = Modifier
+    val baseModifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1F)
         .align(Alignment.Center)
-        .offset { shakeOffset.value }
     
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1F)
-            .align(Alignment.Center)
+        modifier = baseModifier
             .background(LocalBackgroundColor.current)
             .pointerInput(isIdle) {
                 detectTapGestures(
@@ -213,6 +205,8 @@ internal fun GameScreenMapContainer(
         LocalHorizontalOffset provides horizontalOffset,
         LocalBackgroundColor provides Color(0xFF212121),
     ) {
+        val modifier = baseModifier.offset { shakeOffset.value }
+        
         GameScreenMap(
             modifier = modifier,
             tiles = mapState.tiles,
@@ -241,14 +235,14 @@ internal fun GameScreenMapContainer(
             tilesPadding = mapState.tilesPadding,
             tilesToReveal = mapState.tilesToFadeIn,
             tilesToFade = mapState.tilesToFadeOut,
-            offsets = enemiesOffsets.value,
+            animationStates = enemiesOffsets.value,
             animatedOffset = animatedMovementOffset.value,
             initialOffset = initialMovementOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,
             characterFrameIndex = characterAnimationFrame,
         )
-    
+        
         Health(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -285,7 +279,7 @@ internal fun GameScreenMapContainer(
     
     interactionState?.let { state ->
         when (state) {
-            is PlayerInteractionState.SearchingContainer -> {
+            is PlayerInteraction.SearchingContainer -> {
                 GameScreenContainerWindow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -297,5 +291,21 @@ internal fun GameScreenMapContainer(
                 )
             }
         }
+    }
+}
+
+private fun EnemiesAnimations.toMap(
+    tileDimension: Int,
+) = associate { (id, animation) ->
+    when (animation) {
+        is EnemyAnimation.Move -> id to EnemyAnimationState(
+            tileDimension = tileDimension,
+            moveState = animation,
+        )
+        
+        else -> id to EnemyAnimationState(
+            offset = IntOffset.Zero,
+            alpha = 1f,
+        )
     }
 }

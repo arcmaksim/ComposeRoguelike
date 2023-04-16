@@ -1,11 +1,11 @@
 package ru.meatgames.tomb.screen.compose.game.animation
 
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.keyframes
 
-internal val screenShakeKeyframes: AnimationSpec<Float> = keyframes {
+internal val screenShakeKeyframes: KeyframesSpec<Float> = keyframes {
     durationMillis = ENEMIES_ATTACK_DURATION_MILLIS
     
     val easing = FastOutLinearInEasing
@@ -22,7 +22,7 @@ internal val screenShakeKeyframes: AnimationSpec<Float> = keyframes {
 
 fun produceAttackKeyFrames(
     durationInMillis: Int,
-): AnimationSpec<Float> = keyframes {
+): KeyframesSpec<Float> = keyframes {
     durationMillis = durationInMillis
     
     -.5f at (durationInMillis / 2) with FastOutSlowInEasing

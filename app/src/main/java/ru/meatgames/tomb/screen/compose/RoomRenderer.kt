@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.design.h2TextStyle
-import ru.meatgames.tomb.domain.RoomPreviewRenderProcessor
+import ru.meatgames.tomb.domain.render.RoomPreviewRenderProcessor
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile

@@ -1,7 +1,8 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.render
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
+import ru.meatgames.tomb.domain.MapTileWrapper
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
@@ -10,9 +11,6 @@ import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.MapRenderTilesDecorator
 import ru.meatgames.tomb.render.RenderData
-import ru.meatgames.tomb.screen.compose.game.render.RenderTiles
-import ru.meatgames.tomb.screen.compose.game.render.ScreenSpaceMapRenderTile
-import ru.meatgames.tomb.screen.compose.game.render.ScreenSpaceRenderTiles
 import javax.inject.Inject
 
 class RoomPreviewRenderProcessor @Inject constructor(

@@ -1,12 +1,12 @@
 package ru.meatgames.tomb.screen.compose.game
 
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.domain.enemy.EnemyId
+import ru.meatgames.tomb.domain.map.EnemiesAnimations
+import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
-import ru.meatgames.tomb.screen.compose.game.animation.EnemiesAnimationState
-import ru.meatgames.tomb.screen.compose.game.animation.PlayerAnimationState
+import ru.meatgames.tomb.domain.player.PlayerAnimation
+import ru.meatgames.tomb.domain.player.PlayerInteraction
 
 enum class GameScreenEvent {
     NavigateToWinScreen,
@@ -24,9 +24,9 @@ enum class GameScreenEvent {
  */
 data class GameScreenState(
     val mapState: MapScreenController.MapScreenState = MapScreenController.MapScreenState.Loading,
-    val playerAnimation: PlayerAnimationState? = null,
-    val enemiesAnimations: List<Pair<EnemyId, EnemiesAnimationState>>? = null,
-    val interactionState: PlayerInteractionState? = null,
+    val playerAnimation: PlayerAnimation? = null,
+    val enemiesAnimations: EnemiesAnimations? = null,
+    val interactionState: PlayerInteraction? = null,
 )
 
 interface GameScreenNavigator {

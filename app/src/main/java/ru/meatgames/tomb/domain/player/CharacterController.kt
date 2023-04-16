@@ -1,9 +1,10 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.player
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.behaviorcard.BehaviorCard
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.Initiative

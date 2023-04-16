@@ -1,6 +1,6 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
-import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy

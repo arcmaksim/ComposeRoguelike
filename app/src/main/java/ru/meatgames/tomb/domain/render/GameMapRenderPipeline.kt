@@ -1,11 +1,10 @@
-package ru.meatgames.tomb.screen.compose.game.render
+package ru.meatgames.tomb.domain.render
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.EnemiesHolder
 import ru.meatgames.tomb.domain.ItemsHolder
-import ru.meatgames.tomb.domain.MapDecoratorPipeline
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile

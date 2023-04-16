@@ -14,10 +14,10 @@ import ru.meatgames.tomb.domain.GameControllerImpl
 import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.ItemsControllerImpl
 import ru.meatgames.tomb.domain.ItemsHolder
-import ru.meatgames.tomb.domain.MapController
-import ru.meatgames.tomb.domain.MapControllerImpl
-import ru.meatgames.tomb.domain.MapCreator
-import ru.meatgames.tomb.domain.MapTerraformer
+import ru.meatgames.tomb.domain.map.MapController
+import ru.meatgames.tomb.domain.map.MapControllerImpl
+import ru.meatgames.tomb.domain.map.MapCreator
+import ru.meatgames.tomb.domain.map.MapTerraformer
 import ru.meatgames.tomb.domain.mapgenerator.MainMapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.PlaygroundMapGenerator

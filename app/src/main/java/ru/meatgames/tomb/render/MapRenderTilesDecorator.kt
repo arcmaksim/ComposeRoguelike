@@ -1,6 +1,6 @@
 package ru.meatgames.tomb.render
 
-import ru.meatgames.tomb.screen.compose.game.render.ScreenSpaceRenderTiles
+import ru.meatgames.tomb.domain.render.ScreenSpaceRenderTiles
 
 interface MapRenderTilesDecorator {
 

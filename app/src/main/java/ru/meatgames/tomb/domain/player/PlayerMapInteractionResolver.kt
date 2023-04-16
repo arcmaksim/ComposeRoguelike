@@ -1,6 +1,9 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.player
 
+import ru.meatgames.tomb.domain.EnemiesHolder
+import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.component.toCoordinates
+import ru.meatgames.tomb.domain.map.MapTerraformer
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.resolvedOffset

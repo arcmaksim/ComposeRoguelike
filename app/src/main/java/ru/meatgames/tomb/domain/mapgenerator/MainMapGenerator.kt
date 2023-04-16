@@ -6,7 +6,7 @@ import ru.meatgames.tomb.domain.EnemiesController
 import ru.meatgames.tomb.domain.EnemiesHolder
 import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.ItemsHolder
-import ru.meatgames.tomb.domain.LevelMap
+import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.domain.MapTile
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.item.Item
@@ -142,7 +142,7 @@ class MainMapGenerator @Inject constructor(
                     y = randomOuterWall.second,
                 ) {
                     copy(
-                        objectEntityTile = ObjectEntityTile.DoorClosed,
+                        objectEntityTile = null,//ObjectEntityTile.DoorClosed,
                     )
                 }
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")

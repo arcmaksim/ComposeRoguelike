@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.screen.compose.game.render
+package ru.meatgames.tomb.domain.render
 
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile

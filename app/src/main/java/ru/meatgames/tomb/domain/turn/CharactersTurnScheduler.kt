@@ -1,8 +1,9 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.turn
 
 import ru.meatgames.tomb.domain.component.Initiative
 import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyId
+import ru.meatgames.tomb.domain.player.CharacterState
 import javax.inject.Inject
 
 class CharactersTurnScheduler @Inject constructor() {
@@ -16,7 +17,7 @@ class CharactersTurnScheduler @Inject constructor() {
         return listOf(
             Initiative.SuperHigh, Initiative.High, Initiative.Medium, Initiative.Low, Initiative.SuperLow
         ).flatMap { currentInitiative ->
-            val enemiesPositions = map[currentInitiative]?.map {InitiativePosition.Enemy(it.id) } ?: emptyList()
+            val enemiesPositions = map[currentInitiative]?.map { InitiativePosition.Enemy(it.id) } ?: emptyList()
             val playerPosition = characterState.takeIf { it.initiative == currentInitiative }
                 ?.let { InitiativePosition.Player }
             listOfNotNull(playerPosition) + enemiesPositions

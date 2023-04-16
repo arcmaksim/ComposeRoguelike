@@ -12,15 +12,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.toOffset
-import androidx.compose.ui.unit.toSize
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
+import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
 
 @Preview(widthDp = 436, heightDp = 436)
 @Composable
@@ -45,7 +45,7 @@ private fun GameScreenMapPreview() {
             tilesPadding = 0,
             tilesToReveal = emptySet(),
             tilesToFade = emptySet(),
-            offsets = mutableMapOf(),
+            animationStates = mutableMapOf(),
             initialOffset = IntOffset.Zero,
             animatedOffset = IntOffset.Zero,
             revealedTilesAlpha = 1f,
@@ -63,7 +63,7 @@ internal fun GameScreenEnemies(
     tilesPadding: Int,
     tilesToReveal: Set<ScreenSpaceCoordinates>,
     tilesToFade: Set<ScreenSpaceCoordinates>,
-    offsets: Map<EnemyId, IntOffset>,
+    animationStates: Map<EnemyId, EnemyAnimationState>,
     initialOffset: IntOffset,
     animatedOffset: IntOffset,
     revealedTilesAlpha: Float,
@@ -71,9 +71,8 @@ internal fun GameScreenEnemies(
     characterFrameIndex: Int,
 ) {
     val tileSize = LocalTileSize.current
-    val offset = LocalHorizontalOffset.current
+    val horizontalScreenBorderOffset = LocalHorizontalOffset.current
     val tileDimension = tileSize.width
-    val backgroundColor = LocalBackgroundColor.current
     
     Canvas(modifier = modifier) {
         tiles.mapIndexedNotNull { index, mapRenderTile ->
@@ -82,71 +81,53 @@ internal fun GameScreenEnemies(
                 ?.enemyId
                 ?.let { index to mapRenderTile }
         }.forEach { (index, renderTile) ->
-            val column = index % tilesWidth - tilesPadding
-            val row = index / tilesWidth - tilesPadding
-            val animationOffset = offsets.getOrDefault(renderTile.enemyData!!.enemyId, IntOffset.Zero)
-            val dstOffset = offset + initialOffset + animatedOffset + animationOffset + IntOffset(
-                column * tileDimension,
-                row * tileDimension,
+            val tileScreenSpaceCoordinates = (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
+            val tileOffset = IntOffset(
+                tileScreenSpaceCoordinates.first * tileDimension,
+                tileScreenSpaceCoordinates.second * tileDimension,
             )
             
-            val tileScreenSpaceCoordinates = column to row
+            val enemyId = renderTile.enemyData!!.enemyId
+            
+            val animationOffset = animationStates[enemyId]?.offset ?: IntOffset.Zero
+            val animationAlpha = animationStates[enemyId]?.alpha
+            
+            val dstOffset = horizontalScreenBorderOffset + initialOffset + animatedOffset + animationOffset + tileOffset
             
             when {
-                renderTile.isVisible -> {
-                    val alpha = revealedTilesAlpha.takeIf { tilesToReveal.contains(tileScreenSpaceCoordinates) }
-                    drawRevealedTile(
-                        renderTile = renderTile,
-                        dstOffset = dstOffset,
-                        tileSize = tileSize,
-                        tileDimension = tileDimension,
-                        alpha = alpha,
-                        characterFrameIndex = characterFrameIndex,
-                        backgroundColor = backgroundColor,
-                    )
-                }
-                tilesToFade.contains(tileScreenSpaceCoordinates) -> {
-                    drawRevealedTile(
-                        renderTile = renderTile,
-                        dstOffset = dstOffset,
-                        tileSize = tileSize,
-                        tileDimension = tileDimension,
-                        alpha = fadedTilesAlpha,
-                        characterFrameIndex = characterFrameIndex,
-                        backgroundColor = backgroundColor,
-                    )
-                }
+                animationAlpha != null -> animationAlpha
+                renderTile.isVisible && tilesToReveal.contains(tileScreenSpaceCoordinates) -> revealedTilesAlpha
+                renderTile.isVisible -> 1f
+                tilesToFade.contains(tileScreenSpaceCoordinates) -> fadedTilesAlpha
+                else -> null
+            }?.let { alpha ->
+                renderTile.enemyData.drawCharacter(
+                    dstOffset = dstOffset,
+                    tileSize = tileSize,
+                    tileDimension = tileDimension,
+                    alpha = alpha,
+                    characterFrameIndex = characterFrameIndex,
+                )
             }
         }
     }
 }
 
-private fun DrawScope.drawRevealedTile(
-    renderTile: MapRenderTile.Content,
+context(DrawScope)
+private fun AnimationRenderData.drawCharacter(
     dstOffset: IntOffset,
     tileSize: IntSize,
     tileDimension: Int,
-    backgroundColor: Color,
     characterFrameIndex: Int,
     alpha: Float?,
 ) {
-    renderTile.enemyData?.let { data ->
-        drawCharacter(
-            tileDimension = tileDimension,
-            shadowRenderData = data.shadowRenderData,
-            frameIndex = characterFrameIndex,
-            characterRenderData = data,
-            dstSize = tileSize,
-            dstOffset = dstOffset,
-            alpha = alpha?.let { 1f - it } ?: 1f,
-        )
-        alpha?.let {
-            drawRect(
-                topLeft = dstOffset.toOffset(),
-                color = backgroundColor,
-                alpha = it,
-                size = tileSize.toSize(),
-            )
-        }
-    }
+    drawCharacter(
+        tileDimension = tileDimension,
+        shadowRenderData = shadowRenderData,
+        frameIndex = characterFrameIndex,
+        characterRenderData = this,
+        dstSize = tileSize,
+        dstOffset = dstOffset,
+        alpha = alpha ?: 1f,
+    )
 }

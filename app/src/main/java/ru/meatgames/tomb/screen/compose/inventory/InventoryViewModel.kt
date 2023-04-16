@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import ru.meatgames.tomb.domain.CharacterController
+import ru.meatgames.tomb.domain.player.CharacterController
 import javax.inject.Inject
 
 @HiltViewModel

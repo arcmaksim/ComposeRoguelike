@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.map
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,18 +9,33 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
+import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.domain.GameState
+import ru.meatgames.tomb.domain.MapTile
+import ru.meatgames.tomb.domain.MapTileWrapper
+import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.component.minus
+import ru.meatgames.tomb.domain.component.plus
+import ru.meatgames.tomb.domain.render.computeFov
+import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
-import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.screen.compose.game.render.GameMapRenderPipeline
+import ru.meatgames.tomb.resolvedOffset
+import ru.meatgames.tomb.domain.enemy.EnemyAnimation
+import ru.meatgames.tomb.domain.player.CharacterController
+import ru.meatgames.tomb.domain.player.CharacterState
+import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
+
+typealias EnemiesAnimations = List<Pair<EnemyId, EnemyAnimation>>
 
 @Singleton
 class MapScreenController @Inject constructor(
@@ -62,19 +77,16 @@ class MapScreenController @Inject constructor(
                 
                 val mapWidth = map.mapWrapper.width
                 val mapHeight = map.mapWrapper.height
-    
+                
                 combine(
                     map.mapWrapper.state,
                     characterController.characterStateFlow,
                     gameController.state,
                 ) { streamedTiles, characterState, gameState ->
-                    logMessage("ZXC", "$gameState -> ${gameState.updatesState()}")
-                    if (latestGameState == gameState) {
-                        logMessage("ZXC", "Game state gated")
-                        return@combine cachedMapState
-                    }
+                    if (latestGameState == gameState) return@combine cachedMapState
                     
                     latestGameState = gameState
+                    
                     if (gameState.updatesState()) {
                         return@combine streamedTiles.toMapState(
                             mapWidth = mapWidth,
@@ -107,17 +119,21 @@ class MapScreenController @Inject constructor(
             return MapScreenState.Loading
         }
         
+        val leftXCoordinate = characterState.position.x - preProcessingViewportWidth / 2
+        val topYCoordinate = characterState.position.y - preProcessingViewportHeight / 2
+        val viewportZeroPosition = (leftXCoordinate + preProcessingBufferSizeModifier) to (topYCoordinate + preProcessingBufferSizeModifier)
+        
         val reducedTiles = reduceToViewportSize(
-            mapX = characterState.position.x - preProcessingViewportWidth / 2,
-            mapY = characterState.position.y - preProcessingViewportHeight / 2,
+            leftXCoordinate = leftXCoordinate,
+            topYCoordinate = topYCoordinate,
             mapWidth = mapWidth,
             mapHeight = mapHeight,
-        )
-    
-        reducedTiles.calculateFov(
-            viewportWidth = viewportWidth,
-            viewportHeight = viewportHeight,
-        )
+        ).also {
+            it.calculateFov(
+                viewportWidth = viewportWidth,
+                viewportHeight = viewportHeight,
+            )
+        }
         
         val pipelineRenderData = gameMapRenderPipeline.run(
             tiles = reducedTiles,
@@ -128,22 +144,23 @@ class MapScreenController @Inject constructor(
             },
         )
         
+        val tileToFadeIn = pipelineRenderData.tilesToFadeIn.toSet()
+        val tileToFadeOut = pipelineRenderData.tilesToFadeOut.toSet()
+        
         return MapScreenState.Ready(
             tilesWidth = preProcessingViewportWidth,
             viewportWidth = viewportWidth,
             viewportHeight = viewportHeight,
             tilesPadding = preProcessingBufferSizeModifier,
             tiles = pipelineRenderData.tiles,
-            tilesToFadeIn = pipelineRenderData.tilesToFadeIn.toSet(),
-            tilesToFadeOut = pipelineRenderData.tilesToFadeOut.toSet(),
+            tilesToFadeIn = tileToFadeIn,
+            tilesToFadeOut = tileToFadeOut,
             characterRenderData = characterRenderData,
             playerHealth = characterState.health,
-            turnResultsToAnimate = when (gameState) {
-                is GameState.AnimatingCharacter -> MapScreenCharacterTurnResults.Player(gameState.turnResult)
-                is GameState.AnimatingEnemies -> MapScreenCharacterTurnResults.Enemies(gameState.results)
-                is GameState.WaitingForInput, is GameState.PrepareForEnemies -> null
-                else -> throw IllegalArgumentException("Unexpected game state: $gameState")
-            },
+            turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(
+                viewportZeroPosition = viewportZeroPosition,
+                viewportWidth = viewportWidth,
+            ),
         )
     }
     
@@ -176,23 +193,23 @@ class MapScreenController @Inject constructor(
     }
     
     private fun List<MapTile>.reduceToViewportSize(
-        mapX: Int,
-        mapY: Int,
+        leftXCoordinate: Int,
+        topYCoordinate: Int,
         mapWidth: Int,
         mapHeight: Int,
     ): List<MapTileWrapper?> = (0 until preProcessingViewportHeight).map { line ->
-        val start = (mapY + line) * mapWidth + mapX
+        val start = (topYCoordinate + line) * mapWidth + leftXCoordinate
         val end = start + preProcessingViewportWidth
         when {
-            mapY + line !in 0 until mapHeight -> {
+            topYCoordinate + line !in 0 until mapHeight -> {
                 List(preProcessingViewportWidth) { null }
             }
             
-            mapX < 0 -> {
+            leftXCoordinate < 0 -> {
                 List(preProcessingViewportWidth) { index ->
                     val tileIndex = start + index
                     when {
-                        mapX + index < 0 -> null
+                        leftXCoordinate + index < 0 -> null
                         else -> this[tileIndex]
                     }?.toMapTileWrapper(
                         tileIndex = tileIndex,
@@ -201,11 +218,11 @@ class MapScreenController @Inject constructor(
                 }
             }
             
-            mapX + preProcessingViewportWidth > mapWidth -> {
+            leftXCoordinate + preProcessingViewportWidth > mapWidth -> {
                 List(preProcessingViewportWidth) { index ->
                     val tileIndex = start + index
                     when {
-                        mapX + index < mapWidth -> this[tileIndex]
+                        leftXCoordinate + index < mapWidth -> this[tileIndex]
                         else -> null
                     }?.toMapTileWrapper(
                         tileIndex = tileIndex,
@@ -232,6 +249,79 @@ class MapScreenController @Inject constructor(
         tile = this,
     )
     
+    private fun GameState.toMapScreenCharacterAnimations(
+        viewportWidth: Int,
+        viewportZeroPosition: Coordinates,
+    ): MapScreenCharacterAnimations? = when (this) {
+        is GameState.AnimatingCharacter -> {
+            MapScreenCharacterAnimations.Player(turnResult)
+        }
+        
+        is GameState.AnimatingEnemies -> {
+            MapScreenCharacterAnimations.Enemies(
+                results.filterNonVisibleAnimations(
+                    viewportWidth = viewportWidth,
+                    viewportZeroPosition = viewportZeroPosition,
+                ).toEnemiesAnimations(
+                    viewportWidth = viewportWidth,
+                    viewportZeroPosition = viewportZeroPosition,
+                ),
+            )
+        }
+        
+        is GameState.WaitingForInput, is GameState.PrepareForEnemies -> null
+        
+        else -> throw IllegalArgumentException("Unexpected game state: $this")
+    }
+    
+    private fun List<EnemyTurnResult>.filterNonVisibleAnimations(
+        viewportZeroPosition: Coordinates,
+        viewportWidth: Int,
+    ): List<EnemyTurnResult> = filter { result ->
+        when (result) {
+            is EnemyTurnResult.Move -> {
+                listOf(
+                    result.position - viewportZeroPosition,
+                    result.position + result.direction.resolvedOffset - viewportZeroPosition,
+                )
+            }
+            else -> listOf(result.position - viewportZeroPosition)
+        }.filter { (x, y) -> x in 0 until viewportWidth && y in 0 until viewportHeight }
+            .any { (x, y) -> cachedVisibilityMask[x + y * viewportWidth] }
+    }
+    
+    private fun List<EnemyTurnResult>.toEnemiesAnimations(
+        viewportZeroPosition: Coordinates,
+        viewportWidth: Int,
+    ): EnemiesAnimations = map { result ->
+        when (result) {
+            is EnemyTurnResult.Move -> {
+                val currentScreenSpacePosition = result.position - viewportZeroPosition
+                val currentScreenSpaceIndex = currentScreenSpacePosition.first + currentScreenSpacePosition.second * viewportWidth
+                val currentTileVisibility = cachedVisibilityMask.getOrElse(currentScreenSpaceIndex) { false }
+                
+                val nextScreenSpacePosition = currentScreenSpacePosition + result.direction.resolvedOffset
+                val nextScreenSpaceIndex = nextScreenSpacePosition.first + nextScreenSpacePosition.second * viewportWidth
+                val nextTileVisibility = cachedVisibilityMask.getOrElse(nextScreenSpaceIndex) { false }
+                
+                result.enemyId to EnemyAnimation.Move(
+                    direction = result.direction,
+                    fade = when {
+                        !currentTileVisibility && nextTileVisibility -> EnemyAnimation.Move.Fade.IN
+                        currentTileVisibility && !nextTileVisibility -> EnemyAnimation.Move.Fade.OUT
+                        else -> EnemyAnimation.Move.Fade.NONE
+                    },
+                )
+            }
+            
+            is EnemyTurnResult.Attack -> {
+                result.enemyId to EnemyAnimation.Attack(
+                    direction = result.direction,
+                )
+            }
+        }
+    }
+    
     sealed class MapScreenState {
         
         data class Ready(
@@ -244,22 +334,22 @@ class MapScreenController @Inject constructor(
             val tilesToFadeIn: Set<ScreenSpaceCoordinates>,
             val tilesToFadeOut: Set<ScreenSpaceCoordinates>,
             val playerHealth: HealthComponent,
-            val turnResultsToAnimate: MapScreenCharacterTurnResults?,
+            val turnResultsToAnimate: MapScreenCharacterAnimations?,
         ) : MapScreenState()
         
         object Loading : MapScreenState()
         
     }
     
-    sealed class MapScreenCharacterTurnResults {
+    sealed class MapScreenCharacterAnimations {
         
         data class Player(
             val turnResult: PlayerTurnResult,
-        ) : MapScreenCharacterTurnResults()
+        ) : MapScreenCharacterAnimations()
         
         data class Enemies(
-            val turnResults: List<EnemyTurnResult>,
-        ) : MapScreenCharacterTurnResults()
+            val animations: EnemiesAnimations,
+        ) : MapScreenCharacterAnimations()
         
     }
     

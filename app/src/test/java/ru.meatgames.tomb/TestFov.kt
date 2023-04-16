@@ -1,7 +1,7 @@
 package ru.meatgames.tomb
 
 import org.junit.Test
-import ru.meatgames.tomb.domain.computeFov
+import ru.meatgames.tomb.domain.render.computeFov
 
 class TestFov {
 

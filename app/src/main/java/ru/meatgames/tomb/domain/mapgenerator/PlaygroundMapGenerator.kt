@@ -4,7 +4,7 @@ import ru.meatgames.tomb.domain.EnemiesController
 import ru.meatgames.tomb.domain.EnemiesHolder
 import ru.meatgames.tomb.domain.ItemsController
 import ru.meatgames.tomb.domain.ItemsHolder
-import ru.meatgames.tomb.domain.LevelMap
+import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.model.room.data.RoomsData

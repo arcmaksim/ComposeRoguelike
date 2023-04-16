@@ -4,11 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.map.MapScreenController
+import ru.meatgames.tomb.screen.compose.game.animation.ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenLoading
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
-
-private const val ANIMATION_TIME = 300
 
 @Composable
 internal fun GameScreen(
@@ -55,7 +54,7 @@ private fun GameScreenContent(
             playerAnimation = state.playerAnimation,
             enemiesAnimations = state.enemiesAnimations,
             interactionState = state.interactionState,
-            animationDurationMillis = ANIMATION_TIME,
+            animationDurationMillis = ANIMATION_DURATION_MILLIS,
             navigator = navigator,
             interactionController = interactionController,
         )

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.domain.GameController
-import ru.meatgames.tomb.domain.MapCreator
+import ru.meatgames.tomb.domain.map.MapCreator
 import javax.inject.Inject
 
 @HiltViewModel

@@ -8,6 +8,12 @@ import ru.meatgames.tomb.domain.component.calculateVectorTo
 import ru.meatgames.tomb.domain.component.isNextTo
 import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.enemy.Enemy
+import ru.meatgames.tomb.domain.map.MapController
+import ru.meatgames.tomb.domain.map.MapCreator
+import ru.meatgames.tomb.domain.player.CharacterController
+import ru.meatgames.tomb.domain.player.CharacterState
+import ru.meatgames.tomb.domain.player.PlayerMapInteractionResolver
+import ru.meatgames.tomb.domain.turn.CharactersTurnScheduler
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
@@ -107,6 +113,7 @@ class GameControllerImpl @Inject constructor(
             attackPlayer(damage)
         
             return EnemyTurnResult.Attack(
+                position = position.toCoordinates(),
                 enemyId = id,
                 direction = vectorToPlayer.asDirections().first(),
                 amount = damage,
@@ -121,6 +128,7 @@ class GameControllerImpl @Inject constructor(
                 val tileInteraction = tile.objectEntityTile?.let(tilesController::hasObjectEntityNoInteraction) ?: true
                 if (tileInteraction && enemiesController.moveEnemy(id, direction)) {
                     return EnemyTurnResult.Move(
+                        position = position.toCoordinates(),
                         enemyId = id,
                         direction = direction,
                     )
