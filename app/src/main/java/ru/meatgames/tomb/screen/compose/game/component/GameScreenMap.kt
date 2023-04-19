@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,8 +14,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
-import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
+import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -28,7 +27,6 @@ import ru.meatgames.tomb.screen.compose.game.LocalTileSize
 private fun GameScreenMapPreview() {
     val context = LocalContext.current
     
-    NewAssets.loadAssets(context)
     val themeAssets = ThemeAssets(context)
     
     val modifier = Modifier
@@ -75,83 +73,63 @@ internal fun GameScreenMap(
     
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
-            val column = index % tilesWidth - tilesPadding
-            val row = index / tilesWidth - tilesPadding
-            val dstOffset = offset + initialOffset + animatedOffset + IntOffset(
-                column * tileDimension,
-                row * tileDimension,
+            val tileScreenSpaceCoordinates = (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
+            val tileOffset = IntOffset(
+                tileScreenSpaceCoordinates.first * tileDimension,
+                tileScreenSpaceCoordinates.second * tileDimension,
             )
             
-            val tileScreenSpaceCoordinates = column to row
+            val dstOffset = offset + initialOffset + animatedOffset + tileOffset
             
-            if (renderTile is MapRenderTile.Content && renderTile.isVisible) {
-                val alpha = revealedTilesAlpha.takeIf { tilesToReveal.contains(tileScreenSpaceCoordinates) }
-                drawRevealedTile(
-                    renderTile = renderTile,
+            when {
+                renderTile !is MapRenderTile.Content -> null
+                renderTile.isVisible && tilesToReveal.contains(tileScreenSpaceCoordinates) -> {
+                    if (renderTile.objectData != null) logMessage("GameScreenMap", "flag1: $revealedTilesAlpha")
+                    renderTile to revealedTilesAlpha
+                }
+                renderTile.isVisible -> {
+                    if (renderTile.objectData != null) logMessage("GameScreenMap", "flag2: ${1f}")
+                    renderTile to 1f
+                }
+                tilesToFade.contains(tileScreenSpaceCoordinates) -> renderTile to fadedTilesAlpha
+                else -> null
+            }?.let { (tile, alpha) ->
+                tile.drawRevealedTile(
                     dstOffset = dstOffset,
                     tileSize = tileSize,
+                    backgroundColor = backgroundColor,
                     alpha = alpha,
-                    backgroundColor = backgroundColor,
-                )
-            }
-            if (renderTile is MapRenderTile.Content && !renderTile.isVisible
-                && tilesToFade.contains(tileScreenSpaceCoordinates)
-            ) {
-                drawRevealedTile(
-                    renderTile = renderTile,
-                    dstOffset = dstOffset,
-                    tileSize = tileSize,
-                    alpha = fadedTilesAlpha,
-                    backgroundColor = backgroundColor,
                 )
             }
         }
     }
 }
 
-private fun DrawScope.drawRevealedTile(
-    renderTile: MapRenderTile.Content,
+context(DrawScope)
+    private fun MapRenderTile.Content.drawRevealedTile(
     dstOffset: IntOffset,
     tileSize: IntSize,
     backgroundColor: Color,
-    alpha: Float?,
+    alpha: Float = 1f,
 ) {
-    val filterQuality = FilterQuality.None
-    
-    drawImage(
-        image = renderTile.floorData.asset,
-        srcOffset = renderTile.floorData.srcOffset,
-        srcSize = NewAssets.tileSize,
+    floorData.drawImage(
         dstOffset = dstOffset,
         dstSize = tileSize,
-        filterQuality = filterQuality,
     )
-    renderTile.objectData?.let { objectTile ->
-        drawImage(
-            image = objectTile.asset,
-            srcOffset = objectTile.srcOffset,
-            srcSize = NewAssets.tileSize,
-            dstOffset = dstOffset,
-            dstSize = tileSize,
-            filterQuality = filterQuality,
-        )
-    }
-    renderTile.itemData?.let { itemData ->
-        drawImage(
-            image = itemData.asset,
-            srcOffset = itemData.srcOffset,
-            srcSize = NewAssets.tileSize,
-            dstOffset = dstOffset,
-            dstSize = tileSize,
-            filterQuality = filterQuality,
-        )
-    }
-    alpha?.let {
+    objectData?.drawImage(
+        dstOffset = dstOffset,
+        dstSize = tileSize,
+    )
+    itemData?.drawImage(
+        dstOffset = dstOffset,
+        dstSize = tileSize,
+    )
+    if (alpha != 1f) {
         drawRect(
-            topLeft = dstOffset.toOffset(),
             color = backgroundColor,
-            alpha = it,
+            topLeft = dstOffset.toOffset(),
             size = tileSize.toSize(),
+            alpha = 1f - alpha,
         )
     }
 }

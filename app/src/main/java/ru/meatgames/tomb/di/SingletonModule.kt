@@ -6,13 +6,18 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
-import ru.meatgames.tomb.domain.ItemsController
-import ru.meatgames.tomb.domain.ItemsControllerImpl
-import ru.meatgames.tomb.domain.ItemsHolder
-import ru.meatgames.tomb.domain.MapController
-import ru.meatgames.tomb.domain.MapControllerImpl
-import ru.meatgames.tomb.domain.MapCreator
-import ru.meatgames.tomb.domain.MapTerraformer
+import ru.meatgames.tomb.domain.enemy.EnemiesController
+import ru.meatgames.tomb.domain.enemy.EnemiesControllerImpl
+import ru.meatgames.tomb.domain.enemy.EnemiesHolder
+import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.domain.GameControllerImpl
+import ru.meatgames.tomb.domain.item.ItemsController
+import ru.meatgames.tomb.domain.item.ItemsControllerImpl
+import ru.meatgames.tomb.domain.item.ItemsHolder
+import ru.meatgames.tomb.domain.map.MapController
+import ru.meatgames.tomb.domain.map.MapControllerImpl
+import ru.meatgames.tomb.domain.map.MapCreator
+import ru.meatgames.tomb.domain.map.MapTerraformer
 import ru.meatgames.tomb.domain.mapgenerator.MainMapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.PlaygroundMapGenerator
@@ -63,6 +68,16 @@ interface SingletonModule {
     fun bindItemsController(
         itemsController: ItemsControllerImpl,
     ): ItemsController
+    
+    @Binds
+    fun bindEnemiesHolder(
+        enemiesHolder: EnemiesControllerImpl,
+    ): EnemiesHolder
+    
+    @Binds
+    fun bindEnemiesController(
+        enemiesController: EnemiesControllerImpl,
+    ): EnemiesController
 
     @Binds
     @IntoSet
@@ -81,6 +96,11 @@ interface SingletonModule {
     fun bindPlaygroundMapGenerator(
         playgroundMapGenerator: PlaygroundMapGenerator,
     ): MapGenerator
+    
+    @Binds
+    fun bindGameController(
+        gameController: GameControllerImpl,
+    ): GameController
 
     companion object {
         @Named(MAP_WIDTH_KEY)

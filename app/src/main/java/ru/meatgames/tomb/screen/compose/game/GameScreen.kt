@@ -2,19 +2,12 @@ package ru.meatgames.tomb.screen.compose.game
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.domain.Coordinates
-import ru.meatgames.tomb.domain.MapScreenController
-import ru.meatgames.tomb.domain.item.ItemContainerId
-import ru.meatgames.tomb.domain.item.ItemId
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ru.meatgames.tomb.domain.map.MapScreenController
+import ru.meatgames.tomb.screen.compose.game.animation.ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenLoading
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
-
-private const val ANIMATION_TIME = 300
-private const val HERO_IDLE_ANIMATION_FRAMES = 2
-private const val HERO_IDLE_ANIMATION_FRAME_TIME = 600
 
 @Composable
 internal fun GameScreen(
@@ -34,45 +27,36 @@ internal fun GameScreen(
         }
     }
     
-    val state by viewModel.state.collectAsState(GameScreenState())
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val isIdle by viewModel.isIdle.collectAsStateWithLifecycle()
     
     GameScreenContent(
         state = state,
-        onCharacterMove = viewModel::onMoveCharacter,
-        onMapGeneration = viewModel::newMap,
-        onInventory = viewModel::openInventory,
-        onCharacterSheet = viewModel::openCharacterSheet,
-        onCloseInteractionMenu = viewModel::closeInteractionMenu,
-        onItemSelected = viewModel::pickUpItem,
+        isIdle = isIdle,
+        navigator = viewModel,
+        interactionController = viewModel,
     )
 }
 
 @Composable
 private fun GameScreenContent(
     state: GameScreenState,
-    onCharacterMove: (Direction) -> Unit,
-    onMapGeneration: () -> Unit,
-    onInventory: () -> Unit,
-    onCharacterSheet: () -> Unit,
-    onCloseInteractionMenu: () -> Unit,
-    onItemSelected: (Coordinates, ItemContainerId, ItemId) -> Unit,
+    isIdle: Boolean,
+    navigator: GameScreenNavigator,
+    interactionController: GameScreenInteractionController,
 ) {
     when (val mapState = state.mapState) {
         is MapScreenController.MapScreenState.Loading -> GameScreenLoading()
         is MapScreenController.MapScreenState.Ready -> GameScreenMapContainer(
             mapState = mapState,
+            isIdle = isIdle,
+            playerHealth = mapState.playerHealth,
             playerAnimation = state.playerAnimation,
+            enemiesAnimations = state.enemiesAnimations,
             interactionState = state.interactionState,
-            previousMoveDirection = state.previousMoveDirection,
-            animationTime = ANIMATION_TIME,
-            heroIdleAnimationFrames = HERO_IDLE_ANIMATION_FRAMES,
-            heroIdleAnimationFrameTime = HERO_IDLE_ANIMATION_FRAME_TIME,
-            onCharacterMove = onCharacterMove,
-            onMapGeneration = onMapGeneration,
-            onInventory = onInventory,
-            onCharacterSheet = onCharacterSheet,
-            onCloseInteractionMenu = onCloseInteractionMenu,
-            onItemSelected = onItemSelected,
+            animationDurationMillis = ANIMATION_DURATION_MILLIS,
+            navigator = navigator,
+            interactionController = interactionController,
         )
     }
 }

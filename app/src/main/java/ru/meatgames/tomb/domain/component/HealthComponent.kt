@@ -6,10 +6,13 @@ data class HealthComponent(
 ) {
     
     val isDepleted: Boolean
-        get() = currentHealth > 0
+        get() = currentHealth <= 0
     
     val isAtMaxHealth: Boolean
         get() = currentHealth == maxHealth
+    
+    val ratio: Float
+        get() = currentHealth.toFloat() / maxHealth
     
     constructor(
         maxHealth: Int,

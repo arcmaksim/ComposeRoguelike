@@ -11,12 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.screen.compose.container.ContainerItem
-import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionState
+import ru.meatgames.tomb.domain.player.PlayerInteraction
 import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview
@@ -24,7 +23,7 @@ import ru.meatgames.tomb.screen.compose.system.Toolbar
 private fun GameScreenContainerWindowPreview() {
     GameScreenContainerWindow(
         modifier = Modifier,
-        interactionState = GameScreenInteractionState.SearchingContainer(
+        interactionState = PlayerInteraction.SearchingContainer(
             coordinates = 0 to 0,
             itemContainerId = ItemContainerId(),
             items = setOf(
@@ -33,16 +32,16 @@ private fun GameScreenContainerWindowPreview() {
             ),
         ),
         onClose = { Unit },
-        onItemClick = { _, _, _ -> Unit },
+        onItemClick = { _, _ -> Unit },
     )
 }
 
 @Composable
 internal fun GameScreenContainerWindow(
     modifier: Modifier,
-    interactionState: GameScreenInteractionState.SearchingContainer,
+    interactionState: PlayerInteraction.SearchingContainer,
     onClose: () -> Unit,
-    onItemClick: (Coordinates, ItemContainerId, ItemId) -> Unit,
+    onItemClick: (ItemContainerId, ItemId) -> Unit,
 ) {
     BackHandler(onBack = onClose)
     
@@ -65,7 +64,6 @@ internal fun GameScreenContainerWindow(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     onItemClick(
-                        interactionState.coordinates,
                         interactionState.itemContainerId,
                         it.id,
                     )

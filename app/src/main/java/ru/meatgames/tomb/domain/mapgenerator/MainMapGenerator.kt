@@ -2,9 +2,13 @@ package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
-import ru.meatgames.tomb.domain.ItemsController
-import ru.meatgames.tomb.domain.LevelMap
-import ru.meatgames.tomb.domain.MapTile
+import ru.meatgames.tomb.domain.enemy.EnemiesController
+import ru.meatgames.tomb.domain.enemy.EnemiesHolder
+import ru.meatgames.tomb.domain.item.ItemsController
+import ru.meatgames.tomb.domain.item.ItemsHolder
+import ru.meatgames.tomb.domain.map.LevelMap
+import ru.meatgames.tomb.domain.map.MapTile
+import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
@@ -21,7 +25,10 @@ import kotlin.random.Random
 
 class MainMapGenerator @Inject constructor(
     roomsData: RoomsData,
+    private val itemsHolder: ItemsHolder,
     private val itemsController: ItemsController,
+    private val enemiesHolder: EnemiesHolder,
+    private val enemiesController: EnemiesController,
 ) : MapGenerator {
     
     private val random = Random(System.currentTimeMillis())
@@ -35,6 +42,9 @@ class MainMapGenerator @Inject constructor(
     override fun generateMap(
         map: LevelMap,
     ): MapConfiguration {
+        itemsHolder.clearContainers()
+        enemiesHolder.clearEnemies()
+        
         val initialRoomPositionX = 10
         val initialRoomPositionY = 3
         val initialRoom = rooms.first()
@@ -59,6 +69,11 @@ class MainMapGenerator @Inject constructor(
         
         map.placeItems(
             amount = 10,
+            random = random,
+        )
+        
+        map.placeEnemies(
+            amount = 20,
             random = random,
         )
         
@@ -127,7 +142,7 @@ class MainMapGenerator @Inject constructor(
                     y = randomOuterWall.second,
                 ) {
                     copy(
-                        objectEntityTile = ObjectEntityTile.DoorClosed,
+                        objectEntityTile = null,//ObjectEntityTile.DoorClosed,
                     )
                 }
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
@@ -145,10 +160,10 @@ class MainMapGenerator @Inject constructor(
         while (localOuterWallsPool.isNotEmpty()) {
             val wall = localOuterWallsPool.random(random)
             
-            val topTile = getTile(wall.first, wall.second - 1)?.tile
-            val bottomTile = getTile(wall.first, wall.second + 1)?.tile
-            val leftTile = getTile(wall.first - 1, wall.second)?.tile
-            val rightTile = getTile(wall.first + 1, wall.second)?.tile
+            val topTile = getTile(wall.first, wall.second - 1)
+            val bottomTile = getTile(wall.first, wall.second + 1)
+            val leftTile = getTile(wall.first - 1, wall.second)
+            val rightTile = getTile(wall.first + 1, wall.second)
             
             when {
                 topTile.isEmpty && bottomTile.isWall && leftTile.isWall && rightTile.isWall -> Direction.Bottom
@@ -225,9 +240,31 @@ class MainMapGenerator @Inject constructor(
             while (true) {
                 val x = random.nextInt(width)
                 val y = random.nextInt(height)
-                val tile = getTile(x, y)?.tile
+                val tile = getTile(x, y)
                 if (tile.isEmpty) {
                     Item("Item $i ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(x, y)
+                    break
+                }
+            }
+        }
+    }
+    
+    private fun LevelMap.placeEnemies(
+        amount: Int,
+        random: Random,
+    ) {
+        for (i in 0 until amount) {
+            while (true) {
+                val x = random.nextInt(width)
+                val y = random.nextInt(height)
+                val tile = getTile(x, y)
+                val coordinates = Coordinates(x, y)
+                if (tile.isEmpty && enemiesHolder.getEnemy(coordinates) == null) {
+                    enemiesController.placeEnemy(
+                        enemyType = EnemyType.values().random(random),
+                        coordinates = coordinates,
+                        levelMap = this,
+                    )
                     break
                 }
             }
@@ -262,7 +299,7 @@ class MainMapGenerator @Inject constructor(
         log("Checking zone at $mapX $mapY dimensions $roomWidth x $roomHeight")
         for (x in mapX until mapX + roomWidth) {
             for (y in mapY until mapY + roomHeight) {
-                val tile = getTile(x, y)?.tile ?: return false
+                val tile = getTile(x, y) ?: return false
                 if (!tile.isWall) return false
             }
         }

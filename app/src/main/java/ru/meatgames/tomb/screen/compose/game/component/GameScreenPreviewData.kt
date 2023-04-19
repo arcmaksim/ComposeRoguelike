@@ -1,6 +1,9 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
-import ru.meatgames.tomb.domain.MapScreenController
+import ru.meatgames.tomb.domain.map.MapScreenController
+import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.enemy.EnemyType
+import ru.meatgames.tomb.domain.enemy.produceEnemy
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
@@ -17,21 +20,21 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         FloorRenderTile.Floor to ObjectRenderTile.Wall10,
         FloorRenderTile.Floor to ObjectRenderTile.Wall8,
         FloorRenderTile.Floor to ObjectRenderTile.DoorOpened,
-        FloorRenderTile.Floor to ObjectRenderTile.Wall12,
+        FloorRenderTile.Floor to ObjectRenderTile.Wall4,
         
-        FloorRenderTile.Floor to ObjectRenderTile.Wall5,
+        FloorRenderTile.Floor to ObjectRenderTile.Wall1,
         FloorRenderTile.Floor to null,
         FloorRenderTile.Floor to null,
         FloorRenderTile.Floor to null,
         FloorRenderTile.Floor to ObjectRenderTile.Wall5,
         
-        FloorRenderTile.Floor to ObjectRenderTile.Wall5,
+        FloorRenderTile.Floor to ObjectRenderTile.DoorOpened,
         FloorRenderTile.Floor to null,
         FloorRenderTile.Floor to null,
         FloorRenderTile.Floor to ObjectRenderTile.StairsUp,
         FloorRenderTile.Floor to ObjectRenderTile.Wall5,
         
-        FloorRenderTile.Floor to ObjectRenderTile.Wall5,
+        FloorRenderTile.Floor to ObjectRenderTile.Wall4,
         FloorRenderTile.Floor to ObjectRenderTile.StairsDown,
         FloorRenderTile.Floor to null,
         FloorRenderTile.Floor to null,
@@ -48,6 +51,10 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         17 to themeAssets.resolveItemRenderData(),
     )
     
+    val enemies = mapOf(
+        7 to EnemyType.SkeletonWarrior.produceEnemy(0 to 0).let(themeAssets::getEnemyRenderData),
+    )
+    
     return renderTiles.mapIndexed { index, tilesPair ->
         val floorData = themeAssets.resolveFloorRenderData(tilesPair.first)
         val objectData = tilesPair.second?.let {
@@ -56,15 +63,16 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         MapRenderTile.Content(
             floorData = RenderData(
                 asset = floorData.first,
-                srcOffset = floorData.second,
+                offset = floorData.second,
             ),
             objectData = objectData?.let {
                 RenderData(
                     asset = it.first,
-                    srcOffset = it.second,
+                    offset = it.second,
                 )
             },
             itemData = items[index],
+            enemyData = enemies[index],
             isVisible = true,
         )
     }
@@ -78,6 +86,9 @@ internal fun gameScreenMapContainerPreviewMapReadyState(
     tilesPadding = 0,
     viewportWidth = gameScreenMapContainerPreviewMapSize,
     viewportHeight = gameScreenMapContainerPreviewMapSize,
-    tilesToFade = emptySet(),
-    tilesToReveal = emptySet(),
+    tilesToFadeOut = emptySet(),
+    tilesToFadeIn = emptySet(),
+    characterRenderData = themeAssets.characterRenderData,
+    playerHealth = HealthComponent(10),
+    turnResultsToAnimate = null,
 )

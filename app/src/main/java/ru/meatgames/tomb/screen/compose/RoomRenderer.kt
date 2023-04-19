@@ -20,15 +20,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import ru.meatgames.tomb.NewAssets
 import ru.meatgames.tomb.design.h2TextStyle
-import ru.meatgames.tomb.domain.RoomPreviewRenderProcessor
+import ru.meatgames.tomb.domain.render.RoomPreviewRenderProcessor
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.WallsDecorator
-import ru.meatgames.tomb.domain.MapTile
-import ru.meatgames.tomb.domain.MapTileWrapper
+import ru.meatgames.tomb.domain.map.MapTile
+import ru.meatgames.tomb.domain.map.MapTileWrapper
+import ru.meatgames.tomb.model.temp.ASSETS_TILE_DIMENSION
+import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
 import kotlin.math.max
 
 @Preview
@@ -54,7 +55,7 @@ private fun RoomRenderer() {
                     .entity,
                 objectEntityTile = roomsData.objectMapping
                     .first { it.symbol == room.objects[index].toString() }
-                    .let { it.entity!! },
+                    .let { it.entity },
             ),
         )
     }
@@ -89,8 +90,8 @@ private fun RoomRenderer(
     val objectAlpha = if (renderType == RoomRenderType.TransparentObjects) .2f else 1f
     
     val bitmap = Bitmap.createBitmap(
-        NewAssets.tileSize.width,
-        NewAssets.tileSize.height,
+        ASSETS_TILE_DIMENSION,
+        ASSETS_TILE_DIMENSION,
         Bitmap.Config.RGB_565,
     ).run {
         eraseColor(android.graphics.Color.MAGENTA)
@@ -139,8 +140,8 @@ private fun RoomRenderer(
 
                 drawImage(
                     image = renderTile.floorData.asset,
-                    srcOffset = renderTile.floorData.srcOffset,
-                    srcSize = NewAssets.tileSize,
+                    srcOffset = renderTile.floorData.offset,
+                    srcSize = ASSETS_TILE_SIZE,
                     dstOffset = dstOffset,
                     dstSize = tileSize,
                     filterQuality = FilterQuality.None,
@@ -148,8 +149,8 @@ private fun RoomRenderer(
                 renderTile.objectData?.let { objectTile ->
                     drawImage(
                         image = objectTile.asset,
-                        srcOffset = objectTile.srcOffset,
-                        srcSize = NewAssets.tileSize,
+                        srcOffset = objectTile.offset,
+                        srcSize = ASSETS_TILE_SIZE,
                         dstOffset = dstOffset,
                         dstSize = tileSize,
                         filterQuality = FilterQuality.None,
@@ -160,7 +161,7 @@ private fun RoomRenderer(
                 if (roomPreviewData.outerWalls.contains(column to row)) {
                     drawImage(
                         image = bitmap,
-                        srcSize = NewAssets.tileSize,
+                        srcSize = ASSETS_TILE_SIZE,
                         dstOffset = dstOffset,
                         dstSize = tileSize,
                         filterQuality = FilterQuality.None,

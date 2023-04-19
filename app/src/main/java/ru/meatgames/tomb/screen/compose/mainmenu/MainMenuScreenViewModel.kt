@@ -1,12 +1,14 @@
 package ru.meatgames.tomb.screen.compose.mainmenu
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import ru.meatgames.tomb.domain.GameController
-import ru.meatgames.tomb.domain.MapCreator
+import ru.meatgames.tomb.domain.map.MapCreator
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,12 +20,16 @@ class MainMenuScreenViewModel @Inject constructor(
     val events: Flow<Event?> = _events.receiveAsFlow()
     
     fun launchNewGame() {
-        gameController.generateNewMap(MapCreator.MapType.MAIN)
+        viewModelScope.launch {
+            gameController.generateNewMap(MapCreator.MapType.MAIN)
+        }
         _events.trySend(Event.NewGame)
     }
     
     fun lunchPlayground() {
-        gameController.generateNewMap(MapCreator.MapType.PLAYGROUND)
+        viewModelScope.launch {
+            gameController.generateNewMap(MapCreator.MapType.PLAYGROUND)
+        }
         _events.trySend(Event.NewGame)
     }
     

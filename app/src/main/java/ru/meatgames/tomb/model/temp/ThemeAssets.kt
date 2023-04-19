@@ -6,12 +6,16 @@ import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import ru.meatgames.tomb.domain.enemy.Enemy
+import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
+import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.RenderData
 import java.io.IOException
 import java.io.InputStream
@@ -19,7 +23,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.random.Random
 
-private const val TILE_SIZE = 24
+const val ASSETS_TILE_DIMENSION = 24
+val ASSETS_TILE_SIZE = IntSize(ASSETS_TILE_DIMENSION, ASSETS_TILE_DIMENSION)
 
 @OptIn(ExperimentalSerializationApi::class)
 @Singleton
@@ -35,6 +40,9 @@ class ThemeAssets @Inject constructor(
     private val stairsThemes: StairsThemes
     
     private val gismo: ImageBitmap
+    private val heroTileset: ImageBitmap
+    private val enemiesTileset: ImageBitmap
+    private val shadowsTileset: ImageBitmap
 
     init {
         wallsThemes = context.loadWalls()
@@ -43,6 +51,9 @@ class ThemeAssets @Inject constructor(
         stairsThemes = context.loadStairs()
         
         gismo = context.getBitmapFromAsset("bag").asImageBitmap()
+        heroTileset = context.getBitmapFromAsset("character_animation_sheet").asImageBitmap()
+        enemiesTileset = context.getBitmapFromAsset("enemies").asImageBitmap()
+        shadowsTileset = context.getBitmapFromAsset("shadows").asImageBitmap()
 
         val theme = wallsThemes.themes.random(Random(System.currentTimeMillis())).title
 
@@ -53,6 +64,19 @@ class ThemeAssets @Inject constructor(
             doorsTheme = doorsThemes.themes.first(),
         )
     }
+    
+    val characterRenderData = AnimationRenderData(
+        asset = heroTileset,
+        offsets = listOf(
+            IntOffset(0, 0),
+            IntOffset(ASSETS_TILE_DIMENSION, 0),
+        ),
+        shadowRenderData = RenderData(
+            asset = shadowsTileset,
+            offset = IntOffset(ASSETS_TILE_DIMENSION * 4, 0),
+        ),
+        healthRatio = 0f,
+    )
 
     private fun Context.getBitmapFromAsset(
         bitmapName: String,
@@ -75,11 +99,11 @@ class ThemeAssets @Inject constructor(
         return WallsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * TILE_SIZE
+                val verticalOffset = theme.verticalOffset * ASSETS_TILE_DIMENSION
                 WallsThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(ASSETS_TILE_DIMENSION * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -95,11 +119,11 @@ class ThemeAssets @Inject constructor(
         return FloorThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * TILE_SIZE
+                val verticalOffset = theme.verticalOffset * ASSETS_TILE_DIMENSION
                 FloorThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(ASSETS_TILE_DIMENSION * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -115,11 +139,11 @@ class ThemeAssets @Inject constructor(
         return DoorsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * TILE_SIZE
+                val verticalOffset = theme.verticalOffset * ASSETS_TILE_DIMENSION
                 DoorsThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(ASSETS_TILE_DIMENSION * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -135,11 +159,11 @@ class ThemeAssets @Inject constructor(
         return StairsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
-                val verticalOffset = theme.verticalOffset * TILE_SIZE
+                val verticalOffset = theme.verticalOffset * ASSETS_TILE_DIMENSION
                 StairsThemes.Theme(
                     title = theme.name,
                     map = data.tiles.associate {
-                        it.tile to IntOffset(TILE_SIZE * it.horizontalOffset, verticalOffset)
+                        it.tile to IntOffset(ASSETS_TILE_DIMENSION * it.horizontalOffset, verticalOffset)
                     },
                 )
             }
@@ -189,7 +213,47 @@ class ThemeAssets @Inject constructor(
     
     fun resolveItemRenderData(): RenderData = RenderData(
         asset = gismo,
-        srcOffset = IntOffset(0, 0),
+        offset = IntOffset(0, 0),
     )
-
+    
+    fun getEnemyRenderData(
+        enemy: Enemy,
+    ): AnimationRenderData {
+        val index = when (enemy.type) {
+            EnemyType.Skeleton -> 0
+            EnemyType.SkeletonArcher -> 2
+            EnemyType.SkeletonWarrior -> 4
+            EnemyType.SkeletonNecromancer -> 6
+        }
+        return AnimationRenderData(
+            asset = enemiesTileset,
+            offsets = listOf(
+                IntOffset(index * ASSETS_TILE_DIMENSION, 0),
+                IntOffset((index + 1) * ASSETS_TILE_DIMENSION, 0),
+            ),
+            shadowRenderData = enemy.type.getEnemyShadowRenderData(),
+            shadowHorizontalOffset = enemy.type.getShadowHorizontalOffset(),
+            healthRatio = enemy.health.ratio,
+            enemyId = enemy.id,
+        )
+    }
+    
+    private fun EnemyType.getEnemyShadowRenderData(): RenderData {
+        val index = when (this) {
+            EnemyType.Skeleton, EnemyType.SkeletonArcher, EnemyType.SkeletonWarrior -> 4
+            EnemyType.SkeletonNecromancer -> 5
+        }
+        return RenderData(
+            asset = shadowsTileset,
+            offset = IntOffset(index * ASSETS_TILE_DIMENSION, 0),
+        )
+    }
+    
+    private fun EnemyType.getShadowHorizontalOffset(): Int = when (this) {
+        EnemyType.Skeleton, EnemyType.SkeletonArcher, EnemyType.SkeletonWarrior -> 2
+        EnemyType.SkeletonNecromancer -> 1
+    }
+    
 }
+
+fun Int.getOriginalTileSinglePixelOffset() = this / ASSETS_TILE_DIMENSION
