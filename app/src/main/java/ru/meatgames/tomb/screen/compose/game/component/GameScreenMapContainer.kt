@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
@@ -7,16 +8,27 @@ import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -25,24 +37,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
-import ru.meatgames.tomb.design.BaseTextButton
+import ru.meatgames.tomb.R
+import ru.meatgames.tomb.design.h1TextStyle
+import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.model.temp.ThemeAssets
-import ru.meatgames.tomb.screen.compose.charactersheet.Health
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -242,37 +260,20 @@ internal fun GameScreenMapContainer(
             fadedTilesAlpha = fadedTilesAlpha.value,
             characterFrameIndex = characterAnimationFrame,
         )
-        
-        Health(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 64.dp),
-            currentHealth = playerHealth.currentHealth,
-            maxHealth = playerHealth.maxHealth,
-        )
     }
     
-    BaseTextButton(
-        title = "Character Sheet",
-        modifier = Modifier.align(Alignment.TopEnd),
-        onClick = navigator::navigateToCharacterSheet,
-    )
-    
-    BaseTextButton(
-        title = "Inventory",
-        modifier = Modifier.align(Alignment.BottomStart),
-        onClick = navigator::navigateToInventory,
-    )
-    
-    BaseTextButton(
-        title = "New map",
-        modifier = Modifier.align(Alignment.BottomEnd),
-        onClick = navigator::onNewMapRequest,
+    BottomControls(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(vertical = 16.dp),
+        playerHealth = playerHealth,
+        navigator = navigator,
     )
     
     Text(
-        modifier = Modifier.align(Alignment.TopStart),
-        text = if (isIdle) "Idle" else "Processing",
+        modifier = Modifier.align(Alignment.TopCenter)
+            .padding(top = 16.dp),
+        text = if (isIdle) "Play!" else "Wait...",
         style = h3TextStyle,
         color = if (isIdle) Color.White else Color.Red,
     )
@@ -290,6 +291,118 @@ internal fun GameScreenMapContainer(
                     onItemClick = interactionController::itemSelected,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun BottomControls(
+    modifier: Modifier = Modifier,
+    playerHealth: HealthComponent,
+    navigator: GameScreenNavigator,
+) {
+    Row(
+        modifier = modifier.then(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        ),
+    ) {
+        Stat(
+            currentValue = playerHealth.currentHealth.toString(),
+            maxValue = playerHealth.maxHealth.toString(),
+        )
+        
+        Spacer(modifier = Modifier.weight(1f))
+    
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            IconButton(
+                illustrationResId = R.drawable.il_s_heart,
+                onClick = navigator::navigateToCharacterSheet,
+            )
+            IconButton(
+                illustrationResId = R.drawable.il_m_armor,
+                onClick = navigator::navigateToInventory,
+            )
+            IconButton(
+                illustrationResId = R.drawable.il_s_watch,
+                enabled = false,
+            )
+        }
+    }
+}
+
+@Composable
+private fun IconButton(
+    @DrawableRes illustrationResId: Int,
+    enabled: Boolean = true,
+    onClick: () -> Unit = { Unit },
+) {
+    val shape = RoundedCornerShape(16.dp)
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .background(
+                color = Color.DarkGray,
+                shape = shape,
+            )
+            .clip(shape)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(bounded = true),
+                enabled = enabled,
+                onClick = onClick,
+                role = Button,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        val colorMatrix = remember {
+            ColorMatrix().apply {
+                if (!enabled) setToSaturation(0f)
+            }
+        }
+        
+        Image(
+            modifier = Modifier.size(36.dp),
+            painter = painterResource(illustrationResId),
+            contentDescription = "None",
+            colorFilter = ColorFilter.colorMatrix(colorMatrix),
+        )
+    }
+}
+
+@Composable
+private fun Stat(
+    currentValue: String,
+    maxValue: String,
+) {
+    val shape = RoundedCornerShape(16.dp)
+    Box(
+        modifier = Modifier
+            .width(120.dp)
+            .height(64.dp)
+            .background(
+                color = Color.DarkGray,
+                shape = shape,
+            )
+            .clip(shape)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row {
+            Text(
+                modifier = Modifier.alignByBaseline(),
+                text = currentValue,
+                style = h1TextStyle,
+                color = Color.Red,
+            )
+            Text(
+                modifier = Modifier.alignByBaseline(),
+                text = "/$maxValue",
+                style = h2TextStyle,
+            )
         }
     }
 }
