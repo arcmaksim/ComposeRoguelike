@@ -2,7 +2,7 @@ package ru.meatgames.tomb.domain.render
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
-import ru.meatgames.tomb.domain.MapTileWrapper
+import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile

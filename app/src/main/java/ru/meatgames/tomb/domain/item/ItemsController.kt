@@ -1,10 +1,6 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.item
 
-import ru.meatgames.tomb.domain.item.Item
-import ru.meatgames.tomb.domain.item.ItemContainer
-import ru.meatgames.tomb.domain.item.ItemContainerId
-import ru.meatgames.tomb.domain.item.ItemId
-import ru.meatgames.tomb.domain.item.MapContainerId
+import ru.meatgames.tomb.domain.Coordinates
 import javax.inject.Inject
 import javax.inject.Singleton
 

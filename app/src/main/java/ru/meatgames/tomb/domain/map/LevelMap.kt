@@ -2,7 +2,6 @@ package ru.meatgames.tomb.domain.map
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import ru.meatgames.tomb.domain.MapTile
 import ru.meatgames.tomb.logMessage
 
 class LevelMap(

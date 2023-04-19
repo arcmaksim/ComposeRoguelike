@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.map
 
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile

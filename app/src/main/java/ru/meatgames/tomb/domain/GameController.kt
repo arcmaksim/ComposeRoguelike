@@ -7,6 +7,8 @@ import ru.meatgames.tomb.domain.component.asDirections
 import ru.meatgames.tomb.domain.component.calculateVectorTo
 import ru.meatgames.tomb.domain.component.isNextTo
 import ru.meatgames.tomb.domain.component.toCoordinates
+import ru.meatgames.tomb.domain.enemy.EnemiesController
+import ru.meatgames.tomb.domain.enemy.EnemiesHolder
 import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.map.MapController
 import ru.meatgames.tomb.domain.map.MapCreator

@@ -7,8 +7,6 @@ import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
 import ru.meatgames.tomb.di.PLAYGROUND_MAP_GENERATOR
 import ru.meatgames.tomb.domain.Coordinates
-import ru.meatgames.tomb.domain.MapTile
-import ru.meatgames.tomb.domain.MapTileWrapper
 import ru.meatgames.tomb.domain.mapgenerator.MapConfiguration
 import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile

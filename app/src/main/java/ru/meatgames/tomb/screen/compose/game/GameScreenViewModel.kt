@@ -15,7 +15,7 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
-import ru.meatgames.tomb.domain.ItemsHolder
+import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.player.PlayerMapInteractionController
 import ru.meatgames.tomb.domain.item.ItemContainerId

@@ -12,7 +12,7 @@ import ru.meatgames.tomb.GameController
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.screen.BasicScreen
 import ru.meatgames.tomb.screen.Screens
-import ru.meatgames.tomb.domain.MapTile
+import ru.meatgames.tomb.domain.map.MapTile
 import ru.meatgames.tomb.util.*
 import java.util.*
 

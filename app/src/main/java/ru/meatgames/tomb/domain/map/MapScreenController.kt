@@ -12,8 +12,6 @@ import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
-import ru.meatgames.tomb.domain.MapTile
-import ru.meatgames.tomb.domain.MapTileWrapper
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.minus

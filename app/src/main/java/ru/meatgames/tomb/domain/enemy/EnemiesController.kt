@@ -1,10 +1,9 @@
-package ru.meatgames.tomb.domain
+package ru.meatgames.tomb.domain.enemy
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.component.toPositionComponent
-import ru.meatgames.tomb.domain.enemy.Enemy
-import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.resolvedOffset
 import timber.log.Timber
 import javax.inject.Inject

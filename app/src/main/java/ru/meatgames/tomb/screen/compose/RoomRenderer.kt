@@ -26,8 +26,8 @@ import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.WallsDecorator
-import ru.meatgames.tomb.domain.MapTile
-import ru.meatgames.tomb.domain.MapTileWrapper
+import ru.meatgames.tomb.domain.map.MapTile
+import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.model.temp.ASSETS_TILE_DIMENSION
 import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
 import kotlin.math.max

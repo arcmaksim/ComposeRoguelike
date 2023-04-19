@@ -1,6 +1,6 @@
 package ru.meatgames.tomb.domain.render
 
-import ru.meatgames.tomb.domain.MapTileWrapper
+import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile

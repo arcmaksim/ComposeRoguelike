@@ -4,8 +4,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
-import ru.meatgames.tomb.domain.EnemiesHolder
-import ru.meatgames.tomb.domain.ItemsHolder
+import ru.meatgames.tomb.domain.enemy.EnemiesHolder
+import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.map.MapController
