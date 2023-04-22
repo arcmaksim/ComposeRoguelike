@@ -107,7 +107,7 @@ class GameControllerImpl @Inject constructor(
     
     private fun Enemy.takeTurn(
         player: CharacterState,
-    ): EnemyTurnResult? {
+    ): EnemyTurnResult {
         val vectorToPlayer = position.calculateVectorTo(player.position)
     
         if (vectorToPlayer.isNextTo()) {
@@ -138,7 +138,10 @@ class GameControllerImpl @Inject constructor(
             }
         }
         
-        return null
+        return EnemyTurnResult.SkipTurn(
+            enemyId = id,
+            position = position.toCoordinates(),
+        )
     }
     
     private fun Enemy.attackPlayer(

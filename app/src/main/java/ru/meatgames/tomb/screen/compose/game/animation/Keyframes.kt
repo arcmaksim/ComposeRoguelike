@@ -20,14 +20,28 @@ internal val screenShakeKeyframes: KeyframesSpec<Float> = keyframes {
     0f at 300 with easing
 }
 
-fun produceAttackKeyFrames(
-    durationInMillis: Int,
+fun produceAttackKeyframes(
+    durationMillis: Int,
 ): KeyframesSpec<Float> = keyframes {
-    durationMillis = durationInMillis
+    this.durationMillis = durationMillis
     
-    -.5f at (durationInMillis / 2) with FastOutSlowInEasing
-    1f at durationInMillis - (durationInMillis / 4) with FastOutSlowInEasing
-    0f at durationInMillis with FastOutSlowInEasing
+    -.5f at (durationMillis / 2) with FastOutSlowInEasing
+    1f at durationMillis - (durationMillis / 4) with FastOutSlowInEasing
+    0f at durationMillis with FastOutSlowInEasing
 }
 
-internal val defaultAttackKeyframes = produceAttackKeyFrames(ENEMIES_ATTACK_DURATION_MILLIS)
+internal val defaultAttackKeyframes = produceAttackKeyframes(ENEMIES_ATTACK_DURATION_MILLIS)
+
+internal fun produceIconKeyframes(
+    durationMillis: Int,
+): KeyframesSpec<Float> = keyframes {
+    this.durationMillis = durationMillis
+    
+    val easing = FastOutLinearInEasing
+    val transitionDurationMillis = 50
+    
+    0f at 0 with easing
+    1f at transitionDurationMillis with easing
+    1f at durationMillis - transitionDurationMillis with easing
+    0f at durationMillis with easing
+}

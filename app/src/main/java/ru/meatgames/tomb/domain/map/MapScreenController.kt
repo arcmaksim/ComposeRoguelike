@@ -29,6 +29,7 @@ import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.CharacterState
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
+import ru.meatgames.tomb.render.Icon
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -37,7 +38,7 @@ typealias EnemiesAnimations = List<Pair<EnemyId, EnemyAnimation>>
 
 @Singleton
 class MapScreenController @Inject constructor(
-    themeAssets: ThemeAssets,
+    private val themeAssets: ThemeAssets,
     @Named(MAP_VIEWPORT_WIDTH_KEY)
     private val viewportWidth: Int,
     @Named(MAP_VIEWPORT_HEIGHT_KEY)
@@ -316,6 +317,10 @@ class MapScreenController @Inject constructor(
                 result.enemyId to EnemyAnimation.Attack(
                     direction = result.direction,
                 )
+            }
+            
+            is EnemyTurnResult.SkipTurn -> {
+                result.enemyId to EnemyAnimation.Icon(themeAssets.getIconRenderData(Icon.Clock))
             }
         }
     }

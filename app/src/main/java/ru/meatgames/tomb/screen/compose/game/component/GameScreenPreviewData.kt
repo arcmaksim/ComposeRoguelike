@@ -4,6 +4,7 @@ import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
+import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
@@ -64,11 +65,13 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
             floorData = RenderData(
                 asset = floorData.first,
                 offset = floorData.second,
+                size = ASSETS_TILE_SIZE,
             ),
             objectData = objectData?.let {
                 RenderData(
                     asset = it.first,
                     offset = it.second,
+                    size = ASSETS_TILE_SIZE,
                 )
             },
             itemData = items[index],

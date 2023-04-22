@@ -85,6 +85,7 @@ internal fun GameScreenCharacter(
                 y = tileDimension * (viewportHeight / 2),
             ),
             alpha = 1f,
+            iconState = null,
         )
     }
 }

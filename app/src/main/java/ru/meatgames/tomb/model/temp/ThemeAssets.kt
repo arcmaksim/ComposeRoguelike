@@ -16,6 +16,7 @@ import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import ru.meatgames.tomb.render.AnimationRenderData
+import ru.meatgames.tomb.render.Icon
 import ru.meatgames.tomb.render.RenderData
 import java.io.IOException
 import java.io.InputStream
@@ -31,19 +32,20 @@ val ASSETS_TILE_SIZE = IntSize(ASSETS_TILE_DIMENSION, ASSETS_TILE_DIMENSION)
 class ThemeAssets @Inject constructor(
     @ApplicationContext context: Context,
 ) {
-
+    
     private val currentTheme: CurrentTheme
-
+    
     private val wallsThemes: WallsThemes
     private val floorThemes: FloorThemes
     private val doorsThemes: DoorsThemes
     private val stairsThemes: StairsThemes
     
     private val gismo: ImageBitmap
+    private val clock: ImageBitmap
     private val heroTileset: ImageBitmap
     private val enemiesTileset: ImageBitmap
     private val shadowsTileset: ImageBitmap
-
+    
     init {
         wallsThemes = context.loadWalls()
         floorThemes = context.loadFloor()
@@ -51,12 +53,13 @@ class ThemeAssets @Inject constructor(
         stairsThemes = context.loadStairs()
         
         gismo = context.getBitmapFromAsset("bag").asImageBitmap()
+        clock = context.getBitmapFromAsset("clock").asImageBitmap()
         heroTileset = context.getBitmapFromAsset("character_animation_sheet").asImageBitmap()
         enemiesTileset = context.getBitmapFromAsset("enemies").asImageBitmap()
         shadowsTileset = context.getBitmapFromAsset("shadows").asImageBitmap()
-
+        
         val theme = wallsThemes.themes.random(Random(System.currentTimeMillis())).title
-
+        
         currentTheme = CurrentTheme(
             wallsTheme = wallsThemes.themes.first { it.title == theme },
             floorTheme = floorThemes.themes.first { it.title == theme },
@@ -74,10 +77,11 @@ class ThemeAssets @Inject constructor(
         shadowRenderData = RenderData(
             asset = shadowsTileset,
             offset = IntOffset(ASSETS_TILE_DIMENSION * 4, 0),
+            size = ASSETS_TILE_SIZE,
         ),
         healthRatio = 0f,
     )
-
+    
     private fun Context.getBitmapFromAsset(
         bitmapName: String,
     ): Bitmap {
@@ -89,13 +93,13 @@ class ThemeAssets @Inject constructor(
         }
         return BitmapFactory.decodeStream(inputStream)
     }
-
+    
     private fun Context.loadWalls(): WallsThemes {
         val atlas = getBitmapFromAsset("walls").asImageBitmap()
         val data = Json.decodeFromStream<WallTilesDto>(
             assets.open("data/walls.json"),
         )
-
+        
         return WallsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
@@ -109,13 +113,13 @@ class ThemeAssets @Inject constructor(
             }
         )
     }
-
+    
     private fun Context.loadFloor(): FloorThemes {
         val atlas = getBitmapFromAsset("floor").asImageBitmap()
         val data = Json.decodeFromStream<FloorTilesDto>(
             assets.open("data/floor.json"),
         )
-
+        
         return FloorThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
@@ -129,13 +133,13 @@ class ThemeAssets @Inject constructor(
             }
         )
     }
-
+    
     private fun Context.loadDoors(): DoorsThemes {
         val atlas = getBitmapFromAsset("doors").asImageBitmap()
         val data = Json.decodeFromStream<DoorTilesDto>(
             assets.open("data/doors.json"),
         )
-
+        
         return DoorsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
@@ -149,13 +153,13 @@ class ThemeAssets @Inject constructor(
             }
         )
     }
-
+    
     private fun Context.loadStairs(): StairsThemes {
         val atlas = getBitmapFromAsset("stairs").asImageBitmap()
         val data = Json.decodeFromStream<StairTilesDto>(
             assets.open("data/stairs.json"),
         )
-
+        
         return StairsThemes(
             atlas = atlas,
             themes = data.themes.map { theme ->
@@ -169,7 +173,7 @@ class ThemeAssets @Inject constructor(
             }
         )
     }
-
+    
     fun resolveFloorRenderData(
         floorRenderTile: FloorRenderTile,
     ): Pair<ImageBitmap, IntOffset> = when (floorRenderTile) {
@@ -177,7 +181,7 @@ class ThemeAssets @Inject constructor(
             floorThemes.atlas to currentTheme.floorTheme.map.getValue(floorRenderTile)
         }
     }
-
+    
     fun resolveObjectRenderData(
         objectRenderTile: ObjectRenderTile,
     ): Pair<ImageBitmap, IntOffset> = when (objectRenderTile) {
@@ -185,7 +189,7 @@ class ThemeAssets @Inject constructor(
         ObjectRenderTile.DoorOpened -> {
             doorsThemes.atlas to currentTheme.doorsTheme.map.getValue(objectRenderTile)
         }
-
+        
         ObjectRenderTile.StairsDown,
         ObjectRenderTile.StairsUp -> {
             stairsThemes.atlas to currentTheme.stairsTheme.map.getValue(objectRenderTile)
@@ -214,6 +218,7 @@ class ThemeAssets @Inject constructor(
     fun resolveItemRenderData(): RenderData = RenderData(
         asset = gismo,
         offset = IntOffset(0, 0),
+        size = ASSETS_TILE_SIZE,
     )
     
     fun getEnemyRenderData(
@@ -246,12 +251,23 @@ class ThemeAssets @Inject constructor(
         return RenderData(
             asset = shadowsTileset,
             offset = IntOffset(index * ASSETS_TILE_DIMENSION, 0),
+            size = ASSETS_TILE_SIZE,
         )
     }
     
     private fun EnemyType.getShadowHorizontalOffset(): Int = when (this) {
         EnemyType.Skeleton, EnemyType.SkeletonArcher, EnemyType.SkeletonWarrior -> 2
         EnemyType.SkeletonNecromancer -> 1
+    }
+    
+    fun getIconRenderData(
+        icon: Icon,
+    ): RenderData = when (icon) {
+        Icon.Clock -> RenderData(
+            asset = clock,
+            offset = IntOffset(0, 0),
+            size = IntSize(clock.width, clock.height),
+        )
     }
     
 }

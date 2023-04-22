@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.domain.enemy
 
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.render.RenderData
 
 sealed class EnemyAnimation {
 
@@ -13,6 +14,10 @@ sealed class EnemyAnimation {
     
     data class Attack(
         val direction: Direction,
+    ) : EnemyAnimation()
+    
+    data class Icon(
+        val renderData: RenderData,
     ) : EnemyAnimation()
 
 }

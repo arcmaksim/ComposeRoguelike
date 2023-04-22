@@ -123,7 +123,7 @@ internal fun GameScreenMapContainer(
     
     val view = LocalView.current
     val shakeOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
-    val enemiesOffsets = remember(enemiesAnimations) {
+    val enemiesAnimationUpdates = remember(enemiesAnimations) {
         mutableStateOf(enemiesAnimations?.toMap(tileDimension) ?: emptyMap())
     }
     val horizontalOffset = IntOffset(
@@ -147,7 +147,7 @@ internal fun GameScreenMapContainer(
     
     // Pose animation
     val characterIdleTransition = rememberInfiniteTransition(label = "characterIdleInfiniteTransition")
-    val characterAnimationFrame by characterIdleTransition.animateValue(
+    val characterAnimationFrameIndex by characterIdleTransition.animateValue(
         initialValue = 0,
         targetValue = CHARACTER_IDLE_ANIMATION_FRAMES,
         typeConverter = Int.VectorConverter,
@@ -158,7 +158,7 @@ internal fun GameScreenMapContainer(
                 easing = LinearEasing,
             ),
         ),
-        label = "characterIdleAnimationFrame",
+        label = "characterIdleAnimationFrameIndex",
     )
     
     LaunchedEffect(playerAnimation) {
@@ -190,7 +190,7 @@ internal fun GameScreenMapContainer(
                         animationDurationMillis = animationDurationMillis,
                         tileDimension = tileDimension,
                     ) { it, state ->
-                        enemiesOffsets.value = enemiesOffsets.value.toMutableMap().apply {
+                        enemiesAnimationUpdates.value = enemiesAnimationUpdates.value.toMutableMap().apply {
                             this[it] = state
                         }
                     },
@@ -241,7 +241,7 @@ internal fun GameScreenMapContainer(
         
         GameScreenCharacter(
             modifier = modifier,
-            frameIndex = characterAnimationFrame,
+            frameIndex = characterAnimationFrameIndex,
             viewportWidth = mapState.viewportWidth,
             viewportHeight = mapState.viewportHeight,
             characterRenderData = mapState.characterRenderData,
@@ -254,12 +254,12 @@ internal fun GameScreenMapContainer(
             tilesPadding = mapState.tilesPadding,
             tilesToReveal = mapState.tilesToFadeIn,
             tilesToFade = mapState.tilesToFadeOut,
-            animationStates = enemiesOffsets.value,
+            animationStates = enemiesAnimationUpdates.value,
             animatedOffset = animatedMovementOffset.value,
             initialOffset = initialMovementOffset,
             revealedTilesAlpha = revealedTilesAlpha.value,
             fadedTilesAlpha = fadedTilesAlpha.value,
-            characterFrameIndex = characterAnimationFrame,
+            characterFrameIndex = characterAnimationFrameIndex,
         )
     }
     
@@ -324,15 +324,15 @@ private fun BottomControls(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             IconButton(
-                illustrationResId = R.drawable.il_s_heart,
+                illustrationResId = R.drawable.il_heart,
                 onClick = navigator::navigateToCharacterSheet,
             )
             IconButton(
-                illustrationResId = R.drawable.il_m_armor,
+                illustrationResId = R.drawable.il_armor,
                 onClick = navigator::navigateToInventory,
             )
             IconButton(
-                illustrationResId = R.drawable.il_s_watch,
+                illustrationResId = R.drawable.il_watch,
                 onClick = interactionController::skipTurn,
                 enabled = isIdle,
             )
@@ -415,16 +415,18 @@ private fun Stat(
 
 private fun EnemiesAnimations.toMap(
     tileDimension: Int,
-) = associate { (id, animation) ->
+): Map<EnemyId, EnemyAnimationState?> = associate { (id, animation) ->
     when (animation) {
-        is EnemyAnimation.Move -> id to EnemyAnimationState(
+        is EnemyAnimation.Move -> id to EnemyAnimationState.Transition(
             tileDimension = tileDimension,
             moveState = animation,
         )
         
-        else -> id to EnemyAnimationState(
+        is EnemyAnimation.Attack -> id to EnemyAnimationState.Transition(
             offset = IntOffset.Zero,
             alpha = 1f,
         )
+        
+        is EnemyAnimation.Icon -> id to null
     }
-}
+}.toMap()

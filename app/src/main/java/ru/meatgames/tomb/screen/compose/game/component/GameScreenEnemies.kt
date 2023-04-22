@@ -63,7 +63,7 @@ internal fun GameScreenEnemies(
     tilesPadding: Int,
     tilesToReveal: Set<ScreenSpaceCoordinates>,
     tilesToFade: Set<ScreenSpaceCoordinates>,
-    animationStates: Map<EnemyId, EnemyAnimationState>,
+    animationStates: Map<EnemyId, EnemyAnimationState?>,
     initialOffset: IntOffset,
     animatedOffset: IntOffset,
     revealedTilesAlpha: Float,
@@ -89,8 +89,12 @@ internal fun GameScreenEnemies(
             
             val enemyId = renderTile.enemyData!!.enemyId
             
-            val animationOffset = animationStates[enemyId]?.offset ?: IntOffset.Zero
-            val animationAlpha = animationStates[enemyId]?.alpha
+            val (animationOffset, animationAlpha) = animationStates[enemyId]
+                ?.let { it as? EnemyAnimationState.Transition }
+                ?.let { it.offset to it.alpha }
+                ?: let { IntOffset.Zero to null }
+            
+            val iconState = animationStates[enemyId]?.let { it as? EnemyAnimationState.Icon }
             
             val dstOffset = horizontalScreenBorderOffset + initialOffset + animatedOffset + animationOffset + tileOffset
             
@@ -107,6 +111,7 @@ internal fun GameScreenEnemies(
                     tileDimension = tileDimension,
                     alpha = alpha,
                     characterFrameIndex = characterFrameIndex,
+                    iconState = iconState,
                 )
             }
         }
@@ -120,6 +125,7 @@ private fun AnimationRenderData.drawCharacter(
     tileDimension: Int,
     characterFrameIndex: Int,
     alpha: Float?,
+    iconState: EnemyAnimationState.Icon?,
 ) {
     drawCharacter(
         tileDimension = tileDimension,
@@ -129,5 +135,6 @@ private fun AnimationRenderData.drawCharacter(
         dstSize = tileSize,
         dstOffset = dstOffset,
         alpha = alpha ?: 1f,
+        iconState = iconState,
     )
 }

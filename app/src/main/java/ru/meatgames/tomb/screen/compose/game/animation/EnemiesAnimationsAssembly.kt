@@ -32,6 +32,13 @@ suspend fun List<Pair<EnemyId, EnemyAnimation>>.assembleEnemiesAnimations(
             tileDimension = tileDimension,
             update = update,
         )
+        
+        is EnemyAnimation.Icon -> animationState.asAnimationAsync(
+            enemyId = enemyId,
+            durationMillis = animationDurationMillis,
+            delayMillis = delayMillis,
+            update = update,
+        )
     }
 }.toTypedArray()
 
@@ -41,14 +48,14 @@ private suspend fun EnemyAnimation.Move.asAnimationAsync(
     durationMillis: Int,
     delayMillis: Int,
     tileDimension: Int,
-    update: (EnemyId, EnemyAnimationState) -> Unit,
+    update: (EnemyId, EnemyAnimationState.Transition) -> Unit,
 ): Deferred<Unit> = asEnemiesMoveAnimationAsync(
     durationMillis = durationMillis,
     delayMillis = delayMillis,
 ) { coefficient ->
     update(
         enemyId,
-        EnemyAnimationState(
+        EnemyAnimationState.Transition(
             offset = -direction.toIntOffset(tileDimension) * coefficient,
             alpha = when (fade) {
                 EnemyAnimation.Move.Fade.IN -> 1f - coefficient
@@ -64,7 +71,7 @@ private suspend fun EnemyAnimation.Attack.asAnimationAsync(
     enemyId: EnemyId,
     delayMillis: Int,
     tileDimension: Int,
-    update: (EnemyId, EnemyAnimationState) -> Unit,
+    update: (EnemyId, EnemyAnimationState.Transition) -> Unit,
 ): Deferred<Unit> {
     val resoledExaggeration = ENEMIES_DEFAULT_ATTACK_EXAGGERATION.coerceIn(.5f, 2f)
     val animationDistance = tileDimension * ATTACK_DISTANCE_MODIFIER
@@ -75,9 +82,30 @@ private suspend fun EnemyAnimation.Attack.asAnimationAsync(
     ) { coefficient ->
         update(
             enemyId,
-            EnemyAnimationState(
+            EnemyAnimationState.Transition(
                 offset = offset * coefficient,
                 alpha = 1f,
+            ),
+        )
+    }
+}
+
+context(CoroutineScope)
+private suspend fun EnemyAnimation.Icon.asAnimationAsync(
+    enemyId: EnemyId,
+    durationMillis: Int,
+    delayMillis: Int,
+    update: (EnemyId, EnemyAnimationState.Icon) -> Unit,
+): Deferred<Unit> {
+    return asIconAnimationAsync(
+        durationMillis = durationMillis,
+        delayMillis = delayMillis,
+    ) { alpha ->
+        update(
+            enemyId,
+            EnemyAnimationState.Icon(
+                renderData = renderData,
+                iconAlpha = alpha,
             ),
         )
     }
