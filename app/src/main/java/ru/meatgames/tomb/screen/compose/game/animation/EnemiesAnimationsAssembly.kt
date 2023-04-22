@@ -15,7 +15,7 @@ suspend fun List<Pair<EnemyId, EnemyAnimation>>.assembleEnemiesAnimations(
 ): Array<Deferred<Any>> = mapIndexedNotNull { index, (enemyId, animationState) ->
     if (Config.skipEnemiesAnimations) return@mapIndexedNotNull null
     
-    val delayMillis = animationDurationMillis / 2 * index
+    val delayMillis = animationDurationMillis / 3 * index
     
     when (animationState) {
         is EnemyAnimation.Move -> animationState.asAnimationAsync(
