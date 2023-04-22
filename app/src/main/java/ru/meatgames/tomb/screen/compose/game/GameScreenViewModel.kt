@@ -162,12 +162,22 @@ class GameScreenViewModel @Inject constructor(
         }
     }
     
-    override suspend fun finishPlayerAnimation() {
-        gameController.finishPlayerAnimation(latestTurnResult)
+    override fun finishPlayerAnimation() {
+        viewModelScope.launch {
+            gameController.finishPlayerAnimation(latestTurnResult)
+        }
     }
     
-    override suspend fun finishEnemiesAnimation() {
-        gameController.finishEnemiesAnimations()
+    override fun finishEnemiesAnimation() {
+        viewModelScope.launch {
+            gameController.finishEnemiesAnimations()
+        }
     }
     
+    override fun skipTurn() {
+        if (!isIdle.value) return
+        viewModelScope.launch {
+            gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)
+        }
+    }
 }

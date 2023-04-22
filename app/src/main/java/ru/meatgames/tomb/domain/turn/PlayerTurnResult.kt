@@ -34,6 +34,8 @@ sealed class PlayerTurnResult {
         val direction: Direction,
     ) : PlayerTurnResult()
     
+    object SkipTurn : PlayerTurnResult()
+    
 }
 
 fun PlayerTurnResult.finishesPlayerTurn(): Boolean = when (this) {
@@ -43,6 +45,7 @@ fun PlayerTurnResult.finishesPlayerTurn(): Boolean = when (this) {
 }
 
 fun PlayerTurnResult.hasAnimation(): Boolean = when (this) {
-    is PlayerTurnResult.PickupItem -> false
+    is PlayerTurnResult.PickupItem,
+    is PlayerTurnResult.SkipTurn-> false
     else -> true
 }

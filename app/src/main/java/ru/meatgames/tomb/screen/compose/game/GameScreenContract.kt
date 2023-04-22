@@ -41,7 +41,7 @@ interface GameScreenNavigator {
 
 interface GameScreenInteractionController {
     
-    suspend fun finishPlayerAnimation()
+    fun finishPlayerAnimation()
     
     fun processCharacterMoveInput(direction: Direction)
     
@@ -52,6 +52,8 @@ interface GameScreenInteractionController {
         itemId: ItemId,
     )
     
-    suspend fun finishEnemiesAnimation()
+    fun finishEnemiesAnimation()
+    
+    fun skipTurn()
     
 }

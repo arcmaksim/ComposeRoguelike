@@ -146,7 +146,7 @@ internal fun GameScreenMapContainer(
     }
     
     // Pose animation
-    val characterIdleTransition = rememberInfiniteTransition()
+    val characterIdleTransition = rememberInfiniteTransition(label = "characterIdleInfiniteTransition")
     val characterAnimationFrame by characterIdleTransition.animateValue(
         initialValue = 0,
         targetValue = CHARACTER_IDLE_ANIMATION_FRAMES,
@@ -157,7 +157,8 @@ internal fun GameScreenMapContainer(
                 durationMillis = CHARACTER_IDLE_ANIMATION_DURATION_MILLIS * CHARACTER_IDLE_ANIMATION_FRAMES,
                 easing = LinearEasing,
             ),
-        )
+        ),
+        label = "characterIdleAnimationFrame",
     )
     
     LaunchedEffect(playerAnimation) {
@@ -263,11 +264,13 @@ internal fun GameScreenMapContainer(
     }
     
     BottomControls(
+        isIdle = isIdle,
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .padding(vertical = 16.dp),
         playerHealth = playerHealth,
         navigator = navigator,
+        interactionController = interactionController,
     )
     
     Text(
@@ -297,9 +300,11 @@ internal fun GameScreenMapContainer(
 
 @Composable
 private fun BottomControls(
-    modifier: Modifier = Modifier,
+    isIdle: Boolean,
     playerHealth: HealthComponent,
     navigator: GameScreenNavigator,
+    interactionController: GameScreenInteractionController,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.then(
@@ -328,7 +333,8 @@ private fun BottomControls(
             )
             IconButton(
                 illustrationResId = R.drawable.il_s_watch,
-                enabled = false,
+                onClick = interactionController::skipTurn,
+                enabled = isIdle,
             )
         }
     }
@@ -358,7 +364,7 @@ private fun IconButton(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        val colorMatrix = remember {
+        val colorMatrix = remember(enabled) {
             ColorMatrix().apply {
                 if (!enabled) setToSaturation(0f)
             }
