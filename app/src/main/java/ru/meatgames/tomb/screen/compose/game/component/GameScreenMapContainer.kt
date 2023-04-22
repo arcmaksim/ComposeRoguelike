@@ -71,7 +71,7 @@ import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_FRAMES
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.player.PlayerAnimation
-import ru.meatgames.tomb.domain.player.isStateless
+import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations
 import ru.meatgames.tomb.screen.compose.game.animation.assemblePlayerInputAnimations
@@ -116,7 +116,7 @@ internal fun GameScreenMapContainer(
         .background(Color(0xFF212121))
         .fillMaxSize(),
 ) {
-    val isPlayerAnimationStateless = playerAnimation.isStateless
+    val animationUpdatesScreenSpaceTiles = playerAnimation.updatesScreenSpaceTiles
     
     val screenWidth = LocalDensity.current.run { maxWidth.toPx() }.toInt()
     val tileDimension = screenWidth / mapState.viewportWidth
@@ -139,10 +139,10 @@ internal fun GameScreenMapContainer(
     
     // Reveal offsets
     val revealedTilesAlpha = remember(playerAnimation) {
-        mutableStateOf(if (isPlayerAnimationStateless) 1f else 0f)
+        mutableStateOf(if (animationUpdatesScreenSpaceTiles) 0f else 1f)
     }
     val fadedTilesAlpha = remember(playerAnimation) {
-        mutableStateOf(if (isPlayerAnimationStateless) 0f else 1f)
+        mutableStateOf(if (animationUpdatesScreenSpaceTiles) 1f else 0f)
     }
     
     // Pose animation

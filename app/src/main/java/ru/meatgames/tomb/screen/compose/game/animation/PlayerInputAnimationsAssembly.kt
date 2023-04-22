@@ -8,7 +8,7 @@ import kotlinx.coroutines.Deferred
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.config.Config
 import ru.meatgames.tomb.domain.player.PlayerAnimation
-import ru.meatgames.tomb.domain.player.isStateless
+import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 
 context(CoroutineScope)
 suspend fun PlayerAnimation?.assemblePlayerInputAnimations(
@@ -42,13 +42,13 @@ suspend fun PlayerAnimation?.assemblePlayerInputAnimations(
         else -> emptyList()
     }
     
-    val tilesAnimations = if (isStateless) {
-        emptyList<Deferred<Any>>()
-    } else {
+    val tilesAnimations = if (updatesScreenSpaceTiles) {
         listOf(
             fadeInTilesAlpha.asFadeInAnimationAsync(animationDurationMillis),
             fadeOutTilesAlpha.asFadeOutAnimationAsync(animationDurationMillis),
         )
+    } else {
+        emptyList<Deferred<Any>>()
     }
     
     return (specificAnimations + tilesAnimations).toTypedArray()

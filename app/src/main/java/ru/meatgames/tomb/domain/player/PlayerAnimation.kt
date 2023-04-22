@@ -16,9 +16,9 @@ sealed class PlayerAnimation {
 
 }
 
-val PlayerAnimation?.isStateless: Boolean
+val PlayerAnimation?.updatesScreenSpaceTiles: Boolean
     get() = when (this) {
         is PlayerAnimation.Shake,
-        is PlayerAnimation.Attack -> true
-        else -> false
+        is PlayerAnimation.Attack -> false
+        else -> true
     }
