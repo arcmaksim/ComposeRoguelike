@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
-import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -82,16 +81,18 @@ internal fun GameScreenMap(
             val dstOffset = offset + initialOffset + animatedOffset + tileOffset
             
             when {
-                renderTile !is MapRenderTile.Content -> null
+                renderTile !is MapRenderTile.Content -> {
+                    null
+                }
                 renderTile.isVisible && tilesToReveal.contains(tileScreenSpaceCoordinates) -> {
-                    if (renderTile.objectData != null) logMessage("GameScreenMap", "flag1: $revealedTilesAlpha")
                     renderTile to revealedTilesAlpha
                 }
                 renderTile.isVisible -> {
-                    if (renderTile.objectData != null) logMessage("GameScreenMap", "flag2: ${1f}")
                     renderTile to 1f
                 }
-                tilesToFade.contains(tileScreenSpaceCoordinates) -> renderTile to fadedTilesAlpha
+                tilesToFade.contains(tileScreenSpaceCoordinates) -> {
+                    renderTile to fadedTilesAlpha
+                }
                 else -> null
             }?.let { (tile, alpha) ->
                 tile.drawRevealedTile(
@@ -106,7 +107,7 @@ internal fun GameScreenMap(
 }
 
 context(DrawScope)
-    private fun MapRenderTile.Content.drawRevealedTile(
+private fun MapRenderTile.Content.drawRevealedTile(
     dstOffset: IntOffset,
     tileSize: IntSize,
     backgroundColor: Color,
