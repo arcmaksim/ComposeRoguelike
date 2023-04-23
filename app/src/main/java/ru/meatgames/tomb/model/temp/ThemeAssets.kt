@@ -79,7 +79,7 @@ class ThemeAssets @Inject constructor(
         ),
         shadowRenderData = RenderData(
             asset = shadowsTileset,
-            offset = IntOffset(ASSETS_TILE_DIMENSION * 4, 0),
+            offset = IntOffset(ASSETS_TILE_DIMENSION * 12, 0),
             size = ASSETS_TILE_SIZE,
         ),
         healthRatio = 0f,
@@ -248,8 +248,8 @@ class ThemeAssets @Inject constructor(
     
     private fun EnemyType.getEnemyShadowRenderData(): RenderData {
         val index = when (this) {
-            EnemyType.Skeleton, EnemyType.SkeletonArcher, EnemyType.SkeletonWarrior -> 4
-            EnemyType.SkeletonNecromancer -> 5
+            EnemyType.Skeleton, EnemyType.SkeletonArcher, EnemyType.SkeletonWarrior -> 12
+            EnemyType.SkeletonNecromancer -> 13
         }
         return RenderData(
             asset = shadowsTileset,
@@ -272,6 +272,12 @@ class ThemeAssets @Inject constructor(
             size = IntSize(clock.width, clock.height),
         )
     }
+    
+    fun resolveBottomShadow(): RenderData = RenderData(
+        asset = shadowsTileset,
+        offset = IntOffset(ASSETS_TILE_DIMENSION, 0),
+        size = ASSETS_TILE_SIZE,
+    )
     
 }
 

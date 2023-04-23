@@ -117,6 +117,12 @@ private fun MapRenderTile.Content.drawRevealedTile(
         dstOffset = dstOffset,
         dstSize = tileSize,
     )
+    decorations.forEach {
+        it.drawImage(
+            dstOffset = dstOffset,
+            dstSize = tileSize,
+        )
+    }
     objectData?.drawImage(
         dstOffset = dstOffset,
         dstSize = tileSize,

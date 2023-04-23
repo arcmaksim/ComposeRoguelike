@@ -9,6 +9,8 @@ sealed class MapRenderTile {
         val objectData: RenderData?,
         val itemData: RenderData?,
         val enemyData: AnimationRenderData?,
+        // TODO: add render order
+        val decorations: List<RenderData> = emptyList(),
         val isVisible: Boolean,
     ) : MapRenderTile()
 

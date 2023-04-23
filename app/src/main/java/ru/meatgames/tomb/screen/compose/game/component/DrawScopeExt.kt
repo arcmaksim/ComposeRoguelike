@@ -25,7 +25,7 @@ fun RenderData.drawImage(
         alpha = alpha,
         image = asset,
         srcOffset = offset,
-        srcSize = size ?: ASSETS_TILE_SIZE,
+        srcSize = size,
         dstOffset = dstOffset,
         dstSize = dstSize,
         filterQuality = FilterQuality.None,
