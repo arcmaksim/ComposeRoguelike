@@ -10,6 +10,8 @@ internal val navigatorPreviewStub = object : GameScreenNavigator {
     override fun navigateToInventory() = Unit
     
     override fun navigateToCharacterSheet() = Unit
+    
+    override fun showDialog() = Unit
 }
 
 internal val interactionControllerPreviewStub = object : GameScreenInteractionController {

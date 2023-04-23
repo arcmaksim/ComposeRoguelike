@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.charactersheet.CharacterSheetScreen
+import ru.meatgames.tomb.screen.compose.featuretoggle.FeatureToggleScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
 import ru.meatgames.tomb.screen.compose.game.dialog.GameScreenDialog
 import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
@@ -76,10 +77,20 @@ fun TombApp(
                     onBack = navController::popBackStack,
                 )
             }
+            composable(GameState.FeatureToggles.id) {
+                FeatureToggleScreen(
+                    viewModel = hiltViewModel(),
+                    onBack = navController::popBackStack,
+                )
+            }
             dialog(GameState.GameScreenDialog.id) {
                 GameScreenDialog(
                     viewModel = hiltViewModel(),
                     closeDialog = navController::popBackStack,
+                    onFeatureToggles = {
+                        navController.popBackStack()
+                        navController.navigate(GameState.FeatureToggles.id)
+                    },
                     closeGame = onCloseApp,
                 )
             }

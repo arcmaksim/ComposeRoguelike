@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import ru.meatgames.tomb.design.h2TextStyle
 fun GameScreenDialogPreview() {
     GameScreenDialogContent(
         onNewMapRequested = { Unit },
+        onFeatureToggles = { Unit },
         onCloseGame = { Unit },
     )
 }
@@ -30,17 +32,28 @@ fun GameScreenDialogPreview() {
 fun GameScreenDialog(
     viewModel: GameScreenDialogVM,
     closeDialog: () -> Unit,
+    onFeatureToggles: () -> Unit,
     closeGame: () -> Unit,
 ) {
-    val callback = remember(viewModel, closeDialog) {
+    val newMapRequestCallback = remember(viewModel, closeDialog) {
         {
             closeDialog()
             viewModel.generateNewMap()
         }
     }
     
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                GameScreenDialogEvent.NavigateToFeatureToggles -> onFeatureToggles()
+                else -> Unit
+            }
+        }
+    }
+    
     GameScreenDialogContent(
-        onNewMapRequested = callback,
+        onNewMapRequested = newMapRequestCallback,
+        onFeatureToggles = viewModel::showFeatureToggles,
         onCloseGame = closeGame,
     )
 }
@@ -48,6 +61,7 @@ fun GameScreenDialog(
 @Composable
 private fun GameScreenDialogContent(
     onNewMapRequested: () -> Unit,
+    onFeatureToggles: () -> Unit,
     onCloseGame: () -> Unit,
 ) {
     Column(
@@ -69,6 +83,11 @@ private fun GameScreenDialogContent(
         BaseTextButton(
             title = "Generate new map",
             onClick = onNewMapRequested,
+        )
+    
+        BaseTextButton(
+            title = "Feature toggles",
+            onClick = onFeatureToggles,
         )
     
         BaseTextButton(

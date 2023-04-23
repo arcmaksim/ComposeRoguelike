@@ -2,7 +2,8 @@ package ru.meatgames.tomb.screen.compose.game.animation
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import ru.meatgames.tomb.config.Config
+import ru.meatgames.tomb.config.FeatureToggles
+import ru.meatgames.tomb.config.FeatureToggleKey
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.toIntOffset
@@ -13,7 +14,7 @@ suspend fun List<Pair<EnemyId, EnemyAnimation>>.assembleEnemiesAnimations(
     tileDimension: Int,
     update: (EnemyId, EnemyAnimationState) -> Unit,
 ): Array<Deferred<Any>> = mapIndexedNotNull { index, (enemyId, animationState) ->
-    if (Config.skipEnemiesAnimations) return@mapIndexedNotNull null
+    if (FeatureToggles.getToggleValue(FeatureToggleKey.SkipEnemiesAnimations)) return@mapIndexedNotNull null
     
     val delayMillis = animationDurationMillis / 3 * index
     
