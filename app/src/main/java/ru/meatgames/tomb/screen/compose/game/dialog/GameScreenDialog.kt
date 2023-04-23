@@ -22,6 +22,7 @@ import ru.meatgames.tomb.design.h2TextStyle
 fun GameScreenDialogPreview() {
     GameScreenDialogContent(
         onNewMapRequested = { Unit },
+        onCloseGame = { Unit },
     )
 }
 
@@ -29,6 +30,7 @@ fun GameScreenDialogPreview() {
 fun GameScreenDialog(
     viewModel: GameScreenDialogVM,
     closeDialog: () -> Unit,
+    closeGame: () -> Unit,
 ) {
     val callback = remember(viewModel, closeDialog) {
         {
@@ -39,12 +41,14 @@ fun GameScreenDialog(
     
     GameScreenDialogContent(
         onNewMapRequested = callback,
+        onCloseGame = closeGame,
     )
 }
 
 @Composable
 private fun GameScreenDialogContent(
     onNewMapRequested: () -> Unit,
+    onCloseGame: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -65,6 +69,11 @@ private fun GameScreenDialogContent(
         BaseTextButton(
             title = "Generate new map",
             onClick = onNewMapRequested,
+        )
+    
+        BaseTextButton(
+            title = "Close game",
+            onClick = onCloseGame,
         )
     }
 }

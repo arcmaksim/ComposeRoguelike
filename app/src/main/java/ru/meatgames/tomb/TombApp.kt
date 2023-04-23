@@ -80,6 +80,7 @@ fun TombApp(
                 GameScreenDialog(
                     viewModel = hiltViewModel(),
                     closeDialog = navController::popBackStack,
+                    closeGame = onCloseApp,
                 )
             }
         }
