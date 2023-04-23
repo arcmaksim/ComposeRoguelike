@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import ru.meatgames.tomb.config.Config
 import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
@@ -58,7 +59,9 @@ class ThemeAssets @Inject constructor(
         enemiesTileset = context.getBitmapFromAsset("enemies").asImageBitmap()
         shadowsTileset = context.getBitmapFromAsset("shadows").asImageBitmap()
         
-        val theme = wallsThemes.themes.random(Random(System.currentTimeMillis())).title
+        val theme = Config.themeOverride?.let { themeOverride ->
+            wallsThemes.themes.first { it.title == themeOverride }.title
+        } ?: wallsThemes.themes.random(Random(System.currentTimeMillis())).title
         
         currentTheme = CurrentTheme(
             wallsTheme = wallsThemes.themes.first { it.title == theme },
