@@ -10,11 +10,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.charactersheet.CharacterSheetScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
+import ru.meatgames.tomb.screen.compose.game.dialog.GameScreenDialog
 import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
 
 @ExperimentalMaterialApi
@@ -50,6 +52,7 @@ fun TombApp(
                     },
                     onInventory = { navController.navigate(GameState.Inventory.id) },
                     onCharacterSheet = { navController.navigate(GameState.Stats.id) },
+                    onDialog = { navController.navigate(GameState.GameScreenDialog.id) },
                 )
             }
             composable(GameState.WinScreen.id) {
@@ -71,6 +74,12 @@ fun TombApp(
                 CharacterSheetScreen(
                     viewModel = hiltViewModel(),
                     onBack = navController::popBackStack,
+                )
+            }
+            dialog(GameState.GameScreenDialog.id) {
+                GameScreenDialog(
+                    viewModel = hiltViewModel(),
+                    closeDialog = navController::popBackStack,
                 )
             }
         }

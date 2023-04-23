@@ -24,11 +24,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -39,20 +37,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.component.IconButton
+import ru.meatgames.tomb.component.IllustrationButton
 import ru.meatgames.tomb.design.h1TextStyle
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.design.h3TextStyle
@@ -263,18 +259,27 @@ internal fun GameScreenMapContainer(
         )
     }
     
+    IconButton(
+        modifier = Modifier
+            .align(Alignment.TopEnd)
+            .padding(16.dp),
+        iconResId = R.drawable.ic_cog,
+        onClick = navigator::showDialog,
+    )
+    
     BottomControls(
-        isIdle = isIdle,
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .padding(vertical = 16.dp),
+        isIdle = isIdle,
         playerHealth = playerHealth,
         navigator = navigator,
         interactionController = interactionController,
     )
     
     Text(
-        modifier = Modifier.align(Alignment.TopCenter)
+        modifier = Modifier
+            .align(Alignment.TopCenter)
             .padding(top = 16.dp),
         text = if (isIdle) "Play!" else "Wait...",
         style = h3TextStyle,
@@ -319,63 +324,24 @@ private fun BottomControls(
         )
         
         Spacer(modifier = Modifier.weight(1f))
-    
+        
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            IconButton(
+            IllustrationButton(
                 illustrationResId = R.drawable.il_heart,
                 onClick = navigator::navigateToCharacterSheet,
             )
-            IconButton(
+            IllustrationButton(
                 illustrationResId = R.drawable.il_armor,
                 onClick = navigator::navigateToInventory,
             )
-            IconButton(
+            IllustrationButton(
                 illustrationResId = R.drawable.il_watch,
                 onClick = interactionController::skipTurn,
                 enabled = isIdle,
             )
         }
-    }
-}
-
-@Composable
-private fun IconButton(
-    @DrawableRes illustrationResId: Int,
-    enabled: Boolean = true,
-    onClick: () -> Unit = { Unit },
-) {
-    val shape = RoundedCornerShape(16.dp)
-    Box(
-        modifier = Modifier
-            .size(64.dp)
-            .background(
-                color = Color.DarkGray,
-                shape = shape,
-            )
-            .clip(shape)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(bounded = true),
-                enabled = enabled,
-                onClick = onClick,
-                role = Button,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        val colorMatrix = remember(enabled) {
-            ColorMatrix().apply {
-                if (!enabled) setToSaturation(0f)
-            }
-        }
-        
-        Image(
-            modifier = Modifier.size(36.dp),
-            painter = painterResource(illustrationResId),
-            contentDescription = "None",
-            colorFilter = ColorFilter.colorMatrix(colorMatrix),
-        )
     }
 }
 

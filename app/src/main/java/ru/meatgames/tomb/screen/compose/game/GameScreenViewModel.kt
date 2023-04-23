@@ -147,6 +147,10 @@ class GameScreenViewModel @Inject constructor(
         _events.trySend(GameScreenEvent.NavigateToCharacterSheet)
     }
     
+    override fun showDialog() {
+        _events.trySend(GameScreenEvent.ShowDialog)
+    }
+    
     private fun finishAnimationsOnNavigation() {
         when {
             state.value.playerAnimation != null -> {

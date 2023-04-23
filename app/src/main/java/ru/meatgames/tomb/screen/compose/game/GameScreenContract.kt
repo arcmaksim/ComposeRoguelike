@@ -12,6 +12,7 @@ enum class GameScreenEvent {
     NavigateToWinScreen,
     NavigateToInventory,
     NavigateToCharacterSheet,
+    ShowDialog,
 }
 
 /**
@@ -36,6 +37,8 @@ interface GameScreenNavigator {
     fun navigateToInventory()
     
     fun navigateToCharacterSheet()
+    
+    fun showDialog()
     
 }
 

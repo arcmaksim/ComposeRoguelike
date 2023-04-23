@@ -15,6 +15,7 @@ internal fun GameScreen(
     onWin: () -> Unit,
     onInventory: () -> Unit,
     onCharacterSheet: () -> Unit,
+    onDialog: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -22,6 +23,7 @@ internal fun GameScreen(
                 GameScreenEvent.NavigateToWinScreen -> onWin()
                 GameScreenEvent.NavigateToInventory -> onInventory()
                 GameScreenEvent.NavigateToCharacterSheet -> onCharacterSheet()
+                GameScreenEvent.ShowDialog -> onDialog()
                 else -> Unit
             }
         }
