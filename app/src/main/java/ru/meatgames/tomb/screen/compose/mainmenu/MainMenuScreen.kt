@@ -33,7 +33,7 @@ fun MainMenuScreen(
     onNewGame: () -> Unit,
     onCloseApp: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             event ?: return@collect
             when (event) {

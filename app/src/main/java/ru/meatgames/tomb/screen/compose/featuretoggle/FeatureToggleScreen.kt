@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.compose.featuretoggle
 
+import Toolbar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +24,6 @@ import ru.meatgames.tomb.R
 import ru.meatgames.tomb.config.FeatureToggleKey
 import ru.meatgames.tomb.config.FeatureToggleState
 import ru.meatgames.tomb.design.h3TextStyle
-import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview
 @Composable

@@ -17,7 +17,7 @@ internal fun GameScreen(
     onCharacterSheet: () -> Unit,
     onDialog: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
                 GameScreenEvent.NavigateToWinScreen -> onWin()

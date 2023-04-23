@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
+import Toolbar
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,6 @@ import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.screen.compose.container.ContainerItem
 import ru.meatgames.tomb.domain.player.PlayerInteraction
-import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview
 @Composable
