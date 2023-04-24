@@ -2,6 +2,7 @@ package ru.meatgames.tomb
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -27,8 +28,9 @@ fun TombApp(
 ) {
     Box(
         modifier = Modifier
+            .fillMaxSize()
             .background(Color(0xFF212121))
-            .fillMaxSize(),
+            .displayCutoutPadding(),
     ) {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
