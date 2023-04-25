@@ -1,6 +1,5 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.VectorConverter
@@ -8,11 +7,8 @@ import androidx.compose.animation.core.animateValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -52,22 +48,22 @@ import ru.meatgames.tomb.component.IllustrationButton
 import ru.meatgames.tomb.design.h1TextStyle
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.design.h3TextStyle
+import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.enemy.EnemyAnimation
+import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenController
-import ru.meatgames.tomb.domain.component.HealthComponent
-import ru.meatgames.tomb.domain.enemy.EnemyId
+import ru.meatgames.tomb.domain.player.PlayerAnimation
+import ru.meatgames.tomb.domain.player.PlayerInteraction
+import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
-import ru.meatgames.tomb.domain.player.PlayerInteraction
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_FRAMES
-import ru.meatgames.tomb.domain.enemy.EnemyAnimation
-import ru.meatgames.tomb.domain.player.PlayerAnimation
-import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations
 import ru.meatgames.tomb.screen.compose.game.animation.assemblePlayerInputAnimations

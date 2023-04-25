@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -70,6 +71,10 @@ internal fun GameScreenMap(
     val tileDimension = tileSize.width
     val backgroundColor = LocalBackgroundColor.current
     
+    val baseOffset = remember(offset, initialOffset, animatedOffset) {
+        offset + initialOffset + animatedOffset
+    }
+    
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
             val tileScreenSpaceCoordinates = (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
@@ -78,7 +83,7 @@ internal fun GameScreenMap(
                 tileScreenSpaceCoordinates.second * tileDimension,
             )
             
-            val dstOffset = offset + initialOffset + animatedOffset + tileOffset
+            val dstOffset = baseOffset + tileOffset
             
             when {
                 renderTile !is MapRenderTile.Content -> {
