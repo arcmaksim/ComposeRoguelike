@@ -7,6 +7,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import ru.meatgames.tomb.GameController.getMap2
 import ru.meatgames.tomb.model.provider.GameDataProvider
@@ -28,7 +29,10 @@ class MainActivity : AppCompatActivity() {
         GameDataProvider.init(this)
     
         setContent {
-            TombApp(::finish)
+            TombApp(
+                viewModel = hiltViewModel(),
+                onCloseApp = ::finish,
+            )
         }
     }
 

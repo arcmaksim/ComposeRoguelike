@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -24,6 +25,7 @@ import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
 @ExperimentalMaterialApi
 @Composable
 fun TombApp(
+    viewModel: RootVM,
     onCloseApp: () -> Unit,
 ) {
     Box(
@@ -53,8 +55,18 @@ fun TombApp(
                             popUpToTop(navController)
                         }
                     },
-                    onInventory = { navController.navigate(GameState.Inventory.id) },
-                    onCharacterSheet = { navController.navigate(GameState.Stats.id) },
+                    onInventory = {
+                        navController.navigateTo(
+                            rootVM = viewModel,
+                            state = GameState.Inventory,
+                        )
+                    },
+                    onCharacterSheet = {
+                        navController.navigateTo(
+                            rootVM = viewModel,
+                            state = GameState.Stats,
+                        )
+                    },
                     onDialog = { navController.navigate(GameState.GameScreenDialog.id) },
                 )
             }
@@ -70,32 +82,43 @@ fun TombApp(
             composable(GameState.Inventory.id) {
                 InventoryScreen(
                     viewModel = hiltViewModel(),
-                    onBack = navController::popBackStack,
+                    onBack = navController::navigateUp,
                 )
             }
             composable(GameState.Stats.id) {
                 CharacterSheetScreen(
                     viewModel = hiltViewModel(),
-                    onBack = navController::popBackStack,
+                    onBack = navController::navigateUp,
                 )
             }
             composable(GameState.FeatureToggles.id) {
                 FeatureToggleScreen(
                     viewModel = hiltViewModel(),
-                    onBack = navController::popBackStack,
+                    onBack = navController::navigateUp,
                 )
             }
             dialog(GameState.GameScreenDialog.id) {
                 GameScreenDialog(
                     viewModel = hiltViewModel(),
-                    closeDialog = navController::popBackStack,
+                    closeDialog = navController::navigateUp,
                     onFeatureToggles = {
-                        navController.popBackStack()
-                        navController.navigate(GameState.FeatureToggles.id)
+                        navController.navigateUp()
+                        navController.navigateTo(
+                            rootVM = viewModel,
+                            state = GameState.FeatureToggles,
+                        )
                     },
                     closeGame = onCloseApp,
                 )
             }
         }
     }
+}
+
+private fun NavController.navigateTo(
+    rootVM: RootVM,
+    state: GameState,
+) {
+    rootVM.finishCurrentAnimations()
+    navigate(state.id)
 }

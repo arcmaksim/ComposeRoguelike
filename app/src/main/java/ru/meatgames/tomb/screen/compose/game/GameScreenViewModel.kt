@@ -138,32 +138,15 @@ class GameScreenViewModel @Inject constructor(
     }
     
     override fun navigateToInventory() {
-        finishAnimationsOnNavigation()
         _events.trySend(GameScreenEvent.NavigateToInventory)
     }
     
     override fun navigateToCharacterSheet() {
-        finishAnimationsOnNavigation()
         _events.trySend(GameScreenEvent.NavigateToCharacterSheet)
     }
     
     override fun showDialog() {
         _events.trySend(GameScreenEvent.ShowDialog)
-    }
-    
-    private fun finishAnimationsOnNavigation() {
-        when {
-            state.value.playerAnimation != null -> {
-                viewModelScope.launch {
-                    gameController.finishPlayerAnimation(latestTurnResult)
-                }
-            }
-            state.value.enemiesAnimations != null -> {
-                viewModelScope.launch {
-                    gameController.finishEnemiesAnimations()
-                }
-            }
-        }
     }
     
     override fun closeInteractionMenu() {

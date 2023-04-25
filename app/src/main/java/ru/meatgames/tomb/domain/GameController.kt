@@ -52,6 +52,8 @@ interface GameController {
     
     suspend fun finishEnemiesAnimations()
     
+    suspend fun finishCurrentAnimations()
+    
 }
 
 @Singleton
@@ -207,6 +209,15 @@ class GameControllerImpl @Inject constructor(
         _state.emit(GameState.WaitingForInput)
     }
     
+    override suspend fun finishCurrentAnimations() {
+        _state.replayCache.firstOrNull()?.let {
+            when (it) {
+                is GameState.AnimatingCharacter -> finishPlayerAnimation(it.turnResult)
+                is GameState.AnimatingEnemies -> finishEnemiesAnimations()
+                else -> Unit
+            }
+        }
+    }
 }
 
 sealed class GameState {
