@@ -91,18 +91,20 @@ class GameControllerImpl @Inject constructor(
         characterController.setPosition(
             coordinates = configuration.startCoordinates,
         )
-        calcTurnQueue()
+        calcTurnQueue(true)
         runEnemiesTurns()
     }
     
-    private fun calcTurnQueue() {
+    private fun calcTurnQueue(
+        clearQueue: Boolean,
+    ) {
         val list = charactersTurnScheduler.produceSchedule(
             characterController.characterStateFlow.value,
             enemiesHolder.getEnemies(),
         )
         
         when {
-            currentTurnQueue.isEmpty() -> currentTurnQueue = LinkedTransferQueue(list + list)
+            clearQueue || currentTurnQueue.isEmpty() -> currentTurnQueue = LinkedTransferQueue(list + list)
             else -> currentTurnQueue.addAll(list)
         }
     }
@@ -184,7 +186,7 @@ class GameControllerImpl @Inject constructor(
     private suspend fun runEnemiesTurns() {
         _state.emit(GameState.ProcessingEnemies)
         
-        if (currentTurnQueue.size == 0) calcTurnQueue()
+        if (currentTurnQueue.size == 0) calcTurnQueue(false)
         
         val results = mutableListOf<EnemyTurnResult>()
         
@@ -198,10 +200,10 @@ class GameControllerImpl @Inject constructor(
             
             val enemy = enemiesHolder.getEnemy(element.enemyId) ?: continue
             logMessage("TURN", "${enemy.type} at ${enemy.position}")
-            enemy.takeTurn(characterController.characterStateFlow.value)?.let(results::add)
+            enemy.takeTurn(characterController.characterStateFlow.value).let(results::add)
         }
         
-        calcTurnQueue()
+        calcTurnQueue(false)
         _state.emit(GameState.AnimatingEnemies(results))
     }
     
