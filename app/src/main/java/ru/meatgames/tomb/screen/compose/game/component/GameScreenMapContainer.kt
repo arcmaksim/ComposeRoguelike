@@ -55,6 +55,7 @@ import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
+import ru.meatgames.tomb.logErrorWithTag
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
@@ -151,6 +152,7 @@ internal fun GameScreenMapContainer(
     )
     
     LaunchedEffect(playerAnimation) {
+        "Received $playerAnimation".logErrorWithTag("GameState123")
         awaitAll(
             *playerAnimation.assemblePlayerInputAnimations(
                 animationDurationMillis = animationDurationMillis,

@@ -101,6 +101,7 @@ class GameScreenViewModel @Inject constructor(
             is PlayerTurnResult.Block -> PlayerAnimation.Shake
             is PlayerTurnResult.Move -> PlayerAnimation.Move(direction)
             is PlayerTurnResult.Attack -> PlayerAnimation.Attack(direction)
+            is PlayerTurnResult.Interaction -> PlayerAnimation.None
             else -> null
         }
     

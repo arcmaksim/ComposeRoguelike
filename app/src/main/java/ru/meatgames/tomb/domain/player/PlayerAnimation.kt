@@ -13,6 +13,9 @@ sealed class PlayerAnimation {
     data class Attack(
         val direction: Direction,
     ) : PlayerAnimation()
+    
+    // Needed to trigger game state change when there is no character animation
+    object None : PlayerAnimation()
 
 }
 
