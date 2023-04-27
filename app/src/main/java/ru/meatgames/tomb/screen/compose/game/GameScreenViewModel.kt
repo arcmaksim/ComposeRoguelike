@@ -154,6 +154,7 @@ class GameScreenViewModel @Inject constructor(
     override fun skipTurn() {
         if (!isIdle.value) return
         viewModelScope.launch {
+            gameController.blockPlayerTurn()
             gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)
         }
     }
