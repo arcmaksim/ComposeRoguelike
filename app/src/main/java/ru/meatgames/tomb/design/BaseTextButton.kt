@@ -1,11 +1,9 @@
 package ru.meatgames.tomb.design
 
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -24,13 +22,9 @@ fun BaseTextButton(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = h3TextStyle,
     onClick: () -> Unit,
-) = Button(
+) = TextButton(
     modifier = modifier,
     elevation = null,
-    colors = ButtonDefaults.buttonColors(
-        backgroundColor = Color.Transparent,
-        contentColor = Color.Transparent,
-    ),
     onClick = onClick,
 ) {
     Text(
