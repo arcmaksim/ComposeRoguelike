@@ -24,7 +24,6 @@ internal fun ContainerItem(
     BaseTextButton(
         modifier = modifier.then(Modifier),
         title = item.name,
-    ) {
-        onClick(item)
-    }
+        onClick = { onClick(item) },
+    )
 }
