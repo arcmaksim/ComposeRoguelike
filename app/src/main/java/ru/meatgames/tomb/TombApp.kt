@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,9 +38,10 @@ fun TombApp(
         viewModel.dialogState.collect { dialogState ->
             when (dialogState) {
                 is DialogState.Container -> {
-                    val destinationRoute = "ContainerDialog/${dialogState.itemContainerId.id}"
-                    navController.findDestination(destinationRoute)
-                        ?: let { navController.navigate(destinationRoute) }
+                    navController.safeNavigate("ContainerDialog/${dialogState.itemContainerId.id}")
+                }
+                is DialogState.GameMenu -> {
+                    navController.safeNavigate(GameState.GameScreenDialog.id)
                 }
                 else -> navController.navigateUp()
             }
@@ -57,7 +57,6 @@ fun TombApp(
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
                 MainMenuScreen(
-                    viewModel = hiltViewModel(),
                     onNewGame = {
                         navController.navigate(GameState.MainGame.id) {
                             popUpToTop(navController)
@@ -68,7 +67,6 @@ fun TombApp(
             }
             composable(GameState.MainGame.id) {
                 GameScreen(
-                    viewModel = hiltViewModel(),
                     onWin = {
                         navController.navigate(GameState.WinScreen.id) {
                             popUpToTop(navController)
@@ -86,7 +84,6 @@ fun TombApp(
                             state = GameState.Stats,
                         )
                     },
-                    onDialog = { navController.navigate(GameState.GameScreenDialog.id) },
                 )
             }
             composable(GameState.WinScreen.id) {
@@ -100,26 +97,21 @@ fun TombApp(
             }
             composable(GameState.Inventory.id) {
                 InventoryScreen(
-                    viewModel = hiltViewModel(),
                     onBack = navController::navigateUp,
                 )
             }
             composable(GameState.Stats.id) {
                 CharacterSheetScreen(
-                    viewModel = hiltViewModel(),
                     onBack = navController::navigateUp,
                 )
             }
             composable(GameState.FeatureToggles.id) {
                 FeatureToggleScreen(
-                    viewModel = hiltViewModel(),
                     onBack = navController::navigateUp,
                 )
             }
             dialog(GameState.GameScreenDialog.id) {
                 GameScreenDialog(
-                    viewModel = hiltViewModel(),
-                    closeDialog = navController::navigateUp,
                     onFeatureToggles = {
                         navController.navigateUp()
                         navController.navigateTo(
@@ -147,4 +139,11 @@ private fun NavController.navigateTo(
 ) {
     rootVM.finishCurrentAnimations()
     navigate(state.id)
+}
+
+private fun NavController.safeNavigate(
+    destinationRoute: String,
+) {
+    runCatching { getBackStackEntry(destinationRoute) }
+        .onFailure { navigate(destinationRoute) }
 }

@@ -11,7 +11,6 @@ enum class GameScreenEvent {
     NavigateToWinScreen,
     NavigateToInventory,
     NavigateToCharacterSheet,
-    ShowDialog,
 }
 
 /**

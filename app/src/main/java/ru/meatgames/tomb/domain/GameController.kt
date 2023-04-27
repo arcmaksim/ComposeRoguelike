@@ -58,6 +58,10 @@ interface GameController {
     
     suspend fun closeCurrentDialog()
     
+    suspend fun showDialog(
+        dialogState: DialogState,
+    )
+    
 }
 
 @Singleton
@@ -87,6 +91,7 @@ class GameControllerImpl @Inject constructor(
     override suspend fun generateNewMap(
         mapType: MapCreator.MapType,
     ) {
+        _dialogState.value = null
         _state.tryEmit(GameState.Loading)
         _lastMapType = mapType
         val configuration = mapCreator.createNewMap(mapType)
@@ -282,6 +287,12 @@ class GameControllerImpl @Inject constructor(
     private fun List<EnemyTurnResult>.resolveDialogState(): DialogUpdateResult = when {
         any { it is EnemyTurnResult.Attack } -> DialogUpdateResult.DisruptInteraction
         else -> DialogUpdateResult.NoChange
+    }
+    
+    override suspend fun showDialog(
+        dialogState: DialogState,
+    ) {
+        _dialogState.value = dialogState
     }
     
 }

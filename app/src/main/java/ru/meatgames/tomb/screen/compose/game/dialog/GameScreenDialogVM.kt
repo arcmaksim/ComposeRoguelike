@@ -30,4 +30,10 @@ class GameScreenDialogVM @Inject constructor(
         }
     }
     
+    fun closeDialog() {
+        viewModelScope.launch {
+            gameController.closeCurrentDialog()
+        }
+    }
+    
 }

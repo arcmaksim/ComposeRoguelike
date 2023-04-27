@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.design.h3TextStyle
@@ -30,7 +31,7 @@ private fun InventoryScreenPreview() {
 
 @Composable
 fun InventoryScreen(
-    viewModel: InventoryViewModel,
+    viewModel: InventoryViewModel = hiltViewModel(),
     onBack: () -> Unit,
 ) {
     LaunchedEffect(viewModel) {

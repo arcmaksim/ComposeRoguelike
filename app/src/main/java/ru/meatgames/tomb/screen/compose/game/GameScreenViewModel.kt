@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
@@ -118,7 +119,9 @@ class GameScreenViewModel @Inject constructor(
     }
     
     override fun showDialog() {
-        _events.trySend(GameScreenEvent.ShowDialog)
+        viewModelScope.launch {
+            gameController.showDialog(DialogState.GameMenu)
+        }
     }
     
     override fun closeInteractionMenu() {

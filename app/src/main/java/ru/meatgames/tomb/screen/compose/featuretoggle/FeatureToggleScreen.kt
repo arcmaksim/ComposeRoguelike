@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.config.FeatureToggleKey
@@ -37,7 +38,7 @@ fun FeatureToggleScreenPreview() {
 
 @Composable
 fun FeatureToggleScreen(
-    viewModel: FeatureToggleScreenVM,
+    viewModel: FeatureToggleScreenVM = hiltViewModel(),
     onBack: () -> Unit,
 ) {
     LaunchedEffect(viewModel) {

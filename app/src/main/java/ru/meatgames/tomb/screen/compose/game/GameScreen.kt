@@ -3,6 +3,7 @@ package ru.meatgames.tomb.screen.compose.game
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.screen.compose.game.animation.ANIMATION_DURATION_MILLIS
@@ -11,11 +12,10 @@ import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
 
 @Composable
 internal fun GameScreen(
-    viewModel: GameScreenViewModel,
+    viewModel: GameScreenViewModel = hiltViewModel(),
     onWin: () -> Unit,
     onInventory: () -> Unit,
     onCharacterSheet: () -> Unit,
-    onDialog: () -> Unit,
 ) {
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
@@ -23,7 +23,6 @@ internal fun GameScreen(
                 GameScreenEvent.NavigateToWinScreen -> onWin()
                 GameScreenEvent.NavigateToInventory -> onInventory()
                 GameScreenEvent.NavigateToCharacterSheet -> onCharacterSheet()
-                GameScreenEvent.ShowDialog -> onDialog()
                 else -> Unit
             }
         }
