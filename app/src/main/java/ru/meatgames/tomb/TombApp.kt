@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -14,13 +15,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
-import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
+import ru.meatgames.tomb.domain.DialogState
+import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.charactersheet.CharacterSheetScreen
 import ru.meatgames.tomb.screen.compose.featuretoggle.FeatureToggleScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
+import ru.meatgames.tomb.screen.compose.game.container.ContainerDialog
 import ru.meatgames.tomb.screen.compose.game.dialog.GameScreenDialog
 import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
+import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
+import java.util.UUID
 
 @ExperimentalMaterialApi
 @Composable
@@ -28,13 +33,27 @@ fun TombApp(
     viewModel: RootVM,
     onCloseApp: () -> Unit,
 ) {
+    val navController = rememberNavController()
+    
+    LaunchedEffect(viewModel) {
+        viewModel.dialogState.collect { dialogState ->
+            when (dialogState) {
+                is DialogState.Container -> {
+                    val destinationRoute = "ContainerDialog/${dialogState.itemContainerId.id}"
+                    navController.findDestination(destinationRoute)
+                        ?: let { navController.navigate(destinationRoute) }
+                }
+                else -> navController.navigateUp()
+            }
+        }
+    }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF212121))
             .displayCutoutPadding(),
     ) {
-        val navController = rememberNavController()
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
             composable(GameState.MainMenu.id) {
                 MainMenuScreen(
@@ -109,6 +128,13 @@ fun TombApp(
                         )
                     },
                     closeGame = onCloseApp,
+                )
+            }
+            dialog(GameState.ContainerDialog.id) {
+                ContainerDialog(
+                    itemContainerId = ItemContainerId(
+                        UUID.fromString(it.arguments!!.getString("itemContainerId")!!),
+                    ),
                 )
             }
         }

@@ -52,9 +52,8 @@ import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
-import ru.meatgames.tomb.domain.map.MapScreenController
+import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
-import ru.meatgames.tomb.domain.player.PlayerInteraction
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
@@ -85,7 +84,6 @@ private fun GameScreenMapContainerPreview() {
         playerHealth = HealthComponent(10),
         playerAnimation = null,
         enemiesAnimations = emptyList(),
-        interactionState = null,
         animationDurationMillis = 300,
         navigator = navigatorPreviewStub,
         interactionController = interactionControllerPreviewStub,
@@ -94,12 +92,11 @@ private fun GameScreenMapContainerPreview() {
 
 @Composable
 internal fun GameScreenMapContainer(
-    mapState: MapScreenController.MapScreenState.Ready,
+    mapState: MapScreenState.Ready,
     isIdle: Boolean,
     playerHealth: HealthComponent,
     playerAnimation: PlayerAnimation?,
     enemiesAnimations: List<Pair<EnemyId, EnemyAnimation>>?,
-    interactionState: PlayerInteraction?,
     animationDurationMillis: Int,
     navigator: GameScreenNavigator,
     interactionController: GameScreenInteractionController,
@@ -203,7 +200,7 @@ internal fun GameScreenMapContainer(
             .pointerInput(isIdle) {
                 detectTapGestures(
                     onTap = {
-                        if (isIdle && interactionState == null) {
+                        if (isIdle) {
                             (interactionController::processCharacterMoveInput)(it.toDirection(maxWidth))
                         }
                     },
@@ -281,22 +278,6 @@ internal fun GameScreenMapContainer(
         style = h3TextStyle,
         color = if (isIdle) Color.White else Color.Red,
     )
-    
-    interactionState?.let { state ->
-        when (state) {
-            is PlayerInteraction.SearchingContainer -> {
-                GameScreenContainerWindow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.Center),
-                    interactionState = state,
-                    onClose = interactionController::closeInteractionMenu,
-                    onItemClick = interactionController::itemSelected,
-                )
-            }
-        }
-    }
 }
 
 @Composable

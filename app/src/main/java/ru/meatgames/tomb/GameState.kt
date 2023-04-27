@@ -7,6 +7,7 @@ enum class GameState(val id: String) {
     Stub("stub"),
     
     GameScreenDialog("GameScreenDialog"),
+    ContainerDialog("ContainerDialog/{itemContainerId}"),
     FeatureToggles("FeatureToggles"),
     
     Inventory("inventory"),

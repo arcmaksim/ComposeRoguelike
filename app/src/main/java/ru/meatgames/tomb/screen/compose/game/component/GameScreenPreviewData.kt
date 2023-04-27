@@ -1,9 +1,9 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
-import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
+import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.render.hasBottomShadow
 import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.temp.ThemeAssets
@@ -89,7 +89,7 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
 
 internal fun gameScreenMapContainerPreviewMapReadyState(
     themeAssets: ThemeAssets,
-): MapScreenController.MapScreenState.Ready = MapScreenController.MapScreenState.Ready(
+): MapScreenState.Ready = MapScreenState.Ready(
     tiles = gameScreenMapContainerPreviewRenderTiles(themeAssets),
     tilesWidth = gameScreenMapContainerPreviewMapSize,
     tilesPadding = 0,

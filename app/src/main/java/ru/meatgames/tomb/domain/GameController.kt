@@ -1,8 +1,8 @@
 package ru.meatgames.tomb.domain
 
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.domain.component.asDirections
 import ru.meatgames.tomb.domain.component.calculateVectorTo
 import ru.meatgames.tomb.domain.component.isNextTo
@@ -20,6 +20,7 @@ import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
 import ru.meatgames.tomb.domain.turn.hasAnimation
+import ru.meatgames.tomb.logErrorWithTag
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.resolvedOffset
@@ -33,6 +34,7 @@ interface GameController {
     val lastMapType: MapCreator.MapType
     
     val state: SharedFlow<GameState>
+    val dialogState: StateFlow<DialogState?>
     
     suspend fun generateNewMap(
         mapType: MapCreator.MapType,
@@ -54,6 +56,8 @@ interface GameController {
     
     suspend fun finishCurrentAnimations()
     
+    suspend fun closeCurrentDialog()
+    
 }
 
 @Singleton
@@ -67,14 +71,12 @@ class GameControllerImpl @Inject constructor(
     private val charactersTurnScheduler: CharactersTurnScheduler,
     private val mapInteractionResolver: PlayerMapInteractionResolver,
 ) : GameController {
+
+    private val _state = MutableStateFlow<GameState>(GameState.Loading)
+    override val state: StateFlow<GameState> = _state
     
-    private val _state = MutableSharedFlow<GameState>(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    ).apply {
-        tryEmit(GameState.Loading)
-    }
-    override val state: SharedFlow<GameState> = _state
+    private val _dialogState = MutableStateFlow<DialogState?>(null)
+    override val dialogState: StateFlow<DialogState?> = _dialogState
     
     private var _lastMapType: MapCreator.MapType = MapCreator.MapType.MAIN
     override val lastMapType: MapCreator.MapType
@@ -113,11 +115,11 @@ class GameControllerImpl @Inject constructor(
         player: CharacterState,
     ): EnemyTurnResult {
         val vectorToPlayer = position.calculateVectorTo(player.position)
-    
+        
         if (vectorToPlayer.isNextTo()) {
             val damage = 1
             attackPlayer(damage)
-        
+            
             return EnemyTurnResult.Attack(
                 position = position.toCoordinates(),
                 enemyId = id,
@@ -127,11 +129,13 @@ class GameControllerImpl @Inject constructor(
         }
         
         val directionsToPlayer = vectorToPlayer.asDirections()
-    
+        
         directionsToPlayer.forEach { direction ->
             val newPosition = (position + direction.resolvedOffset).toCoordinates()
-            mapController.getTile(newPosition)?.tile?.let {  tile ->
-                val tileInteraction = tile.objectEntityTile?.let(tilesController::hasObjectEntityNoInteraction) ?: true
+            mapController.getTile(newPosition)?.tile?.let { tile ->
+                val tileInteraction = tile.objectEntityTile
+                    ?.let(tilesController::hasObjectEntityNoInteraction)
+                    ?: true
                 if (tileInteraction && enemiesController.moveEnemy(id, direction)) {
                     return EnemyTurnResult.Move(
                         position = position.toCoordinates(),
@@ -153,19 +157,31 @@ class GameControllerImpl @Inject constructor(
     ) = characterController.modifyHealth(-damage)
     
     override suspend fun blockPlayerTurn() {
+        if (state.value !is GameState.WaitingForInput) {
+            "Trying to block player input when state is ${state.value}".logErrorWithTag("GameState")
+            return
+        }
+        
         _state.emit(GameState.ProcessingInput)
     }
     
     override suspend fun finishPlayerTurn(
         result: PlayerTurnResult?,
     ) {
-        result?.let {
-            mapInteractionResolver.resolvePlayerMove(it)
+        if (state.value !is GameState.ProcessingInput) {
+            "Trying to finish player turn when state is ${state.value}".logErrorWithTag("GameState")
+            return
+        }
+        
+        result?.let { turnResult ->
+            mapInteractionResolver.resolvePlayerMove(turnResult)
             val nextState = when {
-                it.hasAnimation() -> GameState.AnimatingCharacter(it)
+                turnResult is PlayerTurnResult.ContainerInteraction -> null
+                turnResult.hasAnimation() -> GameState.AnimatingCharacter(turnResult)
                 else -> GameState.PrepareForEnemies
             }
-            _state.emit(nextState)
+            turnResult.resolveDialogState().updateState()
+            nextState?.let { _state.emit(it) }
         } ?: let {
             _state.emit(GameState.WaitingForInput)
         }
@@ -173,13 +189,20 @@ class GameControllerImpl @Inject constructor(
     
     override suspend fun finishPlayerAnimation(
         result: PlayerTurnResult?,
-    ) = _state.emit(
-        if (result?.finishesPlayerTurn() == true) {
-            GameState.PrepareForEnemies
-        } else {
-            GameState.WaitingForInput
-        },
-    )
+    ) {
+        if (state.value !is GameState.AnimatingCharacter) {
+            "Trying to finish player animation when state is ${state.value}".logErrorWithTag("GameState")
+            return
+        }
+        
+        _state.emit(
+            if (result?.finishesPlayerTurn() == true) {
+                GameState.PrepareForEnemies
+            } else {
+                GameState.WaitingForInput
+            },
+        )
+    }
     
     override suspend fun startEnemiesTurn() = runEnemiesTurns()
     
@@ -204,44 +227,61 @@ class GameControllerImpl @Inject constructor(
         }
         
         calcTurnQueue(false)
+        results.resolveDialogState().updateState()
         _state.emit(GameState.AnimatingEnemies(results))
     }
     
     override suspend fun finishEnemiesAnimations() {
+        if (state.value !is GameState.AnimatingEnemies) {
+            "Trying to finish enemies animations when state is ${state.value}".logErrorWithTag("GameState")
+            return
+        }
+        
         _state.emit(GameState.WaitingForInput)
     }
     
     override suspend fun finishCurrentAnimations() {
-        _state.replayCache.firstOrNull()?.let {
-            when (it) {
-                is GameState.AnimatingCharacter -> finishPlayerAnimation(it.turnResult)
-                is GameState.AnimatingEnemies -> finishEnemiesAnimations()
-                else -> Unit
-            }
+        when (val state = state.value) {
+            is GameState.AnimatingCharacter -> finishPlayerAnimation(state.turnResult)
+            is GameState.AnimatingEnemies -> finishEnemiesAnimations()
+            else -> Unit
         }
     }
-}
-
-sealed class GameState {
     
-    object Loading : GameState()
+    override suspend fun closeCurrentDialog() {
+        _dialogState.value = null
+    }
     
-    object WaitingForInput : GameState()
+    private fun DialogUpdateResult.updateState() {
+        when (this) {
+            is DialogUpdateResult.NewInteraction -> {
+                _dialogState.value = dialogState
+            }
+            
+            is DialogUpdateResult.DisruptInteraction -> {
+                if (dialogState.value?.isInterruptable == true) {
+                    _dialogState.value = null
+                }
+            }
+            
+            else -> Unit
+        }
+    }
     
-    object ProcessingInput : GameState()
+    private fun PlayerTurnResult.resolveDialogState(): DialogUpdateResult = when {
+        this is PlayerTurnResult.ContainerInteraction ->
+            DialogUpdateResult.NewInteraction(DialogState.Container(itemContainerId))
+        
+        this is PlayerTurnResult.PickupItem && !isLastItem -> {
+            DialogUpdateResult.NewInteraction(DialogState.Container(itemContainerId))
+        }
+        
+        else -> DialogUpdateResult.DisruptInteraction
+    }
     
-    data class AnimatingCharacter(
-        val turnResult: PlayerTurnResult,
-    ) : GameState()
-    
-    // Needs for clearing animations
-    object PrepareForEnemies : GameState()
-    
-    object ProcessingEnemies : GameState()
-    
-    data class AnimatingEnemies(
-        // TODO ordered set
-        val results: List<EnemyTurnResult>,
-    ) : GameState()
+    private fun List<EnemyTurnResult>.resolveDialogState(): DialogUpdateResult = when {
+        any { it is EnemyTurnResult.Attack } -> DialogUpdateResult.DisruptInteraction
+        else -> DialogUpdateResult.NoChange
+    }
     
 }

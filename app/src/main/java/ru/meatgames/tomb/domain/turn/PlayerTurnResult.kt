@@ -20,12 +20,12 @@ sealed class PlayerTurnResult {
     data class ContainerInteraction(
         val coordinates: Coordinates,
         val itemContainerId: ItemContainerId,
-        val itemIds: Set<ItemId>,
     ) : PlayerTurnResult()
     
     data class PickupItem(
         val itemContainerId: ItemContainerId,
         val itemId: ItemId,
+        val isLastItem: Boolean = true,
     ) : PlayerTurnResult()
 
     object Block : PlayerTurnResult()

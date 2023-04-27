@@ -12,6 +12,8 @@ class RootVM @Inject constructor(
     private val gameController: GameController,
 ) : ViewModel() {
     
+    val dialogState = gameController.dialogState
+    
     fun finishCurrentAnimations() {
         viewModelScope.launch {
             gameController.finishCurrentAnimations()

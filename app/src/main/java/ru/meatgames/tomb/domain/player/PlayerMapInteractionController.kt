@@ -52,7 +52,6 @@ class PlayerMapInteractionController @Inject constructor(
             itemContainer != null -> PlayerTurnResult.ContainerInteraction(
                 coordinates = coordinates,
                 itemContainerId = itemContainer.id,
-                itemIds = itemContainer.itemIds,
             )
     
             tile.objectEntityTile != null -> tile.objectEntityTile.resolveMoveResult(

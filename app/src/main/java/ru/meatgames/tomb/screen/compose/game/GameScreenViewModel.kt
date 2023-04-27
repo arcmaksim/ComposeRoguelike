@@ -15,22 +15,21 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
-import ru.meatgames.tomb.domain.item.ItemsHolder
+import ru.meatgames.tomb.domain.PlayerInputProcessor
 import ru.meatgames.tomb.domain.map.MapScreenController
-import ru.meatgames.tomb.domain.player.PlayerMapInteractionController
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
+import ru.meatgames.tomb.domain.map.MapScreenCharacterAnimations
+import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.domain.player.PlayerAnimation
-import ru.meatgames.tomb.domain.player.PlayerInteraction
 import javax.inject.Inject
 
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
     private val mapScreenController: MapScreenController,
-    private val mapInteractionController: PlayerMapInteractionController,
     private val gameController: GameController,
-    private val itemsHolder: ItemsHolder,
+    private val playerInputProcessor: PlayerInputProcessor,
 ) : ViewModel(), GameScreenNavigator, GameScreenInteractionController {
     
     private val _events = Channel<GameScreenEvent?>()
@@ -63,40 +62,28 @@ class GameScreenViewModel @Inject constructor(
                     mapState = it,
                     playerAnimation = it.toPlayerAnimation(),
                     enemiesAnimations = it.toEnemiesAnimations(),
-                    interactionState = it.toPlayerInteraction(),
                 )
             }.launchIn(this)
         }
     }
     
-    private fun MapScreenController.MapScreenState.toPlayerAnimation(): PlayerAnimation? {
-        return (if (this is MapScreenController.MapScreenState.Ready &&
-            turnResultsToAnimate is MapScreenController.MapScreenCharacterAnimations.Player) {
+    private fun MapScreenState.toPlayerAnimation(): PlayerAnimation? {
+        return (if (this is MapScreenState.Ready &&
+            turnResultsToAnimate is MapScreenCharacterAnimations.Player) {
             turnResultsToAnimate.turnResult
         } else {
             null
         })?.resolvePlayerAnimation()
     }
     
-    private fun MapScreenController.MapScreenState.toPlayerInteraction(): PlayerInteraction? {
-        return (if (this is MapScreenController.MapScreenState.Ready &&
-            turnResultsToAnimate is MapScreenController.MapScreenCharacterAnimations.Player) {
-            turnResultsToAnimate.turnResult
-        } else {
-            null
-        })?.resolvePlayerInteractionState()
-    }
-    
-    private fun MapScreenController.MapScreenState.toEnemiesAnimations(): EnemiesAnimations? {
-        return if (this is MapScreenController.MapScreenState.Ready &&
-            turnResultsToAnimate is MapScreenController.MapScreenCharacterAnimations.Enemies) {
+    private fun MapScreenState.toEnemiesAnimations(): EnemiesAnimations? {
+        return if (this is MapScreenState.Ready &&
+            turnResultsToAnimate is MapScreenCharacterAnimations.Enemies) {
             turnResultsToAnimate.animations
         } else {
             null
         }
     }
-    
-    private var latestTurnResult: PlayerTurnResult? = null
     
     override fun processCharacterMoveInput(
         direction: Direction,
@@ -104,9 +91,7 @@ class GameScreenViewModel @Inject constructor(
         if (!isIdle.value) return
         
         viewModelScope.launch {
-            gameController.blockPlayerTurn()
-            latestTurnResult = mapInteractionController.resolveMoveResult(direction)
-            gameController.finishPlayerTurn(latestTurnResult)
+            playerInputProcessor.processPlayerInput(direction)
         }
     }
     
@@ -115,19 +100,6 @@ class GameScreenViewModel @Inject constructor(
             is PlayerTurnResult.Block -> PlayerAnimation.Shake
             is PlayerTurnResult.Move -> PlayerAnimation.Move(direction)
             is PlayerTurnResult.Attack -> PlayerAnimation.Attack(direction)
-            else -> null
-        }
-    
-    private fun PlayerTurnResult.resolvePlayerInteractionState(): PlayerInteraction? =
-        when (this) {
-            is PlayerTurnResult.ContainerInteraction -> {
-                PlayerInteraction.SearchingContainer(
-                    coordinates = coordinates,
-                    itemContainerId = itemContainerId,
-                    items = itemsHolder.getItems(itemIds),
-                )
-            }
-            
             else -> null
         }
     
@@ -160,15 +132,16 @@ class GameScreenViewModel @Inject constructor(
         itemId: ItemId,
     ) {
         viewModelScope.launch {
-            gameController.blockPlayerTurn()
-            latestTurnResult = mapInteractionController.pickItem(itemContainerId, itemId)
-            gameController.finishPlayerTurn(latestTurnResult)
+            playerInputProcessor.processPlayerInput(
+                itemContainerId = itemContainerId,
+                itemId = itemId,
+            )
         }
     }
     
     override fun finishPlayerAnimation() {
         viewModelScope.launch {
-            gameController.finishPlayerAnimation(latestTurnResult)
+            gameController.finishPlayerAnimation(playerInputProcessor.latestTurnResult)
         }
     }
     
@@ -185,3 +158,5 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 }
+
+

@@ -12,24 +12,19 @@ import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
-import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
-import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.minus
 import ru.meatgames.tomb.domain.component.plus
-import ru.meatgames.tomb.domain.render.computeFov
-import ru.meatgames.tomb.domain.enemy.EnemyId
-import ru.meatgames.tomb.domain.turn.EnemyTurnResult
-import ru.meatgames.tomb.domain.turn.PlayerTurnResult
-import ru.meatgames.tomb.model.temp.ThemeAssets
-import ru.meatgames.tomb.model.temp.TilesController
-import ru.meatgames.tomb.render.AnimationRenderData
-import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.resolvedOffset
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
+import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.CharacterState
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
+import ru.meatgames.tomb.domain.render.computeFov
+import ru.meatgames.tomb.domain.turn.EnemyTurnResult
+import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.render.Icon
+import ru.meatgames.tomb.resolvedOffset
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -284,6 +279,7 @@ class MapScreenController @Inject constructor(
                     result.position + result.direction.resolvedOffset - viewportZeroPosition,
                 )
             }
+            
             else -> listOf(result.position - viewportZeroPosition)
         }.filter { (x, y) -> x in 0 until viewportWidth && y in 0 until viewportHeight }
             .any { (x, y) -> cachedVisibilityMask[x + y * viewportWidth] }
@@ -323,37 +319,6 @@ class MapScreenController @Inject constructor(
                 result.enemyId to EnemyAnimation.Icon(themeAssets.getIconRenderData(Icon.Clock))
             }
         }
-    }
-    
-    sealed class MapScreenState {
-        
-        data class Ready(
-            val characterRenderData: AnimationRenderData,
-            val tiles: List<MapRenderTile?>,
-            val tilesWidth: Int,
-            val tilesPadding: Int,
-            val viewportWidth: Int,
-            val viewportHeight: Int,
-            val tilesToFadeIn: Set<ScreenSpaceCoordinates>,
-            val tilesToFadeOut: Set<ScreenSpaceCoordinates>,
-            val playerHealth: HealthComponent,
-            val turnResultsToAnimate: MapScreenCharacterAnimations?,
-        ) : MapScreenState()
-        
-        object Loading : MapScreenState()
-        
-    }
-    
-    sealed class MapScreenCharacterAnimations {
-        
-        data class Player(
-            val turnResult: PlayerTurnResult,
-        ) : MapScreenCharacterAnimations()
-        
-        data class Enemies(
-            val animations: EnemiesAnimations,
-        ) : MapScreenCharacterAnimations()
-        
     }
     
 }

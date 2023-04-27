@@ -52,7 +52,7 @@ class ItemsControllerImpl @Inject constructor() : ItemsController, ItemsHolder {
     private fun Coordinates.createContainer(
         item: Item,
     ) {
-        val itemContainer = ItemContainer(setOf(item.id))
+        val itemContainer = ItemContainer(itemIds = setOf(item.id))
         
         itemContainers[itemContainer.id] = itemContainer
         itemContainersMapping[this] = itemContainer.id
@@ -89,9 +89,16 @@ class ItemsControllerImpl @Inject constructor() : ItemsController, ItemsHolder {
         itemContainers.clear()
     }
     
-    override fun getItems(
+    override suspend fun getItems(
         itemIds: Set<ItemId>,
     ): Set<Item> = itemIds.mapNotNull { items[it] }.toSet()
+    
+    override suspend fun getItems(
+        itemContainerId: ItemContainerId,
+    ): Set<Item> {
+        val itemContainer = itemContainers[itemContainerId] ?: return emptySet()
+        return itemContainer.itemIds.mapNotNull { items[it] }.toSet()
+    }
     
 }
 
@@ -123,7 +130,11 @@ interface ItemsHolder {
     
     fun clearContainers()
     
-    fun getItems(
+    suspend fun getItems(
+        itemContainerId: ItemContainerId,
+    ): Set<Item>
+    
+    suspend fun getItems(
         itemIds: Set<ItemId>,
     ): Set<Item>
     
