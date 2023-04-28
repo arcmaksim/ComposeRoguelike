@@ -21,7 +21,6 @@ import ru.meatgames.tomb.domain.player.CharacterState
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
 import ru.meatgames.tomb.domain.render.computeFov
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
-import ru.meatgames.tomb.logErrorWithTag
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.temp.TilesController
 import ru.meatgames.tomb.render.Icon
@@ -79,14 +78,12 @@ class MapScreenController @Inject constructor(
                     gameController.state,
                 ) { streamedTiles, characterState, gameState ->
                     if (latestGameState == gameState) {
-                        "Same state".logErrorWithTag("GameState123")
                         return@combine cachedMapState
                     }
                     
                     latestGameState = gameState
                     
                     if (gameState.updatesState()) {
-                        "Update state".logErrorWithTag("GameState123")
                         return@combine streamedTiles.toMapState(
                             mapWidth = mapWidth,
                             mapHeight = mapHeight,

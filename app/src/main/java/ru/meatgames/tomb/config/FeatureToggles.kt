@@ -23,6 +23,11 @@ object FeatureToggles {
                 title = "Show enemies health bar",
                 value = true,
             ),
+            FeatureToggleState(
+                key = FeatureToggleKey.ShowMovementControls,
+                title = "Show movement controls",
+                value = false,
+            ),
         )
     )
     val state: StateFlow<List<FeatureToggleState>> = _state

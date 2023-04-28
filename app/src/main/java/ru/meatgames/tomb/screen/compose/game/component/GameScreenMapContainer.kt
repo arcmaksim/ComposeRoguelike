@@ -8,7 +8,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -33,10 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -55,7 +54,6 @@ import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
-import ru.meatgames.tomb.logErrorWithTag
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
@@ -69,7 +67,6 @@ import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations
 import ru.meatgames.tomb.screen.compose.game.animation.assemblePlayerInputAnimations
 import ru.meatgames.tomb.screen.compose.game.interactionControllerPreviewStub
 import ru.meatgames.tomb.screen.compose.game.navigatorPreviewStub
-import ru.meatgames.tomb.toDirection
 import ru.meatgames.tomb.toIntOffset
 
 @Preview
@@ -91,6 +88,7 @@ private fun GameScreenMapContainerPreview() {
     )
 }
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 internal fun GameScreenMapContainer(
     mapState: MapScreenState.Ready,
@@ -152,7 +150,6 @@ internal fun GameScreenMapContainer(
     )
     
     LaunchedEffect(playerAnimation) {
-        "Received $playerAnimation".logErrorWithTag("GameState123")
         awaitAll(
             *playerAnimation.assemblePlayerInputAnimations(
                 animationDurationMillis = animationDurationMillis,
@@ -195,20 +192,6 @@ internal fun GameScreenMapContainer(
         .fillMaxWidth()
         .aspectRatio(1F)
         .align(Alignment.Center)
-    
-    Box(
-        modifier = baseModifier
-            .background(LocalBackgroundColor.current)
-            .pointerInput(isIdle) {
-                detectTapGestures(
-                    onTap = {
-                        if (isIdle) {
-                            (interactionController::processCharacterMoveInput)(it.toDirection(maxWidth))
-                        }
-                    },
-                )
-            },
-    )
     
     CompositionLocalProvider(
         LocalTileSize provides IntSize(tileDimension, tileDimension),
@@ -253,6 +236,12 @@ internal fun GameScreenMapContainer(
             characterFrameIndex = characterAnimationFrameIndex,
         )
     }
+    
+    GameScreenControls(
+        modifier = baseModifier,
+        isIdle = isIdle,
+        interactionController = interactionController,
+    )
     
     IconButton(
         modifier = Modifier
