@@ -1,10 +1,13 @@
 package ru.meatgames.tomb
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import ru.meatgames.tomb.GameController.getMap2
 import ru.meatgames.tomb.model.provider.GameDataProvider
@@ -26,15 +29,21 @@ class MainActivity : AppCompatActivity() {
         GameDataProvider.init(this)
     
         setContent {
-            TombApp(::finish)
+            TombApp(
+                viewModel = hiltViewModel(),
+                onCloseApp = ::finish,
+            )
         }
     }
 
     private fun setupFullScreenMode() {
-        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            or View.SYSTEM_UI_FLAG_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_IMMERSIVE)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = false
+        }
     }
 
     override fun onSaveInstanceState(

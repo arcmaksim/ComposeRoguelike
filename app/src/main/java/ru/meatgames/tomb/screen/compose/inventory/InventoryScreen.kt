@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.compose.inventory
 
+import Toolbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,11 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.screen.compose.container.ContainerItem
-import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview(widthDp = 320, heightDp = 640, showBackground = true, backgroundColor = 0xFF212121)
 @Composable
@@ -30,10 +31,10 @@ private fun InventoryScreenPreview() {
 
 @Composable
 fun InventoryScreen(
-    viewModel: InventoryViewModel,
+    viewModel: InventoryViewModel = hiltViewModel(),
     onBack: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
                 InventoryEvent.Back -> onBack()

@@ -6,6 +6,10 @@ enum class GameState(val id: String) {
     WinScreen("winScreen"),
     Stub("stub"),
     
+    GameScreenDialog("GameScreenDialog"),
+    ContainerDialog("ContainerDialog/{itemContainerId}"),
+    FeatureToggles("FeatureToggles"),
+    
     Inventory("inventory"),
     Gear("gear"),
     ItemDetails("itemDetails"),

@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.compose.charactersheet
 
+import Toolbar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.screen.compose.system.Toolbar
 
 @Preview(widthDp = 320, heightDp = 640, showBackground = true, backgroundColor = 0xFF212121)
 @Composable
@@ -28,10 +29,10 @@ private fun InventoryScreenPreview() {
 
 @Composable
 fun CharacterSheetScreen(
-    viewModel: CharacterSheetVM,
+    viewModel: CharacterSheetVM = hiltViewModel(),
     onBack: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
                 CharacterSheetEvent.Back -> onBack()

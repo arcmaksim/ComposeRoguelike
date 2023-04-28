@@ -45,62 +45,40 @@ const val PLAYGROUND_MAP_GENERATOR = "PLAYGROUND_MAP_GENERATOR"
 interface SingletonModule {
 
     @Binds
-    fun bindMapGenerator(
-        controller: MapControllerImpl,
-    ): MapCreator
+    fun MapControllerImpl.bindMapCreator(): MapCreator
 
     @Binds
-    fun bindMapTerraformer(
-        controller: MapControllerImpl,
-    ): MapTerraformer
+    fun MapControllerImpl.bindMapTerraformer(): MapTerraformer
 
     @Binds
-    fun bindMapController(
-        controller: MapControllerImpl,
-    ): MapController
+    fun MapControllerImpl.bindMapController(): MapController
     
     @Binds
-    fun bindItemsHolder(
-        itemsHolder: ItemsControllerImpl,
-    ): ItemsHolder
+    fun ItemsControllerImpl.bindItemsHolder(): ItemsHolder
     
     @Binds
-    fun bindItemsController(
-        itemsController: ItemsControllerImpl,
-    ): ItemsController
+    fun ItemsControllerImpl.bindItemsController(): ItemsController
     
     @Binds
-    fun bindEnemiesHolder(
-        enemiesHolder: EnemiesControllerImpl,
-    ): EnemiesHolder
+    fun EnemiesControllerImpl.bindEnemiesHolder(): EnemiesHolder
     
     @Binds
-    fun bindEnemiesController(
-        enemiesController: EnemiesControllerImpl,
-    ): EnemiesController
+    fun EnemiesControllerImpl.bindEnemiesController(): EnemiesController
 
     @Binds
     @IntoSet
-    fun bindWallsDecorator(
-        decorator: WallsDecorator,
-    ): MapRenderTilesDecorator
+    fun WallsDecorator.bindWallsDecorator(): MapRenderTilesDecorator
     
     @Binds
     @Named(MAIN_MAP_GENERATOR)
-    fun bindMainMapGenerator(
-        mainMapGenerator: MainMapGenerator,
-    ): MapGenerator
+    fun MainMapGenerator.bindMainMapGenerator(): MapGenerator
     
     @Binds
     @Named(PLAYGROUND_MAP_GENERATOR)
-    fun bindPlaygroundMapGenerator(
-        playgroundMapGenerator: PlaygroundMapGenerator,
-    ): MapGenerator
+    fun PlaygroundMapGenerator.bindPlaygroundMapGenerator(): MapGenerator
     
     @Binds
-    fun bindGameController(
-        gameController: GameControllerImpl,
-    ): GameController
+    fun GameControllerImpl.bindGameController(): GameController
 
     companion object {
         @Named(MAP_WIDTH_KEY)

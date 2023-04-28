@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import ru.meatgames.tomb.design.BaseTextButton
 import ru.meatgames.tomb.design.h1TextStyle
 
@@ -29,11 +30,11 @@ private fun MainMenuScreenPreview() {
 
 @Composable
 fun MainMenuScreen(
-    viewModel: MainMenuScreenViewModel,
+    viewModel: MainMenuScreenViewModel = hiltViewModel(),
     onNewGame: () -> Unit,
     onCloseApp: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             event ?: return@collect
             when (event) {

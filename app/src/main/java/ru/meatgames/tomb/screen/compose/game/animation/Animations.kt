@@ -78,3 +78,27 @@ suspend fun asEnemiesAttackAnimationAsync(
         update(animatedValue)
     }
 }
+
+/**
+ * Animate skip turn
+ *
+ * @param durationMillis animation duration in milliseconds
+ * @param delayMillis animation delay in milliseconds
+ * @param update callback
+ */
+context(CoroutineScope)
+suspend fun asIconAnimationAsync(
+    durationMillis: Int,
+    delayMillis: Int,
+    update: (Float) -> Unit,
+) = async {
+    delay(delayMillis.toLong())
+    animate(
+        initialValue = 0f,
+        targetValue = 0f,
+        typeConverter = Float.VectorConverter,
+        animationSpec = produceIconKeyframes(durationMillis),
+    ) { animatedValue, _ ->
+        update(animatedValue)
+    }
+}

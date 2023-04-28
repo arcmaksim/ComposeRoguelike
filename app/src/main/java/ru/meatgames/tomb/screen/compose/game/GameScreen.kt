@@ -3,20 +3,21 @@ package ru.meatgames.tomb.screen.compose.game
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ru.meatgames.tomb.domain.map.MapScreenController
+import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.screen.compose.game.animation.ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenLoading
 import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
 
 @Composable
 internal fun GameScreen(
-    viewModel: GameScreenViewModel,
+    viewModel: GameScreenViewModel = hiltViewModel(),
     onWin: () -> Unit,
     onInventory: () -> Unit,
     onCharacterSheet: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
                 GameScreenEvent.NavigateToWinScreen -> onWin()
@@ -46,14 +47,13 @@ private fun GameScreenContent(
     interactionController: GameScreenInteractionController,
 ) {
     when (val mapState = state.mapState) {
-        is MapScreenController.MapScreenState.Loading -> GameScreenLoading()
-        is MapScreenController.MapScreenState.Ready -> GameScreenMapContainer(
+        is MapScreenState.Loading -> GameScreenLoading()
+        is MapScreenState.Ready -> GameScreenMapContainer(
             mapState = mapState,
             isIdle = isIdle,
             playerHealth = mapState.playerHealth,
             playerAnimation = state.playerAnimation,
             enemiesAnimations = state.enemiesAnimations,
-            interactionState = state.interactionState,
             animationDurationMillis = ANIMATION_DURATION_MILLIS,
             navigator = navigator,
             interactionController = interactionController,

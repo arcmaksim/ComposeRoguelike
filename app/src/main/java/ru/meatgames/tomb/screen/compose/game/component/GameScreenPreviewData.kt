@@ -1,9 +1,11 @@
 package ru.meatgames.tomb.screen.compose.game.component
 
-import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
+import ru.meatgames.tomb.domain.map.MapScreenState
+import ru.meatgames.tomb.domain.render.hasBottomShadow
+import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
@@ -60,27 +62,34 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         val objectData = tilesPair.second?.let {
             themeAssets.resolveObjectRenderData(it)
         }
+        val tileAbove = renderTiles.getOrNull(index - gameScreenMapContainerPreviewMapSize)
         MapRenderTile.Content(
             floorData = RenderData(
                 asset = floorData.first,
                 offset = floorData.second,
+                size = ASSETS_TILE_SIZE,
             ),
             objectData = objectData?.let {
                 RenderData(
                     asset = it.first,
                     offset = it.second,
+                    size = ASSETS_TILE_SIZE,
                 )
             },
             itemData = items[index],
             enemyData = enemies[index],
             isVisible = true,
+            decorations = tileAbove?.second
+                ?.takeIf { it.hasBottomShadow() }
+                ?.let { listOf(themeAssets.resolveBottomShadow()) }
+                ?: emptyList(),
         )
     }
 }
 
 internal fun gameScreenMapContainerPreviewMapReadyState(
     themeAssets: ThemeAssets,
-): MapScreenController.MapScreenState.Ready = MapScreenController.MapScreenState.Ready(
+): MapScreenState.Ready = MapScreenState.Ready(
     tiles = gameScreenMapContainerPreviewRenderTiles(themeAssets),
     tilesWidth = gameScreenMapContainerPreviewMapSize,
     tilesPadding = 0,

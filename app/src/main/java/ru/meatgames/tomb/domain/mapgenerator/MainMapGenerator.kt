@@ -142,7 +142,7 @@ class MainMapGenerator @Inject constructor(
                     y = randomOuterWall.second,
                 ) {
                     copy(
-                        objectEntityTile = null,//ObjectEntityTile.DoorClosed,
+                        objectEntityTile = ObjectEntityTile.DoorClosed,
                     )
                 }
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")

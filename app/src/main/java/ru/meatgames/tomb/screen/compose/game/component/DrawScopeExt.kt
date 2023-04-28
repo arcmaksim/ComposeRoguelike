@@ -8,10 +8,13 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
+import ru.meatgames.tomb.config.FeatureToggles
+import ru.meatgames.tomb.config.FeatureToggleKey
 import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.temp.getOriginalTileSinglePixelOffset
 import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.RenderData
+import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
 
 context(DrawScope)
 fun RenderData.drawImage(
@@ -23,7 +26,7 @@ fun RenderData.drawImage(
         alpha = alpha,
         image = asset,
         srcOffset = offset,
-        srcSize = ASSETS_TILE_SIZE,
+        srcSize = size,
         dstOffset = dstOffset,
         dstSize = dstSize,
         filterQuality = FilterQuality.None,
@@ -38,11 +41,12 @@ fun DrawScope.drawCharacter(
     dstSize: IntSize,
     dstOffset: IntOffset,
     alpha: Float,
+    iconState: EnemyAnimationState.Icon?,
 ) {
     val originalTileSinglePixelOffset = tileDimension.getOriginalTileSinglePixelOffset()
     val verticalOffset = originalTileSinglePixelOffset * 3
     
-    if (characterRenderData.healthRatio != 0f) {
+    if (FeatureToggles.getToggleValue(FeatureToggleKey.ShowEnemiesHealthBar) && characterRenderData.healthRatio != 0f) {
         val topLeftOffset = dstOffset.toOffset() + Offset(x = 0f, y = -verticalOffset * 2f)
         val innerOffset = topLeftOffset.copy(
             x = topLeftOffset.x + originalTileSinglePixelOffset.toFloat(),
@@ -85,4 +89,16 @@ fun DrawScope.drawCharacter(
         dstSize = dstSize,
         filterQuality = FilterQuality.None,
     )
+    
+    iconState?.let {
+        val iconDimension = tileDimension / 2
+        it.renderData.drawImage(
+            dstOffset = dstOffset.copy(
+                x = dstOffset.x + (tileDimension - iconDimension) / 2,
+                y = dstOffset.y + (tileDimension - iconDimension) / 2 - verticalOffset,
+            ),
+            dstSize = IntSize(iconDimension, iconDimension),
+            alpha = it.iconAlpha,
+        )
+    }
 }

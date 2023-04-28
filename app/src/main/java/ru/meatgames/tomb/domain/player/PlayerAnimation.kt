@@ -13,12 +13,15 @@ sealed class PlayerAnimation {
     data class Attack(
         val direction: Direction,
     ) : PlayerAnimation()
+    
+    // Needed to trigger game state change when there is no character animation
+    object None : PlayerAnimation()
 
 }
 
-val PlayerAnimation?.isStateless: Boolean
+val PlayerAnimation?.updatesScreenSpaceTiles: Boolean
     get() = when (this) {
         is PlayerAnimation.Shake,
-        is PlayerAnimation.Attack -> true
-        else -> false
+        is PlayerAnimation.Attack -> false
+        else -> true
     }

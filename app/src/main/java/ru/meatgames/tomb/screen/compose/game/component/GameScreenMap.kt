@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -15,7 +16,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
-import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.temp.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -71,6 +71,10 @@ internal fun GameScreenMap(
     val tileDimension = tileSize.width
     val backgroundColor = LocalBackgroundColor.current
     
+    val baseOffset = remember(offset, initialOffset, animatedOffset) {
+        offset + initialOffset + animatedOffset
+    }
+    
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
             val tileScreenSpaceCoordinates = (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
@@ -79,19 +83,21 @@ internal fun GameScreenMap(
                 tileScreenSpaceCoordinates.second * tileDimension,
             )
             
-            val dstOffset = offset + initialOffset + animatedOffset + tileOffset
+            val dstOffset = baseOffset + tileOffset
             
             when {
-                renderTile !is MapRenderTile.Content -> null
+                renderTile !is MapRenderTile.Content -> {
+                    null
+                }
                 renderTile.isVisible && tilesToReveal.contains(tileScreenSpaceCoordinates) -> {
-                    if (renderTile.objectData != null) logMessage("GameScreenMap", "flag1: $revealedTilesAlpha")
                     renderTile to revealedTilesAlpha
                 }
                 renderTile.isVisible -> {
-                    if (renderTile.objectData != null) logMessage("GameScreenMap", "flag2: ${1f}")
                     renderTile to 1f
                 }
-                tilesToFade.contains(tileScreenSpaceCoordinates) -> renderTile to fadedTilesAlpha
+                tilesToFade.contains(tileScreenSpaceCoordinates) -> {
+                    renderTile to fadedTilesAlpha
+                }
                 else -> null
             }?.let { (tile, alpha) ->
                 tile.drawRevealedTile(
@@ -106,7 +112,7 @@ internal fun GameScreenMap(
 }
 
 context(DrawScope)
-    private fun MapRenderTile.Content.drawRevealedTile(
+private fun MapRenderTile.Content.drawRevealedTile(
     dstOffset: IntOffset,
     tileSize: IntSize,
     backgroundColor: Color,
@@ -116,6 +122,12 @@ context(DrawScope)
         dstOffset = dstOffset,
         dstSize = tileSize,
     )
+    decorations.forEach {
+        it.drawImage(
+            dstOffset = dstOffset,
+            dstSize = tileSize,
+        )
+    }
     objectData?.drawImage(
         dstOffset = dstOffset,
         dstSize = tileSize,
