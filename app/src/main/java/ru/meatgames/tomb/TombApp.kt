@@ -43,7 +43,7 @@ fun TombApp(
                 is DialogState.GameMenu -> {
                     navController.safeNavigate(GameState.GameScreenDialog.id)
                 }
-                else -> navController.navigateUp()
+                else -> Unit
             }
         }
     }
@@ -113,12 +113,12 @@ fun TombApp(
             dialog(GameState.GameScreenDialog.id) {
                 GameScreenDialog(
                     onFeatureToggles = {
-                        navController.navigateUp()
                         navController.navigateTo(
                             rootVM = viewModel,
                             state = GameState.FeatureToggles,
                         )
                     },
+                    closeDialog = navController::navigateUp,
                     closeGame = onCloseApp,
                 )
             }
@@ -127,6 +127,7 @@ fun TombApp(
                     itemContainerId = ItemContainerId(
                         UUID.fromString(it.arguments!!.getString("itemContainerId")!!),
                     ),
+                    closeDialog = navController::navigateUp,
                 )
             }
         }

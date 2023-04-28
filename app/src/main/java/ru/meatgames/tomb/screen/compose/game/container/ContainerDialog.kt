@@ -47,9 +47,19 @@ fun ContainerDialogPreview() {
 fun ContainerDialog(
     itemContainerId: ItemContainerId,
     viewModel: ContainerDialogVM = hiltViewModel(),
+    closeDialog: () -> Unit,
 ) {
     LaunchedEffect(viewModel, itemContainerId) {
         viewModel.loadState(itemContainerId)
+    }
+    
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            when (event) {
+                ContainerDialogEvent.CloseDialog -> closeDialog()
+                else -> Unit
+            }
+        }
     }
     
     val state by viewModel.state.collectAsStateWithLifecycle()

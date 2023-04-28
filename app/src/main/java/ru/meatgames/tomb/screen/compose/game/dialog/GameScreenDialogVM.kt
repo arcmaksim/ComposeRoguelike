@@ -20,20 +20,27 @@ class GameScreenDialogVM @Inject constructor(
     
     fun generateNewMap() {
         viewModelScope.launch {
+            dismissDialog()
             gameController.generateNewMap(gameController.lastMapType)
         }
     }
     
     fun showFeatureToggles() {
         viewModelScope.launch {
+            dismissDialog()
             _events.send(GameScreenDialogEvent.NavigateToFeatureToggles)
         }
     }
     
     fun closeDialog() {
         viewModelScope.launch {
-            gameController.closeCurrentDialog()
+            dismissDialog()
         }
+    }
+    
+    private suspend fun dismissDialog() {
+        gameController.closeCurrentDialog()
+        _events.send(GameScreenDialogEvent.CloseDialog)
     }
     
 }

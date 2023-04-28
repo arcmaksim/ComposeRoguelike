@@ -34,12 +34,14 @@ fun GameScreenDialogPreview() {
 fun GameScreenDialog(
     viewModel: GameScreenDialogVM = hiltViewModel(),
     onFeatureToggles: () -> Unit,
+    closeDialog: () -> Unit,
     closeGame: () -> Unit,
 ) {
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             when (event) {
                 GameScreenDialogEvent.NavigateToFeatureToggles -> onFeatureToggles()
+                GameScreenDialogEvent.CloseDialog -> closeDialog()
                 else -> Unit
             }
         }
