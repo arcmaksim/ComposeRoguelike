@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import ru.meatgames.tomb.design.BaseTextButton
+import ru.meatgames.tomb.design.component.BaseTextButton
 import ru.meatgames.tomb.design.h1TextStyle
 
 @Preview(widthDp = 360, heightDp = 640,)

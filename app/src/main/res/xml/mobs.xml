@@ -1,8 +1,0 @@
-<mobs>
-    <mob name="Крыса" health="5" attack="-1" defense="7" armor="0" speed="11" damage="2"/>
-    <mob name="Летучая мышь" health="4" attack="-1" defense="8" armor="0" speed="8" damage="2"/>
-    <mob name="Слизень" health="7" attack="0" defense="8" armor="1" speed="12" damage="3"/>
-    <mob name="Скелет" health="8" attack="1" defense="9" armor="1" speed="11" damage="4"/>
-    <mob name="Гоблин" health="10" attack="2" defense="11" armor="2" speed="10" damage="5"/>
-    <mob name="Король гоблинов" health="20" attack="2" defense="12" armor="2" speed="10" damage="3"/>
-</mobs>

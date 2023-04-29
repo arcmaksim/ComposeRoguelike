@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.component.IconButton
-import ru.meatgames.tomb.component.IllustrationButton
+import ru.meatgames.tomb.design.component.IconButton
+import ru.meatgames.tomb.design.component.IllustrationButton
 import ru.meatgames.tomb.design.h1TextStyle
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.design.h3TextStyle
@@ -54,7 +54,7 @@ import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
-import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor

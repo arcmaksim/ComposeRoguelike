@@ -21,8 +21,8 @@ import ru.meatgames.tomb.domain.player.CharacterState
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
 import ru.meatgames.tomb.domain.render.computeFov
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
-import ru.meatgames.tomb.model.temp.ThemeAssets
-import ru.meatgames.tomb.model.temp.TilesController
+import ru.meatgames.tomb.model.theme.ThemeAssets
+import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.render.Icon
 import ru.meatgames.tomb.resolvedOffset
 import javax.inject.Inject

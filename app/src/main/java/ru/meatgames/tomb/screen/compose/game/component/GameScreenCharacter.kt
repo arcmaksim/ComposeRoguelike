@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
-import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset

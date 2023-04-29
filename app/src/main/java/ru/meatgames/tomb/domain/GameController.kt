@@ -23,7 +23,7 @@ import ru.meatgames.tomb.domain.turn.hasAnimation
 import ru.meatgames.tomb.logErrorWithTag
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.logMessageWithTag
-import ru.meatgames.tomb.model.temp.TilesController
+import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.resolvedOffset
 import java.util.Queue
 import java.util.concurrent.LinkedTransferQueue

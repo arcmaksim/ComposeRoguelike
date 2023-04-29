@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.config.FeatureToggleKey
-import ru.meatgames.tomb.model.temp.ASSETS_TILE_SIZE
-import ru.meatgames.tomb.model.temp.getOriginalTileSinglePixelOffset
+import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
+import ru.meatgames.tomb.model.theme.getOriginalTileSinglePixelOffset
 import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.RenderData
 import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
