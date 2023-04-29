@@ -1,10 +1,10 @@
-package ru.meatgames.tomb.model.temp
+package ru.meatgames.tomb.model.theme
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 
-data class StairsThemes(
+data class DoorsThemes(
     val atlas: ImageBitmap,
     val themes: List<Theme>,
 ) {

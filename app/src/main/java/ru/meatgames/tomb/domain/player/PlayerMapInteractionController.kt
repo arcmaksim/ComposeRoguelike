@@ -10,7 +10,7 @@ import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.map.MapController
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
-import ru.meatgames.tomb.model.temp.TilesController
+import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.resolvedOffset
 import javax.inject.Inject

@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import ru.meatgames.tomb.design.BaseTextButton
+import ru.meatgames.tomb.design.component.BaseTextButton
 import ru.meatgames.tomb.design.h2TextStyle
 
 @Preview

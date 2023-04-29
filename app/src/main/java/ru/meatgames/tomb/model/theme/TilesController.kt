@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.model.temp
+package ru.meatgames.tomb.model.theme
 
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile

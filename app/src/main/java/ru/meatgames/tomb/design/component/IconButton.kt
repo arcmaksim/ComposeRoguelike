@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.component
+package ru.meatgames.tomb.design.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background

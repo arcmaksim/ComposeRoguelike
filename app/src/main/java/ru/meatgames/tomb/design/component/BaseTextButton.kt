@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.design
+package ru.meatgames.tomb.design.component
 
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import ru.meatgames.tomb.design.h3TextStyle
 
 @Preview
 @Composable

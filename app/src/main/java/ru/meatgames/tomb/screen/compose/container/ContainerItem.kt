@@ -3,7 +3,7 @@ package ru.meatgames.tomb.screen.compose.container
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import ru.meatgames.tomb.design.BaseTextButton
+import ru.meatgames.tomb.design.component.BaseTextButton
 import ru.meatgames.tomb.domain.item.Item
 
 @Preview

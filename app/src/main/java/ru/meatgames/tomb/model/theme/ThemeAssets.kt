@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.model.temp
+package ru.meatgames.tomb.model.theme
 
 import android.content.Context
 import android.graphics.Bitmap

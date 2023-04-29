@@ -11,9 +11,5 @@ enum class GameState(val id: String) {
     FeatureToggles("FeatureToggles"),
     
     Inventory("inventory"),
-    Gear("gear"),
-    ItemDetails("itemDetails"),
     Stats("stats"),
-    Map("map"),
-    Death("death"),
 }

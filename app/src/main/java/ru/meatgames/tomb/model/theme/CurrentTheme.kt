@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.model.temp
+package ru.meatgames.tomb.model.theme
 
 data class CurrentTheme(
     val wallsTheme: WallsThemes.Theme,

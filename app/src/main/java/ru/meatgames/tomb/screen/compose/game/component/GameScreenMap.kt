@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
-import ru.meatgames.tomb.model.temp.ThemeAssets
+import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
