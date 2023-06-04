@@ -33,6 +33,8 @@ class GameScreenViewModel @Inject constructor(
     private val playerInputProcessor: PlayerInputProcessor,
 ) : ViewModel(), GameScreenNavigator, GameScreenInteractionController {
     
+    private var queuedInput: Direction? = null
+    
     private val _events = Channel<GameScreenEvent?>()
     val events: Flow<GameScreenEvent?> = _events.receiveAsFlow()
     
@@ -54,6 +56,12 @@ class GameScreenViewModel @Inject constructor(
                 when (state) {
                     is GameState.PrepareForEnemies -> {
                         gameController.startEnemiesTurn()
+                    }
+                    is GameState.WaitingForInput -> {
+                        queuedInput?.let {
+                            queuedInput = null
+                            processCharacterMoveInput(it)
+                        }
                     }
                     else -> Unit
                 }
@@ -89,8 +97,11 @@ class GameScreenViewModel @Inject constructor(
     override fun processCharacterMoveInput(
         direction: Direction,
     ) {
-        if (!isIdle.value) return
-        
+        if (!isIdle.value) {
+            queuedInput = direction
+            return
+        }
+    
         viewModelScope.launch {
             playerInputProcessor.processPlayerInput(direction)
         }

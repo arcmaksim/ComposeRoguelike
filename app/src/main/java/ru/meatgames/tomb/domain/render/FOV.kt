@@ -17,9 +17,9 @@ fun computeFov(
     revealTile(originX, originY)
 
     setOf(
-        Direction.Top,
+        Direction.Up,
         Direction.Right,
-        Direction.Bottom,
+        Direction.Down,
         Direction.Left,
     ).map { direction ->
         val quadrant = Quadrant(
@@ -91,8 +91,8 @@ data class Quadrant(
     fun transform(
         tile: Tile,
     ): Tile = when (direction) {
-        Direction.Top -> Tile(originX + tile.col, originY - tile.rowDepth)
-        Direction.Bottom -> Tile(originX + tile.col, originY + tile.rowDepth)
+        Direction.Up -> Tile(originX + tile.col, originY - tile.rowDepth)
+        Direction.Down -> Tile(originX + tile.col, originY + tile.rowDepth)
         Direction.Right -> Tile(originX + tile.rowDepth, originY + tile.col)
         Direction.Left -> Tile(originX - tile.rowDepth, originY + tile.col)
     }

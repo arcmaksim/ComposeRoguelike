@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import ru.meatgames.tomb.config.FeatureToggles
-import ru.meatgames.tomb.config.FeatureToggleKey
+import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.theme.getOriginalTileSinglePixelOffset
 import ru.meatgames.tomb.render.AnimationRenderData
@@ -46,7 +46,7 @@ fun DrawScope.drawCharacter(
     val originalTileSinglePixelOffset = tileDimension.getOriginalTileSinglePixelOffset()
     val verticalOffset = originalTileSinglePixelOffset * 3
     
-    if (FeatureToggles.getToggleValue(FeatureToggleKey.ShowEnemiesHealthBar) && characterRenderData.healthRatio != 0f) {
+    if (FeatureToggles.getToggleValue(FeatureToggle.ShowEnemiesHealthBar) && characterRenderData.healthRatio != 0f) {
         val topLeftOffset = dstOffset.toOffset() + Offset(x = 0f, y = -verticalOffset * 2f)
         val innerOffset = topLeftOffset.copy(
             x = topLeftOffset.x + originalTileSinglePixelOffset.toFloat(),

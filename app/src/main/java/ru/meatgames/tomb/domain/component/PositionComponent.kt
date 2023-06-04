@@ -34,7 +34,7 @@ fun PositionComponent.calculateVectorTo(
 
 fun Vector.asDirections(): List<Direction> {
     fun Int.horizontalDirection(): Direction = if (this > 0) Direction.Left else Direction.Right
-    fun Int.verticalDirection(): Direction = if (this > 0) Direction.Top else Direction.Bottom
+    fun Int.verticalDirection(): Direction = if (this > 0) Direction.Up else Direction.Down
     
     return when {
         first == 0 && second != 0 -> listOf(
@@ -43,7 +43,7 @@ fun Vector.asDirections(): List<Direction> {
         )
         second == 0 && first != 0 -> listOf(
             first.horizontalDirection(),
-            *listOf(Direction.Top, Direction.Bottom).shuffled().toTypedArray(),
+            *listOf(Direction.Up, Direction.Down).shuffled().toTypedArray(),
         )
         abs(second) == abs(first) -> listOf(second.verticalDirection(), first.horizontalDirection()).shuffled()
         else -> listOf(first.horizontalDirection(), second.verticalDirection()).shuffled()

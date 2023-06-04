@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.config.FeatureToggleKey
+import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.item.ItemContainerId
@@ -33,7 +33,6 @@ import ru.meatgames.tomb.toDirection
 private fun GameScreenControlsPreview() {
     GameScreenControls(
         modifier = Modifier.size(300.dp),
-        isIdle = true,
         interactionController = object : GameScreenInteractionController {
             override fun finishPlayerAnimation() = Unit
             override fun processCharacterMoveInput(direction: Direction) = Unit
@@ -47,23 +46,20 @@ private fun GameScreenControlsPreview() {
 
 @Composable
 fun GameScreenControls(
-    isIdle: Boolean,
     interactionController: GameScreenInteractionController,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
-    val shouldDrawMovementControls = FeatureToggles.getToggleValue(FeatureToggleKey.ShowMovementControls)
+    val shouldDrawMovementControls = FeatureToggles.getToggleValue(FeatureToggle.ShowMovementControls)
     
     BoxWithConstraints(
         modifier = modifier.then(
             Modifier
-                .pointerInput(isIdle) {
+                .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
-                            if (isIdle) {
-                                val width = with(density) { size.width.toDp() }
-                                (interactionController::processCharacterMoveInput)(it.toDirection(width))
-                            }
+                            val width = with(density) { size.width.toDp() }
+                            (interactionController::processCharacterMoveInput)(it.toDirection(width))
                         },
                     )
                 }

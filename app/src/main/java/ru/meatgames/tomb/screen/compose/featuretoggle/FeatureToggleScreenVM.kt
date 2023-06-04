@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.config.FeatureToggles
-import ru.meatgames.tomb.config.FeatureToggleKey
+import ru.meatgames.tomb.config.FeatureToggle
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +20,7 @@ class FeatureToggleScreenVM @Inject constructor(): ViewModel() {
     val state = FeatureToggles.state
     
     fun updateToggle(
-        key: FeatureToggleKey,
+        key: FeatureToggle,
         value: Boolean,
     ) = FeatureToggles.updateToggle(key, value)
     

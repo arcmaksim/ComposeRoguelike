@@ -9,22 +9,22 @@ object FeatureToggles {
     private val _state = MutableStateFlow(
         listOf(
             FeatureToggleState(
-                key = FeatureToggleKey.SkipPlayerAnimations,
+                key = FeatureToggle.SkipPlayerAnimations,
                 title = "Skip player animations",
                 value = false,
             ),
             FeatureToggleState(
-                key = FeatureToggleKey.SkipEnemiesAnimations,
+                key = FeatureToggle.SkipEnemiesAnimations,
                 title = "Skip enemies animations",
                 value = false,
             ),
             FeatureToggleState(
-                key = FeatureToggleKey.ShowEnemiesHealthBar,
+                key = FeatureToggle.ShowEnemiesHealthBar,
                 title = "Show enemies health bar",
                 value = true,
             ),
             FeatureToggleState(
-                key = FeatureToggleKey.ShowMovementControls,
+                key = FeatureToggle.ShowMovementControls,
                 title = "Show movement controls",
                 value = false,
             ),
@@ -34,16 +34,16 @@ object FeatureToggles {
     
     val themeOverride: String? = null
     
-    private val cachedToggleValues: MutableMap<FeatureToggleKey, Boolean> = _state.value
+    private val cachedToggleValues: MutableMap<FeatureToggle, Boolean> = _state.value
         .associate { it.key to it.value }
         .toMutableMap()
     
     fun getToggleValue(
-        key: FeatureToggleKey,
+        key: FeatureToggle,
     ): Boolean = cachedToggleValues[key]!!
     
     fun updateToggle(
-        key: FeatureToggleKey,
+        key: FeatureToggle,
         value: Boolean,
     ) {
         _state.update { featureToggles ->
