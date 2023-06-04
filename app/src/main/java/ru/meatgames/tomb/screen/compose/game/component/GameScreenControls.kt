@@ -129,7 +129,7 @@ private fun BoxWithConstraintsScope.BoundsLabels() {
         modifier = Modifier
             .padding(top = maxWidth * .66f)
             .align(Alignment.Center),
-        text = "Bottom",
+        text = "Down",
         style = style,
         color = Color.Red,
     )
