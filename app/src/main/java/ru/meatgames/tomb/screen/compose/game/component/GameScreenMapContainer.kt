@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -88,7 +87,6 @@ private fun GameScreenMapContainerPreview() {
     )
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 internal fun GameScreenMapContainer(
     mapState: MapScreenState.Ready,
@@ -161,7 +159,9 @@ internal fun GameScreenMapContainer(
                 fadeOutTilesAlpha = fadedTilesAlpha,
             ),
         )
-        if (playerAnimation != null) interactionController.finishPlayerAnimation()
+        if (playerAnimation != null) {
+            interactionController.finishPlayerAnimation()
+        }
     }
     
     LaunchedEffect(enemiesAnimations) {
@@ -239,7 +239,6 @@ internal fun GameScreenMapContainer(
     
     GameScreenControls(
         modifier = baseModifier,
-        isIdle = isIdle,
         interactionController = interactionController,
     )
     

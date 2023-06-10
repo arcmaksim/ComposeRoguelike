@@ -166,8 +166,8 @@ class MainMapGenerator @Inject constructor(
             val rightTile = getTile(wall.first + 1, wall.second)
             
             when {
-                topTile.isEmpty && bottomTile.isWall && leftTile.isWall && rightTile.isWall -> Direction.Bottom
-                bottomTile.isEmpty && leftTile.isWall && rightTile.isWall && topTile.isWall -> Direction.Top
+                topTile.isEmpty && bottomTile.isWall && leftTile.isWall && rightTile.isWall -> Direction.Down
+                bottomTile.isEmpty && leftTile.isWall && rightTile.isWall && topTile.isWall -> Direction.Up
                 leftTile.isEmpty && rightTile.isWall && topTile.isWall && bottomTile.isWall -> Direction.Right
                 rightTile.isEmpty && topTile.isWall && bottomTile.isWall && leftTile.isWall -> Direction.Left
                 else -> null
@@ -189,15 +189,15 @@ class MainMapGenerator @Inject constructor(
         log("Resolving room wall for $name, at ${randomOuterWall.first} ${randomOuterWall.second} with $direction")
         
         val wall = when (direction) {
-            Direction.Top -> outerWalls.filter { it.second == height - 1 }.randomOrNull(random)
-            Direction.Bottom -> outerWalls.filter { it.second == 0 }.randomOrNull(random)
+            Direction.Up -> outerWalls.filter { it.second == height - 1 }.randomOrNull(random)
+            Direction.Down -> outerWalls.filter { it.second == 0 }.randomOrNull(random)
             Direction.Left -> outerWalls.filter { it.first == width - 1 }.randomOrNull(random)
             Direction.Right -> outerWalls.filter { it.first == 0 }.randomOrNull(random)
         } ?: return null
         
         return when (direction) {
-            Direction.Top -> randomOuterWall.first - wall.first to randomOuterWall.second - wall.second
-            Direction.Bottom -> randomOuterWall.first - wall.first to randomOuterWall.second
+            Direction.Up -> randomOuterWall.first - wall.first to randomOuterWall.second - wall.second
+            Direction.Down -> randomOuterWall.first - wall.first to randomOuterWall.second
             Direction.Left -> randomOuterWall.first - wall.first to randomOuterWall.second - wall.second
             Direction.Right -> randomOuterWall.first to randomOuterWall.second - wall.second
         }

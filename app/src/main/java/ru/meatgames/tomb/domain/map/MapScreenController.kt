@@ -1,12 +1,14 @@
 package ru.meatgames.tomb.domain.map
 
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
 import ru.meatgames.tomb.domain.Coordinates
@@ -38,7 +40,7 @@ class MapScreenController @Inject constructor(
     private val viewportWidth: Int,
     @Named(MAP_VIEWPORT_HEIGHT_KEY)
     private val viewportHeight: Int,
-    private val mapController: MapController,
+    mapController: MapController,
     private val characterController: CharacterController,
     private val tilesController: TilesController,
     private val gameMapRenderPipeline: GameMapRenderPipeline,
@@ -58,45 +60,45 @@ class MapScreenController @Inject constructor(
     private val preProcessingViewportHeight: Int =
         viewportHeight + 2 * preProcessingBufferSizeModifier
     
-    private var cachedMapState: MapScreenState = MapScreenState.Loading
-    
-    private var latestGameState: GameState = GameState.Loading
-    
     init {
-        GlobalScope.launch {
-            mapController.mapFlow.flatMapLatest { map ->
-                if (map !is MapState.MapAvailable) {
-                    return@flatMapLatest flow { MapScreenState.Loading }
+        mapController.mapFlow
+            .flatMapLatest { map ->
+                when (map) {
+                    is MapState.MapUnavailable -> flow { MapScreenState.Loading }
+                    is MapState.MapAvailable -> produceMapFlow(map.mapWrapper)
                 }
-                
-                val mapWidth = map.mapWrapper.width
-                val mapHeight = map.mapWrapper.height
-                
-                combine(
-                    map.mapWrapper.state,
-                    characterController.characterStateFlow,
-                    gameController.state,
-                ) { streamedTiles, characterState, gameState ->
-                    if (latestGameState == gameState) {
-                        return@combine cachedMapState
-                    }
-                    
-                    latestGameState = gameState
-                    
-                    if (gameState.updatesState()) {
-                        return@combine streamedTiles.toMapState(
-                            mapWidth = mapWidth,
-                            mapHeight = mapHeight,
-                            characterState = characterState,
-                            gameState = gameState,
-                        ).also {
-                            cachedMapState = it
-                        }
-                    }
-                    
-                    cachedMapState
+            }
+            .onEach(_state::emit)
+            .launchIn(GlobalScope)
+    }
+    
+    private fun produceMapFlow(
+        mapWrapper: LevelMapWrapper,
+    ): Flow<MapScreenState> {
+        var cachedMapState: MapScreenState = MapScreenState.Loading
+        var latestGameState: GameState = GameState.Loading
+        
+        return combine(
+            mapWrapper.state,
+            characterController.characterStateFlow,
+            gameController.state,
+        ) { streamedTiles, characterState, gameState ->
+            if (latestGameState == gameState) return@combine cachedMapState
+            
+            latestGameState = gameState
+            
+            if (gameState.updatesState()) {
+                return@combine streamedTiles.toMapState(
+                    mapWidth = mapWrapper.width,
+                    mapHeight = mapWrapper.height,
+                    characterState = characterState,
+                    gameState = gameState,
+                ).also {
+                    cachedMapState = it
                 }
-            }.collect(_state::emit)
+            }
+            
+            cachedMapState
         }
     }
     
@@ -117,7 +119,8 @@ class MapScreenController @Inject constructor(
         
         val leftXCoordinate = characterState.position.x - preProcessingViewportWidth / 2
         val topYCoordinate = characterState.position.y - preProcessingViewportHeight / 2
-        val viewportZeroPosition = (leftXCoordinate + preProcessingBufferSizeModifier) to (topYCoordinate + preProcessingBufferSizeModifier)
+        val viewportZeroPosition =
+            (leftXCoordinate + preProcessingBufferSizeModifier) to (topYCoordinate + preProcessingBufferSizeModifier)
         
         val reducedTiles = reduceToViewportSize(
             leftXCoordinate = leftXCoordinate,
@@ -294,12 +297,17 @@ class MapScreenController @Inject constructor(
         when (result) {
             is EnemyTurnResult.Move -> {
                 val currentScreenSpacePosition = result.position - viewportZeroPosition
-                val currentScreenSpaceIndex = currentScreenSpacePosition.first + currentScreenSpacePosition.second * viewportWidth
-                val currentTileVisibility = cachedVisibilityMask.getOrElse(currentScreenSpaceIndex) { false }
+                val currentScreenSpaceIndex =
+                    currentScreenSpacePosition.first + currentScreenSpacePosition.second * viewportWidth
+                val currentTileVisibility =
+                    cachedVisibilityMask.getOrElse(currentScreenSpaceIndex) { false }
                 
-                val nextScreenSpacePosition = currentScreenSpacePosition + result.direction.resolvedOffset
-                val nextScreenSpaceIndex = nextScreenSpacePosition.first + nextScreenSpacePosition.second * viewportWidth
-                val nextTileVisibility = cachedVisibilityMask.getOrElse(nextScreenSpaceIndex) { false }
+                val nextScreenSpacePosition =
+                    currentScreenSpacePosition + result.direction.resolvedOffset
+                val nextScreenSpaceIndex =
+                    nextScreenSpacePosition.first + nextScreenSpacePosition.second * viewportWidth
+                val nextTileVisibility =
+                    cachedVisibilityMask.getOrElse(nextScreenSpaceIndex) { false }
                 
                 result.enemyId to EnemyAnimation.Move(
                     direction = result.direction,

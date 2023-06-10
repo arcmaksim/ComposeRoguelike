@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
-import ru.meatgames.tomb.config.FeatureToggleKey
+import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.config.FeatureToggleState
 import ru.meatgames.tomb.design.h3TextStyle
 
@@ -62,7 +62,7 @@ fun FeatureToggleScreen(
 @Composable
 private fun FeatureToggleScreenContent(
     featureToggles: List<FeatureToggleState>,
-    onFeatureToggleUpdate: (FeatureToggleKey, Boolean) -> Unit,
+    onFeatureToggleUpdate: (FeatureToggle, Boolean) -> Unit,
     onBack: () -> Unit,
 ) {
     Column(
@@ -93,7 +93,7 @@ private fun FeatureToggleScreenContent(
 @Composable
 private fun FeatureToggle(
     featureToggle: FeatureToggleState,
-    onFeatureToggleUpdate: (FeatureToggleKey, Boolean) -> Unit,
+    onFeatureToggleUpdate: (FeatureToggle, Boolean) -> Unit,
 ) {
     Row(
         modifier = Modifier

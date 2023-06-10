@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.config.FeatureToggles
-import ru.meatgames.tomb.config.FeatureToggleKey
+import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 
@@ -21,7 +21,7 @@ suspend fun PlayerAnimation?.assemblePlayerInputAnimations(
     fadeInTilesAlpha: MutableState<Float>,
     fadeOutTilesAlpha: MutableState<Float>,
 ): Array<Deferred<Any>> {
-    if (FeatureToggles.getToggleValue(FeatureToggleKey.SkipPlayerAnimations)) return emptyArray()
+    if (FeatureToggles.getToggleValue(FeatureToggle.SkipPlayerAnimations)) return emptyArray()
     
     val specificAnimations = when (this) {
         is PlayerAnimation.Shake -> asAnimationAsync(
