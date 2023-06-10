@@ -159,7 +159,9 @@ internal fun GameScreenMapContainer(
                 fadeOutTilesAlpha = fadedTilesAlpha,
             ),
         )
-        if (playerAnimation != null) interactionController.finishPlayerAnimation()
+        if (playerAnimation != null) {
+            interactionController.finishPlayerAnimation()
+        }
     }
     
     LaunchedEffect(enemiesAnimations) {

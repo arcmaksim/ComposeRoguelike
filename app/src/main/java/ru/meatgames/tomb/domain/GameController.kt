@@ -1,8 +1,7 @@
 package ru.meatgames.tomb.domain
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.domain.component.asDirections
 import ru.meatgames.tomb.domain.component.calculateVectorTo
 import ru.meatgames.tomb.domain.component.isNextTo
@@ -22,7 +21,6 @@ import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
 import ru.meatgames.tomb.domain.turn.hasAnimation
 import ru.meatgames.tomb.logErrorWithTag
 import ru.meatgames.tomb.logMessage
-import ru.meatgames.tomb.logMessageWithTag
 import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.resolvedOffset
 import java.util.Queue
@@ -34,8 +32,8 @@ interface GameController {
     
     val lastMapType: MapCreator.MapType
     
-    val state: SharedFlow<GameState>
-    val dialogState: StateFlow<DialogState?>
+    val state: Flow<GameState>
+    val dialogState: Flow<DialogState?>
     
     suspend fun generateNewMap(
         mapType: MapCreator.MapType,
@@ -78,10 +76,10 @@ class GameControllerImpl @Inject constructor(
 ) : GameController {
 
     private val _state = MutableStateFlow<GameState>(GameState.Loading)
-    override val state: StateFlow<GameState> = _state
+    override val state: Flow<GameState> = _state
     
     private val _dialogState = MutableStateFlow<DialogState?>(null)
-    override val dialogState: StateFlow<DialogState?> = _dialogState
+    override val dialogState: Flow<DialogState?> = _dialogState
     
     private var _lastMapType: MapCreator.MapType = MapCreator.MapType.MAIN
     override val lastMapType: MapCreator.MapType
@@ -163,19 +161,19 @@ class GameControllerImpl @Inject constructor(
     ) = characterController.modifyHealth(-damage)
     
     override suspend fun blockPlayerTurn() {
-        if (state.value !is GameState.WaitingForInput) {
-            "Trying to block player input when state is ${state.value}".logErrorWithTag("GameState")
+        if (_state.value !is GameState.WaitingForInput) {
+            "Trying to block player input when state is ${_state.value}".logErrorWithTag("GameState")
             return
         }
-        
+    
         _state.emit(GameState.ProcessingInput)
     }
     
     override suspend fun finishPlayerTurn(
         result: PlayerTurnResult?,
     ) {
-        if (state.value !is GameState.ProcessingInput) {
-            "Trying to finish player turn when state is ${state.value}".logErrorWithTag("GameState")
+        if (_state.value !is GameState.ProcessingInput) {
+            "Trying to finish player turn when state is ${_state.value}".logErrorWithTag("GameState")
             return
         }
         
@@ -187,10 +185,7 @@ class GameControllerImpl @Inject constructor(
                 else -> GameState.PrepareForEnemies
             }
             turnResult.resolveDialogState().updateState()
-            nextState?.let {
-                "$it".logMessageWithTag("GameState123")
-                _state.emit(it)
-            }
+            nextState?.let { _state.emit(it) }
         } ?: let {
             _state.emit(GameState.WaitingForInput)
         }
@@ -199,8 +194,8 @@ class GameControllerImpl @Inject constructor(
     override suspend fun finishPlayerAnimation(
         result: PlayerTurnResult?,
     ) {
-        if (state.value !is GameState.AnimatingCharacter) {
-            "Trying to finish player animation when state is ${state.value}".logErrorWithTag("GameState")
+        if (_state.value !is GameState.AnimatingCharacter) {
+            "Trying to finish player animation when state is ${_state.value}".logErrorWithTag("GameState")
             return
         }
         
@@ -241,8 +236,8 @@ class GameControllerImpl @Inject constructor(
     }
     
     override suspend fun finishEnemiesAnimations() {
-        if (state.value !is GameState.AnimatingEnemies) {
-            "Trying to finish enemies animations when state is ${state.value}".logErrorWithTag("GameState")
+        if (_state.value !is GameState.AnimatingEnemies) {
+            "Trying to finish enemies animations when state is ${_state.value}".logErrorWithTag("GameState")
             return
         }
         
@@ -250,7 +245,7 @@ class GameControllerImpl @Inject constructor(
     }
     
     override suspend fun finishCurrentAnimations() {
-        when (val state = state.value) {
+        when (val state = _state.value) {
             is GameState.AnimatingCharacter -> finishPlayerAnimation(state.turnResult)
             is GameState.AnimatingEnemies -> finishEnemiesAnimations()
             else -> Unit
@@ -268,7 +263,7 @@ class GameControllerImpl @Inject constructor(
             }
             
             is DialogUpdateResult.DisruptInteraction -> {
-                if (dialogState.value?.isInterruptable == true) {
+                if (_dialogState.value?.isInterruptable == true) {
                     _dialogState.value = null
                 }
             }
