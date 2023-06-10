@@ -14,7 +14,7 @@ In active development
 
 ### Future plans
 1. Content;
-2. ~~Multiplatform support (fot both Kotlin and Compose)~~ (postponed/cancelled).
+2. ~~Multiplatform support (fot both Kotlin and Compose)~~ (postponed/canceled).
 
 ### Video
 https://github.com/arcmaksim/ComposeRoguelike/assets/3370362/14de7443-663e-406f-9955-1996a4238992
