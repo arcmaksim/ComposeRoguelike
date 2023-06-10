@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.config.FeatureToggle
+import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
@@ -123,7 +125,9 @@ class GameScreenViewModel @Inject constructor(
         direction: Direction,
     ) {
         if (!isIdle.value) {
-            queuedInput = direction
+            if (FeatureToggles.getToggleValue(FeatureToggle.InputQueue)) {
+                queuedInput = direction
+            }
             return
         }
         

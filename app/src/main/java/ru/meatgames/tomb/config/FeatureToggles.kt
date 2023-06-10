@@ -28,6 +28,11 @@ object FeatureToggles {
                 title = "Show movement controls",
                 value = false,
             ),
+            FeatureToggleState(
+                key = FeatureToggle.InputQueue,
+                title = "Enable input queue",
+                value = true,
+            ),
         )
     )
     val state: StateFlow<List<FeatureToggleState>> = _state

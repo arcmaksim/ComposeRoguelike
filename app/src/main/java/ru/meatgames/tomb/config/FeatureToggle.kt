@@ -5,4 +5,5 @@ enum class FeatureToggle {
     SkipEnemiesAnimations,
     ShowEnemiesHealthBar,
     ShowMovementControls,
+    InputQueue,
 }
