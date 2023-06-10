@@ -40,9 +40,11 @@ fun TombApp(
                 is DialogState.Container -> {
                     navController.safeNavigate("ContainerDialog/${dialogState.itemContainerId.id}")
                 }
+                
                 is DialogState.GameMenu -> {
                     navController.safeNavigate(GameState.GameScreenDialog.id)
                 }
+                
                 else -> Unit
             }
         }
@@ -119,7 +121,10 @@ fun TombApp(
                         )
                     },
                     closeDialog = navController::navigateUp,
-                    closeGame = onCloseApp,
+                    closeGame = {
+                        viewModel.closeDialog()
+                        onCloseApp()
+                    },
                 )
             }
             dialog(GameState.ContainerDialog.id) {

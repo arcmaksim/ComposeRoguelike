@@ -20,4 +20,10 @@ class RootVM @Inject constructor(
         }
     }
     
+    fun closeDialog() {
+        viewModelScope.launch {
+            gameController.closeCurrentDialog()
+        }
+    }
+    
 }
