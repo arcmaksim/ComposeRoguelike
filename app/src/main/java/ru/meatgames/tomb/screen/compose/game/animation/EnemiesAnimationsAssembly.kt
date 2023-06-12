@@ -1,47 +1,106 @@
 package ru.meatgames.tomb.screen.compose.game.animation
 
+import android.view.View
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.config.FeatureToggle
+import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
+import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.toIntOffset
+import timber.log.Timber
 
-context(CoroutineScope)
+/*context(CoroutineScope)
 suspend fun List<Pair<EnemyId, EnemyAnimation>>.assembleEnemiesAnimations(
     animationDurationMillis: Int,
     tileDimension: Int,
+    view: View,
+    onAttack: () -> Unit,
     update: (EnemyId, EnemyAnimationState) -> Unit,
-): Array<Deferred<Any>> = mapIndexedNotNull { index, (enemyId, animationState) ->
-    if (FeatureToggles.getToggleValue(FeatureToggle.SkipEnemiesAnimations)) return@mapIndexedNotNull null
-    
-    val delayMillis = animationDurationMillis / 3 * index
-    
-    when (animationState) {
-        is EnemyAnimation.Move -> animationState.asAnimationAsync(
-            enemyId = enemyId,
-            durationMillis = animationDurationMillis,
-            delayMillis = delayMillis,
-            tileDimension = tileDimension,
-            update = update,
-        )
+): Array<Deferred<Any>> {
+    if (FeatureToggles.getToggleValue(FeatureToggle.SkipEnemiesAnimations)) return emptyArray()
+    return mapIndexedNotNull { index, (enemyId, animationState) ->
+        val delayMillis = animationDurationMillis / 3 * index
         
-        is EnemyAnimation.Attack -> animationState.asAnimationAsync(
-            enemyId = enemyId,
-            delayMillis = delayMillis,
-            tileDimension = tileDimension,
-            update = update,
-        )
+        when (animationState) {
+            is EnemyAnimation.Move -> animationState.asAnimationAsync(
+                enemyId = enemyId,
+                durationMillis = animationDurationMillis,
+                delayMillis = delayMillis,
+                tileDimension = tileDimension,
+                update = update,
+            )
+            
+            is EnemyAnimation.Attack -> animationState.asAnimationAsync2(
+                enemyId = enemyId,
+                delayMillis = delayMillis,
+                tileDimension = tileDimension,
+                update = update,
+                view = view,
+                onAttack = onAttack,
+            )
+            
+            is EnemyAnimation.Icon -> animationState.asAnimationAsync(
+                enemyId = enemyId,
+                durationMillis = animationDurationMillis,
+                delayMillis = delayMillis,
+                update = update,
+            )
+        }
+    }.toTypedArray()
+}*/
+
+sealed class EnemyAnimationEvent {
+    
+    data class Attack(
+        val enemyId: EnemyId,
+    ) : EnemyAnimationEvent()
+    
+}
+
+context(CoroutineScope)
+suspend fun List<Pair<EnemyId, EnemyAnimation>>.assembleEnemiesAnimations2(
+    animationDurationMillis: Int,
+    tileDimension: Int,
+    view: View,
+    onAttack: (EnemyAnimationEvent) -> Unit,
+    update: (EnemyId, EnemyAnimationState) -> Unit,
+): Array<Deferred<Any>> {
+    if (FeatureToggles.getToggleValue(FeatureToggle.SkipEnemiesAnimations)) return emptyArray()
+    return mapIndexed { index, (enemyId, animationState) ->
+        val delayMillis = animationDurationMillis / 3 * index
         
-        is EnemyAnimation.Icon -> animationState.asAnimationAsync(
-            enemyId = enemyId,
-            durationMillis = animationDurationMillis,
-            delayMillis = delayMillis,
-            update = update,
-        )
-    }
-}.toTypedArray()
+        when (animationState) {
+            is EnemyAnimation.Move -> listOf(animationState.asAnimationAsync(
+                enemyId = enemyId,
+                durationMillis = animationDurationMillis,
+                delayMillis = delayMillis,
+                tileDimension = tileDimension,
+                update = update,
+            ))
+            
+            is EnemyAnimation.Attack -> animationState.asAnimationAsync2(
+                enemyId = enemyId,
+                delayMillis = delayMillis,
+                tileDimension = tileDimension,
+                update = update,
+                view = view,
+                onAttack = onAttack,
+            )
+            
+            is EnemyAnimation.Icon -> listOf(animationState.asAnimationAsync(
+                enemyId = enemyId,
+                durationMillis = animationDurationMillis,
+                delayMillis = delayMillis,
+                update = update,
+            ))
+        }
+    }.fold(mutableListOf<Deferred<Any>>()) { acc, deferred -> acc.also { it.addAll(deferred) } }
+        .toTypedArray()
+}
 
 context(CoroutineScope)
 private suspend fun EnemyAnimation.Move.asAnimationAsync(
@@ -50,7 +109,7 @@ private suspend fun EnemyAnimation.Move.asAnimationAsync(
     delayMillis: Int,
     tileDimension: Int,
     update: (EnemyId, EnemyAnimationState.Transition) -> Unit,
-): Deferred<Unit> = asEnemiesMoveAnimationAsync(
+): Deferred<Any> = asEnemiesMoveAnimationAsync(
     durationMillis = durationMillis,
     delayMillis = delayMillis,
 ) { coefficient ->
@@ -92,12 +151,49 @@ private suspend fun EnemyAnimation.Attack.asAnimationAsync(
 }
 
 context(CoroutineScope)
+private suspend fun EnemyAnimation.Attack.asAnimationAsync2(
+    enemyId: EnemyId,
+    delayMillis: Int,
+    tileDimension: Int,
+    view: View,
+    onAttack: (EnemyAnimationEvent) -> Unit = {},
+    update: (EnemyId, EnemyAnimationState.Transition) -> Unit,
+): List<Deferred<Any>> {
+    val resoledExaggeration = ENEMIES_DEFAULT_ATTACK_EXAGGERATION.coerceIn(.5f, 2f)
+    val animationDistance = tileDimension * ATTACK_DISTANCE_MODIFIER
+    val offset = direction.toIntOffset((animationDistance * resoledExaggeration).toInt())
+    
+    val attackAnimation = asEnemiesAttackAnimationAsync(
+        delayMillis = delayMillis,
+    ) { coefficient ->
+        update(
+            enemyId,
+            EnemyAnimationState.Transition(
+                offset = offset * coefficient,
+                alpha = 1f,
+            ),
+        )
+    }
+    val vibration = view.asDeferredConfirmVibrationAsync(
+        delayMillis = DEFAULT_ATTACK_DELAY_MILLIS,
+        onAnimation = {
+            logMessage("Attack", "Получай пизды блять")
+            onAttack(EnemyAnimationEvent.Attack(enemyId)) },
+    )
+    
+    return listOf(
+        attackAnimation,
+        vibration,
+    )
+}
+
+context(CoroutineScope)
 private suspend fun EnemyAnimation.Icon.asAnimationAsync(
     enemyId: EnemyId,
     durationMillis: Int,
     delayMillis: Int,
     update: (EnemyId, EnemyAnimationState.Icon) -> Unit,
-): Deferred<Unit> {
+): Deferred<Any> {
     return asIconAnimationAsync(
         durationMillis = durationMillis,
         delayMillis = delayMillis,

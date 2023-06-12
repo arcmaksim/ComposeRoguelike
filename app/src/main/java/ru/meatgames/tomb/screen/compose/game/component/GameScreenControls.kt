@@ -26,6 +26,7 @@ import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
+import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationEvent
 import ru.meatgames.tomb.toDirection
 
 @Preview
@@ -40,6 +41,7 @@ private fun GameScreenControlsPreview() {
             override fun itemSelected(itemContainerId: ItemContainerId, itemId: ItemId) = Unit
             override fun finishEnemiesAnimation() = Unit
             override fun skipTurn() = Unit
+            override fun onEnemyAnimationEvent(event: EnemyAnimationEvent) = Unit
         },
     )
 }

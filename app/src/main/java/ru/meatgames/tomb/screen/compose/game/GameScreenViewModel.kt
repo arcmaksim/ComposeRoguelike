@@ -28,8 +28,11 @@ import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenCharacterAnimations
 import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.map.MapScreenState
+import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.PlayerAnimation
+import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
+import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,6 +40,7 @@ class GameScreenViewModel @Inject constructor(
     mapScreenController: MapScreenController,
     private val gameController: GameController,
     private val playerInputProcessor: PlayerInputProcessor,
+    private val characterController: CharacterController,
 ) : ViewModel(), GameScreenNavigator, GameScreenInteractionController {
     
     private var queuedInput: Direction? = null
@@ -54,6 +58,9 @@ class GameScreenViewModel @Inject constructor(
     
     private val _isIdle = MutableStateFlow(true)
     val isIdle: StateFlow<Boolean> = _isIdle
+    
+    private var cachedPlayerTurnResult: PlayerTurnResult? = null
+    private var cachedEnemyTurnResult: EnemiesAnimations? = null
     
     init {
         mapScreenController
@@ -102,23 +109,33 @@ class GameScreenViewModel @Inject constructor(
     }
     
     private fun MapScreenState.toPlayerAnimation(): PlayerAnimation? {
-        return (if (this is MapScreenState.Ready &&
+        val turnResult = if (this is MapScreenState.Ready &&
             turnResultsToAnimate is MapScreenCharacterAnimations.Player
         ) {
             turnResultsToAnimate.turnResult
         } else {
             null
-        })?.resolvePlayerAnimation()
+        }
+        
+        if (cachedPlayerTurnResult == turnResult) return _state.value.playerAnimation
+    
+        cachedPlayerTurnResult = turnResult
+        return turnResult?.resolvePlayerAnimation()
     }
     
     private fun MapScreenState.toEnemiesAnimations(): EnemiesAnimations? {
-        return if (this is MapScreenState.Ready &&
+        val animations = if (this is MapScreenState.Ready &&
             turnResultsToAnimate is MapScreenCharacterAnimations.Enemies
         ) {
             turnResultsToAnimate.animations
         } else {
             null
         }
+    
+        if (cachedEnemyTurnResult == animations) return _state.value.enemiesAnimations
+    
+        cachedEnemyTurnResult = animations
+        return animations
     }
     
     override fun processCharacterMoveInput(
@@ -202,6 +219,10 @@ class GameScreenViewModel @Inject constructor(
             gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)
         }
     }
+    
+    override fun onEnemyAnimationEvent(
+        event: EnemyAnimationEvent,
+    ) {
+        characterController.modifyHealth(-1)
+    }
 }
-
-

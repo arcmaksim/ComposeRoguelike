@@ -61,8 +61,9 @@ import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_FRAMES
+import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationEvent
 import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
-import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations
+import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations2
 import ru.meatgames.tomb.screen.compose.game.animation.assemblePlayerInputAnimations
 import ru.meatgames.tomb.screen.compose.game.interactionControllerPreviewStub
 import ru.meatgames.tomb.screen.compose.game.navigatorPreviewStub
@@ -174,8 +175,10 @@ internal fun GameScreenMapContainer(
             
             else -> {
                 awaitAll(
-                    *enemiesAnimations.assembleEnemiesAnimations(
+                    *enemiesAnimations.assembleEnemiesAnimations2(
                         animationDurationMillis = animationDurationMillis,
+                        view = view,
+                        onAttack = interactionController::onEnemyAnimationEvent,
                         tileDimension = tileDimension,
                     ) { it, state ->
                         enemiesAnimationUpdates.value = enemiesAnimationUpdates.value.toMutableMap().apply {

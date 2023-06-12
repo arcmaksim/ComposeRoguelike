@@ -2,6 +2,7 @@ package ru.meatgames.tomb.domain.enemy
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.component.AttackInstance
 import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.component.toPositionComponent
 import ru.meatgames.tomb.resolvedOffset
@@ -14,6 +15,7 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
     
     private val enemies = mutableMapOf<EnemyId, Enemy>()
     private val enemyMapping = mutableMapOf<Coordinates, EnemyId>()
+    private val attacks = mutableMapOf<EnemyId, AttackInstance>()
     
     override fun getEnemy(
         coordinates: Coordinates,
@@ -82,6 +84,20 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         enemies[enemyId] = enemy.copy(health = updatedComponent)
         return true
     }
+    
+    fun reduceAttackCountdown() {
+        val attackInstances = attacks.values.toList()
+        attacks.clear()
+        
+        attackInstances.forEach { attackInstance ->
+            val updatedCountdown = attackInstance.countdown - 1
+            if (updatedCountdown > 0) {
+                attacks[attackInstance.enemyId] = attackInstance.copy(countdown = updatedCountdown)
+            } else {
+                tryToInflictDamage(attackInstance.target, attackInstance.attack.damage)
+            }
+        }
+    }
 }
 
 // write interface
@@ -120,3 +136,4 @@ interface EnemiesHolder {
     fun clearEnemies()
     
 }
+

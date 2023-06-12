@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.domain.enemy
 
+import ru.meatgames.tomb.domain.component.AttackComponent
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.Initiative
 import ru.meatgames.tomb.domain.component.PositionComponent
@@ -14,5 +15,6 @@ data class Enemy @Inject constructor(
     val type: EnemyType,
     val health: HealthComponent,
     val position: PositionComponent,
+    //val attack: AttackComponent,
     val initiative: Initiative,
 )

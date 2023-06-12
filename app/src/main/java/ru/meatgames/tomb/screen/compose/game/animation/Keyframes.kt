@@ -6,11 +6,11 @@ import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.keyframes
 
 internal val screenShakeKeyframes: KeyframesSpec<Float> = keyframes {
-    durationMillis = ENEMIES_ATTACK_DURATION_MILLIS
+    durationMillis = DEFAULT_ATTACK_DURATION_MILLIS
     
     val easing = FastOutLinearInEasing
     val animationSteps = 5
-    val animationStep = ENEMIES_ATTACK_DURATION_MILLIS / animationSteps
+    val animationStep = DEFAULT_ATTACK_DURATION_MILLIS / animationSteps
     
     (0 until animationSteps).forEach {
         val value = if (it % 2 == 0) 1f else -1f
@@ -30,7 +30,7 @@ fun produceAttackKeyframes(
     0f at durationMillis with FastOutSlowInEasing
 }
 
-internal val defaultAttackKeyframes = produceAttackKeyframes(ENEMIES_ATTACK_DURATION_MILLIS)
+internal val defaultAttackKeyframes = produceAttackKeyframes(DEFAULT_ATTACK_DURATION_MILLIS)
 
 internal fun produceIconKeyframes(
     durationMillis: Int,

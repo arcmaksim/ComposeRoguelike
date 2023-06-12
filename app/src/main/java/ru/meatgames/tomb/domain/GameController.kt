@@ -122,7 +122,7 @@ class GameControllerImpl @Inject constructor(
         
         if (vectorToPlayer.isNextTo()) {
             val damage = 1
-            attackPlayer(damage)
+            //attackPlayer(damage)
             
             return EnemyTurnResult.Attack(
                 position = position.toCoordinates(),

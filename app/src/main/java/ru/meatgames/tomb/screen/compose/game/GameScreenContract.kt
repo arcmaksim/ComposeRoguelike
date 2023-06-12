@@ -6,6 +6,7 @@ import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
+import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationEvent
 
 enum class GameScreenEvent {
     NavigateToWinScreen,
@@ -54,5 +55,10 @@ interface GameScreenInteractionController {
     fun finishEnemiesAnimation()
     
     fun skipTurn()
+    
+    // Move to the another interface because it's an animation callback and not an interaction
+    fun onEnemyAnimationEvent(
+        event: EnemyAnimationEvent,
+    )
     
 }

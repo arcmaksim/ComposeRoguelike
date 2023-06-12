@@ -90,3 +90,7 @@ data class CharacterState(
     val allBehaviorCards: List<BehaviorCard> = emptyList(),
     val inventory: List<Item> = emptyList(),
 )
+
+fun CharacterState.isChangedExceptForPosition(
+    other: CharacterState,
+): Boolean = this != other && position == other.position

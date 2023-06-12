@@ -1,5 +1,7 @@
 package ru.meatgames.tomb.domain.component
 
+import ru.meatgames.tomb.logMessage
+
 data class HealthComponent(
     val currentHealth: Int,
     val maxHealth: Int,
@@ -23,8 +25,12 @@ data class HealthComponent(
     
     fun updateHealth(
         modifier: Int,
-    ): HealthComponent = copy(
-        currentHealth = (currentHealth + modifier).coerceAtMost(maxHealth),
-    )
+    ): HealthComponent {
+        val value = (currentHealth + modifier).coerceAtMost(maxHealth)
+        logMessage("Attack", "was $currentHealth, now $value")
+        return copy(
+            currentHealth = value,
+        )
+    }
     
 }

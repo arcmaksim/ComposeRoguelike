@@ -20,9 +20,11 @@ fun View.asDeferredRejectVibrationAsync() = async {
 
 context(CoroutineScope)
 fun View.asDeferredConfirmVibrationAsync(
-    delay: Long = 0L,
+    delayMillis: Int = 0,
+    onAnimation: () -> Unit = {},
 ) = async {
-    delay(delay)
+    delay(delayMillis.toLong())
+    onAnimation()
     performHapticFeedback(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             HapticFeedbackConstants.CONFIRM

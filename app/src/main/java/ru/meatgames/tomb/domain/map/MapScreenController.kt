@@ -20,6 +20,7 @@ import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.CharacterState
+import ru.meatgames.tomb.domain.player.isChangedExceptForPosition
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
 import ru.meatgames.tomb.domain.render.computeFov
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
@@ -76,29 +77,38 @@ class MapScreenController @Inject constructor(
         mapWrapper: LevelMapWrapper,
     ): Flow<MapScreenState> {
         var cachedMapState: MapScreenState = MapScreenState.Loading
+        
+        var latestTiles: List<MapTile> = mapWrapper.state.value
         var latestGameState: GameState = GameState.Loading
+        var latestCharacterState: CharacterState = characterController.characterStateFlow.value
         
         return combine(
             mapWrapper.state,
             characterController.characterStateFlow,
             gameController.state,
         ) { streamedTiles, characterState, gameState ->
-            if (latestGameState == gameState) return@combine cachedMapState
+            val capturedMapState = cachedMapState
             
-            latestGameState = gameState
-            
-            if (gameState.updatesState()) {
-                return@combine streamedTiles.toMapState(
+            return@combine when {
+                characterState.isChangedExceptForPosition(latestCharacterState) && capturedMapState is MapScreenState.Ready -> {
+                    capturedMapState.updateCharacterStateOnly(characterState)
+                }
+                gameState != latestGameState && gameState.updatesState() && capturedMapState is MapScreenState.Ready -> {
+                    capturedMapState.updateGameStateOnly(characterState, gameState)
+                }
+                streamedTiles != latestTiles || capturedMapState is MapScreenState.Loading -> streamedTiles.toMapState(
                     mapWidth = mapWrapper.width,
                     mapHeight = mapWrapper.height,
                     characterState = characterState,
                     gameState = gameState,
-                ).also {
-                    cachedMapState = it
-                }
+                )
+                else -> capturedMapState
+            }.run {
+                latestGameState = gameState
+                latestCharacterState = characterState
+                cachedMapState = this
+                this
             }
-            
-            cachedMapState
         }
     }
     
@@ -329,6 +339,29 @@ class MapScreenController @Inject constructor(
                 result.enemyId to EnemyAnimation.Icon(themeAssets.getIconRenderData(Icon.Clock))
             }
         }
+    }
+    
+    private fun MapScreenState.Ready.updateCharacterStateOnly(
+        characterState: CharacterState,
+    ): MapScreenState = copy(
+        playerHealth = characterState.health,
+    )
+    
+    private fun MapScreenState.Ready.updateGameStateOnly(
+        characterState: CharacterState,
+        gameState: GameState,
+    ): MapScreenState {
+        val leftXCoordinate = characterState.position.x - preProcessingViewportWidth / 2
+        val topYCoordinate = characterState.position.y - preProcessingViewportHeight / 2
+        val viewportZeroPosition =
+            (leftXCoordinate + preProcessingBufferSizeModifier) to (topYCoordinate + preProcessingBufferSizeModifier)
+        
+        return copy(
+            turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(
+                viewportZeroPosition = viewportZeroPosition,
+                viewportWidth = viewportWidth,
+            ),
+        )
     }
     
 }

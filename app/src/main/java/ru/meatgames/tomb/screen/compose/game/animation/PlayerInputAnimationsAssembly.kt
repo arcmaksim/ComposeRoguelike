@@ -88,5 +88,5 @@ private suspend fun PlayerAnimation.Attack.asAnimationAsync(
         defaultAttackKeyframes,
         direction,
     ),
-    view.asDeferredConfirmVibrationAsync(250L),
+    view.asDeferredConfirmVibrationAsync(DEFAULT_ATTACK_DELAY_MILLIS),
 )
