@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,6 +17,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
+import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -73,6 +75,10 @@ internal fun GameScreenMap(
     
     val baseOffset = remember(offset, initialOffset, animatedOffset) {
         offset + initialOffset + animatedOffset
+    }
+    
+    SideEffect {
+        logMessage("Offset", "$offset + $initialOffset + $animatedOffset = $baseOffset")
     }
     
     Canvas(modifier = modifier) {

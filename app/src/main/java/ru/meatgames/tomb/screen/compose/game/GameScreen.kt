@@ -54,7 +54,7 @@ private fun GameScreenContent(
             playerHealth = mapState.playerHealth,
             playerAnimation = state.playerAnimation,
             enemiesAnimations = state.enemiesAnimations,
-            animationDurationMillis = ANIMATION_DURATION_MILLIS,
+            animationDurationMillis = ANIMATION_DURATION_MILLIS * 10,
             navigator = navigator,
             interactionController = interactionController,
         )

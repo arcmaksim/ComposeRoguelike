@@ -21,9 +21,11 @@ import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.CharacterState
 import ru.meatgames.tomb.domain.player.isChangedExceptForPosition
+import ru.meatgames.tomb.domain.player.isPositionChanged
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
 import ru.meatgames.tomb.domain.render.computeFov
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
+import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.render.Icon
@@ -78,9 +80,10 @@ class MapScreenController @Inject constructor(
     ): Flow<MapScreenState> {
         var cachedMapState: MapScreenState = MapScreenState.Loading
         
-        var latestTiles: List<MapTile> = mapWrapper.state.value
-        var latestGameState: GameState = GameState.Loading
-        var latestCharacterState: CharacterState = characterController.characterStateFlow.value
+        var previousTiles: List<MapTile> = mapWrapper.state.value
+        var previousGameState: GameState = GameState.Loading
+        var previousCharacterState: CharacterState = characterController.characterStateFlow.value
+        var characterPositionUpdatedFlag = false
         
         return combine(
             mapWrapper.state,
@@ -88,24 +91,46 @@ class MapScreenController @Inject constructor(
             gameController.state,
         ) { streamedTiles, characterState, gameState ->
             val capturedMapState = cachedMapState
+            if (!characterPositionUpdatedFlag && characterState.isPositionChanged(previousCharacterState)) {
+                characterPositionUpdatedFlag = true
+            }
             
             return@combine when {
-                characterState.isChangedExceptForPosition(latestCharacterState) && capturedMapState is MapScreenState.Ready -> {
-                    capturedMapState.updateCharacterStateOnly(characterState)
+                capturedMapState !is MapScreenState.Ready -> {
+                    streamedTiles.toMapState(
+                        mapWidth = mapWrapper.width,
+                        mapHeight = mapWrapper.height,
+                        characterState = characterState,
+                        gameState = gameState,
+                    )
                 }
-                gameState != latestGameState && gameState.updatesState() && capturedMapState is MapScreenState.Ready -> {
-                    capturedMapState.updateGameStateOnly(characterState, gameState)
+                characterState.isChangedExceptForPosition(previousCharacterState) -> {
+                    capturedMapState.updateCharacterState(characterState)
                 }
-                streamedTiles != latestTiles || capturedMapState is MapScreenState.Loading -> streamedTiles.toMapState(
-                    mapWidth = mapWrapper.width,
-                    mapHeight = mapWrapper.height,
-                    characterState = characterState,
-                    gameState = gameState,
-                )
-                else -> capturedMapState
+                gameState.updatesState() && (characterPositionUpdatedFlag || streamedTiles != previousTiles) -> {
+                    logMessage("State123", "characterPositionUpdatedFlag")
+                    characterPositionUpdatedFlag = false
+                    streamedTiles.toMapState(
+                        mapWidth = mapWrapper.width,
+                        mapHeight = mapWrapper.height,
+                        characterState = characterState,
+                        gameState = gameState,
+                    )
+                }
+                gameState != previousGameState && gameState.updatesState() -> {
+                    logMessage("State123", "updatesState")
+                    capturedMapState.updateAnimation(characterState, gameState)
+                }
+                else -> {
+                    capturedMapState.copy(
+                        tilesToFadeIn = emptySet(),
+                        tilesToFadeOut = emptySet(),
+                    )
+                }
             }.run {
-                latestGameState = gameState
-                latestCharacterState = characterState
+                previousGameState = gameState
+                previousCharacterState = characterState
+                previousTiles = streamedTiles
                 cachedMapState = this
                 this
             }
@@ -341,13 +366,13 @@ class MapScreenController @Inject constructor(
         }
     }
     
-    private fun MapScreenState.Ready.updateCharacterStateOnly(
+    private fun MapScreenState.Ready.updateCharacterState(
         characterState: CharacterState,
     ): MapScreenState = copy(
         playerHealth = characterState.health,
     )
     
-    private fun MapScreenState.Ready.updateGameStateOnly(
+    private fun MapScreenState.Ready.updateAnimation(
         characterState: CharacterState,
         gameState: GameState,
     ): MapScreenState {

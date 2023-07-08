@@ -1,78 +1,120 @@
 package ru.meatgames.tomb.domain.item
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.domain.Coordinates
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private typealias MutableState = Triple<
+    MutableMap<ItemId, Item>,
+    MutableMap<ItemContainerId, ItemContainer>,
+    MutableMap<Coordinates, ItemContainerId>
+>
+
+data class ItemsState(
+    val items: Map<ItemId, Item> = emptyMap(),
+    val containers: Map<ItemContainerId, ItemContainer> = emptyMap(),
+    val containersMapping: Map<Coordinates, ItemContainerId> = emptyMap(),
+)
+
 @Singleton
 class ItemsControllerImpl @Inject constructor() : ItemsController, ItemsHolder {
     
-    private val items = mutableMapOf<ItemId, Item>()
-    private val itemContainers = mutableMapOf<ItemContainerId, ItemContainer>()
-    private val itemContainersMapping = mutableMapOf<Coordinates, ItemContainerId>()
+    private val _state = MutableStateFlow(ItemsState())
+    val state: StateFlow<ItemsState> = _state
+    
+    private val mutableState: MutableState
+        get() = with(state.value) {
+            return Triple(
+                items.toMutableMap(),
+                containers.toMutableMap(),
+                containersMapping.toMutableMap(),
+            )
+        }
     
     /** Returns [MapContainerId.Container] for now */
     override fun getMapContainerId(
         coordinates: Coordinates,
-    ): MapContainerId? = itemContainersMapping[coordinates]?.let(MapContainerId::Container)
+    ): MapContainerId? = with(state.value) {
+        containersMapping[coordinates]?.let(MapContainerId::Container)
+    }
     
     override fun getItemContainer(
         coordinates: Coordinates,
-    ): ItemContainer? = itemContainersMapping[coordinates]?.let(itemContainers::get)
+    ): ItemContainer? = with(state.value) {
+        containersMapping[coordinates]?.let(containers::get)
+    }
     
     override fun addItem(
         coordinates: Coordinates,
         item: Item,
-    ) {
+    ) = with(mutableState) {
+        val (items, containers, mapping) = this
+        
         items[item.id] = item
-    
-        val itemContainerId = itemContainersMapping[coordinates]
-        val itemContainer = itemContainers[itemContainerId]
+        
+        val itemContainerId = mapping[coordinates]
+        val itemContainer = containers[itemContainerId]
         
         itemContainer?.let {
-            item.addToContainer(
-                itemContainer = it,
-                itemContainerCoordinates = coordinates,
+            addToContainer(
+                item = item,
+                container = it.copy(
+                    itemIds = it.itemIds + item.id,
+                ),
+                containerCoordinates = coordinates,
             )
-        } ?: coordinates.createContainer(item)
+        } ?: createContainer(
+            item = item,
+            coordinates = coordinates,
+        )
     }
     
-    private fun Item.addToContainer(
-        itemContainer: ItemContainer,
-        itemContainerCoordinates: Coordinates,
+    private fun MutableState.addToContainer(
+        item: Item,
+        container: ItemContainer,
+        containerCoordinates: Coordinates,
     ) {
-        val newItemContainer = itemContainer.copy(
-            itemIds = itemContainer.itemIds + id,
+        val (_, containers, mapping) = this
+        
+        val newItemContainer = container.copy(
+            itemIds = container.itemIds + item.id,
         )
         
-        itemContainersMapping[itemContainerCoordinates] = newItemContainer.id
-        itemContainers[newItemContainer.id] = newItemContainer
+        mapping[containerCoordinates] = newItemContainer.id
+        containers[newItemContainer.id] = newItemContainer
     }
     
-    private fun Coordinates.createContainer(
+    private fun MutableState.createContainer(
         item: Item,
+        coordinates: Coordinates,
     ) {
+        val (_, containers, mapping) = this
+        
         val itemContainer = ItemContainer(itemIds = setOf(item.id))
         
-        itemContainers[itemContainer.id] = itemContainer
-        itemContainersMapping[this] = itemContainer.id
+        containers[itemContainer.id] = itemContainer
+        mapping[coordinates] = itemContainer.id
     }
     
     override fun takeItem(
         itemContainerId: ItemContainerId,
         itemId: ItemId,
     ): Pair<Item, Boolean>? {
-        val container = itemContainers[itemContainerId] ?: return null
+        val (items, containers, mapping) = mutableState
+        
+        val container = containers[itemContainerId] ?: return null
         val item = items[itemId] ?: return null
         if (!container.itemIds.contains(itemId)) return null
         
         val isContainerEmpty = (container.itemIds - itemId).isEmpty()
         if (isContainerEmpty) {
-            itemContainers.remove(itemContainerId)
-            itemContainersMapping.filterValues { it == itemContainerId }
-                .forEach { itemContainersMapping.remove(it.key) }
+            containers.remove(itemContainerId)
+            mapping.filterValues { it == itemContainerId }
+                .forEach { mapping.remove(it.key) }
         } else {
-            itemContainers[itemContainerId] = container.copy(
+            containers[itemContainerId] = container.copy(
                 itemIds = container.itemIds - itemId,
             )
         }
@@ -81,22 +123,19 @@ class ItemsControllerImpl @Inject constructor() : ItemsController, ItemsHolder {
     }
     
     override fun clearContainers() {
-        itemContainersMapping.clear()
-        
-        itemContainers.values.forEach { container ->
-            container.itemIds.forEach(items::remove)
-        }
-        itemContainers.clear()
+        _state.value = ItemsState()
     }
     
     override suspend fun getItems(
         itemIds: Set<ItemId>,
-    ): Set<Item> = itemIds.mapNotNull { items[it] }.toSet()
+    ): Set<Item> = itemIds
+        .mapNotNull { state.value.items[it] }
+        .toSet()
     
     override suspend fun getItems(
         itemContainerId: ItemContainerId,
-    ): Set<Item> {
-        val itemContainer = itemContainers[itemContainerId] ?: return emptySet()
+    ): Set<Item> = with(state.value) {
+        val itemContainer = containers[itemContainerId] ?: return emptySet()
         return itemContainer.itemIds.mapNotNull { items[it] }.toSet()
     }
     

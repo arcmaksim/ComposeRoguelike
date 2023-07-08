@@ -94,3 +94,7 @@ data class CharacterState(
 fun CharacterState.isChangedExceptForPosition(
     other: CharacterState,
 ): Boolean = this != other && position == other.position
+
+fun CharacterState.isPositionChanged(
+    other: CharacterState,
+): Boolean = position == other.position

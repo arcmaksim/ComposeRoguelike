@@ -53,15 +53,16 @@ import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
+import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.compose.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.compose.game.LocalTileSize
+import ru.meatgames.tomb.screen.compose.game.animation.ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_DURATION_MILLIS
 import ru.meatgames.tomb.screen.compose.game.animation.CHARACTER_IDLE_ANIMATION_FRAMES
-import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationEvent
 import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
 import ru.meatgames.tomb.screen.compose.game.animation.assembleEnemiesAnimations2
 import ru.meatgames.tomb.screen.compose.game.animation.assemblePlayerInputAnimations
@@ -82,7 +83,7 @@ private fun GameScreenMapContainerPreview() {
         playerHealth = HealthComponent(10),
         playerAnimation = null,
         enemiesAnimations = emptyList(),
-        animationDurationMillis = 300,
+        animationDurationMillis = ANIMATION_DURATION_MILLIS,
         navigator = navigatorPreviewStub,
         interactionController = interactionControllerPreviewStub,
     )
@@ -122,19 +123,22 @@ internal fun GameScreenMapContainer(
     val initialMovementOffset = (playerAnimation as? PlayerAnimation.Move)?.direction
         ?.toIntOffset(tileDimension)
         ?: IntOffset.Zero
-    val animatedMovementOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
+    val animatedMovementOffset = remember(playerAnimation) {
+        logMessage("State", "$playerAnimation/$initialMovementOffset")
+        mutableStateOf(IntOffset.Zero)
+    }
     
     // Reveal offsets
-    val revealedTilesAlpha = remember(playerAnimation) {
+    val revealedTilesAlpha = remember(mapState.tilesToFadeIn) {
         mutableStateOf(if (animationUpdatesScreenSpaceTiles) 0f else 1f)
     }
-    val fadedTilesAlpha = remember(playerAnimation) {
+    val fadedTilesAlpha = remember(mapState.tilesToFadeOut) {
         mutableStateOf(if (animationUpdatesScreenSpaceTiles) 1f else 0f)
     }
     
     // Pose animation
     val characterIdleTransition = rememberInfiniteTransition(label = "characterIdleInfiniteTransition")
-    val characterAnimationFrameIndex by characterIdleTransition.animateValue(
+    val characterAnimationFrameIndex = 0/*by characterIdleTransition.animateValue(
         initialValue = 0,
         targetValue = CHARACTER_IDLE_ANIMATION_FRAMES,
         typeConverter = Int.VectorConverter,
@@ -146,7 +150,7 @@ internal fun GameScreenMapContainer(
             ),
         ),
         label = "characterIdleAnimationFrameIndex",
-    )
+    )*/
     
     LaunchedEffect(playerAnimation) {
         awaitAll(

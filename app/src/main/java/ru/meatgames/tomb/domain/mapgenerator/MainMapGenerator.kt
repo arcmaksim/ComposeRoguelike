@@ -67,7 +67,7 @@ class MainMapGenerator @Inject constructor(
             maxRoomPlacementAttempts = 50,
         )
         
-        map.placeItems(
+        /*map.placeItems(
             amount = 10,
             random = random,
         )
@@ -75,7 +75,7 @@ class MainMapGenerator @Inject constructor(
         map.placeEnemies(
             amount = 20,
             random = random,
-        )
+        )*/
         
         return MapConfiguration(
             mapWidth = map.width,

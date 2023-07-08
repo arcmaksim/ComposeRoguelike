@@ -1,5 +1,7 @@
 package ru.meatgames.tomb.domain.enemy
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.component.AttackInstance
@@ -10,25 +12,49 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private typealias MutableState = Triple<
+    MutableMap<EnemyId, Enemy>,
+    MutableMap<Coordinates, EnemyId>,
+    MutableMap<EnemyId, AttackInstance>
+>
+
+data class EnemiesState(
+    val enemies: Map<EnemyId, Enemy> = emptyMap(),
+    val enemiesMapping: Map<Coordinates, EnemyId> = emptyMap(),
+    val attacks: Map<EnemyId, AttackInstance> = emptyMap(),
+)
+
 @Singleton
 class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHolder {
     
-    private val enemies = mutableMapOf<EnemyId, Enemy>()
-    private val enemyMapping = mutableMapOf<Coordinates, EnemyId>()
-    private val attacks = mutableMapOf<EnemyId, AttackInstance>()
+    private val _state = MutableStateFlow(EnemiesState())
+    val state: StateFlow<EnemiesState> = _state
+    
+    private val mutableState: MutableState
+        get() = with(state.value) {
+            return Triple(
+                enemies.toMutableMap(),
+                enemiesMapping.toMutableMap(),
+                attacks.toMutableMap(),
+            )
+        }
     
     override fun getEnemy(
         coordinates: Coordinates,
-    ): Enemy? = enemyMapping[coordinates]?.let { enemies[it] }
+    ): Enemy? = with(state.value) {
+        enemiesMapping[coordinates]?.let(enemies::get)
+    }
     
     override fun getEnemy(
         enemyId: EnemyId,
-    ): Enemy? = enemies[enemyId]
+    ): Enemy? = state.value.enemies[enemyId]
     
     override fun addEnemy(
         coordinates: Coordinates,
         enemy: Enemy,
     ) {
+        val (enemies, enemyMapping, _) = mutableState
+        
         if (enemyMapping[coordinates] != null) {
             Timber.d("Enemy with id ${enemy.id.id} at $coordinates didn't spawn - space was occupied")
             return
@@ -44,6 +70,8 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         enemyId: EnemyId,
         direction: Direction,
     ): Boolean {
+        val (enemies, enemyMapping, _) = mutableState
+        
         val enemy = enemies[enemyId] ?: return false
         val newPosition = (enemy.position + direction.resolvedOffset).toCoordinates()
         
@@ -57,17 +85,22 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         return false
     }
     
-    override fun getEnemies(): List<Enemy> = enemies.values.toList()
+    override fun getEnemies(): List<Enemy> = state
+        .value
+        .enemies
+        .values
+        .toList()
     
     override fun clearEnemies() {
-        enemyMapping.clear()
-        enemies.clear()
+        _state.value = EnemiesState()
     }
     
     override fun tryToInflictDamage(
         coordinates: Coordinates,
         damage: Int,
     ): Boolean {
+        val (enemies, enemyMapping, attacks) = mutableState
+        
         val enemyId = enemyMapping[coordinates] ?: return false
         val enemy = enemies[enemyId] ?: let {
             enemyMapping.remove(coordinates)
@@ -86,6 +119,8 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
     }
     
     fun reduceAttackCountdown() {
+        val (_, _, attacks) = mutableState
+        
         val attackInstances = attacks.values.toList()
         attacks.clear()
         
