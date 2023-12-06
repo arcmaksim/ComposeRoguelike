@@ -20,6 +20,6 @@ sealed class MapScreenState {
         val turnResultsToAnimate: MapScreenCharacterAnimations?,
     ) : MapScreenState()
     
-    object Loading : MapScreenState()
+    data object Loading : MapScreenState()
     
 }

@@ -16,14 +16,14 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.item.ItemContainerId
-import ru.meatgames.tomb.screen.compose.WinScreen
-import ru.meatgames.tomb.screen.compose.charactersheet.CharacterSheetScreen
-import ru.meatgames.tomb.screen.compose.featuretoggle.FeatureToggleScreen
-import ru.meatgames.tomb.screen.compose.game.GameScreen
-import ru.meatgames.tomb.screen.compose.game.container.ContainerDialog
-import ru.meatgames.tomb.screen.compose.game.dialog.GameScreenDialog
-import ru.meatgames.tomb.screen.compose.inventory.InventoryScreen
-import ru.meatgames.tomb.screen.compose.mainmenu.MainMenuScreen
+import ru.meatgames.tomb.screen.WinScreen
+import ru.meatgames.tomb.screen.charactersheet.CharacterSheetScreen
+import ru.meatgames.tomb.screen.featuretoggle.FeatureToggleScreen
+import ru.meatgames.tomb.screen.game.GameScreen
+import ru.meatgames.tomb.screen.game.container.ContainerDialog
+import ru.meatgames.tomb.screen.game.dialog.GameScreenDialog
+import ru.meatgames.tomb.screen.inventory.InventoryScreen
+import ru.meatgames.tomb.screen.mainmenu.MainMenuScreen
 import java.util.UUID
 
 @ExperimentalMaterialApi

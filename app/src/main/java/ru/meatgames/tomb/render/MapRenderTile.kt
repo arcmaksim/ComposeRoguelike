@@ -2,7 +2,7 @@ package ru.meatgames.tomb.render
 
 sealed class MapRenderTile {
 
-    object Empty : MapRenderTile()
+    data object Empty : MapRenderTile()
 
     data class Content(
         val floorData: RenderData,

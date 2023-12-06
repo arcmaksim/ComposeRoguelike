@@ -17,9 +17,9 @@ import ru.meatgames.tomb.domain.stat.Power
 import ru.meatgames.tomb.domain.stat.Speed
 import ru.meatgames.tomb.domain.stat.Technique
 import ru.meatgames.tomb.resolvedOffset
-import ru.meatgames.tomb.screen.compose.charactersheet.alertnessBehaviorCardPreview
-import ru.meatgames.tomb.screen.compose.charactersheet.mightBehaviorCardPreview
-import ru.meatgames.tomb.screen.compose.charactersheet.resilienceBehaviorCardPreview
+import ru.meatgames.tomb.screen.charactersheet.alertnessBehaviorCardPreview
+import ru.meatgames.tomb.screen.charactersheet.mightBehaviorCardPreview
+import ru.meatgames.tomb.screen.charactersheet.resilienceBehaviorCardPreview
 import javax.inject.Inject
 import javax.inject.Singleton
 

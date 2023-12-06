@@ -28,13 +28,13 @@ sealed class PlayerTurnResult {
         val isLastItem: Boolean = true,
     ) : PlayerTurnResult()
 
-    object Block : PlayerTurnResult()
+    data object Block : PlayerTurnResult()
 
     data class Attack(
         val direction: Direction,
     ) : PlayerTurnResult()
     
-    object SkipTurn : PlayerTurnResult()
+    data object SkipTurn : PlayerTurnResult()
     
 }
 
