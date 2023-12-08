@@ -35,11 +35,9 @@ private fun GameScreenControlsPreview() {
     GameScreenControls(
         modifier = Modifier.size(300.dp),
         interactionController = object : GameScreenInteractionController {
-            override fun finishPlayerAnimation() = Unit
             override fun processCharacterMoveInput(direction: Direction) = Unit
             override fun closeInteractionMenu() = Unit
             override fun itemSelected(itemContainerId: ItemContainerId, itemId: ItemId) = Unit
-            override fun finishEnemiesAnimation() = Unit
             override fun skipTurn() = Unit
             override fun onEnemyAnimationEvent(event: EnemyAnimationEvent) = Unit
         },

@@ -16,7 +16,7 @@ class RootVM @Inject constructor(
     
     fun finishCurrentAnimations() {
         viewModelScope.launch {
-            gameController.finishCurrentAnimations()
+            //gameController.finishCurrentAnimations()
         }
     }
     
