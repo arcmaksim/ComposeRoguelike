@@ -9,6 +9,11 @@ object FeatureToggles {
     private val _state = MutableStateFlow(
         listOf(
             FeatureToggleState(
+                key = FeatureToggle.SkipCameraAnimations,
+                title = "Skip camera animations",
+                value = false,
+            ),
+            FeatureToggleState(
                 key = FeatureToggle.SkipPlayerAnimations,
                 title = "Skip player animations",
                 value = false,
