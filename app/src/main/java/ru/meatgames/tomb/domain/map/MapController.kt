@@ -124,6 +124,6 @@ sealed class MapState {
         val mapWrapper: LevelMapWrapper,
     ) : MapState()
 
-    object MapUnavailable : MapState()
+    data object MapUnavailable : MapState()
 
 }

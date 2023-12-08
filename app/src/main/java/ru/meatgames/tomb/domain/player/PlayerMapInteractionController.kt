@@ -1,13 +1,11 @@
 package ru.meatgames.tomb.domain.player
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
-import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
+import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.map.MapController
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.model.theme.TilesController
@@ -18,30 +16,22 @@ import javax.inject.Singleton
 
 @Singleton
 class PlayerMapInteractionController @Inject constructor(
-    characterController: CharacterController,
+    private val characterController: CharacterController,
     private val mapController: MapController,
     private val tilesController: TilesController,
     private val itemsHolder: ItemsHolder,
     private val enemiesHolder: EnemiesHolder,
 ) {
     
-    private val characterStateFlow = characterController.characterStateFlow
-    
-    init {
-        // TODO update
-        GlobalScope.launch {
-            characterStateFlow.collect {}
-        }
-    }
-    
     fun resolveMoveResult(
         direction: Direction,
-    ): PlayerTurnResult? {
+    ): PlayerTurnResult {
         val (offsetX, offsetY) = direction.resolvedOffset
-        val capturedFlow = characterStateFlow.value
+        val capturedFlow = characterController.characterStateFlow.value
         val coordinates = (capturedFlow.position.x + offsetX) to (capturedFlow.position.y + offsetY)
         
-        val tile = mapController.getTile(coordinates)?.tile ?: return null
+        val tile = mapController.getTile(coordinates)?.tile
+            ?: throw IllegalStateException("Tile at $coordinates is null")
         
         val itemContainer = itemsHolder.getItemContainer(coordinates)
         val enemy = enemiesHolder.getEnemy(coordinates)

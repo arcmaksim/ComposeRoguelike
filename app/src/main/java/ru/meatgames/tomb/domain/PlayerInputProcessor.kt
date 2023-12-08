@@ -4,7 +4,9 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.player.PlayerMapInteractionController
+import ru.meatgames.tomb.domain.player.PlayerMapInteractionResolver
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
+import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,17 +14,30 @@ import javax.inject.Singleton
 class PlayerInputProcessor @Inject constructor(
     private val gameController: GameController,
     private val mapInteractionController: PlayerMapInteractionController,
+    private val mapInteractionResolver: PlayerMapInteractionResolver,
 ) {
-    
-    var latestTurnResult: PlayerTurnResult? = null
-        private set
     
     suspend fun processPlayerInput(
         direction: Direction,
     ) {
         gameController.blockPlayerTurn()
-        latestTurnResult = mapInteractionController.resolveMoveResult(direction)
-        gameController.finishPlayerTurn(latestTurnResult)
+        val result = mapInteractionController.resolveMoveResult(direction)
+        mapInteractionResolver.resolvePlayerMove(result)
+        
+        if (result.finishesPlayerTurn()) {
+            gameController.finishTurn()
+            return
+        }
+        
+        // run enemies
+        gameController.finishTurn()
+    }
+    
+    suspend fun skipTurn() {
+        gameController.blockPlayerTurn()
+        mapInteractionResolver.resolvePlayerMove(PlayerTurnResult.SkipTurn)
+        // run enemies
+        gameController.finishTurn()
     }
     
     suspend fun processPlayerInput(
@@ -30,8 +45,16 @@ class PlayerInputProcessor @Inject constructor(
         itemId: ItemId,
     ) {
         gameController.blockPlayerTurn()
-        latestTurnResult = mapInteractionController.pickItem(itemContainerId, itemId)
-        gameController.finishPlayerTurn(latestTurnResult)
+        val result = mapInteractionController.pickItem(itemContainerId, itemId)
+        mapInteractionResolver.resolvePlayerMove(result)
+        
+        if (result.finishesPlayerTurn()) {
+            gameController.finishTurn()
+            return
+        }
+        
+        // run enemies
+        gameController.finishTurn()
     }
     
 }

@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.domain.enemy
+package ru.meatgames.tomb.presentation.enemies
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.render.RenderData

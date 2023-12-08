@@ -29,7 +29,7 @@ internal fun GameScreen(
     }
     
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val isIdle by viewModel.isIdle.collectAsStateWithLifecycle()
+    val isIdle by viewModel.isWaitingForInput.collectAsStateWithLifecycle()
     
     GameScreenContent(
         state = state,
@@ -52,8 +52,6 @@ private fun GameScreenContent(
             mapState = mapState,
             isIdle = isIdle,
             playerHealth = mapState.playerHealth,
-            playerAnimation = state.playerAnimation,
-            enemiesAnimations = state.enemiesAnimations,
             animationDurationMillis = ANIMATION_DURATION_MILLIS,
             navigator = navigator,
             interactionController = interactionController,

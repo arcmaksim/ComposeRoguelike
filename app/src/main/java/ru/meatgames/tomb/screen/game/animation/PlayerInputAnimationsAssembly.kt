@@ -8,8 +8,8 @@ import kotlinx.coroutines.Deferred
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.config.FeatureToggle
-import ru.meatgames.tomb.domain.player.PlayerAnimation
-import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
+import ru.meatgames.tomb.presentation.player.PlayerAnimation
+import ru.meatgames.tomb.presentation.player.updatesScreenSpaceTiles
 
 context(CoroutineScope)
 suspend fun PlayerAnimation?.assemblePlayerInputAnimations(

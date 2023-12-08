@@ -99,5 +99,5 @@ internal fun gameScreenMapContainerPreviewMapReadyState(
     tilesToFadeIn = emptySet(),
     characterRenderData = themeAssets.characterRenderData,
     playerHealth = HealthComponent(10),
-    turnResultsToAnimate = null,
+    cameraAnimation = null,
 )

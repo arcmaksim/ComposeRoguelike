@@ -2,9 +2,10 @@ package ru.meatgames.tomb.domain
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.domain.component.asDirections
 import ru.meatgames.tomb.domain.component.calculateVectorTo
-import ru.meatgames.tomb.domain.component.isNextTo
+import ru.meatgames.tomb.domain.component.isInExactProximity
 import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesController
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
@@ -17,10 +18,7 @@ import ru.meatgames.tomb.domain.player.PlayerMapInteractionResolver
 import ru.meatgames.tomb.domain.turn.CharactersTurnScheduler
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
-import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
-import ru.meatgames.tomb.domain.turn.hasAnimation
 import ru.meatgames.tomb.logErrorWithTag
-import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.resolvedOffset
 import java.util.Queue
@@ -32,7 +30,7 @@ interface GameController {
     
     val lastMapType: MapCreator.MapType
     
-    val state: Flow<GameState>
+    val state: StateFlow<GameState>
     val dialogState: Flow<DialogState?>
     
     suspend fun generateNewMap(
@@ -41,19 +39,7 @@ interface GameController {
     
     suspend fun blockPlayerTurn()
     
-    suspend fun finishPlayerTurn(
-        result: PlayerTurnResult?,
-    )
-    
-    suspend fun startEnemiesTurn()
-    
-    suspend fun finishPlayerAnimation(
-        result: PlayerTurnResult?,
-    )
-    
-    suspend fun finishEnemiesAnimations()
-    
-    suspend fun finishCurrentAnimations()
+    suspend fun finishTurn()
     
     suspend fun closeCurrentDialog()
     
@@ -76,7 +62,7 @@ class GameControllerImpl @Inject constructor(
 ) : GameController {
 
     private val _state = MutableStateFlow<GameState>(GameState.Loading)
-    override val state: Flow<GameState> = _state
+    override val state: StateFlow<GameState> = _state
     
     private val _dialogState = MutableStateFlow<DialogState?>(null)
     override val dialogState: Flow<DialogState?> = _dialogState
@@ -98,7 +84,7 @@ class GameControllerImpl @Inject constructor(
             coordinates = configuration.startCoordinates,
         )
         calcTurnQueue(true)
-        runEnemiesTurns()
+        //runEnemiesTurns()
     }
     
     private fun calcTurnQueue(
@@ -120,7 +106,7 @@ class GameControllerImpl @Inject constructor(
     ): EnemyTurnResult {
         val vectorToPlayer = position.calculateVectorTo(player.position)
         
-        if (vectorToPlayer.isNextTo()) {
+        if (vectorToPlayer.isInExactProximity()) {
             val damage = 1
             //attackPlayer(damage)
             
@@ -161,7 +147,7 @@ class GameControllerImpl @Inject constructor(
     ) = characterController.modifyHealth(-damage)
     
     override suspend fun blockPlayerTurn() {
-        if (_state.value !is GameState.WaitingForInput) {
+        if (_state.value != GameState.WaitingForInput) {
             "Trying to block player input when state is ${_state.value}".logErrorWithTag("GameState")
             return
         }
@@ -169,7 +155,16 @@ class GameControllerImpl @Inject constructor(
         _state.emit(GameState.ProcessingInput)
     }
     
-    override suspend fun finishPlayerTurn(
+    override suspend fun finishTurn() {
+        if (_state.value != GameState.ProcessingInput) {
+            "Trying to finish player turn when state is ${_state.value}".logErrorWithTag("GameState")
+            return
+        }
+        
+        _state.emit(GameState.WaitingForInput)
+    }
+    
+    /*override suspend fun finishPlayerTurn(
         result: PlayerTurnResult?,
     ) {
         if (_state.value !is GameState.ProcessingInput) {
@@ -208,9 +203,9 @@ class GameControllerImpl @Inject constructor(
         )
     }
     
-    override suspend fun startEnemiesTurn() = runEnemiesTurns()
+    override suspend fun startEnemiesTurn() = runEnemiesTurns()*/
     
-    private suspend fun runEnemiesTurns() {
+    /*private suspend fun runEnemiesTurns() {
         _state.emit(GameState.ProcessingEnemies)
         
         if (currentTurnQueue.size == 0) calcTurnQueue(false)
@@ -232,11 +227,11 @@ class GameControllerImpl @Inject constructor(
         
         calcTurnQueue(false)
         results.resolveDialogState().updateState()
-        _state.emit(GameState.AnimatingEnemies(results))
+        _state.emit(GameState.Animation(results))
     }
     
     override suspend fun finishEnemiesAnimations() {
-        if (_state.value !is GameState.AnimatingEnemies) {
+        if (_state.value !is GameState.Animation) {
             "Trying to finish enemies animations when state is ${_state.value}".logErrorWithTag("GameState")
             return
         }
@@ -247,10 +242,10 @@ class GameControllerImpl @Inject constructor(
     override suspend fun finishCurrentAnimations() {
         when (val state = _state.value) {
             is GameState.AnimatingCharacter -> finishPlayerAnimation(state.turnResult)
-            is GameState.AnimatingEnemies -> finishEnemiesAnimations()
+            is GameState.Animation -> finishEnemiesAnimations()
             else -> Unit
         }
-    }
+    }*/
     
     override suspend fun closeCurrentDialog() {
         _dialogState.value = null

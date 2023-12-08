@@ -4,6 +4,7 @@ import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.Offset
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 data class PositionComponent(
     val x: Int,
@@ -16,6 +17,9 @@ data class PositionComponent(
         x = x + increment.first,
         y = y + increment.second,
     )
+    
+    val isValid: Boolean
+        get() = x >= 0 && y >= 0
     
 }
 
@@ -50,9 +54,11 @@ fun Vector.asDirections(): List<Direction> {
     }
 }
 
-fun Vector.isNextTo(): Boolean = when {
-    (first == 1 || first == -1) && second == 0 -> true
-    (second == 1 || second == -1) && first == 0 -> true
+fun Vector.isInExactProximity(
+    range: Int = 1,
+): Boolean = when {
+    second == 0 && first.absoluteValue == range -> true
+    first == 0 && second.absoluteValue == range -> true
     else -> false
 }
 

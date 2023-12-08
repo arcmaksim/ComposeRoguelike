@@ -1,10 +1,10 @@
-package ru.meatgames.tomb.domain.player
+package ru.meatgames.tomb.presentation.player
 
 import ru.meatgames.tomb.Direction
 
 sealed class PlayerAnimation {
     
-    class Shake : PlayerAnimation()
+    data object Shake : PlayerAnimation()
 
     data class Move(
         val direction: Direction,
@@ -15,7 +15,7 @@ sealed class PlayerAnimation {
     ) : PlayerAnimation()
     
     // Needed to trigger game state change when there is no character animation
-    class None : PlayerAnimation()
+    data object None : PlayerAnimation()
 
 }
 

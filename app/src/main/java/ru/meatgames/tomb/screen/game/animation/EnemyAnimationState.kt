@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.screen.game.animation
 
 import androidx.compose.ui.unit.IntOffset
-import ru.meatgames.tomb.domain.enemy.EnemyAnimation
+import ru.meatgames.tomb.presentation.enemies.EnemyAnimation
 import ru.meatgames.tomb.render.RenderData
 import ru.meatgames.tomb.toIntOffset
 
