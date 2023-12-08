@@ -183,23 +183,6 @@ internal fun GameScreenMapContainer(
         )
     }
     
-    // Pose animation
-    val characterIdleTransition =
-        rememberInfiniteTransition(label = "Character idle infinite transition")
-    val characterAnimationFrameIndex by characterIdleTransition.animateValue(
-        label = "Character idle animation frame index",
-        initialValue = 0,
-        targetValue = CHARACTER_IDLE_ANIMATION_FRAMES,
-        typeConverter = Int.VectorConverter,
-        animationSpec = infiniteRepeatable(
-            repeatMode = RepeatMode.Restart,
-            animation = tween(
-                durationMillis = CHARACTER_IDLE_ANIMATION_DURATION_MILLIS * CHARACTER_IDLE_ANIMATION_FRAMES,
-                easing = LinearEasing,
-            ),
-        ),
-    )
-    
     /*LaunchedEffect(playerAnimation) {
         awaitAll(
             *playerAnimation.assemblePlayerInputAnimations(
@@ -262,7 +245,6 @@ internal fun GameScreenMapContainer(
         
         GameScreenCharacter(
             modifier = modifier,
-            frameIndex = characterAnimationFrameIndex,
             viewportWidth = mapState.viewportWidth,
             viewportHeight = mapState.viewportHeight,
             characterRenderData = mapState.characterRenderData,
