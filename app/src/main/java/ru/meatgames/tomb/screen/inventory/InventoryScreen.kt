@@ -17,10 +17,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.design.backgroundColorInt
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.screen.container.ContainerItem
 
-@Preview(widthDp = 320, heightDp = 640, showBackground = true, backgroundColor = 0xFF212121)
+@Preview(
+    widthDp = 320,
+    heightDp = 640,
+    showBackground = true,
+    backgroundColor = backgroundColorInt,
+)
 @Composable
 private fun InventoryScreenPreview() {
     InventoryScreenContent(

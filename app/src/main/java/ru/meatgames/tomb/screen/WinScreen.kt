@@ -7,8 +7,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import ru.meatgames.tomb.design.backgroundColor
 import ru.meatgames.tomb.design.component.BaseTextButton
 import ru.meatgames.tomb.design.h1TextStyle
 
@@ -25,7 +25,7 @@ fun WinScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF212121)),
+            .background(backgroundColor),
     ) {
         Text(
             text = "You win!",

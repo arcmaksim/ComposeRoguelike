@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import ru.meatgames.tomb.design.backgroundColor
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
 import ru.meatgames.tomb.model.theme.ThemeAssets
@@ -39,7 +39,7 @@ private fun GameScreenCharacterPreview() {
     CompositionLocalProvider(
         LocalTileSize provides IntSize(240, 240),
         LocalHorizontalOffset provides IntOffset.Zero,
-        LocalBackgroundColor provides Color(0xFF212121),
+        LocalBackgroundColor provides backgroundColor,
     ) {
         GameScreenCharacter(
             modifier = modifier.offset(24.dp, 40.dp),

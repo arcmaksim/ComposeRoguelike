@@ -17,8 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.design.backgroundColorInt
 
-@Preview(widthDp = 320, heightDp = 640, showBackground = true, backgroundColor = 0xFF212121)
+@Preview(
+    widthDp = 320,
+    heightDp = 640,
+    showBackground = true,
+    backgroundColor = backgroundColorInt,
+)
 @Composable
 private fun InventoryScreenPreview() {
     CharacterSheetScreenContent(

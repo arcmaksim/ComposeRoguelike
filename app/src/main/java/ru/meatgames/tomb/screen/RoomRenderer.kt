@@ -12,7 +12,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -20,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import ru.meatgames.tomb.design.backgroundColor
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.render.RoomPreviewRenderProcessor
 import ru.meatgames.tomb.model.room.data.RoomsRepository
@@ -84,7 +84,7 @@ private fun RoomRenderer(
     renderType: RoomRenderType = RoomRenderType.Full,
 ) = BoxWithConstraints(
     modifier = Modifier
-        .background(Color(0xFF212121))
+        .background(backgroundColor)
         .fillMaxSize(),
 ) {
     val objectAlpha = if (renderType == RoomRenderType.TransparentObjects) .2f else 1f

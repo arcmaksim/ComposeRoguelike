@@ -8,12 +8,12 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import ru.meatgames.tomb.design.backgroundColor
 import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.screen.WinScreen
@@ -53,7 +53,7 @@ fun TombApp(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF212121))
+            .background(backgroundColor)
             .displayCutoutPadding(),
     ) {
         NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
