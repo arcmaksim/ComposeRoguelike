@@ -32,7 +32,7 @@ class PlayerInputProcessor @Inject constructor(
             return result
         }
         
-        // run enemies
+        gameController.startEnemiesTurns()
         gameController.finishTurn()
         return null
     }
@@ -40,7 +40,7 @@ class PlayerInputProcessor @Inject constructor(
     suspend fun skipTurn() {
         gameController.blockPlayerTurn()
         mapInteractionResolver.resolvePlayerMove(PlayerTurnResult.SkipTurn)
-        // run enemies
+        gameController.startEnemiesTurns()
         gameController.finishTurn()
     }
     
@@ -57,7 +57,7 @@ class PlayerInputProcessor @Inject constructor(
             return
         }
         
-        // run enemies
+        gameController.startEnemiesTurns()
         gameController.finishTurn()
     }
     

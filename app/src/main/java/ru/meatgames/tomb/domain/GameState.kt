@@ -4,4 +4,5 @@ enum class GameState {
     Loading,
     WaitingForInput,
     ProcessingInput,
+    EnemiesTurn,
 }

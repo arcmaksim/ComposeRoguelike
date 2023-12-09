@@ -19,6 +19,7 @@ import ru.meatgames.tomb.domain.turn.CharactersTurnScheduler
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.logErrorWithTag
+import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.resolvedOffset
 import java.util.Queue
@@ -38,6 +39,8 @@ interface GameController {
     )
     
     suspend fun blockPlayerTurn()
+    
+    suspend fun startEnemiesTurns()
     
     suspend fun finishTurn()
     
@@ -84,7 +87,7 @@ class GameControllerImpl @Inject constructor(
             coordinates = configuration.startCoordinates,
         )
         calcTurnQueue(true)
-        //runEnemiesTurns()
+        runEnemiesTurns()
     }
     
     private fun calcTurnQueue(
@@ -201,16 +204,13 @@ class GameControllerImpl @Inject constructor(
                 GameState.WaitingForInput
             },
         )
-    }
+    }*/
     
-    override suspend fun startEnemiesTurn() = runEnemiesTurns()*/
+    override suspend fun startEnemiesTurns() = runEnemiesTurns()
     
-    /*private suspend fun runEnemiesTurns() {
-        _state.emit(GameState.ProcessingEnemies)
-        
+    private suspend fun runEnemiesTurns() {
+        _state.emit(GameState.EnemiesTurn)
         if (currentTurnQueue.size == 0) calcTurnQueue(false)
-        
-        val results = mutableListOf<EnemyTurnResult>()
         
         while (currentTurnQueue.size != 0) {
             val element = currentTurnQueue.poll()
@@ -222,30 +222,12 @@ class GameControllerImpl @Inject constructor(
             
             val enemy = enemiesHolder.getEnemy(element.enemyId) ?: continue
             logMessage("TURN", "${enemy.type} at ${enemy.position}")
-            enemy.takeTurn(characterController.characterStateFlow.value).let(results::add)
+            enemy.takeTurn(characterController.characterStateFlow.value)
         }
         
         calcTurnQueue(false)
-        results.resolveDialogState().updateState()
-        _state.emit(GameState.Animation(results))
-    }
-    
-    override suspend fun finishEnemiesAnimations() {
-        if (_state.value !is GameState.Animation) {
-            "Trying to finish enemies animations when state is ${_state.value}".logErrorWithTag("GameState")
-            return
-        }
-        
         _state.emit(GameState.WaitingForInput)
     }
-    
-    override suspend fun finishCurrentAnimations() {
-        when (val state = _state.value) {
-            is GameState.AnimatingCharacter -> finishPlayerAnimation(state.turnResult)
-            is GameState.Animation -> finishEnemiesAnimations()
-            else -> Unit
-        }
-    }*/
     
     override suspend fun closeCurrentDialog() {
         _dialogState.value = null

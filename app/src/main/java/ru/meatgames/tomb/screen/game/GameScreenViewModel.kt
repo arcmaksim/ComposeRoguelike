@@ -7,6 +7,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -15,6 +19,7 @@ import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.domain.GameState
 import ru.meatgames.tomb.domain.PlayerInputProcessor
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
@@ -55,22 +60,22 @@ class GameScreenViewModel @Inject constructor(
             mapScreenController.state
                 .collect { mapScreenState ->
                     _state.update {
-                        it.copy(
-                            mapState = mapScreenState,
-                        )
+                        GameScreenState.mapState.modify(it) { mapScreenState }
                     }
                 }
         }
         
-        /*gameController.state
-            .onEach { _isWaitingForInput.value = it is GameState.WaitingForInput }
+        gameController.state
+            .onEach {
+                _isWaitingForInput.value = it == GameState.WaitingForInput
+            }
             .launchIn(viewModelScope)
         
         isWaitingForInput
             .filter { it }
             .mapNotNull { queuedInput?.also { queuedInput = null } }
             .onEach(::processCharacterMoveInput)
-            .launchIn(viewModelScope)*/
+            .launchIn(viewModelScope)
     }
     
     override fun processCharacterMoveInput(
