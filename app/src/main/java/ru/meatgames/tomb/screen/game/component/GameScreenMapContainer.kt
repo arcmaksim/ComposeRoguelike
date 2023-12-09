@@ -124,23 +124,21 @@ internal fun GameScreenMapContainer(
     val tileDimension = screenWidth / mapState.viewportWidth
     val tileSize = IntSize(tileDimension, tileDimension)
     
+    val cameraAnimationId = mapState.cameraAnimation?.hashCode() ?: -1
+    var playedCameraAnimation by rememberSaveable { mutableIntStateOf(-1) }
+    
     val view = LocalView.current
-    //val shakeOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
-    val shakeOffset = IntOffset.Zero//(playerAnimation) { mutableStateOf(IntOffset.Zero) }
+    val shakeOffset = remember(mapState.cameraAnimation) {
+        mutableStateOf(IntOffset.Zero)
+    }
     val enemiesAnimationUpdates = emptyMap<EnemyId, EnemyAnimationState?>()
     /*val enemiesAnimationUpdates = remember(enemiesAnimations) {
         mutableStateOf(enemiesAnimations?.toMap(tileDimension) ?: emptyMap())
     }*/
     val horizontalOffset = IntOffset(
-        x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeOffset.x,
+        x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeOffset.value.x,
         y = 0,
     )
-    
-    var playedCameraAnimation by rememberSaveable {
-        mutableIntStateOf(-1)
-    }
-    
-    val cameraAnimationId = mapState.cameraAnimation?.hashCode() ?: -1
     
     // Movement offsets
     val initialMovementOffset = remember(mapState.cameraAnimation) {
@@ -178,7 +176,9 @@ internal fun GameScreenMapContainer(
             *mapState.cameraAnimation.assembleAnimations(
                 animationDurationMillis = animationDurationMillis,
                 tileSize = tileSize,
+                shakeOffset = shakeOffset,
                 animatedOffset = animatedMovementOffset,
+                view = view,
             ),
         )
     }
@@ -228,7 +228,7 @@ internal fun GameScreenMapContainer(
         LocalHorizontalOffset provides horizontalOffset,
         LocalBackgroundColor provides backgroundColor,
     ) {
-        val modifier = baseModifier.offset { shakeOffset }
+        val modifier = baseModifier.offset { shakeOffset.value }
         
         GameScreenMap(
             modifier = modifier,

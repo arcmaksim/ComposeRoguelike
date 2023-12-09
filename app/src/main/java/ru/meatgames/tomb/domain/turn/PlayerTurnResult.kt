@@ -38,14 +38,8 @@ sealed class PlayerTurnResult {
     
 }
 
-fun PlayerTurnResult.finishesPlayerTurn(): Boolean = when (this) {
+fun PlayerTurnResult.resetsTurn(): Boolean = when (this) {
     is PlayerTurnResult.Block,
-    is PlayerTurnResult.ContainerInteraction -> false
-    else -> true
-}
-
-fun PlayerTurnResult.hasAnimation(): Boolean = when (this) {
-    is PlayerTurnResult.PickupItem,
-    is PlayerTurnResult.SkipTurn-> false
-    else -> true
+    is PlayerTurnResult.ContainerInteraction -> true
+    else -> false
 }

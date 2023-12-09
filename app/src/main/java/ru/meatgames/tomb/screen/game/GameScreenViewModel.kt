@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.config.FeatureToggle
@@ -17,8 +18,12 @@ import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.PlayerInputProcessor
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
+import ru.meatgames.tomb.domain.map.cameraAnimation
+import ru.meatgames.tomb.domain.map.ready
 import ru.meatgames.tomb.presentation.MapScreenController
 import ru.meatgames.tomb.domain.player.CharacterController
+import ru.meatgames.tomb.domain.turn.PlayerTurnResult
+import ru.meatgames.tomb.presentation.camera.animation.resolveCameraUpdateState
 import ru.meatgames.tomb.screen.game.animation.EnemyAnimationEvent
 import javax.inject.Inject
 
@@ -48,10 +53,12 @@ class GameScreenViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             mapScreenController.state
-                .collect {
-                    _state.value = _state.value.copy(
-                        mapState = it,
-                    )
+                .collect { mapScreenState ->
+                    _state.update {
+                        it.copy(
+                            mapState = mapScreenState,
+                        )
+                    }
                 }
         }
         
@@ -77,8 +84,20 @@ class GameScreenViewModel @Inject constructor(
         }
         
         viewModelScope.launch {
-            playerInputProcessor.processPlayerInput(direction)
-            // _state.value =
+            playerInputProcessor
+                .processPlayerInput(direction)
+                ?.setUnhandledCameraUpdate()
+        }
+    }
+    
+    private fun PlayerTurnResult.setUnhandledCameraUpdate() {
+        resolveCameraUpdateState()?.let { cameraAnimationState ->
+            _state.update { screenState ->
+                GameScreenState.mapState
+                    .ready
+                    .cameraAnimation
+                    .modify(screenState) { cameraAnimationState }
+            }
         }
     }
     

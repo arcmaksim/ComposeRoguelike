@@ -1,15 +1,20 @@
 package ru.meatgames.tomb.domain.map
 
+import arrow.optics.optics
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.presentation.camera.animation.CameraAnimationState
 import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.MapRenderTile
 
+@optics
 sealed class MapScreenState {
+    
+    companion object {}
     
     data object Loading : MapScreenState()
     
+    @optics
     data class Ready(
         val characterRenderData: AnimationRenderData,
         val tiles: List<MapRenderTile?>,
@@ -21,6 +26,8 @@ sealed class MapScreenState {
         val tilesToFadeOut: Set<ScreenSpaceCoordinates>,
         val playerHealth: HealthComponent,
         val cameraAnimation: CameraAnimationState?,
-    ) : MapScreenState()
+    ) : MapScreenState() {
+        companion object
+    }
     
 }

@@ -6,7 +6,7 @@ import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.player.PlayerMapInteractionController
 import ru.meatgames.tomb.domain.player.PlayerMapInteractionResolver
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
-import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
+import ru.meatgames.tomb.domain.turn.resetsTurn
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,20 +17,24 @@ class PlayerInputProcessor @Inject constructor(
     private val mapInteractionResolver: PlayerMapInteractionResolver,
 ) {
     
+    /**
+     * @return Returns results which resets turns
+     */
     suspend fun processPlayerInput(
         direction: Direction,
-    ) {
+    ): PlayerTurnResult? {
         gameController.blockPlayerTurn()
         val result = mapInteractionController.resolveMoveResult(direction)
         mapInteractionResolver.resolvePlayerMove(result)
         
-        if (result.finishesPlayerTurn()) {
+        if (result.resetsTurn()) {
             gameController.finishTurn()
-            return
+            return result
         }
         
         // run enemies
         gameController.finishTurn()
+        return null
     }
     
     suspend fun skipTurn() {
@@ -48,7 +52,7 @@ class PlayerInputProcessor @Inject constructor(
         val result = mapInteractionController.pickItem(itemContainerId, itemId)
         mapInteractionResolver.resolvePlayerMove(result)
         
-        if (result.finishesPlayerTurn()) {
+        if (result.resetsTurn()) {
             gameController.finishTurn()
             return
         }

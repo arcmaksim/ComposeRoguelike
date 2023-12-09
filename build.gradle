@@ -2,7 +2,7 @@ buildscript {
     ext.kotlin_version = "1.9.20"
     ext.compose_version = "1.5.4"
     ext.compose_compiler_version = "1.5.5"
-    ext.compose_navigation_version = "2.7.3"
+    ext.compose_navigation_version = "2.7.5"
     ext.lifecycle_version = "2.6.1"
     ext.arrow_version = "1.2.0"
     ext.dagger_version = "2.48.1"
@@ -11,13 +11,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.1.1"
+        classpath "com.android.tools.build:gradle:8.1.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 plugins {
     id "com.google.dagger.hilt.android" version "$dagger_version" apply false
+    id "com.google.devtools.ksp" version "1.9.20-1.0.14" apply false
 }
 
 allprojects {

@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.screen.game.animation
+package ru.meatgames.tomb.presentation.animation
 
 import android.os.Build
 import android.view.HapticFeedbackConstants

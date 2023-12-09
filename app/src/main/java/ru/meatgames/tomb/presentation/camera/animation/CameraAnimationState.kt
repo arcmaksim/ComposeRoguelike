@@ -1,6 +1,8 @@
 package ru.meatgames.tomb.presentation.camera.animation
 
 import androidx.compose.ui.unit.IntOffset
+import ru.meatgames.tomb.domain.turn.PlayerTurnResult
+import ru.meatgames.tomb.domain.turn.resetsTurn
 
 /**
  * @param creationTime is needed to always produce new hash code
@@ -18,4 +20,16 @@ sealed class CameraAnimationState {
         private val creationTime: Long,
     ) : CameraAnimationState()
     
+    data class Shake(
+        private val creationTime: Long,
+    ) : CameraAnimationState()
+    
+}
+
+fun PlayerTurnResult.resolveCameraUpdateState(): CameraAnimationState? {
+    if (!resetsTurn()) return null
+    return when (this) {
+        is PlayerTurnResult.Block -> CameraAnimationState.Shake(System.currentTimeMillis())
+        else -> null
+    }
 }

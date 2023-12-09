@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.screen.game
 
+import arrow.optics.optics
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
@@ -17,9 +18,11 @@ enum class GameScreenEvent {
  *
  * @param mapState - streamed part of the map (either Loading or Ready)
  */
-data class GameScreenState(
+@optics data class GameScreenState(
     val mapState: MapScreenState = MapScreenState.Loading,
-)
+) {
+    companion object
+}
 
 interface GameScreenNavigator {
     

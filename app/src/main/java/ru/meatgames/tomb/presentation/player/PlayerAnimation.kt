@@ -4,6 +4,7 @@ import ru.meatgames.tomb.Direction
 
 sealed class PlayerAnimation {
     
+    @Deprecated("Use CameraAnimationState.Shake instead")
     data object Shake : PlayerAnimation()
 
     data class Move(

@@ -8,6 +8,7 @@ import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.presentation.enemies.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.logMessage
+import ru.meatgames.tomb.presentation.animation.asDeferredConfirmVibrationAsync
 import ru.meatgames.tomb.toIntOffset
 
 /*context(CoroutineScope)

@@ -2,6 +2,7 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "kotlin-kapt"
+    id "com.google.devtools.ksp"
     id "com.google.dagger.hilt.android"
     id "org.jetbrains.kotlin.plugin.serialization" version "$kotlin_version"
 }
@@ -67,16 +68,18 @@ dependencies {
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
     implementation "androidx.navigation:navigation-compose:$compose_navigation_version"
-    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
+    implementation "androidx.hilt:hilt-navigation-compose:1.1.0"
 
     implementation "io.arrow-kt:arrow-core:$arrow_version"
     implementation "io.arrow-kt:arrow-fx-coroutines:$arrow_version"
+    implementation "io.arrow-kt:arrow-optics:$arrow_version"
+    ksp "io.arrow-kt:arrow-optics-ksp-plugin:$arrow_version"
 
     implementation "com.google.dagger:hilt-android:$dagger_version"
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     implementation "com.jakewharton.timber:timber:4.7.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1"
 
     testImplementation 'junit:junit:4.13.2'
 }
