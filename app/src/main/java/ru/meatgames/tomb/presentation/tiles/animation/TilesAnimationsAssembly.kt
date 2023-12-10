@@ -14,10 +14,14 @@ suspend fun TilesAnimationState?.assembleTilesAnimations(
     fadeInAlpha: MutableState<Float>,
     fadeOutAlpha: MutableState<Float>,
 ): Array<Deferred<Any>> {
-    if (FeatureToggles.getToggleValue(FeatureToggle.SkipTilesAnimations)) return emptyArray()
+    val duration = if (FeatureToggles.getToggleValue(FeatureToggle.SkipTilesAnimations)) {
+        0
+    } else {
+        animationDurationMillis
+    }
     
     return listOf(
-        fadeInAlpha.asFadeInAnimationAsync(animationDurationMillis),
-        fadeOutAlpha.asFadeOutAnimationAsync(animationDurationMillis),
+        fadeInAlpha.asFadeInAnimationAsync(duration),
+        fadeOutAlpha.asFadeOutAnimationAsync(duration),
     ).toTypedArray()
 }
