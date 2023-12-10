@@ -4,8 +4,8 @@ import arrow.optics.optics
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.presentation.camera.animation.CameraAnimationState
-import ru.meatgames.tomb.render.AnimationRenderData
-import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.presentation.render.AnimationRenderData
+import ru.meatgames.tomb.presentation.render.MapRenderTile
 
 @optics
 sealed class MapScreenState {

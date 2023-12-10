@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.meatgames.tomb.domain.component.asDirections
 import ru.meatgames.tomb.domain.component.calculateVectorTo
-import ru.meatgames.tomb.domain.component.isInExactProximity
+import ru.meatgames.tomb.domain.component.isInExactRange
 import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesController
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
@@ -109,7 +109,7 @@ class GameControllerImpl @Inject constructor(
     ): EnemyTurnResult {
         val vectorToPlayer = position.calculateVectorTo(player.position)
         
-        if (vectorToPlayer.isInExactProximity()) {
+        if (vectorToPlayer.isInExactRange()) {
             val damage = 1
             //attackPlayer(damage)
             

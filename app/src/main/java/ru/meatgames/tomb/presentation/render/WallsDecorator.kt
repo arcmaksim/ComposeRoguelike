@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.render
+package ru.meatgames.tomb.presentation.render
 
 import ru.meatgames.tomb.domain.render.RenderTiles
 import ru.meatgames.tomb.domain.render.ScreenSpaceRenderTiles

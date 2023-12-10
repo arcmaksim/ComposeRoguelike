@@ -16,7 +16,7 @@ import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.component.calculateVectorTo
-import ru.meatgames.tomb.domain.component.isInExactProximity
+import ru.meatgames.tomb.domain.component.isInExactRange
 import ru.meatgames.tomb.domain.map.LevelMapWrapper
 import ru.meatgames.tomb.domain.map.MapController
 import ru.meatgames.tomb.domain.map.MapScreenState
@@ -235,7 +235,7 @@ class MapScreenController @Inject constructor(
         }
         
         val vector = calculateVectorTo(otherPosition)
-        if (vector.isInExactProximity()) {
+        if (vector.isInExactRange()) {
             return CameraAnimationState.Smooth(
                 IntOffset(vector.first, vector.second),
                 System.currentTimeMillis()

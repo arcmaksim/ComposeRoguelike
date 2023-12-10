@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.domain.render
 
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
-import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.presentation.render.MapRenderTile
 
 data class GameMapPipelineRenderData(
     val tiles: List<MapRenderTile>,

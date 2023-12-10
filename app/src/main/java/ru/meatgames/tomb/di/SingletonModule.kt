@@ -23,8 +23,8 @@ import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.PlaygroundMapGenerator
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.data.RoomsRepository
-import ru.meatgames.tomb.render.MapRenderTilesDecorator
-import ru.meatgames.tomb.render.WallsDecorator
+import ru.meatgames.tomb.presentation.render.MapRenderTilesDecorator
+import ru.meatgames.tomb.presentation.render.WallsDecorator
 import javax.inject.Named
 
 private const val MAP_WIDTH = 32

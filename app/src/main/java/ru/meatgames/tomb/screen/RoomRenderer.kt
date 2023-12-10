@@ -24,8 +24,8 @@ import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.domain.render.RoomPreviewRenderProcessor
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.theme.ThemeAssets
-import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.render.WallsDecorator
+import ru.meatgames.tomb.presentation.render.MapRenderTile
+import ru.meatgames.tomb.presentation.render.WallsDecorator
 import ru.meatgames.tomb.domain.map.MapTile
 import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_DIMENSION

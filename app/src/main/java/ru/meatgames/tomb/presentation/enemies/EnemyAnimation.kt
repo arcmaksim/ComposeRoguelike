@@ -1,7 +1,7 @@
 package ru.meatgames.tomb.presentation.enemies
 
 import ru.meatgames.tomb.Direction
-import ru.meatgames.tomb.render.RenderData
+import ru.meatgames.tomb.presentation.render.RenderData
 
 sealed class EnemyAnimation {
 

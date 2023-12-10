@@ -54,7 +54,7 @@ fun Vector.asDirections(): List<Direction> {
     }
 }
 
-fun Vector.isInExactProximity(
+fun Vector.isInExactRange(
     range: Int = 1,
 ): Boolean = when {
     second == 0 && first.absoluteValue == range -> true

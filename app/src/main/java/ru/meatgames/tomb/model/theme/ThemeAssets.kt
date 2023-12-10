@@ -16,9 +16,9 @@ import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
-import ru.meatgames.tomb.render.AnimationRenderData
-import ru.meatgames.tomb.render.Icon
-import ru.meatgames.tomb.render.RenderData
+import ru.meatgames.tomb.presentation.render.AnimationRenderData
+import ru.meatgames.tomb.design.Icon
+import ru.meatgames.tomb.presentation.render.RenderData
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject

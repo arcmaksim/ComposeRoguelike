@@ -9,9 +9,9 @@ import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
-import ru.meatgames.tomb.render.MapRenderTile
-import ru.meatgames.tomb.render.MapRenderTilesDecorator
-import ru.meatgames.tomb.render.RenderData
+import ru.meatgames.tomb.presentation.render.MapRenderTile
+import ru.meatgames.tomb.presentation.render.MapRenderTilesDecorator
+import ru.meatgames.tomb.presentation.render.RenderData
 import javax.inject.Inject
 
 class RoomPreviewRenderProcessor @Inject constructor(

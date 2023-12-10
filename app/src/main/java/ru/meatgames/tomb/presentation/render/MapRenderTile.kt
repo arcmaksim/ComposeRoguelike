@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.render
+package ru.meatgames.tomb.presentation.render
 
 sealed class MapRenderTile {
 

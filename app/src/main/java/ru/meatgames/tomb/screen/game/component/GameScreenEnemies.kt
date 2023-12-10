@@ -15,8 +15,8 @@ import ru.meatgames.tomb.design.backgroundColor
 import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.model.theme.ThemeAssets
-import ru.meatgames.tomb.render.AnimationRenderData
-import ru.meatgames.tomb.render.MapRenderTile
+import ru.meatgames.tomb.presentation.render.AnimationRenderData
+import ru.meatgames.tomb.presentation.render.MapRenderTile
 import ru.meatgames.tomb.screen.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.game.LocalTileSize
