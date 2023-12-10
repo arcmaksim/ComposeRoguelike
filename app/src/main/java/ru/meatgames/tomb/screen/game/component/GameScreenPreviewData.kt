@@ -4,13 +4,13 @@ import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
 import ru.meatgames.tomb.domain.map.MapScreenState
-import ru.meatgames.tomb.domain.render.hasBottomShadow
+import ru.meatgames.tomb.presentation.render.hasBottomShadow
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
-import ru.meatgames.tomb.presentation.render.MapRenderTile
-import ru.meatgames.tomb.presentation.render.RenderData
+import ru.meatgames.tomb.presentation.render.model.MapRenderTile
+import ru.meatgames.tomb.presentation.render.model.RenderData
 
 internal const val gameScreenMapContainerPreviewMapSize = 5
 

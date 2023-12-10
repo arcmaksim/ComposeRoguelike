@@ -3,8 +3,8 @@ package ru.meatgames.tomb.domain.map
 import arrow.optics.optics
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.presentation.camera.animation.CameraAnimationState
-import ru.meatgames.tomb.presentation.render.AnimationRenderData
-import ru.meatgames.tomb.presentation.render.MapRenderTile
+import ru.meatgames.tomb.presentation.render.model.AnimationRenderData
+import ru.meatgames.tomb.presentation.render.model.MapRenderTile
 import ru.meatgames.tomb.presentation.tiles.animation.TilesAnimationState
 
 @optics

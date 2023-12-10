@@ -1,7 +1,5 @@
 package ru.meatgames.tomb.presentation.render
 
-import ru.meatgames.tomb.domain.render.RenderTiles
-import ru.meatgames.tomb.domain.render.ScreenSpaceRenderTiles
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import javax.inject.Inject
 

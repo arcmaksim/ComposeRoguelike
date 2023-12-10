@@ -1,11 +1,10 @@
-package ru.meatgames.tomb.domain.render
+package ru.meatgames.tomb.presentation.render
 
 import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
-import ru.meatgames.tomb.presentation.render.MapRenderTilesDecorator
 import javax.inject.Inject
 
 class MapDecoratorPipeline @Inject constructor(

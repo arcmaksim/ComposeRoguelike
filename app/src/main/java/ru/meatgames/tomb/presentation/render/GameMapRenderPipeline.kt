@@ -1,18 +1,21 @@
-package ru.meatgames.tomb.domain.render
+package ru.meatgames.tomb.presentation.render
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
 import ru.meatgames.tomb.domain.item.ItemsHolder
-import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
+import ru.meatgames.tomb.domain.map.MapTileWrapper
+import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
-import ru.meatgames.tomb.presentation.render.MapRenderTile
-import ru.meatgames.tomb.presentation.render.RenderData
-import ru.meatgames.tomb.domain.map.MapTileWrapper
-import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
+import ru.meatgames.tomb.presentation.render.model.GameMapPipelineRenderData
+import ru.meatgames.tomb.presentation.render.model.MapRenderTile
+import ru.meatgames.tomb.presentation.render.model.RenderData
+import ru.meatgames.tomb.presentation.render.model.content
+import ru.meatgames.tomb.presentation.render.model.isVisible
 import javax.inject.Inject
 
 class GameMapRenderPipeline @Inject constructor(
@@ -22,7 +25,7 @@ class GameMapRenderPipeline @Inject constructor(
     private val enemiesHolder: EnemiesHolder,
 ) {
     
-    private var prevTiles = setOf<Coordinates>()
+    private var prevVisibleTiles = emptyMap<Coordinates, ScreenSpaceMapRenderTile>()
     
     // Assumes tiles is a square
     fun run(
@@ -46,29 +49,38 @@ class GameMapRenderPipeline @Inject constructor(
         
         fun MapTileWrapper.toCoordinates() = x to y
         
-        processedRenderTiles.forEach { mapRenderTile ->
-            val newRenderTile = mapRenderTile.second
-            val tileWrapper = mapRenderTile.first ?: return@forEach
+        val updatedRenderTiles = processedRenderTiles.map { renderTile ->
+            val newRenderTile = renderTile.second
+            val tileWrapper = renderTile.first ?: return@map renderTile
             
-            val previousTileWasVisible = prevTiles.contains(tileWrapper.toCoordinates())
+            val coordinates = tileWrapper.toCoordinates()
+            val previousTileWasVisible = prevVisibleTiles.contains(coordinates)
             
             val isCurrentTileVisible = (newRenderTile as? MapRenderTile.Content)?.isVisible ?: false
             
             if (previousTileWasVisible && !isCurrentTileVisible) {
-                tilesToFade.add(tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second)
+                tilesToFade.add(
+                    tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second
+                )
+                return@map prevVisibleTiles[coordinates]?.let {
+                    renderTile.first to MapRenderTile.content.isVisible.modify(it.second) { false }
+                } ?: renderTile
             }
             if (!previousTileWasVisible && isCurrentTileVisible) {
-                tilesToReveal.add(tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second)
+                tilesToReveal.add(
+                    tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second
+                )
             }
+            
+            return@map renderTile
         }
         
-        prevTiles = processedRenderTiles.filter { it.first != null }
+        prevVisibleTiles = processedRenderTiles.filter { it.first != null }
             .filter { (it.second as? MapRenderTile.Content)?.isVisible == true }
-            .map { it.first!!.toCoordinates() }
-            .toSet()
+            .associateBy { it.first!!.toCoordinates() }
         
         return GameMapPipelineRenderData(
-            tiles = processedRenderTiles.map { it.second },
+            tiles = updatedRenderTiles.map { it.second },
             tilesToFadeIn = tilesToReveal.toList(),
             tilesToFadeOut = tilesToFade.toList(),
         )
@@ -85,11 +97,12 @@ class GameMapRenderPipeline @Inject constructor(
                 val y = index / tilesLineWidth
                 
                 // border tiles needs to be skipped as they are not rendered
-                val isVisible = if (x == 0 || x == tilesLineWidth - 1 || y == 0 || y == tilesLineWidth - 1) {
-                    false
-                } else {
-                    shouldRenderTile((y - 1) * (tilesLineWidth - 2) + x - 1)
-                }
+                val isVisible =
+                    if (x == 0 || x == tilesLineWidth - 1 || y == 0 || y == tilesLineWidth - 1) {
+                        false
+                    } else {
+                        shouldRenderTile((y - 1) * (tilesLineWidth - 2) + x - 1)
+                    }
                 
                 val coordinates = pair.first.x to pair.first.y
                 val enemy = enemiesHolder.getEnemy(coordinates)
@@ -148,5 +161,6 @@ internal fun ObjectRenderTile.hasBottomShadow(): Boolean = when (this) {
     ObjectRenderTile.Wall13,
     ObjectRenderTile.Wall14,
     ObjectRenderTile.Wall15 -> true
+    
     else -> false
 }

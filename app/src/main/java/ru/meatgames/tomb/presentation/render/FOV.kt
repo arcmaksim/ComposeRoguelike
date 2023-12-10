@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.domain.render
+package ru.meatgames.tomb.presentation.render
 
 import ru.meatgames.tomb.Direction
 import kotlin.math.ceil

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.toSize
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.design.backgroundColor
 import ru.meatgames.tomb.model.theme.ThemeAssets
-import ru.meatgames.tomb.presentation.render.MapRenderTile
+import ru.meatgames.tomb.presentation.render.model.MapRenderTile
 import ru.meatgames.tomb.presentation.tiles.animation.TilesAnimationState
 import ru.meatgames.tomb.presentation.tiles.animation.assembleTilesAnimations
 import ru.meatgames.tomb.screen.game.LocalBackgroundColor

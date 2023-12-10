@@ -24,8 +24,8 @@ import ru.meatgames.tomb.domain.map.MapState
 import ru.meatgames.tomb.domain.map.MapTile
 import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.domain.player.CharacterController
-import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
-import ru.meatgames.tomb.domain.render.computeFov
+import ru.meatgames.tomb.presentation.render.GameMapRenderPipeline
+import ru.meatgames.tomb.presentation.render.computeFov
 import ru.meatgames.tomb.map
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.theme.TilesController

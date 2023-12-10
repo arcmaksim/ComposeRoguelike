@@ -1,4 +1,4 @@
-package ru.meatgames.tomb.presentation.render
+package ru.meatgames.tomb.presentation.render.model
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
