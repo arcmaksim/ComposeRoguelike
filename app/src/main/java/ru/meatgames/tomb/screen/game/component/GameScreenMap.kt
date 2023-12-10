@@ -5,7 +5,13 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -15,10 +21,12 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.unit.toSize
+import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.design.backgroundColor
-import ru.meatgames.tomb.domain.ScreenSpaceCoordinates
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.presentation.render.MapRenderTile
+import ru.meatgames.tomb.presentation.tiles.animation.TilesAnimationState
+import ru.meatgames.tomb.presentation.tiles.animation.assembleTilesAnimations
 import ru.meatgames.tomb.screen.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.game.LocalTileSize
@@ -44,12 +52,14 @@ private fun GameScreenMapPreview() {
             tiles = gameScreenMapContainerPreviewRenderTiles(themeAssets),
             tilesWidth = gameScreenMapContainerPreviewMapSize,
             tilesPadding = 0,
-            tilesToReveal = emptySet(),
-            tilesToFade = emptySet(),
+            animationDurationMillis = 0,
+            tilesAnimation = TilesAnimationState(
+                creationTime = 0L,
+                tilesToFadeIn = emptySet(),
+                tilesToFadeOut = emptySet(),
+            ),
             initialOffset = IntOffset.Zero,
             animatedOffset = IntOffset.Zero,
-            revealedTilesAlpha = 1f,
-            fadedTilesAlpha = 0f,
         )
     }
 }
@@ -60,13 +70,39 @@ internal fun GameScreenMap(
     tiles: List<MapRenderTile?>,
     tilesWidth: Int,
     tilesPadding: Int,
-    tilesToReveal: Set<ScreenSpaceCoordinates>,
-    tilesToFade: Set<ScreenSpaceCoordinates>,
+    animationDurationMillis: Int,
+    tilesAnimation: TilesAnimationState?,
     initialOffset: IntOffset,
     animatedOffset: IntOffset,
-    revealedTilesAlpha: Float,
-    fadedTilesAlpha: Float,
 ) {
+    var playedTilesAnimation by rememberSaveable { mutableIntStateOf(-1) }
+   
+    val fadeInAlpha = remember(tilesAnimation) {
+        mutableFloatStateOf(if (tilesAnimation.hashCode() == playedTilesAnimation) 1f else 0f)
+    }
+    val fadeOutAlpha = remember(tilesAnimation) {
+        mutableFloatStateOf(if (tilesAnimation.hashCode() == playedTilesAnimation) 0f else 1f)
+    }
+    
+    LaunchedEffect(tilesAnimation) {
+        if (tilesAnimation == null) {
+            playedTilesAnimation = -1
+            return@LaunchedEffect
+        }
+        
+        val currentAnimation = tilesAnimation.hashCode()
+        if (currentAnimation == playedTilesAnimation) return@LaunchedEffect
+        
+        playedTilesAnimation = currentAnimation
+        awaitAll(
+            *tilesAnimation.assembleTilesAnimations(
+                animationDurationMillis = animationDurationMillis,
+                fadeInAlpha = fadeInAlpha,
+                fadeOutAlpha = fadeOutAlpha,
+            ),
+        )
+    }
+    
     val tileSize = LocalTileSize.current
     val offset = LocalHorizontalOffset.current
     val tileDimension = tileSize.width
@@ -78,7 +114,8 @@ internal fun GameScreenMap(
     
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
-            val tileScreenSpaceCoordinates = (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
+            val tileScreenSpaceCoordinates =
+                (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
             val tileOffset = IntOffset(
                 tileScreenSpaceCoordinates.first * tileDimension,
                 tileScreenSpaceCoordinates.second * tileDimension,
@@ -86,22 +123,12 @@ internal fun GameScreenMap(
             
             val dstOffset = baseOffset + tileOffset
             
-            when {
-                renderTile !is MapRenderTile.Content -> {
-                    null
-                }
-                /*renderTile.isVisible && tilesToReveal.contains(tileScreenSpaceCoordinates) -> {
-                    renderTile to revealedTilesAlpha
-                }
-                renderTile.isVisible -> {
-                    renderTile to 1f
-                }
-                tilesToFade.contains(tileScreenSpaceCoordinates) -> {
-                    renderTile to fadedTilesAlpha
-                }
-                else -> null*/
-                else -> renderTile to 1f
-            }?.let { (tile, alpha) ->
+            renderTile?.resolveRenderState(
+                tileScreenSpaceCoordinates = tileScreenSpaceCoordinates,
+                tilesAnimation = tilesAnimation,
+                fadeInAlpha = fadeInAlpha.floatValue,
+                fadeOutAlpha = fadeOutAlpha.floatValue,
+            )?.let { (tile, alpha) ->
                 tile.drawRevealedTile(
                     dstOffset = dstOffset,
                     tileSize = tileSize,
@@ -111,6 +138,31 @@ internal fun GameScreenMap(
             }
         }
     }
+}
+
+private fun MapRenderTile.resolveRenderState(
+    tileScreenSpaceCoordinates: Pair<Int, Int>,
+    tilesAnimation: TilesAnimationState?,
+    fadeInAlpha: Float,
+    fadeOutAlpha: Float,
+): Pair<MapRenderTile.Content, Float>? = when {
+    this !is MapRenderTile.Content -> {
+        null
+    }
+    
+    isVisible && tilesAnimation?.tilesToFadeIn?.contains(tileScreenSpaceCoordinates) == true -> {
+        this to fadeInAlpha
+    }
+    
+    isVisible -> {
+        this to 1f
+    }
+    
+    tilesAnimation?.tilesToFadeOut?.contains(tileScreenSpaceCoordinates) == true -> {
+        this to fadeOutAlpha
+    }
+    
+    else -> null
 }
 
 context(DrawScope)

@@ -1,12 +1,5 @@
 package ru.meatgames.tomb.screen.game.component
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animateValue
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,15 +46,13 @@ import ru.meatgames.tomb.design.h1TextStyle
 import ru.meatgames.tomb.design.h2TextStyle
 import ru.meatgames.tomb.design.h3TextStyle
 import ru.meatgames.tomb.domain.component.HealthComponent
-import ru.meatgames.tomb.presentation.enemies.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenState
-import ru.meatgames.tomb.presentation.player.PlayerAnimation
-import ru.meatgames.tomb.presentation.player.updatesScreenSpaceTiles
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.presentation.camera.animation.CameraAnimationState
 import ru.meatgames.tomb.presentation.camera.animation.assembleAnimations
+import ru.meatgames.tomb.presentation.enemies.EnemyAnimation
 import ru.meatgames.tomb.presentation.multiply
 import ru.meatgames.tomb.screen.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.game.GameScreenNavigator
@@ -70,8 +60,6 @@ import ru.meatgames.tomb.screen.game.LocalBackgroundColor
 import ru.meatgames.tomb.screen.game.LocalHorizontalOffset
 import ru.meatgames.tomb.screen.game.LocalTileSize
 import ru.meatgames.tomb.screen.game.animation.ANIMATION_DURATION_MILLIS
-import ru.meatgames.tomb.screen.game.animation.CHARACTER_IDLE_ANIMATION_DURATION_MILLIS
-import ru.meatgames.tomb.screen.game.animation.CHARACTER_IDLE_ANIMATION_FRAMES
 import ru.meatgames.tomb.screen.game.animation.EnemyAnimationState
 import ru.meatgames.tomb.screen.game.interactionControllerPreviewStub
 import ru.meatgames.tomb.screen.game.navigatorPreviewStub
@@ -118,8 +106,6 @@ internal fun GameScreenMapContainer(
         .background(backgroundColor)
         .fillMaxSize(),
 ) {
-    /*val animationUpdatesScreenSpaceTiles = playerAnimation.updatesScreenSpaceTiles*/
-    
     val screenWidth = LocalDensity.current.run { maxWidth.toPx() }.toInt()
     val tileDimension = screenWidth / mapState.viewportWidth
     val tileSize = IntSize(tileDimension, tileDimension)
@@ -150,16 +136,6 @@ internal fun GameScreenMapContainer(
     }
     val animatedMovementOffset = remember(mapState.cameraAnimation) {
         mutableStateOf(IntOffset.Zero)
-    }
-    
-    // Reveal offsets
-    val revealedTilesAlpha = remember(mapState.tilesToFadeIn) {
-        //mutableFloatStateOf(if (animationUpdatesScreenSpaceTiles) 0f else 1f)
-        mutableFloatStateOf(1f)
-    }
-    val fadedTilesAlpha = remember(mapState.tilesToFadeOut) {
-        //mutableFloatStateOf(if (animationUpdatesScreenSpaceTiles) 1f else 0f)
-        mutableFloatStateOf(0f)
     }
     
     LaunchedEffect(mapState.cameraAnimation) {
@@ -235,12 +211,10 @@ internal fun GameScreenMapContainer(
             tiles = mapState.tiles,
             tilesWidth = mapState.tilesWidth,
             tilesPadding = mapState.tilesPadding,
-            tilesToReveal = mapState.tilesToFadeIn,
-            tilesToFade = mapState.tilesToFadeOut,
+            animationDurationMillis = animationDurationMillis,
             animatedOffset = animatedMovementOffset.value,
             initialOffset = initialMovementOffset,
-            revealedTilesAlpha = 1f,//revealedTilesAlpha.floatValue,
-            fadedTilesAlpha = 0f,//fadedTilesAlpha.floatValue,
+            tilesAnimation = mapState.tilesAnimation,
         )
         
         GameScreenCharacter(

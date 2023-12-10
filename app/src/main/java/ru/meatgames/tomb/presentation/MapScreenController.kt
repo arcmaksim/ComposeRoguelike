@@ -30,6 +30,7 @@ import ru.meatgames.tomb.map
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.theme.TilesController
 import ru.meatgames.tomb.presentation.camera.animation.CameraAnimationState
+import ru.meatgames.tomb.presentation.tiles.animation.TilesAnimationState
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -133,8 +134,11 @@ class MapScreenController @Inject constructor(
             viewportHeight = viewportHeight,
             tilesPadding = preProcessingBufferSizeModifier,
             tiles = pipelineRenderData.tiles,
-            tilesToFadeIn = tileToFadeIn,
-            tilesToFadeOut = tileToFadeOut,
+            tilesAnimation = TilesAnimationState(
+                tilesToFadeIn = tileToFadeIn,
+                tilesToFadeOut = tileToFadeOut,
+                creationTime = System.currentTimeMillis(),
+            ),
             characterRenderData = characterRenderData,
             playerHealth = HealthComponent(10),
             cameraAnimation = characterPosition.produceCameraAnimation()

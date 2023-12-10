@@ -95,9 +95,8 @@ internal fun gameScreenMapContainerPreviewMapReadyState(
     tilesPadding = 0,
     viewportWidth = gameScreenMapContainerPreviewMapSize,
     viewportHeight = gameScreenMapContainerPreviewMapSize,
-    tilesToFadeOut = emptySet(),
-    tilesToFadeIn = emptySet(),
     characterRenderData = themeAssets.characterRenderData,
     playerHealth = HealthComponent(10),
     cameraAnimation = null,
+    tilesAnimation = null,
 )

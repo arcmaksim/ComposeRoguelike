@@ -14,6 +14,11 @@ object FeatureToggles {
                 value = false,
             ),
             FeatureToggleState(
+                key = FeatureToggle.SkipTilesAnimations,
+                title = "Skip tiles animations",
+                value = false,
+            ),
+            FeatureToggleState(
                 key = FeatureToggle.SkipPlayerAnimations,
                 title = "Skip player animations",
                 value = false,
