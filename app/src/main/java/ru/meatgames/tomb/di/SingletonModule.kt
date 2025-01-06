@@ -45,40 +45,62 @@ const val PLAYGROUND_MAP_GENERATOR = "PLAYGROUND_MAP_GENERATOR"
 interface SingletonModule {
 
     @Binds
-    fun MapControllerImpl.bindMapCreator(): MapCreator
+    fun mapCreator(
+        impl: MapControllerImpl,
+    ): MapCreator
 
     @Binds
-    fun MapControllerImpl.bindMapTerraformer(): MapTerraformer
+    fun mapTerraformer(
+        impl: MapControllerImpl,
+    ): MapTerraformer
 
     @Binds
-    fun MapControllerImpl.bindMapController(): MapController
+    fun mapController(
+        impl: MapControllerImpl,
+    ): MapController
     
     @Binds
-    fun ItemsControllerImpl.bindItemsHolder(): ItemsHolder
+    fun itemsHolder(
+        impl: ItemsControllerImpl,
+    ): ItemsHolder
     
     @Binds
-    fun ItemsControllerImpl.bindItemsController(): ItemsController
+    fun itemsController(
+        impl: ItemsControllerImpl,
+    ): ItemsController
     
     @Binds
-    fun EnemiesControllerImpl.bindEnemiesHolder(): EnemiesHolder
+    fun enemiesHolder(
+        impl: EnemiesControllerImpl,
+    ): EnemiesHolder
     
     @Binds
-    fun EnemiesControllerImpl.bindEnemiesController(): EnemiesController
+    fun enemiesController(
+        impl: EnemiesControllerImpl,
+    ): EnemiesController
 
     @Binds
     @IntoSet
-    fun WallsDecorator.bindWallsDecorator(): MapRenderTilesDecorator
+    fun wallsDecorator(
+        impl: WallsDecorator,
+    ): MapRenderTilesDecorator
     
     @Binds
     @Named(MAIN_MAP_GENERATOR)
-    fun MainMapGenerator.bindMainMapGenerator(): MapGenerator
+    fun mainMapGenerator(
+        impl: MainMapGenerator,
+    ): MapGenerator
     
     @Binds
     @Named(PLAYGROUND_MAP_GENERATOR)
-    fun PlaygroundMapGenerator.bindPlaygroundMapGenerator(): MapGenerator
+    fun playgroundMapGenerator(
+        impl: PlaygroundMapGenerator,
+    ): MapGenerator
     
     @Binds
-    fun GameControllerImpl.bindGameController(): GameController
+    fun gameController(
+        impl: GameControllerImpl,
+    ): GameController
 
     companion object {
         @Named(MAP_WIDTH_KEY)
