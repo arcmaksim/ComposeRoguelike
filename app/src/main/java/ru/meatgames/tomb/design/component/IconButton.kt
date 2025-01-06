@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,7 +39,7 @@ fun IconButton(
                 .clip(shape)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(bounded = true),
+                    indication = ripple(bounded = true),
                     enabled = enabled,
                     onClick = onClick,
                     role = Role.Button,
