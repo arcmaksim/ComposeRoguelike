@@ -4,7 +4,6 @@ import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
 import ru.meatgames.tomb.domain.map.MapScreenState
-import ru.meatgames.tomb.domain.render.hasBottomShadow
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
@@ -62,7 +61,11 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
         val objectData = tilesPair.second?.let {
             themeAssets.resolveObjectRenderData(it)
         }
-        val tileAbove = renderTiles.getOrNull(index - gameScreenMapContainerPreviewMapSize)
+        val hasShadow = renderTiles.getOrNull(index - gameScreenMapContainerPreviewMapSize)
+            ?.first
+            ?.javaClass
+            ?.name
+            ?.contains(Regex(".*Wall.*|.*Door.*|.*Stairs.*")) == true
         MapRenderTile.Content(
             floorData = RenderData(
                 asset = floorData.first,
@@ -79,10 +82,7 @@ internal fun gameScreenMapContainerPreviewRenderTiles(
             itemData = items[index],
             enemyData = enemies[index],
             isVisible = true,
-            decorations = tileAbove?.second
-                ?.takeIf { it.hasBottomShadow() }
-                ?.let { listOf(themeAssets.resolveBottomShadow()) }
-                ?: emptyList(),
+            decorations = if (hasShadow) listOf(themeAssets.resolveBottomShadow()) else emptyList(),
         )
     }
 }
