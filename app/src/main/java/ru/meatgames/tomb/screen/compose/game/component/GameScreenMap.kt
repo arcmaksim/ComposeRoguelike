@@ -77,10 +77,10 @@ internal fun GameScreenMap(
     
     Canvas(modifier = modifier) {
         tiles.forEachIndexed { index, renderTile ->
-            val tileScreenSpaceCoordinates = (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
+            val tileScreenSpaceCoordinates = (index % tilesWidth) to (index / tilesWidth)
             val tileOffset = IntOffset(
-                tileScreenSpaceCoordinates.first * tileDimension,
-                tileScreenSpaceCoordinates.second * tileDimension,
+                (tileScreenSpaceCoordinates.first - tilesPadding) * tileDimension,
+                (tileScreenSpaceCoordinates.second - tilesPadding) * tileDimension,
             )
             
             val dstOffset = baseOffset + tileOffset

@@ -41,21 +41,22 @@ class GameMapRenderPipeline @Inject constructor(
 
             val x = index % bufferHolder.width
             val y = index / bufferHolder.width
-            val coordinates =
+            val mapCoordinates =
                 (bufferHolder.horizontalOffset + x) to (bufferHolder.verticalOffset + y)
+            val bufferCoordinates = x to y
 
-            val previousTileWasVisible = previousVisibleTiles.contains(coordinates)
+            val previousTileWasVisible = previousVisibleTiles.contains(mapCoordinates)
             val currentTileVisible = mapRenderTile.isVisible
 
             if (previousTileWasVisible && !currentTileVisible) {
-                tilesToFade.add(coordinates)
+                tilesToFade.add(bufferCoordinates)
             }
             if (!previousTileWasVisible && currentTileVisible) {
-                tilesToReveal.add(coordinates)
+                tilesToReveal.add(bufferCoordinates)
             }
 
             if (currentTileVisible) {
-                previousTiles.add(coordinates)
+                previousTiles.add(mapCoordinates)
             }
         }
 
