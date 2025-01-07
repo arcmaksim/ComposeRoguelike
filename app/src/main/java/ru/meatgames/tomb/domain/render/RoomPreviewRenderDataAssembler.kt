@@ -2,7 +2,7 @@ package ru.meatgames.tomb.domain.render
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.IntOffset
-import ru.meatgames.tomb.domain.map.MapTileWrapper
+import ru.meatgames.tomb.domain.map.MapTile
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
@@ -12,46 +12,51 @@ import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.MapRenderTilesDecorator
 import ru.meatgames.tomb.render.RenderData
-import javax.inject.Inject
 
-class RoomPreviewRenderProcessor @Inject constructor(
+class RoomPreviewRenderDataAssembler(
     private val themeAssets: ThemeAssets,
     private val mapDecorators: Set<@JvmSuppressWildcards MapRenderTilesDecorator>,
+    private val bufferHolder: BufferHolder,
 ) {
-    
-    // Assumes tiles is a square
-    fun produceRenderTilesFrom(
-        tiles: List<MapTileWrapper?>,
-        tilesLineWidth: Int,
-    ): List<ScreenSpaceMapRenderTile> = tiles.mapToRenderTiles()
-        .applyDecorators(tilesLineWidth)
-        .revealAllTiles()
-    
-    private fun List<MapTileWrapper?>.mapToRenderTiles(): List<ScreenSpaceRenderTiles?> = map {
-        it ?: return@map null
-        it to RenderTiles(
-            first = it.tile.floorEntityTile.toFloorRenderTile(),
-            second = it.tile.objectEntityTile?.toObjectRenderTile(),
-        )
-    }
-    
-    private fun List<ScreenSpaceRenderTiles?>.applyDecorators(
-        tilesLineWidth: Int,
-    ): List<ScreenSpaceRenderTiles?> = run {
-        mapDecorators.fold(this) { tiles, decorator ->
-            decorator.processMapRenderTiles(tiles, tilesLineWidth)
+
+    fun run(
+        tiles: List<MapTile>,
+    ) {
+        tiles.forEachIndexed { index, tile ->
+            bufferHolder.mapBuffer[index] = tile
+            bufferHolder.floorRenderingBuffer[index] = tile.floorEntityTile.toFloorRenderTile()
+            bufferHolder.objectRenderingBuffer[index] = tile.objectEntityTile?.toObjectRenderTile()
         }
+
+        mapDecorators.forEach { decorator ->
+            decorator.apply()
+        }
+
+        bufferHolder.visibilityBuffer.fill(true)
+        bufferHolder.resolveResultRenderingBuffer()
     }
-    
-    private fun List<ScreenSpaceRenderTiles?>.revealAllTiles(): List<ScreenSpaceMapRenderTile> = map { pair ->
-        when (pair) {
-            null -> null to MapRenderTile.Empty
-            else -> pair.first to MapRenderTile.Content(
-                floorData = pair.second.first.toFloorRenderTileData(),
-                objectData = pair.second.second?.toObjectRenderTileData(),
+
+    private fun BufferHolder.resolveResultRenderingBuffer() {
+        for (index in 0 until width * height) {
+            val floorRenderTile = floorRenderingBuffer[index]
+            val objectRenderTile = objectRenderingBuffer[index]
+
+            if (floorRenderTile == null) {
+                resultRenderingBuffer[index] = MapRenderTile.Empty
+                continue
+            }
+
+            val objectAbove = mapBuffer.getOrNull(index - width)?.objectEntityTile
+
+            resultRenderingBuffer[index] = MapRenderTile.Content(
+                floorData = floorRenderTile.toFloorRenderTileData(),
+                objectData = objectRenderTile?.toObjectRenderTileData(),
                 itemData = null,
                 enemyData = null,
-                isVisible = true,
+                isVisible = visibilityBuffer[index],
+                decorations = objectAbove?.takeIf { it.hasBottomShadow() == true }
+                    ?.let { listOf(themeAssets.resolveBottomShadow()) }
+                    ?: emptyList(),
             )
         }
     }
