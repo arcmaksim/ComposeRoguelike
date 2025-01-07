@@ -51,13 +51,7 @@ class MapControllerImpl @Inject constructor(
 
     override fun getTile(
         coordinates: Coordinates,
-    ): MapTileWrapper? = levelMap.getTile(coordinates.first, coordinates.second)?.let {
-        MapTileWrapper(
-            tile = it,
-            x = coordinates.first,
-            y = coordinates.second,
-        )
-    }
+    ): MapTile? = levelMap.getTile(coordinates.first, coordinates.second)
 
     override fun changeObject(
         x: Int,
@@ -97,10 +91,9 @@ interface MapTerraformer {
 interface MapController {
     val mapFlow: StateFlow<MapState>
 
-    @Deprecated("Needs to be migrated to MapTile")
     fun getTile(
         coordinates: Coordinates,
-    ): MapTileWrapper?
+    ): MapTile?
 }
 
 data class LevelMapWrapper(

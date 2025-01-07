@@ -41,7 +41,7 @@ class PlayerMapInteractionController @Inject constructor(
         val capturedFlow = characterStateFlow.value
         val coordinates = (capturedFlow.position.x + offsetX) to (capturedFlow.position.y + offsetY)
         
-        val tile = mapController.getTile(coordinates)?.tile ?: return null
+        val tile = mapController.getTile(coordinates) ?: return null
         
         val itemContainer = itemsHolder.getItemContainer(coordinates)
         val enemy = enemiesHolder.getEnemy(coordinates)
