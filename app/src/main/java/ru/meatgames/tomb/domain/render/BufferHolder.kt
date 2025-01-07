@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.domain.render
 
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.map.MapTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
@@ -24,6 +25,8 @@ class BufferHolder(
 
     var horizontalOffset: Int = 0
     var verticalOffset: Int = 0
+    val offset: Coordinates
+        get() = horizontalOffset to verticalOffset
 
     val mapBuffer: Array<MapTile?> = Array(size) { null }
     val visibilityBuffer: BooleanArray = BooleanArray(size) { false }
