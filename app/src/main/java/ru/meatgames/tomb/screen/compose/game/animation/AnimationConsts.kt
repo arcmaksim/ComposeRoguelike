@@ -7,7 +7,7 @@ const val ANIMATION_DURATION_MILLIS = 300
 
 //region Attack
 /**
- * Distance modifier for attack animation - mutliplied by tile size
+ * Distance modifier for attack animation - multiplied by tile size
  */
 const val ATTACK_DISTANCE_MODIFIER = .2f
 const val ENEMIES_ATTACK_DURATION_MILLIS = ANIMATION_DURATION_MILLIS
