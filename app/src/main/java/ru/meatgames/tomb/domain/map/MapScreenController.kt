@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
-import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
 import ru.meatgames.tomb.domain.component.minus
@@ -255,8 +254,8 @@ class MapScreenController @Inject constructor(
             }
             
             else -> listOf(result.position - bufferHolder.offset)
-        }.filter { (x, y) -> x in 0 until viewportWidth && y in 0 until viewportHeight }
-            .any { (x, y) -> bufferHolder.visibilityBuffer[x + y * viewportWidth] }
+        }.filter { (x, y) -> x in 0 until bufferHolder.width && y in 0 until bufferHolder.height }
+            .any { (x, y) -> bufferHolder.visibilityBuffer[x + y * bufferHolder.width] }
     }
     
     private fun List<EnemyTurnResult>.toEnemiesAnimations(
@@ -266,14 +265,14 @@ class MapScreenController @Inject constructor(
             is EnemyTurnResult.Move -> {
                 val currentScreenSpacePosition = result.position - bufferHolder.offset
                 val currentScreenSpaceIndex =
-                    currentScreenSpacePosition.first + currentScreenSpacePosition.second * viewportWidth
+                    currentScreenSpacePosition.first + currentScreenSpacePosition.second * bufferHolder.width
                 val currentTileVisibility =
                     bufferHolder.visibilityBuffer.getOrElse(currentScreenSpaceIndex) { false }
 
                 val nextScreenSpacePosition =
                     currentScreenSpacePosition + result.direction.resolvedOffset
                 val nextScreenSpaceIndex =
-                    nextScreenSpacePosition.first + nextScreenSpacePosition.second * viewportWidth
+                    nextScreenSpacePosition.first + nextScreenSpacePosition.second * bufferHolder.width
                 val nextTileVisibility =
                     bufferHolder.visibilityBuffer.getOrElse(nextScreenSpaceIndex) { false }
 
