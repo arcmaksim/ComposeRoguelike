@@ -28,12 +28,15 @@ fun Direction.toIntOffset(
     return IntOffset(x * dimension, y * dimension)
 }
 
-context(Density)
 internal fun ComposeOffset.toDirection(
-    size: Dp,
-): Direction = when {
-    x > y && x.toDp() > size - y.toDp() -> Direction.Right
-    x > y -> Direction.Up
-    x < y && y.toDp() > size - x.toDp() -> Direction.Down
-    else -> Direction.Left
+    density: Density,
+    size: Int,
+): Direction = with(density) {
+    val sizeDp = size.toDp()
+    when {
+        x > y && x.toDp() > sizeDp - y.toDp() -> Direction.Right
+        x > y -> Direction.Up
+        x < y && y.toDp() > sizeDp - x.toDp() -> Direction.Down
+        else -> Direction.Left
+    }
 }

@@ -50,16 +50,20 @@ fun GameScreenControls(
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
-    val shouldDrawMovementControls = FeatureToggles.getToggleValue(FeatureToggle.ShowMovementControls)
-    
+    val shouldDrawMovementControls =
+        FeatureToggles.getToggleValue(FeatureToggle.ShowMovementControls)
+
     BoxWithConstraints(
         modifier = modifier.then(
             Modifier
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
-                            val width = with(density) { size.width.toDp() }
-                            (interactionController::processCharacterMoveInput)(it.toDirection(width))
+                            val direction = it.toDirection(
+                                density = density,
+                                size = size.width,
+                            )
+                            interactionController.processCharacterMoveInput(direction)
                         },
                     )
                 }

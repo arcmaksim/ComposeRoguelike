@@ -16,17 +16,17 @@ import ru.meatgames.tomb.render.AnimationRenderData
 import ru.meatgames.tomb.render.RenderData
 import ru.meatgames.tomb.screen.compose.game.animation.EnemyAnimationState
 
-context(DrawScope)
-fun RenderData.drawImage(
+fun DrawScope.drawImage(
+    renderData: RenderData,
     dstSize: IntSize,
     dstOffset: IntOffset,
     alpha: Float = 1f,
 ) {
     drawImage(
         alpha = alpha,
-        image = asset,
-        srcOffset = offset,
-        srcSize = size,
+        image = renderData.asset,
+        srcOffset = renderData.offset,
+        srcSize = renderData.size,
         dstOffset = dstOffset,
         dstSize = dstSize,
         filterQuality = FilterQuality.None,
@@ -69,7 +69,8 @@ fun DrawScope.drawCharacter(
         )
     }
     
-    shadowRenderData.drawImage(
+    drawImage(
+        renderData = shadowRenderData,
         dstSize = dstSize,
         dstOffset = dstOffset + IntOffset(
             x = characterRenderData.shadowHorizontalOffset * originalTileSinglePixelOffset,
@@ -92,7 +93,8 @@ fun DrawScope.drawCharacter(
     
     iconState?.let {
         val iconDimension = tileDimension / 2
-        it.renderData.drawImage(
+        drawImage(
+            renderData = it.renderData,
             dstOffset = dstOffset.copy(
                 x = dstOffset.x + (tileDimension - iconDimension) / 2,
                 y = dstOffset.y + (tileDimension - iconDimension) / 2 - verticalOffset,

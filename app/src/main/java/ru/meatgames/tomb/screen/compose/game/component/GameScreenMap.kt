@@ -100,7 +100,8 @@ internal fun GameScreenMap(
                 }
                 else -> null
             }?.let { (tile, alpha) ->
-                tile.drawRevealedTile(
+                drawRevealedTile(
+                    tile = tile,
                     dstOffset = dstOffset,
                     tileSize = tileSize,
                     backgroundColor = backgroundColor,
@@ -111,31 +112,39 @@ internal fun GameScreenMap(
     }
 }
 
-context(DrawScope)
-private fun MapRenderTile.Content.drawRevealedTile(
+private fun DrawScope.drawRevealedTile(
+    tile: MapRenderTile.Content,
     dstOffset: IntOffset,
     tileSize: IntSize,
     backgroundColor: Color,
     alpha: Float = 1f,
 ) {
-    floorData.drawImage(
+    drawImage(
+        renderData = tile.floorData,
         dstOffset = dstOffset,
         dstSize = tileSize,
     )
-    decorations.forEach {
-        it.drawImage(
+    tile.decorations.forEach {
+        drawImage(
+            renderData = it,
             dstOffset = dstOffset,
             dstSize = tileSize,
         )
     }
-    objectData?.drawImage(
-        dstOffset = dstOffset,
-        dstSize = tileSize,
-    )
-    itemData?.drawImage(
-        dstOffset = dstOffset,
-        dstSize = tileSize,
-    )
+    tile.objectData?.let {
+        drawImage(
+            renderData = it,
+            dstOffset = dstOffset,
+            dstSize = tileSize,
+        )
+    }
+    tile.itemData?.let {
+        drawImage(
+            renderData = it,
+            dstOffset = dstOffset,
+            dstSize = tileSize,
+        )
+    }
     if (alpha != 1f) {
         drawRect(
             color = backgroundColor,

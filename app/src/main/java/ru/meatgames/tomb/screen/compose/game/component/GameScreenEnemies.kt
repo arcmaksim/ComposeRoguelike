@@ -105,7 +105,8 @@ internal fun GameScreenEnemies(
                 tilesToFade.contains(tileScreenSpaceCoordinates) -> fadedTilesAlpha
                 else -> null
             }?.let { alpha ->
-                renderTile.enemyData.drawCharacter(
+                drawCharacter(
+                    animationRenderData = renderTile.enemyData,
                     dstOffset = dstOffset,
                     tileSize = tileSize,
                     tileDimension = tileDimension,
@@ -118,8 +119,8 @@ internal fun GameScreenEnemies(
     }
 }
 
-context(DrawScope)
-private fun AnimationRenderData.drawCharacter(
+private fun DrawScope.drawCharacter(
+    animationRenderData: AnimationRenderData,
     dstOffset: IntOffset,
     tileSize: IntSize,
     tileDimension: Int,
@@ -129,9 +130,9 @@ private fun AnimationRenderData.drawCharacter(
 ) {
     drawCharacter(
         tileDimension = tileDimension,
-        shadowRenderData = shadowRenderData,
+        shadowRenderData = animationRenderData.shadowRenderData,
         frameIndex = characterFrameIndex,
-        characterRenderData = this,
+        characterRenderData = animationRenderData,
         dstSize = tileSize,
         dstOffset = dstOffset,
         alpha = alpha ?: 1f,
