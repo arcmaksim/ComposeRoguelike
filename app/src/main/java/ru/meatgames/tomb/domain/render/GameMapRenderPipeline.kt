@@ -34,6 +34,7 @@ class GameMapRenderPipeline @Inject constructor(
 
         val tilesToReveal = mutableSetOf<ScreenSpaceCoordinates>()
         val tilesToFade = mutableSetOf<ScreenSpaceCoordinates>()
+        val previousTiles = mutableSetOf<Coordinates>()
 
         bufferHolder.resultRenderingBuffer.forEachIndexed { index, mapRenderTile ->
             if (mapRenderTile !is MapRenderTile.Content) return@forEachIndexed
@@ -52,16 +53,13 @@ class GameMapRenderPipeline @Inject constructor(
             if (!previousTileWasVisible && currentTileVisible) {
                 tilesToReveal.add(coordinates)
             }
+
+            if (currentTileVisible) {
+                previousTiles.add(coordinates)
+            }
         }
 
-        previousVisibleTiles = bufferHolder.resultRenderingBuffer.mapIndexedNotNull { index, tile ->
-            if (tile !is MapRenderTile.Content) return@mapIndexedNotNull null
-            if (!tile.isVisible) return@mapIndexedNotNull null
-
-            val x = index % bufferHolder.width
-            val y = index / bufferHolder.width
-            (bufferHolder.horizontalOffset + x) to (bufferHolder.verticalOffset + y)
-        }.toSet()
+        previousVisibleTiles = previousTiles
 
         return GameMapPipelineRenderData(
             tiles = bufferHolder.resultRenderingBuffer.toList(),
