@@ -4,7 +4,6 @@ import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -18,10 +17,10 @@ import ru.meatgames.tomb.toIntOffset
  * @param keyframesSpec animation keyframes
  * @param direction direction of animation
  */
-context(CoroutineScope)
-suspend fun MutableState<IntOffset>.asDirectionalKeyframeIntOffsetAnimationAsync(
+fun CoroutineScope.directionalKeyframeIntOffsetAnimationAsync(
     keyframesSpec: KeyframesSpec<Float>,
     direction: Direction,
+    onChange: (IntOffset) -> Unit,
 ) = async {
     val offset = direction.toIntOffset(10)
     animate(
@@ -29,9 +28,15 @@ suspend fun MutableState<IntOffset>.asDirectionalKeyframeIntOffsetAnimationAsync
         targetValue = 0f,
         typeConverter = Float.VectorConverter,
         animationSpec = keyframesSpec,
-    ) { animatedValue, _ ->
-        value = IntOffset((offset.x * animatedValue).toInt(), (offset.y * animatedValue).toInt())
-    }
+        block = { animatedValue, _ ->
+            onChange(
+                IntOffset(
+                    (offset.x * animatedValue).toInt(),
+                    (offset.y * animatedValue).toInt(),
+                ),
+            )
+        },
+    )
 }
 
 /**
@@ -41,8 +46,7 @@ suspend fun MutableState<IntOffset>.asDirectionalKeyframeIntOffsetAnimationAsync
  * @param delayMillis animation delay in milliseconds
  * @param update callback
  */
-context(CoroutineScope)
-suspend fun asEnemiesMoveAnimationAsync(
+fun CoroutineScope.enemiesMoveAnimationAsync(
     durationMillis: Int,
     delayMillis: Int = 0,
     update: (Float) -> Unit,
@@ -52,9 +56,10 @@ suspend fun asEnemiesMoveAnimationAsync(
         targetValue = 0f,
         typeConverter = Float.VectorConverter,
         animationSpec = tween(durationMillis = durationMillis, delayMillis = delayMillis),
-    ) { animatedValue, _ ->
-        update(animatedValue)
-    }
+        block = { animatedValue, _ ->
+            update(animatedValue)
+        },
+    )
 }
 
 /**
@@ -63,8 +68,7 @@ suspend fun asEnemiesMoveAnimationAsync(
  * @param delayMillis animation delay in milliseconds
  * @param update callback
  */
-context(CoroutineScope)
-suspend fun asEnemiesAttackAnimationAsync(
+fun CoroutineScope.enemiesAttackAnimationAsync(
     delayMillis: Int,
     update: (Float) -> Unit,
 ) = async {
@@ -74,9 +78,10 @@ suspend fun asEnemiesAttackAnimationAsync(
         targetValue = 0f,
         typeConverter = Float.VectorConverter,
         animationSpec = defaultAttackKeyframes,
-    ) { animatedValue, _ ->
-        update(animatedValue)
-    }
+        block = { animatedValue, _ ->
+            update(animatedValue)
+        },
+    )
 }
 
 /**
@@ -86,8 +91,7 @@ suspend fun asEnemiesAttackAnimationAsync(
  * @param delayMillis animation delay in milliseconds
  * @param update callback
  */
-context(CoroutineScope)
-suspend fun asIconAnimationAsync(
+fun CoroutineScope.iconAnimationAsync(
     durationMillis: Int,
     delayMillis: Int,
     update: (Float) -> Unit,
@@ -98,7 +102,8 @@ suspend fun asIconAnimationAsync(
         targetValue = 0f,
         typeConverter = Float.VectorConverter,
         animationSpec = produceIconKeyframes(durationMillis),
-    ) { animatedValue, _ ->
-        update(animatedValue)
-    }
+        block = { animatedValue, _ ->
+            update(animatedValue)
+        },
+    )
 }

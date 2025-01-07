@@ -150,6 +150,7 @@ internal fun GameScreenMapContainer(
     LaunchedEffect(playerAnimation) {
         awaitAll(
             *playerAnimation.assemblePlayerInputAnimations(
+                scope = this,
                 animationDurationMillis = animationDurationMillis,
                 view = view,
                 shakeOffset = shakeOffset,
@@ -175,13 +176,15 @@ internal fun GameScreenMapContainer(
             else -> {
                 awaitAll(
                     *enemiesAnimations.assembleEnemiesAnimations(
+                        scope = this,
                         animationDurationMillis = animationDurationMillis,
                         tileDimension = tileDimension,
-                    ) { it, state ->
-                        enemiesAnimationUpdates.value = enemiesAnimationUpdates.value.toMutableMap().apply {
-                            this[it] = state
-                        }
-                    },
+                        update = { it, state ->
+                            enemiesAnimationUpdates.value = enemiesAnimationUpdates.value.toMutableMap().apply {
+                                this[it] = state
+                            }
+                        },
+                    )
                 )
                 interactionController.finishEnemiesAnimation()
             }

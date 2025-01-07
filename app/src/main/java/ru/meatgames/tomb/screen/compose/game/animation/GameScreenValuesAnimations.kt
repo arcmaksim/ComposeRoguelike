@@ -3,56 +3,59 @@ package ru.meatgames.tomb.screen.compose.game.animation
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 
-context(CoroutineScope)
-suspend fun MutableState<Float>.asFadeInAnimationAsync(
+fun CoroutineScope.fadeInAnimationAsync(
     durationMillis: Int,
-) = asFadeAnimationAsync(
+    onChange: (Float) -> Unit,
+) = fadeAnimationAsync(
     durationMillis = durationMillis,
     initialValue = 0f,
     targetValue = 1f,
+    onChange = onChange,
 )
 
-context(CoroutineScope)
-suspend fun MutableState<Float>.asFadeOutAnimationAsync(
+fun CoroutineScope.fadeOutAnimationAsync(
     durationMillis: Int,
-) = asFadeAnimationAsync(
+    onChange: (Float) -> Unit,
+) = fadeAnimationAsync(
     durationMillis = durationMillis,
     initialValue = 1f,
     targetValue = 0f,
+    onChange = onChange,
 )
 
-context(CoroutineScope)
-private suspend fun MutableState<Float>.asFadeAnimationAsync(
+private fun CoroutineScope.fadeAnimationAsync(
     durationMillis: Int,
     initialValue: Float,
     targetValue: Float,
+    onChange: (Float) -> Unit,
 ) = async {
     animate(
         initialValue = initialValue,
         targetValue = targetValue,
         typeConverter = Float.VectorConverter,
         animationSpec = tween(durationMillis),
-    ) { animatedValue, _ ->
-        value = animatedValue
-    }
+        block = { animatedValue, _ ->
+            onChange(animatedValue)
+        },
+    )
 }
 
-context(CoroutineScope)
-suspend fun MutableState<IntOffset>.asMoveAnimationAsync(
+fun CoroutineScope.moveAnimationAsync(
     durationMillis: Int,
     targetValue: IntOffset,
+    onChange: (IntOffset) -> Unit,
 ) = async {
     animate(
         initialValue = IntOffset.Zero,
         targetValue = targetValue,
         typeConverter = IntOffset.VectorConverter,
         animationSpec = tween(durationMillis),
-    ) { animatedValue, _ ->
-        value = animatedValue
-    }
+        block = { animatedValue, _ ->
+            onChange(animatedValue)
+        },
+    )
 }
