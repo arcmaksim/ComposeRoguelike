@@ -3,7 +3,7 @@ package ru.meatgames.tomb.screen.compose
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,55 +21,55 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.design.h2TextStyle
-import ru.meatgames.tomb.domain.render.RoomPreviewRenderProcessor
+import ru.meatgames.tomb.domain.render.RoomPreviewRenderDataAssembler
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.WallsDecorator
 import ru.meatgames.tomb.domain.map.MapTile
-import ru.meatgames.tomb.domain.map.MapTileWrapper
+import ru.meatgames.tomb.domain.render.BufferHolderFactory
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_DIMENSION
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
 import kotlin.math.max
 
 @Preview
 @Composable
-private fun RoomRenderer() {
+private fun RoomRendererPreview() {
     val context = LocalContext.current
 
     val roomsData = RoomsRepository(context).loadData()
-    val mapRenderProcessor = RoomPreviewRenderProcessor(
-        themeAssets = ThemeAssets(context),
-        mapDecorators = setOf(WallsDecorator()),
-    )
-
     val room = roomsData.rooms.random()
 
-    val mapTiles = (0 until room.width * room.height).map { index ->
-        MapTileWrapper(
-            x = index % room.width,
-            y = index % room.height,
-            tile = MapTile(
-                floorEntityTile = roomsData.floorMapping
-                    .first { it.symbol == room.floor[index].toString() }
-                    .entity,
-                objectEntityTile = roomsData.objectMapping
-                    .first { it.symbol == room.objects[index].toString() }
-                    .let { it.entity },
-            ),
+    val bufferHolderFactory = BufferHolderFactory()
+    val bufferHolder = bufferHolderFactory.get(room.width, room.height)
+    val previewRenderDataAssembler = RoomPreviewRenderDataAssembler(
+        themeAssets = ThemeAssets(context),
+        bufferHolder = bufferHolder,
+        mapDecorators = setOf(
+            WallsDecorator(
+                bufferHolderFactory = bufferHolderFactory,
+            )
+        ),
+    )
+
+    val tiles = (0 until room.width * room.height).map { index ->
+        MapTile(
+            floorEntityTile = roomsData.floorMapping
+                .first { it.symbol == room.floor[index].toString() }
+                .entity,
+            objectEntityTile = roomsData.objectMapping
+                .first { it.symbol == room.objects[index].toString() }
+                .entity,
         )
     }
 
-    val renderTiles = mapRenderProcessor.produceRenderTilesFrom(
-        tiles = mapTiles,
-        tilesLineWidth = room.width,
-    ).map { it.second }
+    previewRenderDataAssembler.run(tiles)
 
     val roomPreviewData = RoomPreviewData(
         roomName = room.name,
         roomWidth = room.width,
         roomHeight = room.height,
-        tiles = renderTiles,
+        tiles = bufferHolder.resultRenderingBuffer.toList(),
         outerWalls = room.outerWalls,
     )
 
@@ -82,7 +82,7 @@ private fun RoomRenderer() {
 private fun RoomRenderer(
     roomPreviewData: RoomPreviewData,
     renderType: RoomRenderType = RoomRenderType.Full,
-) = BoxWithConstraints(
+) = Box(
     modifier = Modifier
         .background(Color(0xFF212121))
         .fillMaxSize(),
@@ -99,7 +99,8 @@ private fun RoomRenderer(
     }
     
     Text(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(top = 48.dp)
             .padding(horizontal = 24.dp),
         text = roomPreviewData.roomName,

@@ -1,69 +1,74 @@
 package ru.meatgames.tomb.render
 
-import ru.meatgames.tomb.domain.render.RenderTiles
-import ru.meatgames.tomb.domain.render.ScreenSpaceRenderTiles
+import ru.meatgames.tomb.domain.render.BufferHolder
+import ru.meatgames.tomb.domain.render.BufferHolderFactory
+import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import javax.inject.Inject
 
-class WallsDecorator @Inject constructor() : MapRenderTilesDecorator {
-    
-    override fun processMapRenderTiles(
-        mapRenderTiles: List<ScreenSpaceRenderTiles?>,
-        tileLineWidth: Int,
-    ): List<ScreenSpaceRenderTiles?> = mapRenderTiles.mapIndexed { index, pair ->
-        val objectRenderTile = pair?.second?.second ?: return@mapIndexed pair
-        if (!objectRenderTile.isWall()) return@mapIndexed pair
+class WallsDecorator @Inject constructor(
+    private val bufferHolderFactory: BufferHolderFactory,
+) : MapRenderTilesDecorator {
 
-        val updatedWallRenderTile = mapRenderTiles.calcWallsFlags(index, tileLineWidth)
-            .filterAngles(index, tileLineWidth, mapRenderTiles.size)
-        
-        pair.first to RenderTiles(pair.second.first, updatedWallRenderTile)
+    override fun apply() {
+        val bufferHolder = bufferHolderFactory.cachedBufferHolder
+
+        var index = -1
+
+        bufferHolder.mapBuffer.iterator().forEach { tile ->
+            index++
+
+            if (!bufferHolder.visibilityBuffer[index]) return@forEach
+            val objectEntityTile = tile?.objectEntityTile ?: return@forEach
+            if (!objectEntityTile.isWall()) return@forEach
+
+            val wallFlags = bufferHolder.calcWallsFlags(index)
+            bufferHolder.filterAngles(
+                wallFlags = wallFlags,
+                index = index,
+            )
+        }
     }
 
-    private fun List<ScreenSpaceRenderTiles?>.calcWallsFlags(
-        tileIndex: Int,
-        tilesLineWidth: Int,
+    private fun BufferHolder.calcWallsFlags(
+        index: Int,
     ): Int {
         var wallFlags = 0
 
         // Top
-        if (getOrNull(tileIndex - tilesLineWidth)?.second?.second?.isWall() == true) {
+        if (mapBuffer.getOrNull(index - width)?.objectEntityTile?.isWall() == true) {
             wallFlags += 1
         }
         // Right
-        if (getOrNull(tileIndex + 1)?.second?.second?.isWall() == true) {
+        if (mapBuffer.getOrNull(index + 1)?.objectEntityTile?.isWall() == true) {
             wallFlags += 2
         }
         // Bottom
-        if (getOrNull(tileIndex + tilesLineWidth)?.second?.second?.isWall() == true) {
+        if (mapBuffer.getOrNull(index + width)?.objectEntityTile?.isWall() == true) {
             wallFlags += 4
         }
         // Left
-        if (getOrNull(tileIndex - 1)?.second?.second?.isWall() == true) {
+        if (mapBuffer.getOrNull(index - 1)?.objectEntityTile?.isWall() == true) {
             wallFlags += 8
         }
 
         return wallFlags
     }
 
-    private fun Int.filterAngles(
-        tileIndex: Int,
-        tilesLineWidth: Int,
-        maxIndex: Int
-    ): ObjectRenderTile {
-        val wallRenderTile = toWallRenderTile()
+    private fun BufferHolder.filterAngles(
+        wallFlags: Int,
+        index: Int,
+    ) {
+        val wallRenderTile = wallFlags.toWallRenderTile()
 
-        val x = tileIndex % tilesLineWidth
-        val verticalMiddlePoint = tilesLineWidth / 2
+        val x = index % width
+        val y = index / width
 
-        val y = tileIndex / tilesLineWidth
-        val horizontalMiddlePoint = maxIndex / tilesLineWidth / 2
+        val deltaX = (x - horizontalCenter).coerceIn(minimumValue = -1, maximumValue = 1)
+        val deltaY = (y - verticalCenter).coerceIn(minimumValue = -1, maximumValue = 1)
 
-        val deltaX = (x - verticalMiddlePoint).coerceIn(minimumValue = -1, maximumValue = 1)
-        val deltaY = (y - horizontalMiddlePoint).coerceIn(minimumValue = -1, maximumValue = 1)
-
-        return when (wallRenderTile) {
-            ObjectRenderTile.Wall15 -> (this - calcFilterForWall15(deltaX = deltaX, deltaY = deltaY)).toWallRenderTile()
+        objectRenderingBuffer[index] = when (wallRenderTile) {
+            ObjectRenderTile.Wall15 -> (wallFlags - calcFilterForWall15(deltaX = deltaX, deltaY = deltaY)).toWallRenderTile()
             ObjectRenderTile.Wall7 -> filterWall7(deltaX = deltaX, deltaY = deltaY)
             ObjectRenderTile.Wall11 -> filterWall11(deltaX = deltaX, deltaY = deltaY)
             ObjectRenderTile.Wall14 -> filterWall14(deltaX = deltaX, deltaY = deltaY)
@@ -179,23 +184,8 @@ class WallsDecorator @Inject constructor() : MapRenderTilesDecorator {
         else -> throw IllegalArgumentException("Unknown wall flags value: $this")
     }
 
-    private fun ObjectRenderTile.isWall(): Boolean = when (this) {
-        ObjectRenderTile.Wall0,
-        ObjectRenderTile.Wall1,
-        ObjectRenderTile.Wall2,
-        ObjectRenderTile.Wall3,
-        ObjectRenderTile.Wall4,
-        ObjectRenderTile.Wall5,
-        ObjectRenderTile.Wall6,
-        ObjectRenderTile.Wall7,
-        ObjectRenderTile.Wall8,
-        ObjectRenderTile.Wall9,
-        ObjectRenderTile.Wall10,
-        ObjectRenderTile.Wall11,
-        ObjectRenderTile.Wall12,
-        ObjectRenderTile.Wall13,
-        ObjectRenderTile.Wall14,
-        ObjectRenderTile.Wall15 -> true
+    private fun ObjectEntityTile.isWall(): Boolean = when (this) {
+        ObjectEntityTile.Wall -> true
         else -> false
     }
 

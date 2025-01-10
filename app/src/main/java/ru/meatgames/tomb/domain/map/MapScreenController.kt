@@ -20,6 +20,9 @@ import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.CharacterState
+import ru.meatgames.tomb.domain.render.BUFFER_SIZE_MODIFIER
+import ru.meatgames.tomb.domain.render.BufferHolder
+import ru.meatgames.tomb.domain.render.BufferHolderFactory
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
 import ru.meatgames.tomb.domain.render.computeFov
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
@@ -45,21 +48,14 @@ class MapScreenController @Inject constructor(
     private val tilesController: TilesController,
     private val gameMapRenderPipeline: GameMapRenderPipeline,
     private val gameController: GameController,
+    private val bufferHolderFactory: BufferHolderFactory,
 ) {
     
     private val characterRenderData = themeAssets.characterRenderData
     
     private val _state = MutableStateFlow<MapScreenState>(MapScreenState.Loading)
     val state: StateFlow<MapScreenState> = _state
-    
-    private val cachedVisibilityMask = BooleanArray(viewportWidth * viewportWidth) { false }
-    
-    private val preProcessingBufferSizeModifier: Int = 1
-    private val preProcessingViewportWidth: Int =
-        viewportWidth + 2 * preProcessingBufferSizeModifier
-    private val preProcessingViewportHeight: Int =
-        viewportHeight + 2 * preProcessingBufferSizeModifier
-    
+
     init {
         mapController.mapFlow
             .flatMapLatest { map ->
@@ -116,152 +112,136 @@ class MapScreenController @Inject constructor(
         if (characterState.position.x == -1 && characterState.position.y == -1) {
             return MapScreenState.Loading
         }
-        
-        val leftXCoordinate = characterState.position.x - preProcessingViewportWidth / 2
-        val topYCoordinate = characterState.position.y - preProcessingViewportHeight / 2
-        val viewportZeroPosition =
-            (leftXCoordinate + preProcessingBufferSizeModifier) to (topYCoordinate + preProcessingBufferSizeModifier)
-        
-        val reducedTiles = reduceToViewportSize(
-            leftXCoordinate = leftXCoordinate,
-            topYCoordinate = topYCoordinate,
+
+        val bufferHolder = bufferHolderFactory.get(viewportWidth, viewportHeight)
+
+        bufferHolder.clear()
+
+        bufferHolder.horizontalOffset = characterState.position.x - bufferHolder.horizontalCenter
+        bufferHolder.verticalOffset = characterState.position.y - bufferHolder.verticalCenter
+
+        bufferHolder.fillMapBuffer(
+            tiles = this,
             mapWidth = mapWidth,
             mapHeight = mapHeight,
-        ).also {
-            it.calculateFov(
-                viewportWidth = viewportWidth,
-                viewportHeight = viewportHeight,
-            )
-        }
-        
-        val pipelineRenderData = gameMapRenderPipeline.run(
-            tiles = reducedTiles,
-            tilesLineWidth = preProcessingViewportWidth,
-            startCoordinates = characterState.position.x - viewportWidth / 2 to characterState.position.y - viewportHeight / 2,
-            shouldRenderTile = { index ->
-                cachedVisibilityMask[index]
-            },
         )
-        
-        val tileToFadeIn = pipelineRenderData.tilesToFadeIn.toSet()
-        val tileToFadeOut = pipelineRenderData.tilesToFadeOut.toSet()
-        
+
+        bufferHolder.calculateFov()
+
+        val renderData = gameMapRenderPipeline.run()
+
+        val tileToFadeIn = renderData.tilesToFadeIn.toSet()
+        val tileToFadeOut = renderData.tilesToFadeOut.toSet()
+
         return MapScreenState.Ready(
-            tilesWidth = preProcessingViewportWidth,
+            tilesWidth = bufferHolder.width,
             viewportWidth = viewportWidth,
             viewportHeight = viewportHeight,
-            tilesPadding = preProcessingBufferSizeModifier,
-            tiles = pipelineRenderData.tiles,
+            tilesPadding = BUFFER_SIZE_MODIFIER,
+            tiles = renderData.tiles,
             tilesToFadeIn = tileToFadeIn,
             tilesToFadeOut = tileToFadeOut,
             characterRenderData = characterRenderData,
             playerHealth = characterState.health,
             turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(
-                viewportZeroPosition = viewportZeroPosition,
+                bufferHolder = bufferHolder,
+                viewportZeroPosition = bufferHolder.horizontalOffset to bufferHolder.verticalOffset,
                 viewportWidth = viewportWidth,
             ),
         )
     }
-    
-    private fun List<MapTileWrapper?>.calculateFov(
-        viewportWidth: Int,
-        viewportHeight: Int,
-    ) {
-        cachedVisibilityMask.updateVisibilityMask()
-        
-        val characterScreenSpaceX = viewportWidth / 2
-        val characterScreenSpaceY = viewportHeight / 2
-        
+
+    private fun BufferHolder.calculateFov() {
+        visibilityBuffer.fill(false)
+
         computeFov(
-            originX = characterScreenSpaceX,
-            originY = characterScreenSpaceY,
-            maxDepth = viewportWidth / 2 + 1,
-            revealTile = { x, y -> cachedVisibilityMask[x + y * viewportWidth] = true },
+            originX = horizontalCenter,
+            originY = verticalCenter,
+            maxDepth = horizontalCenter + 1,
+            revealTile = { x, y -> visibilityBuffer[x + y * width] = true },
             checkIfTileIsBlocking = { x, y ->
-                val index = (x + 1) + (y + 1) * preProcessingViewportWidth
-                val objectEntity = this[index]?.tile?.objectEntityTile ?: return@computeFov false
+                val index = x + y * width
+                val objectEntity = mapBuffer[index]?.objectEntityTile ?: return@computeFov false
                 !tilesController.isObjectEntityVisibleThrough(
                     objectEntity = objectEntity,
                 )
             }
         )
+
+        for (i in 0 until width) {
+            visibilityBuffer[i] = false
+            visibilityBuffer[(height - 1) * width + i] = false
+        }
+
+        for (i in 0 until height) {
+            visibilityBuffer[i * width] = false
+            visibilityBuffer[(i + 1) * width - 1] = false
+        }
     }
-    
-    private fun BooleanArray.updateVisibilityMask() {
-        fill(false)
-    }
-    
-    private fun List<MapTile>.reduceToViewportSize(
-        leftXCoordinate: Int,
-        topYCoordinate: Int,
+
+    private fun BufferHolder.fillMapBuffer(
+        tiles: List<MapTile>,
         mapWidth: Int,
         mapHeight: Int,
-    ): List<MapTileWrapper?> = (0 until preProcessingViewportHeight).map { line ->
-        val start = (topYCoordinate + line) * mapWidth + leftXCoordinate
-        val end = start + preProcessingViewportWidth
-        when {
-            topYCoordinate + line !in 0 until mapHeight -> {
-                List(preProcessingViewportWidth) { null }
-            }
-            
-            leftXCoordinate < 0 -> {
-                List(preProcessingViewportWidth) { index ->
-                    val tileIndex = start + index
-                    when {
-                        leftXCoordinate + index < 0 -> null
-                        else -> this[tileIndex]
-                    }?.toMapTileWrapper(
-                        tileIndex = tileIndex,
-                        mapWidth = mapWidth,
+    ) {
+        (0 until height).map { line ->
+            val start = (verticalOffset + line) * mapWidth + horizontalOffset
+
+            (0 until width).map { index ->
+
+                val tileIndex = start + index
+
+                val tile = when {
+                    verticalOffset + line !in 0 until mapHeight -> {
+                        null
+                    }
+
+                    horizontalOffset < 0 -> {
+                        when {
+                            horizontalOffset + index < 0 -> null
+                            else -> tiles[tileIndex]
+                        }
+                    }
+
+                    horizontalOffset + width > mapWidth -> {
+                        when {
+                            horizontalOffset + index < mapWidth -> tiles[tileIndex]
+                            else -> null
+                        }
+                    }
+
+                    else -> {
+                        tiles[start + index]
+                    }
+                }
+
+                tile?.let {
+                    mapBuffer.set(
+                        index = line * width + index,
+                        value = it,
                     )
                 }
-            }
-            
-            leftXCoordinate + preProcessingViewportWidth > mapWidth -> {
-                List(preProcessingViewportWidth) { index ->
-                    val tileIndex = start + index
-                    when {
-                        leftXCoordinate + index < mapWidth -> this[tileIndex]
-                        else -> null
-                    }?.toMapTileWrapper(
-                        tileIndex = tileIndex,
-                        mapWidth = mapWidth,
-                    )
-                }
-            }
-            
-            else -> this.subList(start, end).mapIndexed { index, tile ->
-                tile.toMapTileWrapper(
-                    tileIndex = start + index,
-                    mapWidth = mapWidth,
-                )
             }
         }
-    }.fold(emptyList()) { acc, item -> acc + item }
-    
-    private fun MapTile.toMapTileWrapper(
-        tileIndex: Int,
-        mapWidth: Int,
-    ): MapTileWrapper = MapTileWrapper(
-        x = tileIndex % mapWidth,
-        y = tileIndex / mapWidth,
-        tile = this,
-    )
-    
+    }
+
     private fun GameState.toMapScreenCharacterAnimations(
+        bufferHolder: BufferHolder,
         viewportWidth: Int,
         viewportZeroPosition: Coordinates,
     ): MapScreenCharacterAnimations? = when (this) {
         is GameState.AnimatingCharacter -> {
             MapScreenCharacterAnimations.Player(turnResult)
         }
-        
+
         is GameState.AnimatingEnemies -> {
             MapScreenCharacterAnimations.Enemies(
                 results.filterNonVisibleAnimations(
+                    bufferHolder = bufferHolder,
                     viewportWidth = viewportWidth,
                     viewportZeroPosition = viewportZeroPosition,
                 ).toEnemiesAnimations(
+                    bufferHolder = bufferHolder,
                     viewportWidth = viewportWidth,
                     viewportZeroPosition = viewportZeroPosition,
                 ),
@@ -274,6 +254,7 @@ class MapScreenController @Inject constructor(
     }
     
     private fun List<EnemyTurnResult>.filterNonVisibleAnimations(
+        bufferHolder: BufferHolder,
         viewportZeroPosition: Coordinates,
         viewportWidth: Int,
     ): List<EnemyTurnResult> = filter { result ->
@@ -287,10 +268,11 @@ class MapScreenController @Inject constructor(
             
             else -> listOf(result.position - viewportZeroPosition)
         }.filter { (x, y) -> x in 0 until viewportWidth && y in 0 until viewportHeight }
-            .any { (x, y) -> cachedVisibilityMask[x + y * viewportWidth] }
+            .any { (x, y) -> bufferHolder.visibilityBuffer[x + y * viewportWidth] }
     }
     
     private fun List<EnemyTurnResult>.toEnemiesAnimations(
+        bufferHolder: BufferHolder,
         viewportZeroPosition: Coordinates,
         viewportWidth: Int,
     ): EnemiesAnimations = map { result ->
@@ -300,15 +282,15 @@ class MapScreenController @Inject constructor(
                 val currentScreenSpaceIndex =
                     currentScreenSpacePosition.first + currentScreenSpacePosition.second * viewportWidth
                 val currentTileVisibility =
-                    cachedVisibilityMask.getOrElse(currentScreenSpaceIndex) { false }
-                
+                    bufferHolder.visibilityBuffer.getOrElse(currentScreenSpaceIndex) { false }
+
                 val nextScreenSpacePosition =
                     currentScreenSpacePosition + result.direction.resolvedOffset
                 val nextScreenSpaceIndex =
                     nextScreenSpacePosition.first + nextScreenSpacePosition.second * viewportWidth
                 val nextTileVisibility =
-                    cachedVisibilityMask.getOrElse(nextScreenSpaceIndex) { false }
-                
+                    bufferHolder.visibilityBuffer.getOrElse(nextScreenSpaceIndex) { false }
+
                 result.enemyId to EnemyAnimation.Move(
                     direction = result.direction,
                     fade = when {

@@ -1,6 +1,5 @@
 package ru.meatgames.tomb.domain.render
 
-import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.model.tile.domain.FloorEntityTile
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
@@ -10,28 +9,24 @@ import javax.inject.Inject
 
 class MapDecoratorPipeline @Inject constructor(
     private val mapDecorators: Set<@JvmSuppressWildcards MapRenderTilesDecorator>,
+    private val bufferHolderFactory: BufferHolderFactory,
 ) {
 
     // Assumes tiles is a square
-    fun produceRenderTilesFrom(
-        tiles: List<MapTileWrapper?>,
-        tilesLineWidth: Int,
-    ): List<ScreenSpaceRenderTiles?> = tiles.mapToRenderTiles()
-        .applyDecorators(tilesLineWidth)
+    fun produceRenderTilesFrom() {
+        bufferHolderFactory.cachedBufferHolder.fillRenderingBuffers()
 
-    private fun List<MapTileWrapper?>.mapToRenderTiles(): List<ScreenSpaceRenderTiles?> = map {
-        val tile = it?.tile ?: return@map null
-        it to RenderTiles(
-            first = tile.floorEntityTile.toFloorRenderTile(),
-            second = tile.objectEntityTile?.toObjectRenderTile(),
-        )
+        mapDecorators.forEach { decorator ->
+            decorator.apply()
+        }
     }
-    
-    private fun List<ScreenSpaceRenderTiles?>.applyDecorators(
-        tilesLineWidth: Int,
-    ): List<ScreenSpaceRenderTiles?> = run {
-        mapDecorators.fold(this) { tiles, decorator ->
-            decorator.processMapRenderTiles(tiles, tilesLineWidth)
+
+    private fun BufferHolder.fillRenderingBuffers() {
+        var index = -1
+        mapBuffer.iterator().forEach {
+            index++
+            floorRenderingBuffer[index] = it?.floorEntityTile?.toFloorRenderTile()
+            objectRenderingBuffer[index] = it?.objectEntityTile?.toObjectRenderTile()
         }
     }
 

@@ -17,6 +17,7 @@ data class MapTile(
 
 }
 
+@Deprecated("Migrate to MapTile")
 data class MapTileWrapper(
     val x: Int,
     val y: Int,

@@ -97,6 +97,7 @@ interface MapTerraformer {
 interface MapController {
     val mapFlow: StateFlow<MapState>
 
+    @Deprecated("Needs to be migrated to MapTile")
     fun getTile(
         coordinates: Coordinates,
     ): MapTileWrapper?

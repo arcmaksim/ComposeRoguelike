@@ -11,8 +11,8 @@ import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
 import ru.meatgames.tomb.model.tile.domain.ObjectRenderTile
 import ru.meatgames.tomb.render.MapRenderTile
 import ru.meatgames.tomb.render.RenderData
-import ru.meatgames.tomb.domain.map.MapTileWrapper
 import ru.meatgames.tomb.model.theme.ASSETS_TILE_SIZE
+import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import javax.inject.Inject
 
 class GameMapRenderPipeline @Inject constructor(
@@ -20,93 +20,85 @@ class GameMapRenderPipeline @Inject constructor(
     private val decoratorsPipeline: MapDecoratorPipeline,
     private val itemsHolder: ItemsHolder,
     private val enemiesHolder: EnemiesHolder,
+    private val bufferHolderFactory: BufferHolderFactory,
 ) {
-    
-    private var prevTiles = setOf<Coordinates>()
-    
-    // Assumes tiles is a square
-    fun run(
-        tiles: List<MapTileWrapper?>,
-        tilesLineWidth: Int,
-        startCoordinates: Coordinates,
-        shouldRenderTile: (Int) -> Boolean,
-    ): GameMapPipelineRenderData {
-        val renderTiles = decoratorsPipeline.produceRenderTilesFrom(
-            tiles = tiles,
-            tilesLineWidth = tilesLineWidth,
-        )
-        
-        val processedRenderTiles = renderTiles.applyFOV(
-            tilesLineWidth,
-            shouldRenderTile,
-        )
-        
+
+    private var previousVisibleTiles = setOf<Coordinates>()
+
+    fun run(): GameMapPipelineRenderData {
+        val bufferHolder = bufferHolderFactory.cachedBufferHolder
+
+        decoratorsPipeline.produceRenderTilesFrom()
+
+        bufferHolder.resolveResultRenderingBuffer()
+
         val tilesToReveal = mutableSetOf<ScreenSpaceCoordinates>()
         val tilesToFade = mutableSetOf<ScreenSpaceCoordinates>()
-        
-        fun MapTileWrapper.toCoordinates() = x to y
-        
-        processedRenderTiles.forEach { mapRenderTile ->
-            val newRenderTile = mapRenderTile.second
-            val tileWrapper = mapRenderTile.first ?: return@forEach
-            
-            val previousTileWasVisible = prevTiles.contains(tileWrapper.toCoordinates())
-            
-            val isCurrentTileVisible = (newRenderTile as? MapRenderTile.Content)?.isVisible ?: false
-            
-            if (previousTileWasVisible && !isCurrentTileVisible) {
-                tilesToFade.add(tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second)
+
+        bufferHolder.resultRenderingBuffer.forEachIndexed { index, mapRenderTile ->
+            if (mapRenderTile !is MapRenderTile.Content) return@forEachIndexed
+
+            val x = index % bufferHolder.width
+            val y = index / bufferHolder.width
+            val coordinates =
+                (bufferHolder.horizontalOffset + x) to (bufferHolder.verticalOffset + y)
+
+            val previousTileWasVisible = previousVisibleTiles.contains(coordinates)
+            val currentTileVisible = mapRenderTile.isVisible
+
+            if (previousTileWasVisible && !currentTileVisible) {
+                tilesToFade.add(coordinates)
             }
-            if (!previousTileWasVisible && isCurrentTileVisible) {
-                tilesToReveal.add(tileWrapper.x - startCoordinates.first to tileWrapper.y - startCoordinates.second)
+            if (!previousTileWasVisible && currentTileVisible) {
+                tilesToReveal.add(coordinates)
             }
         }
-        
-        prevTiles = processedRenderTiles.filter { it.first != null }
-            .filter { (it.second as? MapRenderTile.Content)?.isVisible == true }
-            .map { it.first!!.toCoordinates() }
-            .toSet()
-        
+
+        previousVisibleTiles = bufferHolder.resultRenderingBuffer.mapIndexedNotNull { index, tile ->
+            if (tile !is MapRenderTile.Content) return@mapIndexedNotNull null
+            if (!tile.isVisible) return@mapIndexedNotNull null
+
+            val x = index % bufferHolder.width
+            val y = index / bufferHolder.width
+            (bufferHolder.horizontalOffset + x) to (bufferHolder.verticalOffset + y)
+        }.toSet()
+
         return GameMapPipelineRenderData(
-            tiles = processedRenderTiles.map { it.second },
+            tiles = bufferHolder.resultRenderingBuffer.toList(),
             tilesToFadeIn = tilesToReveal.toList(),
             tilesToFadeOut = tilesToFade.toList(),
         )
     }
-    
-    private fun List<ScreenSpaceRenderTiles?>.applyFOV(
-        tilesLineWidth: Int,
-        shouldRenderTile: (Int) -> Boolean,
-    ): List<ScreenSpaceMapRenderTile> = mapIndexed { index, pair ->
-        when (pair) {
-            null -> null to MapRenderTile.Empty
-            else -> {
-                val x = index % tilesLineWidth
-                val y = index / tilesLineWidth
-                
-                // border tiles needs to be skipped as they are not rendered
-                val isVisible = if (x == 0 || x == tilesLineWidth - 1 || y == 0 || y == tilesLineWidth - 1) {
-                    false
-                } else {
-                    shouldRenderTile((y - 1) * (tilesLineWidth - 2) + x - 1)
-                }
-                
-                val coordinates = pair.first.x to pair.first.y
-                val enemy = enemiesHolder.getEnemy(coordinates)
-                val tileAbove = getOrNull(index - tilesLineWidth)?.second
-                
-                pair.first to MapRenderTile.Content(
-                    floorData = pair.second.first.toFloorRenderTileData(),
-                    objectData = pair.second.second?.toObjectRenderTileData(),
-                    itemData = itemsHolder.getItemContainer(coordinates)
-                        ?.let { themeAssets.resolveItemRenderData() },
-                    enemyData = enemy?.let { themeAssets.getEnemyRenderData(it) },
-                    isVisible = isVisible,
-                    decorations = tileAbove?.takeIf { it.second?.hasBottomShadow() == true }
-                        ?.let { listOf(themeAssets.resolveBottomShadow()) }
-                        ?: emptyList(),
-                )
+
+    private fun BufferHolder.resolveResultRenderingBuffer() {
+        for (index in 0 until width * height) {
+            val x = index % width
+            val y = index / width
+
+            val floorRenderTile = floorRenderingBuffer[index]
+            val objectRenderTile = objectRenderingBuffer[index]
+
+            if (floorRenderTile == null) {
+                resultRenderingBuffer[index] = MapRenderTile.Empty
+                continue
             }
+
+            val coordinates = (horizontalOffset + x) to (verticalOffset + y)
+
+            val enemy = enemiesHolder.getEnemy(coordinates)
+            val objectAbove = mapBuffer.getOrNull(index - width)?.objectEntityTile
+
+            resultRenderingBuffer[index] = MapRenderTile.Content(
+                floorData = floorRenderTile.toFloorRenderTileData(),
+                objectData = objectRenderTile?.toObjectRenderTileData(),
+                itemData = itemsHolder.getItemContainer(coordinates)
+                    ?.let { themeAssets.resolveItemRenderData() },
+                enemyData = enemy?.let { themeAssets.getEnemyRenderData(it) },
+                isVisible = visibilityBuffer[index],
+                decorations = objectAbove?.takeIf { it.hasBottomShadow() == true }
+                    ?.let { listOf(themeAssets.resolveBottomShadow()) }
+                    ?: emptyList(),
+            )
         }
     }
     
@@ -129,24 +121,9 @@ class GameMapRenderPipeline @Inject constructor(
     
 }
 
-internal fun ObjectRenderTile.hasBottomShadow(): Boolean = when (this) {
-    ObjectRenderTile.DoorClosed,
-    ObjectRenderTile.StairsUp,
-    ObjectRenderTile.Wall0,
-    ObjectRenderTile.Wall1,
-    ObjectRenderTile.Wall2,
-    ObjectRenderTile.Wall3,
-    ObjectRenderTile.Wall4,
-    ObjectRenderTile.Wall5,
-    ObjectRenderTile.Wall6,
-    ObjectRenderTile.Wall7,
-    ObjectRenderTile.Wall8,
-    ObjectRenderTile.Wall9,
-    ObjectRenderTile.Wall10,
-    ObjectRenderTile.Wall11,
-    ObjectRenderTile.Wall12,
-    ObjectRenderTile.Wall13,
-    ObjectRenderTile.Wall14,
-    ObjectRenderTile.Wall15 -> true
+internal fun ObjectEntityTile.hasBottomShadow(): Boolean = when (this) {
+    ObjectEntityTile.DoorClosed,
+    ObjectEntityTile.StairsUp,
+    ObjectEntityTile.Wall -> true
     else -> false
 }
