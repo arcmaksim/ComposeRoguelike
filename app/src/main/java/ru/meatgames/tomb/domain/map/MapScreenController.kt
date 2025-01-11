@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
-import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
 import ru.meatgames.tomb.domain.component.minus
@@ -143,11 +142,7 @@ class MapScreenController @Inject constructor(
             tilesToFadeOut = tileToFadeOut,
             characterRenderData = characterRenderData,
             playerHealth = characterState.health,
-            turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(
-                bufferHolder = bufferHolder,
-                viewportZeroPosition = bufferHolder.horizontalOffset to bufferHolder.verticalOffset,
-                viewportWidth = viewportWidth,
-            ),
+            turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(bufferHolder),
         )
     }
 
@@ -227,8 +222,6 @@ class MapScreenController @Inject constructor(
 
     private fun GameState.toMapScreenCharacterAnimations(
         bufferHolder: BufferHolder,
-        viewportWidth: Int,
-        viewportZeroPosition: Coordinates,
     ): MapScreenCharacterAnimations? = when (this) {
         is GameState.AnimatingCharacter -> {
             MapScreenCharacterAnimations.Player(turnResult)
@@ -238,12 +231,8 @@ class MapScreenController @Inject constructor(
             MapScreenCharacterAnimations.Enemies(
                 results.filterNonVisibleAnimations(
                     bufferHolder = bufferHolder,
-                    viewportWidth = viewportWidth,
-                    viewportZeroPosition = viewportZeroPosition,
                 ).toEnemiesAnimations(
                     bufferHolder = bufferHolder,
-                    viewportWidth = viewportWidth,
-                    viewportZeroPosition = viewportZeroPosition,
                 ),
             )
         }
@@ -255,39 +244,35 @@ class MapScreenController @Inject constructor(
     
     private fun List<EnemyTurnResult>.filterNonVisibleAnimations(
         bufferHolder: BufferHolder,
-        viewportZeroPosition: Coordinates,
-        viewportWidth: Int,
     ): List<EnemyTurnResult> = filter { result ->
         when (result) {
             is EnemyTurnResult.Move -> {
                 listOf(
-                    result.position - viewportZeroPosition,
-                    result.position + result.direction.resolvedOffset - viewportZeroPosition,
+                    result.position - bufferHolder.offset,
+                    result.position + result.direction.resolvedOffset - bufferHolder.offset,
                 )
             }
             
-            else -> listOf(result.position - viewportZeroPosition)
-        }.filter { (x, y) -> x in 0 until viewportWidth && y in 0 until viewportHeight }
-            .any { (x, y) -> bufferHolder.visibilityBuffer[x + y * viewportWidth] }
+            else -> listOf(result.position - bufferHolder.offset)
+        }.filter { (x, y) -> x in 0 until bufferHolder.width && y in 0 until bufferHolder.height }
+            .any { (x, y) -> bufferHolder.visibilityBuffer[x + y * bufferHolder.width] }
     }
     
     private fun List<EnemyTurnResult>.toEnemiesAnimations(
         bufferHolder: BufferHolder,
-        viewportZeroPosition: Coordinates,
-        viewportWidth: Int,
     ): EnemiesAnimations = map { result ->
         when (result) {
             is EnemyTurnResult.Move -> {
-                val currentScreenSpacePosition = result.position - viewportZeroPosition
+                val currentScreenSpacePosition = result.position - bufferHolder.offset
                 val currentScreenSpaceIndex =
-                    currentScreenSpacePosition.first + currentScreenSpacePosition.second * viewportWidth
+                    currentScreenSpacePosition.first + currentScreenSpacePosition.second * bufferHolder.width
                 val currentTileVisibility =
                     bufferHolder.visibilityBuffer.getOrElse(currentScreenSpaceIndex) { false }
 
                 val nextScreenSpacePosition =
                     currentScreenSpacePosition + result.direction.resolvedOffset
                 val nextScreenSpaceIndex =
-                    nextScreenSpacePosition.first + nextScreenSpacePosition.second * viewportWidth
+                    nextScreenSpacePosition.first + nextScreenSpacePosition.second * bufferHolder.width
                 val nextTileVisibility =
                     bufferHolder.visibilityBuffer.getOrElse(nextScreenSpaceIndex) { false }
 
