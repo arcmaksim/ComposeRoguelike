@@ -7,9 +7,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 
-context(CoroutineScope)
-fun View.asDeferredRejectVibrationAsync() = async {
-    performHapticFeedback(
+fun CoroutineScope.rejectVibrationAsync(
+    view: View,
+) = async {
+    view.performHapticFeedback(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             HapticFeedbackConstants.REJECT
         } else {
@@ -18,12 +19,12 @@ fun View.asDeferredRejectVibrationAsync() = async {
     )
 }
 
-context(CoroutineScope)
-fun View.asDeferredConfirmVibrationAsync(
+fun CoroutineScope.confirmVibrationAsync(
+    view: View,
     delay: Long = 0L,
 ) = async {
     delay(delay)
-    performHapticFeedback(
+    view.performHapticFeedback(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             HapticFeedbackConstants.CONFIRM
         } else {

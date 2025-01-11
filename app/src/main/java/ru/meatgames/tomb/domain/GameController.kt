@@ -136,7 +136,7 @@ class GameControllerImpl @Inject constructor(
         
         directionsToPlayer.forEach { direction ->
             val newPosition = (position + direction.resolvedOffset).toCoordinates()
-            mapController.getTile(newPosition)?.tile?.let { tile ->
+            mapController.getTile(newPosition)?.let { tile ->
                 val tileInteraction = tile.objectEntityTile
                     ?.let(tilesController::hasObjectEntityNoInteraction)
                     ?: true
