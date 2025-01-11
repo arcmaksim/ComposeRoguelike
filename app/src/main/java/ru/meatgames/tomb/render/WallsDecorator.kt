@@ -18,7 +18,6 @@ class WallsDecorator @Inject constructor(
         bufferHolder.mapBuffer.iterator().forEach { tile ->
             index++
 
-            if (!bufferHolder.visibilityBuffer[index]) return@forEach
             val objectEntityTile = tile?.objectEntityTile ?: return@forEach
             if (!objectEntityTile.isWall()) return@forEach
 
