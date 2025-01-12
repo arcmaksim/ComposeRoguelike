@@ -89,14 +89,14 @@ internal fun GameScreenMap(
                 renderTile !is MapRenderTile.Content -> {
                     null
                 }
-                renderTile.isVisible && tilesToReveal.contains(tileScreenSpaceCoordinates) -> {
+                tilesToReveal.contains(tileScreenSpaceCoordinates) -> {
                     renderTile to revealedTilesAlpha
-                }
-                renderTile.isVisible -> {
-                    renderTile to 1f
                 }
                 tilesToFade.contains(tileScreenSpaceCoordinates) -> {
                     renderTile to fadedTilesAlpha
+                }
+                renderTile.isVisible -> {
+                    renderTile to 1f
                 }
                 else -> null
             }?.let { (tile, alpha) ->
