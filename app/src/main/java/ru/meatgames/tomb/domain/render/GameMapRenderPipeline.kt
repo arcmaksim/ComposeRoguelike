@@ -50,6 +50,7 @@ class GameMapRenderPipeline @Inject constructor(
 
             if (previousTileWasVisible && !currentTileVisible) {
                 tilesToFade.add(bufferCoordinates)
+                bufferHolder.replaceWithPreviousResultRenderingBuffer(index)
             }
             if (!previousTileWasVisible && currentTileVisible) {
                 tilesToReveal.add(bufferCoordinates)

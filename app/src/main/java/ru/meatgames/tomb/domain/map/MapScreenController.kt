@@ -114,10 +114,10 @@ class MapScreenController @Inject constructor(
 
         val bufferHolder = bufferHolderFactory.get(viewportWidth, viewportHeight)
 
-        bufferHolder.clear()
-
-        bufferHolder.horizontalOffset = characterState.position.x - bufferHolder.horizontalCenter
-        bufferHolder.verticalOffset = characterState.position.y - bufferHolder.verticalCenter
+        bufferHolder.refresh(
+            horizontalOffset = characterState.position.x - bufferHolder.horizontalCenter,
+            verticalOffset = characterState.position.y - bufferHolder.verticalCenter
+        )
 
         bufferHolder.fillMapBuffer(
             tiles = this,
