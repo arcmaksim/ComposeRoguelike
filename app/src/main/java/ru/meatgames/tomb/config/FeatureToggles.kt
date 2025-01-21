@@ -37,7 +37,7 @@ object FeatureToggles {
     )
     val state: StateFlow<List<FeatureToggleState>> = _state
     
-    val themeOverride: String? = null
+    var themeOverride: String? = null
     
     private val cachedToggleValues: MutableMap<FeatureToggle, Boolean> = _state.value
         .associate { it.key to it.value }

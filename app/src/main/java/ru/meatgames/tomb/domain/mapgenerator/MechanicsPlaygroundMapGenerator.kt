@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.domain.mapgenerator
 
+import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
 import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.map.LevelMap
@@ -26,6 +27,7 @@ class MechanicsPlaygroundMapGenerator @Inject constructor(
     override fun generateMap(
         map: LevelMap,
     ): MapConfiguration {
+        FeatureToggles.themeOverride = "Caves"
         itemsHolder.clearContainers()
         enemiesHolder.clearEnemies()
         
