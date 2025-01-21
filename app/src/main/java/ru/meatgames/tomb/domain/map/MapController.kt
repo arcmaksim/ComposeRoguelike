@@ -2,10 +2,11 @@ package ru.meatgames.tomb.domain.map
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ru.meatgames.tomb.di.MECHANICS_PLAYGROUND_MAP_GENERATOR
 import ru.meatgames.tomb.di.MAIN_MAP_GENERATOR
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
-import ru.meatgames.tomb.di.PLAYGROUND_MAP_GENERATOR
+import ru.meatgames.tomb.di.TESTING_PLAYGROUND_MAP_GENERATOR
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.mapgenerator.MapConfiguration
 import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
@@ -19,7 +20,8 @@ class MapControllerImpl @Inject constructor(
     @Named(MAP_WIDTH_KEY) private val mapWidth: Int,
     @Named(MAP_HEIGHT_KEY) private val mapHeight: Int,
     @Named(MAIN_MAP_GENERATOR) private val mainMapGenerator: MapGenerator,
-    @Named(PLAYGROUND_MAP_GENERATOR) private val playgroundMapGenerator: MapGenerator,
+    @Named(MECHANICS_PLAYGROUND_MAP_GENERATOR) private val mechanicsPlaygroundMapGenerator: MapGenerator,
+    @Named(TESTING_PLAYGROUND_MAP_GENERATOR) private val playgroundMapGenerator: MapGenerator,
 ) : MapCreator, MapTerraformer, MapController {
 
     private lateinit var levelMap: LevelMap
@@ -35,7 +37,8 @@ class MapControllerImpl @Inject constructor(
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
         val configuration = when (type) {
             MapCreator.MapType.MAIN -> mainMapGenerator.generateMap(levelMap)
-            MapCreator.MapType.PLAYGROUND -> playgroundMapGenerator.generateMap(levelMap)
+            MapCreator.MapType.MECHANICS_PLAYGROUND -> mechanicsPlaygroundMapGenerator.generateMap(levelMap)
+            MapCreator.MapType.TESTING_PLAYGROUND -> playgroundMapGenerator.generateMap(levelMap)
         }
 
         _mapFlow.value = MapState.MapAvailable(
@@ -76,7 +79,8 @@ interface MapCreator {
     
     enum class MapType {
         MAIN,
-        PLAYGROUND,
+        MECHANICS_PLAYGROUND,
+        TESTING_PLAYGROUND,
     }
 }
 

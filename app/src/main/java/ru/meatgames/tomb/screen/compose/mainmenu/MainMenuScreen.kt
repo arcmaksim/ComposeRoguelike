@@ -22,9 +22,10 @@ import ru.meatgames.tomb.design.h1TextStyle
 @Composable
 private fun MainMenuScreenPreview() {
     MainMenuScreenContent(
-        onNewGame = { Unit },
-        onPlayground = { Unit },
-        onCloseApp = { Unit },
+        onNewGameSelected = { Unit },
+        onMechanicsPlaygroundSelected = { Unit },
+        onTestingPlaygroundSelected = { Unit },
+        onCloseAppRequested = { Unit },
     )
 }
 
@@ -45,17 +46,19 @@ fun MainMenuScreen(
     }
     
     MainMenuScreenContent(
-        onNewGame = viewModel::launchNewGame,
-        onPlayground = viewModel::lunchPlayground,
-        onCloseApp = viewModel::exitGame,
+        onNewGameSelected = viewModel::launchNewGame,
+        onMechanicsPlaygroundSelected = viewModel::lunchMechanicsPlayground,
+        onTestingPlaygroundSelected = viewModel::lunchTestingPlayground,
+        onCloseAppRequested = viewModel::exitGame,
     )
 }
 
 @Composable
 private fun MainMenuScreenContent(
-    onNewGame: () -> Unit,
-    onPlayground: () -> Unit,
-    onCloseApp: () -> Unit,
+    onNewGameSelected: () -> Unit,
+    onMechanicsPlaygroundSelected: () -> Unit,
+    onTestingPlaygroundSelected: () -> Unit,
+    onCloseAppRequested: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -71,9 +74,10 @@ private fun MainMenuScreenContent(
                 modifier = Modifier.padding(16.dp),
             )
             Buttons(
-                onNewGame = onNewGame,
-                onPlayground = onPlayground,
-                onCloseApp = onCloseApp,
+                onNewGameSelected = onNewGameSelected,
+                onMechanicsPlaygroundSelected = onMechanicsPlaygroundSelected,
+                onTestingPlaygroundSelected = onTestingPlaygroundSelected,
+                onCloseAppRequested = onCloseAppRequested,
             )
         }
     }
@@ -92,9 +96,10 @@ private fun Title(
 
 @Composable
 private fun Buttons(
-    onNewGame: () -> Unit,
-    onPlayground: () -> Unit,
-    onCloseApp: () -> Unit,
+    onNewGameSelected: () -> Unit,
+    onMechanicsPlaygroundSelected: () -> Unit,
+    onTestingPlaygroundSelected: () -> Unit,
+    onCloseAppRequested: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -102,15 +107,19 @@ private fun Buttons(
     ) {
         BaseTextButton(
             title = "New game",
-            onClick = onNewGame,
+            onClick = onNewGameSelected,
         )
         BaseTextButton(
-            title = "Playground",
-            onClick = onPlayground,
+            title = "Mechanics playground",
+            onClick = onMechanicsPlaygroundSelected,
+        )
+        BaseTextButton(
+            title = "Testing playground",
+            onClick = onTestingPlaygroundSelected,
         )
         BaseTextButton(
             title = "Exit",
-            onClick = onCloseApp,
+            onClick = onCloseAppRequested,
         )
     }
 }

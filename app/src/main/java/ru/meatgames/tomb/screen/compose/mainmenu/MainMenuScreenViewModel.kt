@@ -25,10 +25,17 @@ class MainMenuScreenViewModel @Inject constructor(
         }
         _events.trySend(Event.NewGame)
     }
-    
-    fun lunchPlayground() {
+
+    fun lunchMechanicsPlayground() {
         viewModelScope.launch {
-            gameController.generateNewMap(MapCreator.MapType.PLAYGROUND)
+            gameController.generateNewMap(MapCreator.MapType.MECHANICS_PLAYGROUND)
+        }
+        _events.trySend(Event.NewGame)
+    }
+    
+    fun lunchTestingPlayground() {
+        viewModelScope.launch {
+            gameController.generateNewMap(MapCreator.MapType.TESTING_PLAYGROUND)
         }
         _events.trySend(Event.NewGame)
     }
