@@ -57,12 +57,13 @@ class MechanicsPlaygroundMapGenerator @Inject constructor(
                     updateSingleTile(
                         x = x,
                         y = y,
-                    ) {
-                        copy(
-                            floorEntityTile = FloorEntityTile.Floor,
-                            objectEntityTile = ObjectEntityTile.Wall,
-                        )
-                    }
+                        update = {
+                            copy(
+                                floorEntityTile = FloorEntityTile.Floor,
+                                objectEntityTile = ObjectEntityTile.Wall,
+                            )
+                        },
+                    )
                 }
             }
         }
@@ -82,12 +83,13 @@ class MechanicsPlaygroundMapGenerator @Inject constructor(
                 updateSingleTile(
                     x = x + xOffset,
                     y = y + yOffset,
-                ) {
-                    copy(
-                        floorEntityTile = room.floor[i].toFloorEntity(),
-                        objectEntityTile = room.objects[i].toObjectEntity(),
-                    )
-                }
+                    update = {
+                        copy(
+                            floorEntityTile = room.floor[i].toFloorEntity(),
+                            objectEntityTile = room.objects[i].toObjectEntity(),
+                        )
+                    },
+                )
             }
         }
         

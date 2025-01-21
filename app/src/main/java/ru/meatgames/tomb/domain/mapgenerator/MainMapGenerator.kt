@@ -91,12 +91,13 @@ class MainMapGenerator @Inject constructor(
                     updateSingleTile(
                         x = x,
                         y = y,
-                    ) {
-                        copy(
-                            floorEntityTile = FloorEntityTile.Floor,
-                            objectEntityTile = ObjectEntityTile.Wall,
-                        )
-                    }
+                        update = {
+                            copy(
+                                floorEntityTile = FloorEntityTile.Floor,
+                                objectEntityTile = ObjectEntityTile.Wall,
+                            )
+                        },
+                    )
                 }
             }
         }
@@ -140,11 +141,12 @@ class MainMapGenerator @Inject constructor(
                 updateSingleTile(
                     x = randomOuterWall.first,
                     y = randomOuterWall.second,
-                ) {
-                    copy(
-                        objectEntityTile = ObjectEntityTile.DoorClosed,
-                    )
-                }
+                    update = {
+                        copy(
+                            objectEntityTile = ObjectEntityTile.DoorClosed,
+                        )
+                    },
+                )
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
                 outerWallsPool.remove(randomOuterWall)
                 break
@@ -216,12 +218,13 @@ class MainMapGenerator @Inject constructor(
                 updateSingleTile(
                     x = x + xOffset,
                     y = y + yOffset,
-                ) {
-                    copy(
-                        floorEntityTile = room.floor[i].toFloorEntity(),
-                        objectEntityTile = room.objects[i].toObjectEntity(),
-                    )
-                }
+                    update = {
+                        copy(
+                            floorEntityTile = room.floor[i].toFloorEntity(),
+                            objectEntityTile = room.objects[i].toObjectEntity(),
+                        )
+                    },
+                )
             }
         }
         
@@ -261,7 +264,7 @@ class MainMapGenerator @Inject constructor(
                 val coordinates = Coordinates(x, y)
                 if (tile.isEmpty && enemiesHolder.getEnemy(coordinates) == null) {
                     enemiesController.placeEnemy(
-                        enemyType = EnemyType.values().random(random),
+                        enemyType = EnemyType.entries.random(random),
                         coordinates = coordinates,
                         levelMap = this,
                     )
@@ -305,11 +308,6 @@ class MainMapGenerator @Inject constructor(
         }
         return true
     }
-    
-    private fun Room.verticallyMirrored(): Room = copy(
-        floor = floor.reversed(),
-        objects = objects.reversed(),
-    )
     
     private fun Room.rotate(
         random: Random = Random,
