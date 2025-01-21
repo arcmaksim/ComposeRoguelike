@@ -18,6 +18,7 @@ import ru.meatgames.tomb.domain.map.MapController
 import ru.meatgames.tomb.domain.map.MapControllerImpl
 import ru.meatgames.tomb.domain.map.MapCreator
 import ru.meatgames.tomb.domain.map.MapTerraformer
+import ru.meatgames.tomb.domain.mapgenerator.MechanicsPlaygroundMapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.MainMapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.PlaygroundMapGenerator
@@ -38,7 +39,8 @@ private const val MAP_VIEWPORT_HEIGHT = 7
 const val MAP_VIEWPORT_HEIGHT_KEY = "MAP_VIEWPORT_HEIGHT"
 
 const val MAIN_MAP_GENERATOR = "MAIN_MAP_GENERATOR"
-const val PLAYGROUND_MAP_GENERATOR = "PLAYGROUND_MAP_GENERATOR"
+const val MECHANICS_PLAYGROUND_MAP_GENERATOR = "MECHANICS_PLAYGROUND_MAP_GENERATOR"
+const val TESTING_PLAYGROUND_MAP_GENERATOR = "TESTING_PLAYGROUND_MAP_GENERATOR"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -90,9 +92,15 @@ interface SingletonModule {
     fun mainMapGenerator(
         impl: MainMapGenerator,
     ): MapGenerator
+
+    @Binds
+    @Named(MECHANICS_PLAYGROUND_MAP_GENERATOR)
+    fun mechanicsPlaygroundMapGenerator(
+        impl: MechanicsPlaygroundMapGenerator,
+    ): MapGenerator
     
     @Binds
-    @Named(PLAYGROUND_MAP_GENERATOR)
+    @Named(TESTING_PLAYGROUND_MAP_GENERATOR)
     fun playgroundMapGenerator(
         impl: PlaygroundMapGenerator,
     ): MapGenerator
