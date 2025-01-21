@@ -9,6 +9,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 const val BUFFER_SIZE_MODIFIER: Int = 1
+private const val BUFFER_AMOUNT: Int = 2
+private const val DEFAULT_OFFSET = Int.MAX_VALUE
 
 class BufferHolder(
     viewportWidth: Int,
@@ -23,23 +25,62 @@ class BufferHolder(
 
     private val size: Int = width * height
 
-    var horizontalOffset: Int = 0
-    var verticalOffset: Int = 0
+    var horizontalOffset: Int = DEFAULT_OFFSET
+        private set
+    var verticalOffset: Int = DEFAULT_OFFSET
+        private set
     val offset: Coordinates
         get() = horizontalOffset to verticalOffset
+
+    var horizontalMotion: Int = 0
+        private set
+    var verticalMotion: Int = 0
+        private set
+
+    private var bufferCounter: Int = 0
+    private val bufferIndex: Int
+        get() = bufferCounter % BUFFER_AMOUNT
 
     val mapBuffer: Array<MapTile?> = Array(size) { null }
     val visibilityBuffer: BooleanArray = BooleanArray(size) { false }
     val floorRenderingBuffer: Array<FloorRenderTile?> = Array(size) { null }
     val objectRenderingBuffer: Array<ObjectRenderTile?> = Array(size) { null }
-    val resultRenderingBuffer: Array<MapRenderTile> = Array(size) { MapRenderTile.Empty }
+    private val _resultRenderingBuffer: Array<Array<MapRenderTile>> =
+        Array(BUFFER_AMOUNT) { Array(size) { MapRenderTile.Empty } }
 
-    fun clear() {
+    val resultRenderingBuffer: Array<MapRenderTile>
+        get() = _resultRenderingBuffer[bufferIndex]
+
+    fun refresh(
+        horizontalOffset: Int,
+        verticalOffset: Int,
+    ) {
+        if (this.horizontalOffset != DEFAULT_OFFSET && this.verticalOffset != DEFAULT_OFFSET) {
+            horizontalMotion = horizontalOffset - this.horizontalOffset
+            verticalMotion = verticalOffset - this.verticalOffset
+        }
+
+        this.horizontalOffset = horizontalOffset
+        this.verticalOffset = verticalOffset
+
+        bufferCounter++
+
         mapBuffer.fill(null)
         visibilityBuffer.fill(true)
         floorRenderingBuffer.fill(null)
         objectRenderingBuffer.fill(null)
         resultRenderingBuffer.fill(MapRenderTile.Empty)
+    }
+
+    fun replaceWithPreviousResultRenderingBuffer(
+        index: Int,
+    ) {
+        val adjustedIndex = index + horizontalMotion + verticalMotion * width
+        _resultRenderingBuffer[(bufferIndex + 1) % BUFFER_AMOUNT]
+            .getOrNull(adjustedIndex)
+            ?.let {
+                resultRenderingBuffer[index] = it
+            }
     }
 
 }
@@ -60,7 +101,7 @@ class BufferHolderFactory @Inject constructor() {
         viewportHeight: Int,
     ): BufferHolder {
         return _cachedBufferHolder
-            ?.takeIf { viewportWidth + BUFFER_SIZE_MODIFIER == it.width && viewportHeight + BUFFER_SIZE_MODIFIER == it.height }
+            ?.takeIf { viewportWidth + BUFFER_SIZE_MODIFIER * 2 == it.width && viewportHeight + BUFFER_SIZE_MODIFIER * 2 == it.height }
             ?: let { BufferHolder(viewportWidth, viewportHeight).also { _cachedBufferHolder = it } }
     }
 

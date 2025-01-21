@@ -81,10 +81,10 @@ internal fun GameScreenEnemies(
                 ?.enemyId
                 ?.let { index to mapRenderTile }
         }.forEach { (index, renderTile) ->
-            val tileScreenSpaceCoordinates = (index % tilesWidth - tilesPadding) to (index / tilesWidth - tilesPadding)
+            val tileScreenSpaceCoordinates = (index % tilesWidth) to (index / tilesWidth)
             val tileOffset = IntOffset(
-                tileScreenSpaceCoordinates.first * tileDimension,
-                tileScreenSpaceCoordinates.second * tileDimension,
+                (tileScreenSpaceCoordinates.first - tilesPadding) * tileDimension,
+                (tileScreenSpaceCoordinates.second - tilesPadding) * tileDimension,
             )
             
             val enemyId = renderTile.enemyData!!.enemyId
@@ -100,9 +100,9 @@ internal fun GameScreenEnemies(
             
             when {
                 animationAlpha != null -> animationAlpha
-                renderTile.isVisible && tilesToReveal.contains(tileScreenSpaceCoordinates) -> revealedTilesAlpha
-                renderTile.isVisible -> 1f
+                tilesToReveal.contains(tileScreenSpaceCoordinates) -> revealedTilesAlpha
                 tilesToFade.contains(tileScreenSpaceCoordinates) -> fadedTilesAlpha
+                renderTile.isVisible -> 1f
                 else -> null
             }?.let { alpha ->
                 drawCharacter(
