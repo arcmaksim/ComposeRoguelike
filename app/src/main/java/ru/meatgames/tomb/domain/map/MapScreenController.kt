@@ -262,6 +262,13 @@ class MapScreenController @Inject constructor(
         bufferHolder: BufferHolder,
     ): EnemiesAnimations = map { result ->
         when (result) {
+            is EnemyTurnResult.Alert -> {
+                result.enemyId to EnemyAnimation.Icon(
+                    renderData = themeAssets.getIconRenderData(Icon.Alert),
+                    durationModifier = 2f,
+                )
+            }
+
             is EnemyTurnResult.Move -> {
                 val currentScreenSpacePosition = result.position - bufferHolder.offset
                 val currentScreenSpaceIndex =

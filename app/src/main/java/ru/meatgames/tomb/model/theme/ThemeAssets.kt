@@ -12,6 +12,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import ru.meatgames.tomb.config.FeatureToggles
+import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.enemy.Enemy
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.model.tile.domain.FloorRenderTile
@@ -43,6 +44,7 @@ class ThemeAssets @Inject constructor(
     
     private val gismo: ImageBitmap
     private val clock: ImageBitmap
+    private val alert: ImageBitmap
     private val heroTileset: ImageBitmap
     private val enemiesTileset: ImageBitmap
     private val shadowsTileset: ImageBitmap
@@ -55,6 +57,7 @@ class ThemeAssets @Inject constructor(
         
         gismo = context.getBitmapFromAsset("bag").asImageBitmap()
         clock = context.getBitmapFromAsset("clock").asImageBitmap()
+        alert = context.getBitmapFromAsset("alert").asImageBitmap()
         heroTileset = context.getBitmapFromAsset("character_animation_sheet").asImageBitmap()
         enemiesTileset = context.getBitmapFromAsset("enemies").asImageBitmap()
         shadowsTileset = context.getBitmapFromAsset("shadows").asImageBitmap()
@@ -241,7 +244,7 @@ class ThemeAssets @Inject constructor(
             ),
             shadowRenderData = enemy.type.getEnemyShadowRenderData(),
             shadowHorizontalOffset = enemy.type.getShadowHorizontalOffset(),
-            healthRatio = enemy.health.ratio,
+            healthRatio = enemy.getComponent<HealthComponent>().ratio,
             enemyId = enemy.id,
         )
     }
@@ -266,12 +269,18 @@ class ThemeAssets @Inject constructor(
     fun getIconRenderData(
         icon: Icon,
     ): RenderData = when (icon) {
-        Icon.Clock -> RenderData(
-            asset = clock,
-            offset = IntOffset(0, 0),
-            size = IntSize(clock.width, clock.height),
-        )
+        Icon.Clock -> clock.toIconRenderData(sizeModifier = .5f)
+        Icon.Alert -> alert.toIconRenderData()
     }
+
+    private fun ImageBitmap.toIconRenderData(
+        sizeModifier: Float = 1f,
+    ): RenderData = RenderData(
+        asset = this,
+        offset = IntOffset(0, 0),
+        size = IntSize(width, height),
+        sizeModifier = sizeModifier,
+    )
     
     fun resolveBottomShadow(): RenderData = RenderData(
         asset = shadowsTileset,

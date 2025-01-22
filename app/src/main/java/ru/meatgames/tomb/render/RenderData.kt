@@ -9,6 +9,7 @@ data class RenderData(
     val asset: ImageBitmap,
     val offset: IntOffset,
     val size: IntSize,
+    val sizeModifier: Float = 1f,
 )
 
 data class AnimationRenderData(
