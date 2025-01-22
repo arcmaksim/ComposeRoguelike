@@ -17,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,7 +31,13 @@ import ru.meatgames.tomb.design.h3TextStyle
 @Composable
 fun FeatureToggleScreenPreview() {
     FeatureToggleScreenContent(
-        featureToggles = emptyList(),
+        featureToggles = listOf(
+            FeatureToggleState(
+                key = FeatureToggle.UndyingCharacter,
+                title = "Game over screen won't be triggered asdasd",
+                value = false,
+            ),
+        ),
         onFeatureToggleUpdate = { _, _ -> Unit },
         onBack = { Unit },
     )
@@ -102,11 +109,11 @@ private fun FeatureToggle(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
+            modifier = Modifier.weight(1f),
             text = featureToggle.title,
             style = h3TextStyle,
+            textAlign = TextAlign.Start,
         )
-        
-        Spacer(modifier = Modifier.weight(1f))
         
         Switch(
             checked = featureToggle.value,
