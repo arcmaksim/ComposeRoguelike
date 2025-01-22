@@ -8,7 +8,7 @@ import kotlin.math.abs
 data class PositionComponent(
     val x: Int,
     val y: Int,
-) {
+) : Component {
     
     operator fun plus(
         increment: Offset,
