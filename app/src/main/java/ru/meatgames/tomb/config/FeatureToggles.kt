@@ -33,6 +33,11 @@ object FeatureToggles {
                 title = "Enable input queue",
                 value = true,
             ),
+            FeatureToggleState(
+                key = FeatureToggle.UndyingCharacter,
+                title = "Game over screen won't be triggered asdasdasd",
+                value = false,
+            ),
         )
     )
     val state: StateFlow<List<FeatureToggleState>> = _state
