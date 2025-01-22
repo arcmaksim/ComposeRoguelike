@@ -19,6 +19,7 @@ import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.screen.compose.WinScreen
 import ru.meatgames.tomb.screen.compose.charactersheet.CharacterSheetScreen
 import ru.meatgames.tomb.screen.compose.featuretoggle.FeatureToggleScreen
+import ru.meatgames.tomb.screen.compose.game.DeathScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
 import ru.meatgames.tomb.screen.compose.game.container.ContainerDialog
 import ru.meatgames.tomb.screen.compose.game.dialog.GameScreenDialog
@@ -56,7 +57,10 @@ fun TombApp(
             .background(Color(0xFF212121))
             .displayCutoutPadding(),
     ) {
-        NavHost(navController = navController, startDestination = GameState.MainMenu.id) {
+        NavHost(
+            navController = navController,
+            startDestination = GameState.MainMenu.id,
+        ) {
             composable(GameState.MainMenu.id) {
                 MainMenuScreen(
                     onNewGame = {
@@ -71,6 +75,11 @@ fun TombApp(
                 GameScreen(
                     onWin = {
                         navController.navigate(GameState.WinScreen.id) {
+                            popUpToTop(navController)
+                        }
+                    },
+                    onDeath = {
+                        navController.navigate(GameState.DeathScreen.id) {
                             popUpToTop(navController)
                         }
                     },
@@ -90,6 +99,15 @@ fun TombApp(
             }
             composable(GameState.WinScreen.id) {
                 WinScreen(
+                    onNavigateToMainMenu = {
+                        navController.navigate(GameState.MainMenu.id) {
+                            popUpToTop(navController)
+                        }
+                    },
+                )
+            }
+            composable(GameState.DeathScreen.id) {
+                DeathScreen(
                     onNavigateToMainMenu = {
                         navController.navigate(GameState.MainMenu.id) {
                             popUpToTop(navController)

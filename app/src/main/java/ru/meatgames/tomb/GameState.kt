@@ -4,8 +4,8 @@ enum class GameState(val id: String) {
     MainMenu("mainMenu"),
     MainGame("mainGame"),
     WinScreen("winScreen"),
-    Stub("stub"),
-    
+    DeathScreen("deathScreen"),
+
     GameScreenDialog("GameScreenDialog"),
     ContainerDialog("ContainerDialog/{itemContainerId}"),
     FeatureToggles("FeatureToggles"),

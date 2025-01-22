@@ -9,6 +9,7 @@ import ru.meatgames.tomb.domain.player.PlayerAnimation
 
 enum class GameScreenEvent {
     NavigateToWinScreen,
+    NavigateToDeathScreen,
     NavigateToInventory,
     NavigateToCharacterSheet,
 }

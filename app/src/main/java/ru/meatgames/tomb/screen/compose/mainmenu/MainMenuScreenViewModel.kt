@@ -19,25 +19,19 @@ class MainMenuScreenViewModel @Inject constructor(
     private val _events = Channel<Event?>()
     val events: Flow<Event?> = _events.receiveAsFlow()
     
-    fun launchNewGame() {
-        viewModelScope.launch {
-            gameController.generateNewMap(MapCreator.MapType.MAIN)
-        }
-        _events.trySend(Event.NewGame)
-    }
+    fun launchNewGame() = newGame(MapCreator.MapType.MAIN)
 
-    fun lunchMechanicsPlayground() {
+    fun lunchMechanicsPlayground() = newGame(MapCreator.MapType.MECHANICS_PLAYGROUND)
+
+    fun lunchTestingPlayground() = newGame(MapCreator.MapType.TESTING_PLAYGROUND)
+
+    private fun newGame(
+        mapType: MapCreator.MapType,
+    ) {
         viewModelScope.launch {
-            gameController.generateNewMap(MapCreator.MapType.MECHANICS_PLAYGROUND)
+            gameController.startNewGame(mapType)
+            _events.send(Event.NewGame)
         }
-        _events.trySend(Event.NewGame)
-    }
-    
-    fun lunchTestingPlayground() {
-        viewModelScope.launch {
-            gameController.generateNewMap(MapCreator.MapType.TESTING_PLAYGROUND)
-        }
-        _events.trySend(Event.NewGame)
     }
     
     fun exitGame() {

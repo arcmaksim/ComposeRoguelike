@@ -14,6 +14,7 @@ import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
 internal fun GameScreen(
     viewModel: GameScreenViewModel = hiltViewModel(),
     onWin: () -> Unit,
+    onDeath: () -> Unit,
     onInventory: () -> Unit,
     onCharacterSheet: () -> Unit,
 ) {
@@ -21,6 +22,7 @@ internal fun GameScreen(
         viewModel.events.collect { event ->
             when (event) {
                 GameScreenEvent.NavigateToWinScreen -> onWin()
+                GameScreenEvent.NavigateToDeathScreen -> onDeath()
                 GameScreenEvent.NavigateToInventory -> onInventory()
                 GameScreenEvent.NavigateToCharacterSheet -> onCharacterSheet()
                 else -> Unit

@@ -28,6 +28,7 @@ import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenCharacterAnimations
 import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.map.MapScreenState
+import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import javax.inject.Inject
@@ -35,6 +36,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
     mapScreenController: MapScreenController,
+    characterController: CharacterController,
     private val gameController: GameController,
     private val playerInputProcessor: PlayerInputProcessor,
 ) : ViewModel(), GameScreenNavigator, GameScreenInteractionController {
@@ -98,6 +100,16 @@ class GameScreenViewModel @Inject constructor(
             .filter { it }
             .mapNotNull { queuedInput?.also { queuedInput = null } }
             .onEach(::processCharacterMoveInput)
+            .launchIn(viewModelScope)
+
+        characterController
+            .characterStateFlow
+            .filter {
+                it.health.isDepleted && !FeatureToggles.getToggleValue(FeatureToggle.UndyingCharacter)
+            }
+            .onEach {
+                _events.trySend(GameScreenEvent.NavigateToDeathScreen)
+            }
             .launchIn(viewModelScope)
     }
     

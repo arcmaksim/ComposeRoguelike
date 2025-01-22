@@ -62,6 +62,7 @@ class CharacterController @Inject constructor() {
             )
         }
     }
+
     fun modifyHealth(
         modifier: Int,
     ) {
