@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -125,10 +126,10 @@ internal fun GameScreenMapContainer(
     
     // Reveal offsets
     val revealedTilesAlpha = remember(playerAnimation) {
-        mutableStateOf(if (animationUpdatesScreenSpaceTiles) 0f else 1f)
+        mutableFloatStateOf(if (animationUpdatesScreenSpaceTiles) 0f else 1f)
     }
     val fadedTilesAlpha = remember(playerAnimation) {
-        mutableStateOf(if (animationUpdatesScreenSpaceTiles) 1f else 0f)
+        mutableFloatStateOf(if (animationUpdatesScreenSpaceTiles) 1f else 0f)
     }
     
     // Pose animation

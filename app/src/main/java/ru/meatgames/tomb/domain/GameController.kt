@@ -2,17 +2,11 @@ package ru.meatgames.tomb.domain
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import ru.meatgames.tomb.domain.component.asDirections
-import ru.meatgames.tomb.domain.component.calculateVectorTo
-import ru.meatgames.tomb.domain.component.isNextTo
-import ru.meatgames.tomb.domain.component.toCoordinates
-import ru.meatgames.tomb.domain.enemy.EnemiesController
+import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
-import ru.meatgames.tomb.domain.enemy.Enemy
-import ru.meatgames.tomb.domain.map.MapController
+import ru.meatgames.tomb.domain.enemy.EnemiesManager
 import ru.meatgames.tomb.domain.map.MapCreator
 import ru.meatgames.tomb.domain.player.CharacterController
-import ru.meatgames.tomb.domain.player.CharacterState
 import ru.meatgames.tomb.domain.player.PlayerMapInteractionResolver
 import ru.meatgames.tomb.domain.turn.CharactersTurnScheduler
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
@@ -21,8 +15,6 @@ import ru.meatgames.tomb.domain.turn.finishesPlayerTurn
 import ru.meatgames.tomb.domain.turn.hasAnimation
 import ru.meatgames.tomb.logErrorWithTag
 import ru.meatgames.tomb.logMessage
-import ru.meatgames.tomb.model.theme.TilesController
-import ru.meatgames.tomb.resolvedOffset
 import java.util.Queue
 import java.util.concurrent.LinkedTransferQueue
 import javax.inject.Inject
@@ -66,11 +58,9 @@ interface GameController {
 @Singleton
 class GameControllerImpl @Inject constructor(
     private val mapCreator: MapCreator,
-    private val mapController: MapController,
-    private val tilesController: TilesController,
     private val characterController: CharacterController,
     private val enemiesHolder: EnemiesHolder,
-    private val enemiesController: EnemiesController,
+    private val enemiesManager: EnemiesManager,
     private val charactersTurnScheduler: CharactersTurnScheduler,
     private val mapInteractionResolver: PlayerMapInteractionResolver,
 ) : GameController {
@@ -98,7 +88,7 @@ class GameControllerImpl @Inject constructor(
             coordinates = configuration.startCoordinates,
         )
         calcTurnQueue(true)
-        runEnemiesTurns()
+        skipToPlayerTurn()
     }
     
     private fun calcTurnQueue(
@@ -114,51 +104,6 @@ class GameControllerImpl @Inject constructor(
             else -> currentTurnQueue.addAll(list)
         }
     }
-    
-    private fun Enemy.takeTurn(
-        player: CharacterState,
-    ): EnemyTurnResult {
-        val vectorToPlayer = position.calculateVectorTo(player.position)
-        
-        if (vectorToPlayer.isNextTo()) {
-            val damage = 1
-            attackPlayer(damage)
-            
-            return EnemyTurnResult.Attack(
-                position = position.toCoordinates(),
-                enemyId = id,
-                direction = vectorToPlayer.asDirections().first(),
-                amount = damage,
-            )
-        }
-        
-        val directionsToPlayer = vectorToPlayer.asDirections()
-        
-        directionsToPlayer.forEach { direction ->
-            val newPosition = (position + direction.resolvedOffset).toCoordinates()
-            mapController.getTile(newPosition)?.let { tile ->
-                val tileInteraction = tile.objectEntityTile
-                    ?.let(tilesController::hasObjectEntityNoInteraction)
-                    ?: true
-                if (tileInteraction && enemiesController.moveEnemy(id, direction)) {
-                    return EnemyTurnResult.Move(
-                        position = position.toCoordinates(),
-                        enemyId = id,
-                        direction = direction,
-                    )
-                }
-            }
-        }
-        
-        return EnemyTurnResult.SkipTurn(
-            enemyId = id,
-            position = position.toCoordinates(),
-        )
-    }
-    
-    private fun Enemy.attackPlayer(
-        damage: Int,
-    ) = characterController.modifyHealth(-damage)
     
     override suspend fun blockPlayerTurn() {
         if (_state.value !is GameState.WaitingForInput) {
@@ -209,15 +154,32 @@ class GameControllerImpl @Inject constructor(
     }
     
     override suspend fun startEnemiesTurn() = runEnemiesTurns()
-    
+
+    private suspend fun skipToPlayerTurn() {
+        if (currentTurnQueue.isEmpty()) calcTurnQueue(false)
+
+        while (currentTurnQueue.isNotEmpty()) {
+            val element = currentTurnQueue.poll()
+
+            if (element !is CharactersTurnScheduler.InitiativePosition.Enemy) {
+                logMessage("TURN", "Player turn! ${characterController.characterStateFlow.value.position}")
+                break
+            }
+
+            continue
+        }
+
+        _state.emit(GameState.WaitingForInput)
+    }
+
     private suspend fun runEnemiesTurns() {
         _state.emit(GameState.ProcessingEnemies)
         
-        if (currentTurnQueue.size == 0) calcTurnQueue(false)
+        if (currentTurnQueue.isEmpty()) calcTurnQueue(false)
         
         val results = mutableListOf<EnemyTurnResult>()
         
-        while (currentTurnQueue.size != 0) {
+        while (currentTurnQueue.isNotEmpty()) {
             val element = currentTurnQueue.poll()
             
             if (element !is CharactersTurnScheduler.InitiativePosition.Enemy) {
@@ -226,8 +188,8 @@ class GameControllerImpl @Inject constructor(
             }
             
             val enemy = enemiesHolder.getEnemy(element.enemyId) ?: continue
-            logMessage("TURN", "${enemy.type} at ${enemy.position}")
-            enemy.takeTurn(characterController.characterStateFlow.value).let(results::add)
+            logMessage("TURN", "${enemy.type} at ${enemy.getComponent<PositionComponent>()}")
+            enemiesManager.takeTurn(enemy).let(results::add)
         }
         
         calcTurnQueue(false)
