@@ -33,7 +33,7 @@ fun FeatureToggleScreenPreview() {
         featureToggles = listOf(
             FeatureToggleState(
                 key = FeatureToggle.UndyingCharacter,
-                title = "Game over screen won't be triggered asdasd",
+                title = "Game over screen won't be triggered",
                 value = false,
             ),
         ),
