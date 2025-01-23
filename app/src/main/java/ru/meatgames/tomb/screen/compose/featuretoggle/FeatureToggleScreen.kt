@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,17 +45,7 @@ fun FeatureToggleScreenPreview() {
 @Composable
 fun FeatureToggleScreen(
     viewModel: FeatureToggleScreenVM = hiltViewModel(),
-    onBack: () -> Unit,
 ) {
-    LaunchedEffect(viewModel) {
-        viewModel.events.collect { event ->
-            when (event) {
-                FeatureToggleScreenEvent.Back -> onBack()
-                else -> Unit
-            }
-        }
-    }
-    
     val featureToggles by viewModel.state.collectAsStateWithLifecycle()
     
     FeatureToggleScreenContent(

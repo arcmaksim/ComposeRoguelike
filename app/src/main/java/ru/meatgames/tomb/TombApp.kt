@@ -103,29 +103,16 @@ fun TombApp(
                 )
             }
             composable(Scene.Inventory.id) {
-                InventoryScreen(
-                    onBack = navController::navigateUp,
-                )
+                InventoryScreen()
             }
             composable(Scene.Stats.id) {
-                CharacterSheetScreen(
-                    onBack = navController::navigateUp,
-                )
+                CharacterSheetScreen()
             }
             composable(Scene.FeatureToggles.id) {
-                FeatureToggleScreen(
-                    onBack = navController::navigateUp,
-                )
+                FeatureToggleScreen()
             }
             dialog(Scene.GameScreenDialog.id) {
                 GameScreenDialog(
-                    onFeatureToggles = {
-                        navController.navigateTo(
-                            rootVM = viewModel,
-                            state = Scene.FeatureToggles,
-                        )
-                    },
-                    closeDialog = navController::navigateUp,
                     closeGame = {
                         viewModel.closeDialog()
                         onCloseApp()
@@ -137,7 +124,6 @@ fun TombApp(
                     itemContainerId = ItemContainerId(
                         UUID.fromString(it.arguments!!.getString("itemContainerId")!!),
                     ),
-                    closeDialog = navController::navigateUp,
                 )
             }
         }
