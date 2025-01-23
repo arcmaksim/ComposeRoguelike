@@ -9,10 +9,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RootVM @Inject constructor(
+    scenesNavigator: ScenesNavigator,
     private val gameController: GameController,
 ) : ViewModel() {
     
     val dialogState = gameController.dialogState
+    val scenes = scenesNavigator.scene
     
     fun finishCurrentAnimations() {
         viewModelScope.launch {

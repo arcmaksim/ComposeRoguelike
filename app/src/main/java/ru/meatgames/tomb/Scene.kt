@@ -1,6 +1,6 @@
 package ru.meatgames.tomb
 
-enum class GameState(val id: String) {
+enum class Scene(val id: String) {
     MainMenu("mainMenu"),
     MainGame("mainGame"),
     WinScreen("winScreen"),

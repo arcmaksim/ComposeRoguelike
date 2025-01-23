@@ -14,6 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.screen.compose.WinScreen
@@ -34,21 +36,28 @@ fun TombApp(
     onCloseApp: () -> Unit,
 ) {
     val navController = rememberNavController()
-    
+
     LaunchedEffect(viewModel) {
-        viewModel.dialogState.collect { dialogState ->
+        viewModel.dialogState.onEach { dialogState ->
             when (dialogState) {
                 is DialogState.Container -> {
                     navController.safeNavigate("ContainerDialog/${dialogState.itemContainerId.id}")
                 }
                 
                 is DialogState.GameMenu -> {
-                    navController.safeNavigate(GameState.GameScreenDialog.id)
+                    navController.safeNavigate(Scene.GameScreenDialog.id)
                 }
                 
                 else -> Unit
             }
-        }
+        }.launchIn(this)
+
+        viewModel.scenes.onEach {
+            viewModel.finishCurrentAnimations()
+            navController.navigate(it.scene.id) {
+                if (it.popUpToTop) popUpToTop(navController)
+            }
+        }.launchIn(this)
     }
     
     Box(
@@ -59,83 +68,78 @@ fun TombApp(
     ) {
         NavHost(
             navController = navController,
-            startDestination = GameState.MainMenu.id,
+            startDestination = Scene.MainMenu.id,
         ) {
-            composable(GameState.MainMenu.id) {
+            composable(Scene.MainMenu.id) {
                 MainMenuScreen(
-                    onNewGame = {
-                        navController.navigate(GameState.MainGame.id) {
-                            popUpToTop(navController)
-                        }
-                    },
                     onCloseApp = onCloseApp,
                 )
             }
-            composable(GameState.MainGame.id) {
+            composable(Scene.MainGame.id) {
                 GameScreen(
                     onWin = {
-                        navController.navigate(GameState.WinScreen.id) {
+                        navController.navigate(Scene.WinScreen.id) {
                             popUpToTop(navController)
                         }
                     },
                     onDeath = {
-                        navController.navigate(GameState.DeathScreen.id) {
+                        navController.navigate(Scene.DeathScreen.id) {
                             popUpToTop(navController)
                         }
                     },
                     onInventory = {
                         navController.navigateTo(
                             rootVM = viewModel,
-                            state = GameState.Inventory,
+                            state = Scene.Inventory,
                         )
                     },
                     onCharacterSheet = {
                         navController.navigateTo(
                             rootVM = viewModel,
-                            state = GameState.Stats,
+                            state = Scene.Stats,
                         )
                     },
                 )
             }
-            composable(GameState.WinScreen.id) {
+            composable(Scene.WinScreen.id) {
                 WinScreen(
                     onNavigateToMainMenu = {
-                        navController.navigate(GameState.MainMenu.id) {
+                        navController.navigate(Scene.MainMenu.id) {
                             popUpToTop(navController)
                         }
                     },
                 )
             }
-            composable(GameState.DeathScreen.id) {
+            composable(Scene.DeathScreen.id) {
                 DeathScreen(
                     onNavigateToMainMenu = {
-                        navController.navigate(GameState.MainMenu.id) {
+                        navController.navigate(Scene.MainMenu.id) {
                             popUpToTop(navController)
                         }
                     },
                 )
             }
-            composable(GameState.Inventory.id) {
+            composable(Scene.Inventory.id) {
                 InventoryScreen(
                     onBack = navController::navigateUp,
                 )
             }
-            composable(GameState.Stats.id) {
+            composable(Scene.Stats.id) {
                 CharacterSheetScreen(
                     onBack = navController::navigateUp,
                 )
             }
-            composable(GameState.FeatureToggles.id) {
+            composable(Scene.FeatureToggles.id) {
                 FeatureToggleScreen(
                     onBack = navController::navigateUp,
                 )
             }
-            dialog(GameState.GameScreenDialog.id) {
+            dialog(Scene.GameScreenDialog.id) {
                 GameScreenDialog(
                     onFeatureToggles = {
                         navController.navigateTo(
                             rootVM = viewModel,
-                            state = GameState.FeatureToggles,
+                            state = Scene.FeatureToggles,
                         )
                     },
                     closeDialog = navController::navigateUp,
@@ -145,7 +149,7 @@ fun TombApp(
                     },
                 )
             }
-            dialog(GameState.ContainerDialog.id) {
+            dialog(Scene.ContainerDialog.id) {
                 ContainerDialog(
                     itemContainerId = ItemContainerId(
                         UUID.fromString(it.arguments!!.getString("itemContainerId")!!),
@@ -159,7 +163,7 @@ fun TombApp(
 
 private fun NavController.navigateTo(
     rootVM: RootVM,
-    state: GameState,
+    state: Scene,
 ) {
     rootVM.finishCurrentAnimations()
     navigate(state.id)

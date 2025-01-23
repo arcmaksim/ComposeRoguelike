@@ -7,13 +7,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import ru.meatgames.tomb.Scene
+import ru.meatgames.tomb.ScenesNavigator
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.map.MapCreator
+import ru.meatgames.tomb.toSceneNavigationCommand
 import javax.inject.Inject
 
 @HiltViewModel
 class MainMenuScreenViewModel @Inject constructor(
     private val gameController: GameController,
+    private val scenesNavigator: ScenesNavigator,
 ) : ViewModel() {
     
     private val _events = Channel<Event?>()
@@ -30,7 +34,7 @@ class MainMenuScreenViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             gameController.startNewGame(mapType)
-            _events.send(Event.NewGame)
+            scenesNavigator.navigateTo(Scene.MainGame.toSceneNavigationCommand())
         }
     }
     
@@ -39,7 +43,6 @@ class MainMenuScreenViewModel @Inject constructor(
     }
     
     enum class Event {
-        NewGame,
         Exit,
     }
 

@@ -32,14 +32,12 @@ private fun MainMenuScreenPreview() {
 @Composable
 fun MainMenuScreen(
     viewModel: MainMenuScreenViewModel = hiltViewModel(),
-    onNewGame: () -> Unit,
     onCloseApp: () -> Unit,
 ) {
     LaunchedEffect(viewModel) {
         viewModel.events.collect { event ->
             event ?: return@collect
             when (event) {
-                MainMenuScreenViewModel.Event.NewGame -> onNewGame()
                 MainMenuScreenViewModel.Event.Exit -> onCloseApp()
             }
         }
