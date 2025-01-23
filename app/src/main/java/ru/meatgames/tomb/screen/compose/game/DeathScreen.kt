@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import ru.meatgames.tomb.design.component.BaseTextButton
 import ru.meatgames.tomb.design.h1TextStyle
 
-@Preview(widthDp = 360, heightDp = 640,)
+@Preview(widthDp = 360, heightDp = 640)
 @Composable
 fun DeathScreenPreview() {
     DeathScreen { Unit }

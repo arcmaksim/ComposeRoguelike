@@ -14,7 +14,7 @@ class RootVM @Inject constructor(
 ) : ViewModel() {
     
     val dialogState = gameController.dialogState
-    val scenes = scenesNavigator.scene
+    val navigationCommandFlow = scenesNavigator.commandFlow
     
     fun finishCurrentAnimations() {
         viewModelScope.launch {

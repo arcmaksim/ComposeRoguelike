@@ -52,11 +52,17 @@ fun TombApp(
             }
         }.launchIn(this)
 
-        viewModel.scenes.onEach {
+        viewModel.navigationCommandFlow.onEach {
             viewModel.finishCurrentAnimations()
-            navController.navigate(it.scene.id) {
-                if (it.popUpToTop) popUpToTop(navController)
+            when (it) {
+                is ScenesNavigator.Command.NavigateBack -> navController.popBackStack()
+                is ScenesNavigator.Command.NavigateTo -> {
+                    navController.navigate(it.scene.id) {
+                        if (it.popUpToTop) popUpToTop(navController)
+                    }
+                }
             }
+
         }.launchIn(this)
     }
     

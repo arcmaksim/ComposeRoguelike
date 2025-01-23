@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Scene
 import ru.meatgames.tomb.ScenesNavigator
+import ru.meatgames.tomb.asNavigationToCommand
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.map.MapCreator
-import ru.meatgames.tomb.toSceneNavigationCommand
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,7 +34,7 @@ class MainMenuScreenViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             gameController.startNewGame(mapType)
-            scenesNavigator.navigateTo(Scene.MainGame.toSceneNavigationCommand())
+            scenesNavigator.navigateTo(Scene.MainGame.asNavigationToCommand())
         }
     }
     

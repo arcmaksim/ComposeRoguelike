@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.Scene
 import ru.meatgames.tomb.ScenesNavigator
+import ru.meatgames.tomb.asNavigationToCommand
 import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.domain.DialogState
@@ -30,7 +31,6 @@ import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
-import ru.meatgames.tomb.toSceneNavigationCommand
 import javax.inject.Inject
 
 @HiltViewModel
@@ -106,7 +106,7 @@ class GameScreenViewModel @Inject constructor(
                 it.health.isDepleted && !FeatureToggles.getToggleValue(FeatureToggle.UndyingCharacter)
             }
             .onEach {
-                scenesNavigator.navigateTo(Scene.DeathScreen.toSceneNavigationCommand(true))
+                scenesNavigator.navigateTo(Scene.DeathScreen.asNavigationToCommand(true))
             }
             .launchIn(viewModelScope)
     }
@@ -162,11 +162,11 @@ class GameScreenViewModel @Inject constructor(
     }
     
     override fun navigateToInventory() {
-        scenesNavigator.navigateTo(Scene.Inventory.toSceneNavigationCommand())
+        scenesNavigator.navigateTo(Scene.Inventory.asNavigationToCommand())
     }
     
     override fun navigateToCharacterSheet() {
-        scenesNavigator.navigateTo(Scene.Stats.toSceneNavigationCommand())
+        scenesNavigator.navigateTo(Scene.Stats.asNavigationToCommand())
     }
     
     override fun showDialog() {

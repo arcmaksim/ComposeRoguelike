@@ -1,46 +1,49 @@
 package ru.meatgames.tomb
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import ru.meatgames.tomb.ScenesNavigator.Command
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface ScenesNavigator {
 
-    val scene: StateFlow<SceneNavigationCommand>
+    val commandFlow: Flow<Command>
 
     fun navigateTo(
-        navigationCommand: SceneNavigationCommand,
+        command: Command,
     )
+
+    sealed class Command {
+        data object NavigateBack : Command()
+
+        data class NavigateTo(
+            val scene: Scene,
+            val popUpToTop: Boolean = false,
+        ) : Command()
+    }
 
 }
 
 @Singleton
 class ScenesNavigatorImpl @Inject constructor() : ScenesNavigator {
 
-    private val _scene = MutableStateFlow<SceneNavigationCommand>(
-        SceneNavigationCommand(Scene.MainMenu)
-    )
-    override val scene: StateFlow<SceneNavigationCommand>
-        get() = _scene.asStateFlow()
+    private val _commandFlow = MutableSharedFlow<Command>(extraBufferCapacity = 2)
+    override val commandFlow: Flow<Command>
+        get() = _commandFlow.asSharedFlow()
 
     override fun navigateTo(
-        navigationCommand: SceneNavigationCommand,
+        command: Command,
     ) {
-        _scene.value = navigationCommand
+        _commandFlow.tryEmit(command)
     }
 
 }
 
-data class SceneNavigationCommand(
-    val scene: Scene,
-    val popUpToTop: Boolean = false,
-)
-
-fun Scene.toSceneNavigationCommand(
+fun Scene.asNavigationToCommand(
     asTopMost: Boolean = false,
-): SceneNavigationCommand = SceneNavigationCommand(
+): Command = Command.NavigateTo(
     scene = this,
     popUpToTop = asTopMost,
 )
