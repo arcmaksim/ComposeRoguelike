@@ -18,10 +18,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.item.ItemContainerId
-import ru.meatgames.tomb.screen.compose.WinScreen
+import ru.meatgames.tomb.screen.compose.win.WinScreen
 import ru.meatgames.tomb.screen.compose.charactersheet.CharacterSheetScreen
 import ru.meatgames.tomb.screen.compose.featuretoggle.FeatureToggleScreen
-import ru.meatgames.tomb.screen.compose.game.DeathScreen
+import ru.meatgames.tomb.screen.compose.death.DeathScreen
 import ru.meatgames.tomb.screen.compose.game.GameScreen
 import ru.meatgames.tomb.screen.compose.game.container.ContainerDialog
 import ru.meatgames.tomb.screen.compose.game.dialog.GameScreenDialog
@@ -85,22 +85,10 @@ fun TombApp(
                 GameScreen()
             }
             composable(Scene.WinScreen.id) {
-                WinScreen(
-                    onNavigateToMainMenu = {
-                        navController.navigate(Scene.MainMenu.id) {
-                            popUpToTop(navController)
-                        }
-                    },
-                )
+                WinScreen()
             }
             composable(Scene.DeathScreen.id) {
-                DeathScreen(
-                    onNavigateToMainMenu = {
-                        navController.navigate(Scene.MainMenu.id) {
-                            popUpToTop(navController)
-                        }
-                    },
-                )
+                DeathScreen()
             }
             composable(Scene.Inventory.id) {
                 InventoryScreen()
