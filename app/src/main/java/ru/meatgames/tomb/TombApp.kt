@@ -76,30 +76,7 @@ fun TombApp(
                 )
             }
             composable(Scene.MainGame.id) {
-                GameScreen(
-                    onWin = {
-                        navController.navigate(Scene.WinScreen.id) {
-                            popUpToTop(navController)
-                        }
-                    },
-                    onDeath = {
-                        navController.navigate(Scene.DeathScreen.id) {
-                            popUpToTop(navController)
-                        }
-                    },
-                    onInventory = {
-                        navController.navigateTo(
-                            rootVM = viewModel,
-                            state = Scene.Inventory,
-                        )
-                    },
-                    onCharacterSheet = {
-                        navController.navigateTo(
-                            rootVM = viewModel,
-                            state = Scene.Stats,
-                        )
-                    },
-                )
+                GameScreen()
             }
             composable(Scene.WinScreen.id) {
                 WinScreen(

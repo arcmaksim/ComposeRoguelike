@@ -3,8 +3,6 @@ package ru.meatgames.tomb.screen.compose.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -13,9 +11,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.Scene
+import ru.meatgames.tomb.ScenesNavigator
 import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.domain.DialogState
@@ -31,6 +30,7 @@ import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
+import ru.meatgames.tomb.toSceneNavigationCommand
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,12 +39,10 @@ class GameScreenViewModel @Inject constructor(
     characterController: CharacterController,
     private val gameController: GameController,
     private val playerInputProcessor: PlayerInputProcessor,
+    private val scenesNavigator: ScenesNavigator,
 ) : ViewModel(), GameScreenNavigator, GameScreenInteractionController {
     
     private var queuedInput: Direction? = null
-    
-    private val _events = Channel<GameScreenEvent?>()
-    val events: Flow<GameScreenEvent?> = _events.receiveAsFlow()
     
     private val _state = MutableStateFlow(
         GameScreenState(
@@ -108,7 +106,7 @@ class GameScreenViewModel @Inject constructor(
                 it.health.isDepleted && !FeatureToggles.getToggleValue(FeatureToggle.UndyingCharacter)
             }
             .onEach {
-                _events.trySend(GameScreenEvent.NavigateToDeathScreen)
+                scenesNavigator.navigateTo(Scene.DeathScreen.toSceneNavigationCommand(true))
             }
             .launchIn(viewModelScope)
     }
@@ -164,11 +162,11 @@ class GameScreenViewModel @Inject constructor(
     }
     
     override fun navigateToInventory() {
-        _events.trySend(GameScreenEvent.NavigateToInventory)
+        scenesNavigator.navigateTo(Scene.Inventory.toSceneNavigationCommand())
     }
     
     override fun navigateToCharacterSheet() {
-        _events.trySend(GameScreenEvent.NavigateToCharacterSheet)
+        scenesNavigator.navigateTo(Scene.Stats.toSceneNavigationCommand())
     }
     
     override fun showDialog() {

@@ -1,7 +1,6 @@
 package ru.meatgames.tomb.screen.compose.game
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,23 +12,7 @@ import ru.meatgames.tomb.screen.compose.game.component.GameScreenMapContainer
 @Composable
 internal fun GameScreen(
     viewModel: GameScreenViewModel = hiltViewModel(),
-    onWin: () -> Unit,
-    onDeath: () -> Unit,
-    onInventory: () -> Unit,
-    onCharacterSheet: () -> Unit,
 ) {
-    LaunchedEffect(viewModel) {
-        viewModel.events.collect { event ->
-            when (event) {
-                GameScreenEvent.NavigateToWinScreen -> onWin()
-                GameScreenEvent.NavigateToDeathScreen -> onDeath()
-                GameScreenEvent.NavigateToInventory -> onInventory()
-                GameScreenEvent.NavigateToCharacterSheet -> onCharacterSheet()
-                else -> Unit
-            }
-        }
-    }
-    
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isIdle by viewModel.isIdle.collectAsStateWithLifecycle()
     

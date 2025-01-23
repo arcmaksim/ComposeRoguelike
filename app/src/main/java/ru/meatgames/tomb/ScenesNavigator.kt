@@ -38,4 +38,9 @@ data class SceneNavigationCommand(
     val popUpToTop: Boolean = false,
 )
 
-fun Scene.toSceneNavigationCommand(): SceneNavigationCommand = SceneNavigationCommand(this)
+fun Scene.toSceneNavigationCommand(
+    asTopMost: Boolean = false,
+): SceneNavigationCommand = SceneNavigationCommand(
+    scene = this,
+    popUpToTop = asTopMost,
+)
