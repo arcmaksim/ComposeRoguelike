@@ -6,6 +6,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import ru.meatgames.tomb.ScenesNavigator
+import ru.meatgames.tomb.ScenesNavigatorImpl
 import ru.meatgames.tomb.domain.enemy.EnemiesController
 import ru.meatgames.tomb.domain.enemy.EnemiesControllerImpl
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
@@ -109,6 +111,11 @@ interface SingletonModule {
     fun gameController(
         impl: GameControllerImpl,
     ): GameController
+
+    @Binds
+    fun scenesNavigator(
+        impl: ScenesNavigatorImpl,
+    ): ScenesNavigator
 
     companion object {
         @Named(MAP_WIDTH_KEY)
