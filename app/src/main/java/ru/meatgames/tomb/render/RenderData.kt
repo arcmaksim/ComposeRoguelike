@@ -18,5 +18,6 @@ data class AnimationRenderData(
     val shadowRenderData: RenderData,
     val healthRatio: Float,
     val shadowHorizontalOffset: Int = 0,
+    val alpha: Float = 1f,
     val enemyId: EnemyId? = null,
 )
