@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -55,6 +56,7 @@ import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 import ru.meatgames.tomb.model.theme.ThemeAssets
+import ru.meatgames.tomb.render.Illustration
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -213,8 +215,8 @@ internal fun GameScreenMapContainer(
             tilesToFade = mapState.tilesToFadeOut,
             animatedOffset = animatedMovementOffset.value,
             initialOffset = initialMovementOffset,
-            revealedTilesAlpha = revealedTilesAlpha.value,
-            fadedTilesAlpha = fadedTilesAlpha.value,
+            revealedTilesAlpha = revealedTilesAlpha.floatValue,
+            fadedTilesAlpha = fadedTilesAlpha.floatValue,
         )
         
         GameScreenCharacter(
@@ -235,8 +237,8 @@ internal fun GameScreenMapContainer(
             animationStates = enemiesAnimationUpdates.value,
             animatedOffset = animatedMovementOffset.value,
             initialOffset = initialMovementOffset,
-            revealedTilesAlpha = revealedTilesAlpha.value,
-            fadedTilesAlpha = fadedTilesAlpha.value,
+            revealedTilesAlpha = revealedTilesAlpha.floatValue,
+            fadedTilesAlpha = fadedTilesAlpha.floatValue,
             characterFrameIndex = characterAnimationFrameIndex,
         )
     }
@@ -282,37 +284,69 @@ private fun BottomControls(
     interactionController: GameScreenInteractionController,
     modifier: Modifier = Modifier,
 ) {
-    Row(
+    Column(
         modifier = modifier.then(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
         ),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Stats(
+            playerHealth = playerHealth,
+        )
+        Controls(
+            isIdle = isIdle,
+            navigator = navigator,
+            interactionController = interactionController,
+        )
+    }
+}
+
+@Composable
+private fun Stats(
+    playerHealth: HealthComponent,
+) {
+    Row(
+        horizontalArrangement = Arrangement.Start,
     ) {
         Stat(
             currentValue = playerHealth.currentHealth.toString(),
             maxValue = playerHealth.maxHealth.toString(),
         )
-        
+    }
+}
+
+@Composable
+private fun Controls(
+    isIdle: Boolean,
+    navigator: GameScreenNavigator,
+    interactionController: GameScreenInteractionController,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        IllustrationButton(
+            illustration = Illustration.Heart,
+            onClick = navigator::navigateToCharacterSheet,
+        )
+        IllustrationButton(
+            illustration = Illustration.Bag,
+            onClick = navigator::navigateToInventory,
+        )
+
         Spacer(modifier = Modifier.weight(1f))
-        
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            IllustrationButton(
-                illustrationResId = R.drawable.il_heart,
-                onClick = navigator::navigateToCharacterSheet,
-            )
-            IllustrationButton(
-                illustrationResId = R.drawable.il_armor,
-                onClick = navigator::navigateToInventory,
-            )
-            IllustrationButton(
-                illustrationResId = R.drawable.il_watch,
-                onClick = interactionController::skipTurn,
-                enabled = isIdle,
-            )
-        }
+
+        IllustrationButton(
+            illustration = Illustration.Cloak,
+            onClick = interactionController::skipTurn,
+            enabled = isIdle,
+        )
+        IllustrationButton(
+            illustration = Illustration.Clock,
+            onClick = interactionController::skipTurn,
+            enabled = isIdle,
+        )
     }
 }
 

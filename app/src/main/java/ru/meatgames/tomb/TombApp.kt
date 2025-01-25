@@ -118,14 +118,6 @@ fun TombApp(
     }
 }
 
-private fun NavController.navigateTo(
-    rootVM: RootVM,
-    state: Scene,
-) {
-    rootVM.finishCurrentAnimations()
-    navigate(state.id)
-}
-
 private fun NavController.safeNavigate(
     destinationRoute: String,
 ) {

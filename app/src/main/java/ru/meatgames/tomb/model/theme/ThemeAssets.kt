@@ -42,7 +42,7 @@ class ThemeAssets @Inject constructor(
     private val doorsThemes: DoorsThemes
     private val stairsThemes: StairsThemes
     
-    private val gismo: ImageBitmap
+    private val bag: ImageBitmap
     private val clock: ImageBitmap
     private val alert: ImageBitmap
     private val heroTileset: ImageBitmap
@@ -55,7 +55,7 @@ class ThemeAssets @Inject constructor(
         doorsThemes = context.loadDoors()
         stairsThemes = context.loadStairs()
         
-        gismo = context.getBitmapFromAsset("bag").asImageBitmap()
+        bag = context.getBitmapFromAsset("bag").asImageBitmap()
         clock = context.getBitmapFromAsset("clock").asImageBitmap()
         alert = context.getBitmapFromAsset("alert").asImageBitmap()
         heroTileset = context.getBitmapFromAsset("character_animation_sheet").asImageBitmap()
@@ -222,7 +222,7 @@ class ThemeAssets @Inject constructor(
     }
     
     fun resolveItemRenderData(): RenderData = RenderData(
-        asset = gismo,
+        asset = bag,
         offset = IntOffset(0, 0),
         size = ASSETS_TILE_SIZE,
     )
