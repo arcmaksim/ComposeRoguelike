@@ -24,6 +24,8 @@ import ru.meatgames.tomb.domain.mapgenerator.MechanicsPlaygroundMapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.MainMapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.domain.mapgenerator.PlaygroundMapGenerator
+import ru.meatgames.tomb.model.AssetsLoader
+import ru.meatgames.tomb.model.IllustrationAssets
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.data.RoomsRepository
 import ru.meatgames.tomb.render.MapRenderTilesDecorator
@@ -138,6 +140,11 @@ interface SingletonModule {
         fun provideRoomsData(
             roomsRepository: RoomsRepository,
         ): RoomsData = roomsRepository.loadData()
+
+        @Provides
+        fun illustrationAssets(
+            assetsLoader: AssetsLoader,
+        ): IllustrationAssets = assetsLoader.illustrationAssets
     }
     
 }
