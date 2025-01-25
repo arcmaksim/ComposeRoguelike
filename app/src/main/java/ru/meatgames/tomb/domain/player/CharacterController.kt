@@ -10,12 +10,14 @@ import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.Initiative
 import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.component.StatsComponent
+import ru.meatgames.tomb.domain.component.StatusComponent
 import ru.meatgames.tomb.domain.component.toPositionComponent
 import ru.meatgames.tomb.domain.item.Item
 import ru.meatgames.tomb.domain.stat.Cunning
 import ru.meatgames.tomb.domain.stat.Power
 import ru.meatgames.tomb.domain.stat.Speed
 import ru.meatgames.tomb.domain.stat.Technique
+import ru.meatgames.tomb.domain.status.Status
 import ru.meatgames.tomb.resolvedOffset
 import ru.meatgames.tomb.screen.compose.charactersheet.alertnessBehaviorCardPreview
 import ru.meatgames.tomb.screen.compose.charactersheet.mightBehaviorCardPreview
@@ -72,11 +74,36 @@ class CharacterController @Inject constructor() {
             )
         }
     }
+
+    fun addStatus(
+        status: Status,
+    ) {
+        _characterStateFlow.update {
+            it.copy(
+                status = it.status.copy(
+                    it.status.statuses + setOf(status),
+                ),
+            )
+        }
+    }
+
+    fun removeStatus(
+        status: Status,
+    ) {
+        _characterStateFlow.update {
+            it.copy(
+                status = it.status.copy(
+                    it.status.statuses - setOf(status),
+                ),
+            )
+        }
+    }
     
 }
 
 data class CharacterState(
     val position: PositionComponent,
+    val status: StatusComponent = StatusComponent(emptySet()),
     val health: HealthComponent = HealthComponent(10),
     val initiative: Initiative = Initiative.Medium,
     val stats: StatsComponent = StatsComponent(

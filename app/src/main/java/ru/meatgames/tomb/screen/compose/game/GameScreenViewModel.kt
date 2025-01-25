@@ -30,13 +30,14 @@ import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.PlayerAnimation
+import ru.meatgames.tomb.domain.status.Status
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import javax.inject.Inject
 
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
     mapScreenController: MapScreenController,
-    characterController: CharacterController,
+    private val characterController: CharacterController,
     private val gameController: GameController,
     private val playerInputProcessor: PlayerInputProcessor,
     private val scenesNavigator: ScenesNavigator,
@@ -212,6 +213,18 @@ class GameScreenViewModel @Inject constructor(
             gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)
         }
     }
+
+    override fun toggleVisibility() {
+        if (!isIdle.value) return
+        viewModelScope.launch {
+            if (characterController.characterStateFlow.value.status.statuses.isEmpty()) {
+                characterController.addStatus(Status.Invisible)
+            } else {
+                characterController.removeStatus(Status.Invisible)
+            }
+            gameController.blockPlayerTurn()
+            gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)
+        }
+    }
+
 }
-
-

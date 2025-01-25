@@ -110,7 +110,7 @@ internal fun GameScreenEnemies(
                     dstOffset = dstOffset,
                     tileSize = tileSize,
                     tileDimension = tileDimension,
-                    alpha = alpha,
+                    alpha = alpha.coerceAtMost(renderTile.enemyData.alpha),
                     characterFrameIndex = characterFrameIndex,
                     iconState = iconState,
                 )

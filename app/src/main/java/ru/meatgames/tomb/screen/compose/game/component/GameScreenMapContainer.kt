@@ -339,7 +339,7 @@ private fun Controls(
 
         IllustrationButton(
             illustration = Illustration.Cloak,
-            onClick = interactionController::skipTurn,
+            onClick = interactionController::toggleVisibility,
             enabled = isIdle,
         )
         IllustrationButton(
