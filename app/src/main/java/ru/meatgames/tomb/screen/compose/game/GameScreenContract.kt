@@ -48,5 +48,7 @@ interface GameScreenInteractionController {
     fun finishEnemiesAnimation()
     
     fun skipTurn()
+
+    fun toggleVisibility()
     
 }

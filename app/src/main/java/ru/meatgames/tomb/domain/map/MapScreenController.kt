@@ -132,6 +132,14 @@ class MapScreenController @Inject constructor(
         val tileToFadeIn = renderData.tilesToFadeIn.toSet()
         val tileToFadeOut = renderData.tilesToFadeOut.toSet()
 
+        val characterAnimatedRenderData = if (characterState.status.statuses.isNotEmpty()) {
+            characterRenderData.copy(
+                alpha = .5f,
+            )
+        } else {
+            characterRenderData
+        }
+
         return MapScreenState.Ready(
             tilesWidth = bufferHolder.width,
             viewportWidth = viewportWidth,
@@ -140,7 +148,7 @@ class MapScreenController @Inject constructor(
             tiles = renderData.tiles,
             tilesToFadeIn = tileToFadeIn,
             tilesToFadeOut = tileToFadeOut,
-            characterRenderData = characterRenderData,
+            characterRenderData = characterAnimatedRenderData,
             playerHealth = characterState.health,
             turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(bufferHolder),
         )
