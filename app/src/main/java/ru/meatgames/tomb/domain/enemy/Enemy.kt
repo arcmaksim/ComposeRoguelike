@@ -5,6 +5,7 @@ import ru.meatgames.tomb.domain.component.GoalComponent
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.Initiative
 import ru.meatgames.tomb.domain.component.PositionComponent
+import ru.meatgames.tomb.domain.component.StatusComponent
 import java.util.UUID
 
 @JvmInline
@@ -32,6 +33,7 @@ class Enemy(
             health,
             position,
             goal,
+            StatusComponent(),
         ),
     )
 

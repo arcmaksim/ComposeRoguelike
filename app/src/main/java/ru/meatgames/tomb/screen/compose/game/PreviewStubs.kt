@@ -31,4 +31,6 @@ internal val interactionControllerPreviewStub = object : GameScreenInteractionCo
     ) = Unit
     
     override fun skipTurn() = Unit
+
+    override fun toggleVisibility() = Unit
 }

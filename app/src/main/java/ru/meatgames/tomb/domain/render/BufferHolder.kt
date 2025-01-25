@@ -42,8 +42,9 @@ class BufferHolder(
         get() = bufferCounter % BUFFER_AMOUNT
 
     val mapBuffer: Array<MapTile?> = Array(size) { null }
+    val fovBuffer: BooleanArray = BooleanArray(size) { false }
     // TODO: move to a separate entity to use in the gameplay
-    val visibilityBuffer: BooleanArray = BooleanArray(size) { false }
+    val visibilityCache: BooleanArray = BooleanArray(size) { false }
     val floorRenderingBuffer: Array<FloorRenderTile?> = Array(size) { null }
     val objectRenderingBuffer: Array<ObjectRenderTile?> = Array(size) { null }
     private val _resultRenderingBuffer: Array<Array<MapRenderTile>> =
@@ -67,7 +68,8 @@ class BufferHolder(
         bufferCounter++
 
         mapBuffer.fill(null)
-        visibilityBuffer.fill(true)
+        fovBuffer.fill(true)
+        visibilityCache.fill(true)
         floorRenderingBuffer.fill(null)
         objectRenderingBuffer.fill(null)
         resultRenderingBuffer.fill(MapRenderTile.Empty)
@@ -84,11 +86,18 @@ class BufferHolder(
             }
     }
 
-    fun areCoordinatesVisible(
+    fun areCoordinatesVisibleInFov(
         coordinates: Coordinates,
     ): Boolean {
         val bufferIndex = coordinates.first + coordinates.second * width
-        return visibilityBuffer.getOrElse(bufferIndex) { false }
+        return fovBuffer.getOrElse(bufferIndex) { false }
+    }
+
+    fun areCoordinatesVisibleInCache(
+        coordinates: Coordinates,
+    ): Boolean {
+        val bufferIndex = coordinates.first + coordinates.second * width
+        return visibilityCache.getOrElse(bufferIndex) { false }
     }
 
 }

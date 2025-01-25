@@ -217,10 +217,10 @@ class GameScreenViewModel @Inject constructor(
     override fun toggleVisibility() {
         if (!isIdle.value) return
         viewModelScope.launch {
-            if (characterController.characterStateFlow.value.status.statuses.isEmpty()) {
-                characterController.addStatus(Status.Invisible)
-            } else {
+            if (characterController.characterStateFlow.value.status.has(Status.Invisible)) {
                 characterController.removeStatus(Status.Invisible)
+            } else {
+                characterController.addStatus(Status.Invisible)
             }
             gameController.blockPlayerTurn()
             gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)

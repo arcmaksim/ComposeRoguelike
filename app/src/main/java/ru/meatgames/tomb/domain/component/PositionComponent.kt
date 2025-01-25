@@ -28,9 +28,16 @@ fun PositionComponent.toCoordinates(): Coordinates = x to y
 
 typealias Vector = Pair<Int, Int>
 
+val Vector.isZero: Boolean
+    get() = first == 0 && second == 0
+
 fun PositionComponent.calculateVectorTo(
     otherComponent: PositionComponent,
 ): Vector = (x - otherComponent.x) to (y - otherComponent.y)
+
+fun PositionComponent.calculateVectorTo(
+    coordinates: Coordinates,
+): Vector = (x - coordinates.first) to (y - coordinates.second)
 
 fun Vector.asDirections(): List<Direction> {
     fun Int.horizontalDirection(): Direction = if (this > 0) Direction.Left else Direction.Right

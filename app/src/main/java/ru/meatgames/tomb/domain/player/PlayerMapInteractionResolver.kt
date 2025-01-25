@@ -4,6 +4,7 @@ import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
 import ru.meatgames.tomb.domain.item.ItemsController
 import ru.meatgames.tomb.domain.map.MapTerraformer
+import ru.meatgames.tomb.domain.status.Status
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
 import ru.meatgames.tomb.resolvedOffset
@@ -45,6 +46,7 @@ class PlayerMapInteractionResolver @Inject constructor(
             
             is PlayerTurnResult.Attack -> {
                 val coordinates = (characterController.characterStateFlow.value.position + result.direction.resolvedOffset).toCoordinates()
+                characterController.removeStatus(Status.Invisible)
                 enemiesHolder.tryToInflictDamage(coordinates, 2)
             }
         

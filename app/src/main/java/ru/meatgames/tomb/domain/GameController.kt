@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
-import ru.meatgames.tomb.domain.enemy.EnemiesManager
+import ru.meatgames.tomb.domain.enemy.EnemiesMastermind
 import ru.meatgames.tomb.domain.map.MapCreator
 import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.PlayerMapInteractionResolver
@@ -64,7 +64,7 @@ class GameControllerImpl @Inject constructor(
     private val mapCreator: MapCreator,
     private val characterController: CharacterController,
     private val enemiesHolder: EnemiesHolder,
-    private val enemiesManager: EnemiesManager,
+    private val enemiesMastermind: EnemiesMastermind,
     private val charactersTurnScheduler: CharactersTurnScheduler,
     private val mapInteractionResolver: PlayerMapInteractionResolver,
 ) : GameController {
@@ -200,7 +200,7 @@ class GameControllerImpl @Inject constructor(
 
             val enemy = enemiesHolder.getEnemy(element.enemyId) ?: continue
             logMessage("TURN", "${enemy.type} at ${enemy.getComponent<PositionComponent>()}")
-            enemiesManager.takeTurn(enemy).let(results::add)
+            enemiesMastermind.takeTurn(enemy).let(results::add)
         }
 
         calcTurnQueue(false)

@@ -24,6 +24,7 @@ import ru.meatgames.tomb.domain.render.BufferHolder
 import ru.meatgames.tomb.domain.render.BufferHolderFactory
 import ru.meatgames.tomb.domain.render.GameMapRenderPipeline
 import ru.meatgames.tomb.domain.render.computeFov
+import ru.meatgames.tomb.domain.status.Status
 import ru.meatgames.tomb.domain.turn.EnemyTurnResult
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.model.theme.TilesController
@@ -49,9 +50,9 @@ class MapScreenController @Inject constructor(
     private val gameController: GameController,
     private val bufferHolderFactory: BufferHolderFactory,
 ) {
-    
+
     private val characterRenderData = themeAssets.characterRenderData
-    
+
     private val _state = MutableStateFlow<MapScreenState>(MapScreenState.Loading)
     val state: StateFlow<MapScreenState> = _state
 
@@ -66,22 +67,22 @@ class MapScreenController @Inject constructor(
             .onEach(_state::emit)
             .launchIn(GlobalScope)
     }
-    
+
     private fun produceMapFlow(
         mapWrapper: LevelMapWrapper,
     ): Flow<MapScreenState> {
         var cachedMapState: MapScreenState = MapScreenState.Loading
         var latestGameState: GameState = GameState.Loading
-        
+
         return combine(
             mapWrapper.state,
             characterController.characterStateFlow,
             gameController.state,
         ) { streamedTiles, characterState, gameState ->
             if (latestGameState == gameState) return@combine cachedMapState
-            
+
             latestGameState = gameState
-            
+
             if (gameState.updatesState()) {
                 return@combine streamedTiles.toMapState(
                     mapWidth = mapWrapper.width,
@@ -92,16 +93,16 @@ class MapScreenController @Inject constructor(
                     cachedMapState = it
                 }
             }
-            
+
             cachedMapState
         }
     }
-    
+
     private fun GameState.updatesState(): Boolean {
         return this is GameState.AnimatingCharacter || this is GameState.AnimatingEnemies ||
             this is GameState.PrepareForEnemies || this is GameState.WaitingForInput
     }
-    
+
     private fun List<MapTile>.toMapState(
         mapWidth: Int,
         mapHeight: Int,
@@ -132,7 +133,7 @@ class MapScreenController @Inject constructor(
         val tileToFadeIn = renderData.tilesToFadeIn.toSet()
         val tileToFadeOut = renderData.tilesToFadeOut.toSet()
 
-        val characterAnimatedRenderData = if (characterState.status.statuses.isNotEmpty()) {
+        val characterAnimatedRenderData = if (characterState.status.has(Status.Invisible)) {
             characterRenderData.copy(
                 alpha = .5f,
             )
@@ -155,13 +156,17 @@ class MapScreenController @Inject constructor(
     }
 
     private fun BufferHolder.calculateFov() {
-        visibilityBuffer.fill(false)
+        fovBuffer.fill(false)
+        visibilityCache.fill(false)
 
         computeFov(
             originX = horizontalCenter,
             originY = verticalCenter,
             maxDepth = horizontalCenter + 1,
-            revealTile = { x, y -> visibilityBuffer[x + y * width] = true },
+            revealTile = { x, y ->
+                fovBuffer[x + y * width] = true
+                visibilityCache[x + y * width] = true
+            },
             checkIfTileIsBlocking = { x, y ->
                 val index = x + y * width
                 val objectEntity = mapBuffer[index]?.objectEntityTile ?: return@computeFov false
@@ -172,13 +177,13 @@ class MapScreenController @Inject constructor(
         )
 
         for (i in 0 until width) {
-            visibilityBuffer[i] = false
-            visibilityBuffer[(height - 1) * width + i] = false
+            fovBuffer[i] = false
+            fovBuffer[(height - 1) * width + i] = false
         }
 
         for (i in 0 until height) {
-            visibilityBuffer[i * width] = false
-            visibilityBuffer[(i + 1) * width - 1] = false
+            fovBuffer[i * width] = false
+            fovBuffer[(i + 1) * width - 1] = false
         }
     }
 
@@ -244,12 +249,12 @@ class MapScreenController @Inject constructor(
                 ),
             )
         }
-        
+
         is GameState.WaitingForInput, is GameState.PrepareForEnemies -> null
-        
+
         else -> throw IllegalArgumentException("Unexpected game state: $this")
     }
-    
+
     private fun List<EnemyTurnResult>.filterNonVisibleAnimations(
         bufferHolder: BufferHolder,
     ): List<EnemyTurnResult> = filter { result ->
@@ -260,12 +265,12 @@ class MapScreenController @Inject constructor(
                     result.position + result.direction.resolvedOffset - bufferHolder.offset,
                 )
             }
-            
+
             else -> listOf(result.position - bufferHolder.offset)
         }.filter { (x, y) -> x in 0 until bufferHolder.width && y in 0 until bufferHolder.height }
-            .any { (x, y) -> bufferHolder.visibilityBuffer[x + y * bufferHolder.width] }
+            .any { (x, y) -> bufferHolder.fovBuffer[x + y * bufferHolder.width] }
     }
-    
+
     private fun List<EnemyTurnResult>.toEnemiesAnimations(
         bufferHolder: BufferHolder,
     ): EnemiesAnimations = map { result ->
@@ -282,14 +287,14 @@ class MapScreenController @Inject constructor(
                 val currentScreenSpaceIndex =
                     currentScreenSpacePosition.first + currentScreenSpacePosition.second * bufferHolder.width
                 val currentTileVisibility =
-                    bufferHolder.visibilityBuffer.getOrElse(currentScreenSpaceIndex) { false }
+                    bufferHolder.fovBuffer.getOrElse(currentScreenSpaceIndex) { false }
 
                 val nextScreenSpacePosition =
                     currentScreenSpacePosition + result.direction.resolvedOffset
                 val nextScreenSpaceIndex =
                     nextScreenSpacePosition.first + nextScreenSpacePosition.second * bufferHolder.width
                 val nextTileVisibility =
-                    bufferHolder.visibilityBuffer.getOrElse(nextScreenSpaceIndex) { false }
+                    bufferHolder.fovBuffer.getOrElse(nextScreenSpaceIndex) { false }
 
                 result.enemyId to EnemyAnimation.Move(
                     direction = result.direction,
@@ -300,17 +305,17 @@ class MapScreenController @Inject constructor(
                     },
                 )
             }
-            
+
             is EnemyTurnResult.Attack -> {
                 result.enemyId to EnemyAnimation.Attack(
                     direction = result.direction,
                 )
             }
-            
+
             is EnemyTurnResult.SkipTurn -> {
                 result.enemyId to EnemyAnimation.Icon(themeAssets.getIconRenderData(Icon.Clock))
             }
         }
     }
-    
+
 }
