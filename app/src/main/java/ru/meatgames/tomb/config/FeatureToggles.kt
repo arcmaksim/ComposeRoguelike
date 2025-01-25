@@ -35,7 +35,7 @@ object FeatureToggles {
             ),
             FeatureToggleState(
                 key = FeatureToggle.UndyingCharacter,
-                title = "Game over screen won't be triggered asdasdasd",
+                title = "Game over screen won't be triggered",
                 value = false,
             ),
         )
