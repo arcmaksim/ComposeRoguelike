@@ -1,5 +1,6 @@
 package ru.meatgames.tomb.domain.player
 
+import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
 import ru.meatgames.tomb.domain.item.ItemsController
@@ -45,7 +46,7 @@ class PlayerMapInteractionResolver @Inject constructor(
             }
             
             is PlayerTurnResult.Attack -> {
-                val coordinates = (characterController.characterStateFlow.value.position + result.direction.resolvedOffset).toCoordinates()
+                val coordinates = (characterController.characterState.getComponent<PositionComponent>() + result.direction.resolvedOffset).toCoordinates()
                 characterController.removeStatus(Status.Invisible)
                 enemiesHolder.tryToInflictDamage(coordinates, 2)
             }

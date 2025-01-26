@@ -25,7 +25,7 @@ class Enemy(
         position: PositionComponent,
         initiative: Initiative,
         goal: GoalComponent,
-    ) : this (
+    ) : this(
         id = id,
         type = type,
         initiative = initiative,
@@ -40,7 +40,7 @@ class Enemy(
     inline fun <reified C : Component> updateComponent(
         crossinline update: (C) -> C,
     ): C {
-        val component = components.filterIsInstance<C>().first()
+        val component = getComponent<C>()
         components.remove(component)
 
         val updatedComponent = update(component)

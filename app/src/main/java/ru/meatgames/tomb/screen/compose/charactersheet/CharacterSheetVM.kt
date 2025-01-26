@@ -19,8 +19,8 @@ class CharacterSheetVM @Inject constructor(
     private val _state = MutableStateFlow(
         characterController.characterStateFlow.value.run {
             CharacterSheetState(
-                stats = stats,
-                health = health,
+                stats = getComponent(),
+                health = getComponent(),
                 offensiveBehaviorCard = offenseBehaviorCard,
                 defensiveBehaviorCard = defenceBehaviorCard,
                 supportBehaviorCard = supportBehaviorCard,
@@ -33,8 +33,8 @@ class CharacterSheetVM @Inject constructor(
         viewModelScope.launch {
             characterController.characterStateFlow.collect {
                 _state.value = CharacterSheetState(
-                    stats = it.stats,
-                    health = it.health,
+                    stats = it.getComponent(),
+                    health = it.getComponent(),
                     offensiveBehaviorCard = it.offenseBehaviorCard,
                     defensiveBehaviorCard = it.defenceBehaviorCard,
                     supportBehaviorCard = it.supportBehaviorCard,

@@ -13,6 +13,8 @@ import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
+import ru.meatgames.tomb.domain.component.PositionComponent
+import ru.meatgames.tomb.domain.component.StatusComponent
 import ru.meatgames.tomb.domain.component.minus
 import ru.meatgames.tomb.domain.component.plus
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
@@ -109,15 +111,16 @@ class MapScreenController @Inject constructor(
         characterState: CharacterState,
         gameState: GameState,
     ): MapScreenState {
-        if (characterState.position.x == -1 && characterState.position.y == -1) {
+        val position = characterState.getComponent<PositionComponent>()
+        if (position.x == -1 && position.y == -1) {
             return MapScreenState.Loading
         }
 
         val bufferHolder = bufferHolderFactory.get(viewportWidth, viewportHeight)
 
         bufferHolder.refresh(
-            horizontalOffset = characterState.position.x - bufferHolder.horizontalCenter,
-            verticalOffset = characterState.position.y - bufferHolder.verticalCenter
+            horizontalOffset = position.x - bufferHolder.horizontalCenter,
+            verticalOffset = position.y - bufferHolder.verticalCenter,
         )
 
         bufferHolder.fillMapBuffer(
@@ -133,7 +136,7 @@ class MapScreenController @Inject constructor(
         val tileToFadeIn = renderData.tilesToFadeIn.toSet()
         val tileToFadeOut = renderData.tilesToFadeOut.toSet()
 
-        val characterAnimatedRenderData = if (characterState.status.has(Status.Invisible)) {
+        val characterAnimatedRenderData = if (characterState.getComponent<StatusComponent>().has(Status.Invisible)) {
             characterRenderData.copy(
                 alpha = .5f,
             )
@@ -150,7 +153,7 @@ class MapScreenController @Inject constructor(
             tilesToFadeIn = tileToFadeIn,
             tilesToFadeOut = tileToFadeOut,
             characterRenderData = characterAnimatedRenderData,
-            playerHealth = characterState.health,
+            playerHealth = characterState.getComponent(),
             turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(bufferHolder),
         )
     }

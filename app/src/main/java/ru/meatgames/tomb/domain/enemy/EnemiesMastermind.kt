@@ -40,18 +40,19 @@ class EnemiesMastermind @Inject constructor(
         enemy: Enemy,
     ): EnemyTurnResult = with(enemy) {
         val bufferHolder = bufferHolderFactory.cachedBufferHolder
-        val player = characterController.characterStateFlow.value
-        val vectorToPlayer = getComponent<PositionComponent>().calculateVectorTo(player.position)
+        val playerState = characterController.characterState
+        val vectorToPlayer = getComponent<PositionComponent>()
+            .calculateVectorTo(playerState.getComponent<PositionComponent>())
 
         updateFlags(
-            playerState = player,
+            playerState = playerState,
             enemy = enemy,
             bufferHolder = bufferHolder,
         )
 
         val result = when (val goal = getComponent<GoalComponent>().activeGoal) {
             is GoalComponent.Goal.Player -> targetPlayer(
-                playerState = player,
+                playerState = playerState,
                 vectorToPlayer = vectorToPlayer,
             )
             is GoalComponent.Goal.Position -> targetPosition(
@@ -72,7 +73,7 @@ class EnemiesMastermind @Inject constructor(
         flags[IS_VISIBLE_BY_PLAYER] = bufferHolder.areCoordinatesVisibleInCache(
             (enemy.getComponent<PositionComponent>().toCoordinates() - bufferHolder.offset)
         )
-        flags[IS_PLAYER_VISIBLE] = !playerState.status.has(Status.Invisible)
+        flags[IS_PLAYER_VISIBLE] = !playerState.getComponent<StatusComponent>().has(Status.Invisible)
         flags[VISIBLE_CONTACT] = flags[IS_PLAYER_VISIBLE] && flags[IS_VISIBLE_BY_PLAYER]
     }
 
@@ -84,7 +85,7 @@ class EnemiesMastermind @Inject constructor(
             updateComponent<GoalComponent> { _ ->
                 GoalComponent(
                     activeGoal = GoalComponent.Goal.Position(
-                        playerState.position.toCoordinates(),
+                        playerState.getComponent<PositionComponent>().toCoordinates(),
                     ),
                 )
             }
@@ -100,7 +101,7 @@ class EnemiesMastermind @Inject constructor(
             updateComponent<GoalComponent> { _ ->
                 GoalComponent(
                     activeGoal = GoalComponent.Goal.Position(
-                        playerState.position.toCoordinates(),
+                        playerState.getComponent<PositionComponent>().toCoordinates(),
                     ),
                 )
             }
@@ -136,7 +137,7 @@ class EnemiesMastermind @Inject constructor(
         }
 
         if (!vectorToTarget.isZero) {
-            val playerPosition = characterController.characterStateFlow.value.position.toCoordinates()
+            val playerPosition = characterController.characterState.getComponent<PositionComponent>().toCoordinates()
             vectorToTarget.asDirections().forEach { direction ->
                 val newPosition = (getComponent<PositionComponent>() + direction.resolvedOffset).toCoordinates()
 

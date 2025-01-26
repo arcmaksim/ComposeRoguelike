@@ -22,6 +22,8 @@ import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
 import ru.meatgames.tomb.domain.PlayerInputProcessor
+import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.component.StatusComponent
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
@@ -104,7 +106,9 @@ class GameScreenViewModel @Inject constructor(
         characterController
             .characterStateFlow
             .filter {
-                it.health.isDepleted && !FeatureToggles.getToggleValue(FeatureToggle.UndyingCharacter)
+                val isHealthDepleted = it.getComponent<HealthComponent>().isDepleted
+                val isFtDisabled = !FeatureToggles.getToggleValue(FeatureToggle.UndyingCharacter)
+                isHealthDepleted && isFtDisabled
             }
             .onEach {
                 scenesNavigator.navigateTo(Scene.DeathScreen.asNavigationToCommand(true))
@@ -217,7 +221,7 @@ class GameScreenViewModel @Inject constructor(
     override fun toggleVisibility() {
         if (!isIdle.value) return
         viewModelScope.launch {
-            if (characterController.characterStateFlow.value.status.has(Status.Invisible)) {
+            if (characterController.characterState.getComponent<StatusComponent>().has(Status.Invisible)) {
                 characterController.removeStatus(Status.Invisible)
             } else {
                 characterController.addStatus(Status.Invisible)

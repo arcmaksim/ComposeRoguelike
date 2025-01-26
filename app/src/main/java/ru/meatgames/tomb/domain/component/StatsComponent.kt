@@ -10,4 +10,4 @@ data class StatsComponent(
     val speed: Speed = Speed(3),
     val cunning: Cunning = Cunning(3),
     val technique: Technique = Technique(3),
-)
+) : Component

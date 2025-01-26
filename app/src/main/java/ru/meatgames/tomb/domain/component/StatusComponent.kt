@@ -19,7 +19,7 @@ data class StatusComponent(
     fun remove(
         status: Status,
     ): StatusComponent = copy(
-        statuses + setOf(status),
+        statuses - setOf(status),
     )
 
 }

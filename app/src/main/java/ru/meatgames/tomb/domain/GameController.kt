@@ -173,7 +173,7 @@ class GameControllerImpl @Inject constructor(
             val element = currentTurnQueue.poll()
 
             if (element !is CharactersTurnScheduler.InitiativePosition.Enemy) {
-                logMessage("TURN", "Player turn! ${characterController.characterStateFlow.value.position}")
+                logMessage("TURN", "Player turn! ${characterController.characterState.getComponent<PositionComponent>()}")
                 break
             }
 
@@ -194,7 +194,7 @@ class GameControllerImpl @Inject constructor(
             val element = currentTurnQueue.poll()
 
             if (element !is CharactersTurnScheduler.InitiativePosition.Enemy) {
-                logMessage("TURN", "Player turn! ${characterController.characterStateFlow.value.position}")
+                logMessage("TURN", "Player turn! ${characterController.characterState.getComponent<PositionComponent>()}")
                 break
             }
 
