@@ -39,6 +39,16 @@ class IllustrationAssets @Inject constructor(
             iconAtlasX = 8,
             iconAtlasY = 12,
         )
+
+        Illustration.Sword -> illustrationAtlas.toIconRenderData(
+            iconAtlasX = 8,
+            iconAtlasY = 10,
+        )
+
+        Illustration.Shield -> illustrationAtlas.toIconRenderData(
+            iconAtlasX = 1,
+            iconAtlasY = 11,
+        )
     }
 
     private fun ImageBitmap.toIconRenderData(

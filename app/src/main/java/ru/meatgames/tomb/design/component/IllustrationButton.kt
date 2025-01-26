@@ -83,7 +83,7 @@ fun IllustrationButton(
                         dstSize = size,
                         filterQuality = FilterQuality.None,
                     )
-                }
+                },
         ),
         contentAlignment = Alignment.Center,
         content = { Unit },

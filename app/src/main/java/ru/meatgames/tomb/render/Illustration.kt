@@ -5,4 +5,6 @@ enum class Illustration {
     Bag,
     Cloak,
     Heart,
+    Sword,
+    Shield,
 }
