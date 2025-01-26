@@ -21,9 +21,6 @@ class CharacterSheetVM @Inject constructor(
             CharacterSheetState(
                 stats = getComponent(),
                 health = getComponent(),
-                offensiveBehaviorCard = offenseBehaviorCard,
-                defensiveBehaviorCard = defenceBehaviorCard,
-                supportBehaviorCard = supportBehaviorCard,
             )
         }
     )
@@ -35,9 +32,6 @@ class CharacterSheetVM @Inject constructor(
                 _state.value = CharacterSheetState(
                     stats = it.getComponent(),
                     health = it.getComponent(),
-                    offensiveBehaviorCard = it.offenseBehaviorCard,
-                    defensiveBehaviorCard = it.defenceBehaviorCard,
-                    supportBehaviorCard = it.supportBehaviorCard,
                 )
             }
         }

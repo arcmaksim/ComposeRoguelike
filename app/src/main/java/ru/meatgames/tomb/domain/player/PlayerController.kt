@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
-import ru.meatgames.tomb.domain.behaviorcard.BehaviorCard
 import ru.meatgames.tomb.domain.component.Component
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.Initiative
@@ -20,9 +19,6 @@ import ru.meatgames.tomb.domain.stat.Speed
 import ru.meatgames.tomb.domain.stat.Technique
 import ru.meatgames.tomb.domain.status.Status
 import ru.meatgames.tomb.resolvedOffset
-import ru.meatgames.tomb.screen.compose.charactersheet.alertnessBehaviorCardPreview
-import ru.meatgames.tomb.screen.compose.charactersheet.mightBehaviorCardPreview
-import ru.meatgames.tomb.screen.compose.charactersheet.resilienceBehaviorCardPreview
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -103,10 +99,6 @@ class CharacterController @Inject constructor() {
 data class PlayerState(
     val components: Set<Component>,
     val initiative: Initiative = Initiative.Medium,
-    val offenseBehaviorCard: BehaviorCard? = mightBehaviorCardPreview,
-    val defenceBehaviorCard: BehaviorCard? = resilienceBehaviorCardPreview,
-    val supportBehaviorCard: BehaviorCard? = alertnessBehaviorCardPreview,
-    val allBehaviorCards: List<BehaviorCard> = emptyList(),
     val inventory: List<Item> = emptyList(),
 ) {
 
@@ -130,10 +122,6 @@ data class PlayerState(
             status,
         ),
         initiative = initiative,
-        offenseBehaviorCard = mightBehaviorCardPreview,
-        defenceBehaviorCard = resilienceBehaviorCardPreview,
-        supportBehaviorCard = alertnessBehaviorCardPreview,
-        allBehaviorCards = emptyList(),
         inventory = inventory,
     )
 

@@ -71,11 +71,6 @@ private fun CharacterSheetScreenContent(
                 cunning = state.stats.cunning,
                 technique = state.stats.technique,
             )
-            BehaviorCards(
-                offenseBehaviorCard = state.offensiveBehaviorCard,
-                defenceBehaviorCard = state.defensiveBehaviorCard,
-                supportBehaviorCard = state.supportBehaviorCard,
-            )
         }
     }
 }
