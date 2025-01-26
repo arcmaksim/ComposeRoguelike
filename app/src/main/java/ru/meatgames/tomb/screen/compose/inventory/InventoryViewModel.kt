@@ -21,7 +21,7 @@ class InventoryViewModel @Inject constructor(
     
     init {
         viewModelScope.launch {
-            characterController.characterStateFlow.collect {
+            characterController.playerStateFlow.collect {
                 _state.value = InventoryState(it.inventory)
             }
         }

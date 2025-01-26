@@ -17,7 +17,7 @@ class CharacterSheetVM @Inject constructor(
 ): ViewModel() {
     
     private val _state = MutableStateFlow(
-        characterController.characterStateFlow.value.run {
+        characterController.playerStateSnapshot.run {
             CharacterSheetState(
                 stats = getComponent(),
                 health = getComponent(),
@@ -31,7 +31,7 @@ class CharacterSheetVM @Inject constructor(
     
     init {
         viewModelScope.launch {
-            characterController.characterStateFlow.collect {
+            characterController.playerStateFlow.collect {
                 _state.value = CharacterSheetState(
                     stats = it.getComponent(),
                     health = it.getComponent(),

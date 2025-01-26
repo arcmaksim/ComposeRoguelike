@@ -13,7 +13,7 @@ import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.map.MapController
 import ru.meatgames.tomb.domain.minus
 import ru.meatgames.tomb.domain.player.CharacterController
-import ru.meatgames.tomb.domain.player.CharacterState
+import ru.meatgames.tomb.domain.player.PlayerState
 import ru.meatgames.tomb.domain.render.BufferHolder
 import ru.meatgames.tomb.domain.render.BufferHolderFactory
 import ru.meatgames.tomb.domain.status.Status
@@ -40,7 +40,7 @@ class EnemiesMastermind @Inject constructor(
         enemy: Enemy,
     ): EnemyTurnResult = with(enemy) {
         val bufferHolder = bufferHolderFactory.cachedBufferHolder
-        val playerState = characterController.characterState
+        val playerState = characterController.playerStateSnapshot
         val vectorToPlayer = getComponent<PositionComponent>()
             .calculateVectorTo(playerState.getComponent<PositionComponent>())
 
@@ -66,7 +66,7 @@ class EnemiesMastermind @Inject constructor(
     }
 
     private fun updateFlags(
-        playerState: CharacterState,
+        playerState: PlayerState,
         enemy: Enemy,
         bufferHolder: BufferHolder,
     ) {
@@ -78,7 +78,7 @@ class EnemiesMastermind @Inject constructor(
     }
 
     private fun Enemy.targetPlayer(
-        playerState: CharacterState,
+        playerState: PlayerState,
         vectorToPlayer: Vector,
     ): EnemyTurnResult? {
         if (!flags[IS_PLAYER_VISIBLE]) {
@@ -137,7 +137,7 @@ class EnemiesMastermind @Inject constructor(
         }
 
         if (!vectorToTarget.isZero) {
-            val playerPosition = characterController.characterState.getComponent<PositionComponent>().toCoordinates()
+            val playerPosition = characterController.playerStateSnapshot.getComponent<PositionComponent>().toCoordinates()
             vectorToTarget.asDirections().forEach { direction ->
                 val newPosition = (getComponent<PositionComponent>() + direction.resolvedOffset).toCoordinates()
 

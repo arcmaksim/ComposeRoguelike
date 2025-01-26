@@ -29,7 +29,7 @@ class PlayerMapInteractionController @Inject constructor(
         direction: Direction,
     ): PlayerTurnResult? {
         val (offsetX, offsetY) = direction.resolvedOffset
-        val playerState = characterController.characterState
+        val playerState = characterController.playerStateSnapshot
         val coordinates = (playerState.getComponent<PositionComponent>() + (offsetX to offsetY)).toCoordinates()
         
         val tile = mapController.getTile(coordinates) ?: return null

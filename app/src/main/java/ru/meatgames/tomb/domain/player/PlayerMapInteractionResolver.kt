@@ -46,7 +46,7 @@ class PlayerMapInteractionResolver @Inject constructor(
             }
             
             is PlayerTurnResult.Attack -> {
-                val coordinates = (characterController.characterState.getComponent<PositionComponent>() + result.direction.resolvedOffset).toCoordinates()
+                val coordinates = (characterController.playerStateSnapshot.getComponent<PositionComponent>() + result.direction.resolvedOffset).toCoordinates()
                 characterController.removeStatus(Status.Invisible)
                 enemiesHolder.tryToInflictDamage(coordinates, 2)
             }

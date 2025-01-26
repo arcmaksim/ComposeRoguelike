@@ -29,19 +29,19 @@ import javax.inject.Singleton
 @Singleton
 class CharacterController @Inject constructor() {
 
-    private val _characterStateFlow = MutableStateFlow(
-        CharacterState(
+    private val _playerStateFlow = MutableStateFlow(
+        PlayerState(
             position = PositionComponent(-1, -1),
         ),
     )
-    val characterStateFlow: StateFlow<CharacterState> = _characterStateFlow
-    val characterState: CharacterState
-        get() = _characterStateFlow.value
+    val playerStateFlow: StateFlow<PlayerState> = _playerStateFlow
+    val playerStateSnapshot: PlayerState
+        get() = _playerStateFlow.value
 
     fun setPosition(
         coordinates: Coordinates,
     ) {
-        _characterStateFlow.update { state ->
+        _playerStateFlow.update { state ->
             state.updateComponent<PositionComponent> {
                 coordinates.toPositionComponent()
             }
@@ -51,7 +51,7 @@ class CharacterController @Inject constructor() {
     fun move(
         direction: Direction,
     ) {
-        _characterStateFlow.update { state ->
+        _playerStateFlow.update { state ->
             state.updateComponent<PositionComponent> {
                 it + direction.resolvedOffset
             }
@@ -61,7 +61,7 @@ class CharacterController @Inject constructor() {
     fun addItem(
         item: Item,
     ) {
-        _characterStateFlow.update { state ->
+        _playerStateFlow.update { state ->
             state.copy(
                 inventory = state.inventory + item,
             )
@@ -71,7 +71,7 @@ class CharacterController @Inject constructor() {
     fun modifyHealth(
         modifier: Int,
     ) {
-        _characterStateFlow.update { state ->
+        _playerStateFlow.update { state ->
             state.updateComponent<HealthComponent> {
                 it.updateHealth(modifier)
             }
@@ -81,7 +81,7 @@ class CharacterController @Inject constructor() {
     fun addStatus(
         status: Status,
     ) {
-        _characterStateFlow.update { state ->
+        _playerStateFlow.update { state ->
             state.updateComponent<StatusComponent> {
                 it.add(status)
             }
@@ -91,7 +91,7 @@ class CharacterController @Inject constructor() {
     fun removeStatus(
         status: Status,
     ) {
-        _characterStateFlow.update { state ->
+        _playerStateFlow.update { state ->
             state.updateComponent<StatusComponent> {
                 it.remove(status)
             }
@@ -100,7 +100,7 @@ class CharacterController @Inject constructor() {
     
 }
 
-data class CharacterState(
+data class PlayerState(
     val components: Set<Component>,
     val initiative: Initiative = Initiative.Medium,
     val offenseBehaviorCard: BehaviorCard? = mightBehaviorCardPreview,
@@ -139,7 +139,7 @@ data class CharacterState(
 
     inline fun <reified C : Component> updateComponent(
         crossinline update: (C) -> C,
-    ): CharacterState {
+    ): PlayerState {
         val component = getComponent<C>()
         val updatedComponent = update(component)
 

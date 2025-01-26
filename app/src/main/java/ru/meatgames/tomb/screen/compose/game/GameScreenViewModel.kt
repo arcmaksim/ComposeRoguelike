@@ -104,7 +104,7 @@ class GameScreenViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         characterController
-            .characterStateFlow
+            .playerStateFlow
             .filter {
                 val isHealthDepleted = it.getComponent<HealthComponent>().isDepleted
                 val isFtDisabled = !FeatureToggles.getToggleValue(FeatureToggle.UndyingCharacter)
@@ -221,7 +221,7 @@ class GameScreenViewModel @Inject constructor(
     override fun toggleVisibility() {
         if (!isIdle.value) return
         viewModelScope.launch {
-            if (characterController.characterState.getComponent<StatusComponent>().has(Status.Invisible)) {
+            if (characterController.playerStateSnapshot.getComponent<StatusComponent>().has(Status.Invisible)) {
                 characterController.removeStatus(Status.Invisible)
             } else {
                 characterController.addStatus(Status.Invisible)

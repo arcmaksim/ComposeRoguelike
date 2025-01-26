@@ -20,7 +20,7 @@ import ru.meatgames.tomb.domain.component.plus
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.player.CharacterController
-import ru.meatgames.tomb.domain.player.CharacterState
+import ru.meatgames.tomb.domain.player.PlayerState
 import ru.meatgames.tomb.domain.render.BUFFER_SIZE_MODIFIER
 import ru.meatgames.tomb.domain.render.BufferHolder
 import ru.meatgames.tomb.domain.render.BufferHolderFactory
@@ -78,7 +78,7 @@ class MapScreenController @Inject constructor(
 
         return combine(
             mapWrapper.state,
-            characterController.characterStateFlow,
+            characterController.playerStateFlow,
             gameController.state,
         ) { streamedTiles, characterState, gameState ->
             if (latestGameState == gameState) return@combine cachedMapState
@@ -89,7 +89,7 @@ class MapScreenController @Inject constructor(
                 return@combine streamedTiles.toMapState(
                     mapWidth = mapWrapper.width,
                     mapHeight = mapWrapper.height,
-                    characterState = characterState,
+                    playerState = characterState,
                     gameState = gameState,
                 ).also {
                     cachedMapState = it
@@ -108,10 +108,10 @@ class MapScreenController @Inject constructor(
     private fun List<MapTile>.toMapState(
         mapWidth: Int,
         mapHeight: Int,
-        characterState: CharacterState,
+        playerState: PlayerState,
         gameState: GameState,
     ): MapScreenState {
-        val position = characterState.getComponent<PositionComponent>()
+        val position = playerState.getComponent<PositionComponent>()
         if (position.x == -1 && position.y == -1) {
             return MapScreenState.Loading
         }
@@ -136,7 +136,7 @@ class MapScreenController @Inject constructor(
         val tileToFadeIn = renderData.tilesToFadeIn.toSet()
         val tileToFadeOut = renderData.tilesToFadeOut.toSet()
 
-        val characterAnimatedRenderData = if (characterState.getComponent<StatusComponent>().has(Status.Invisible)) {
+        val characterAnimatedRenderData = if (playerState.getComponent<StatusComponent>().has(Status.Invisible)) {
             characterRenderData.copy(
                 alpha = .5f,
             )
@@ -153,7 +153,7 @@ class MapScreenController @Inject constructor(
             tilesToFadeIn = tileToFadeIn,
             tilesToFadeOut = tileToFadeOut,
             characterRenderData = characterAnimatedRenderData,
-            playerHealth = characterState.getComponent(),
+            playerHealth = playerState.getComponent(),
             turnResultsToAnimate = gameState.toMapScreenCharacterAnimations(bufferHolder),
         )
     }
