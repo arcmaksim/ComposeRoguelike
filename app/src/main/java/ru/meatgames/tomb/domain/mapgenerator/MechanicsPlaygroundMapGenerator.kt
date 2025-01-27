@@ -1,8 +1,6 @@
 package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.config.FeatureToggles
-import ru.meatgames.tomb.domain.enemy.EnemiesHolder
-import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
@@ -14,8 +12,6 @@ import javax.inject.Inject
 
 class MechanicsPlaygroundMapGenerator @Inject constructor(
     roomsData: RoomsData,
-    private val itemsHolder: ItemsHolder,
-    private val enemiesHolder: EnemiesHolder,
 ) : MapGenerator {
     
     private val rooms: Map<String, Room> = roomsData.rooms.associateBy { it.name }
@@ -28,9 +24,7 @@ class MechanicsPlaygroundMapGenerator @Inject constructor(
         map: LevelMap,
     ): MapConfiguration {
         FeatureToggles.themeOverride = "Caves"
-        itemsHolder.clearContainers()
-        enemiesHolder.clearEnemies()
-        
+
         val initialRoom = rooms["Circle"]!!
         val initialRoomPositionX = map.width / 2 - initialRoom.width / 2
         val initialRoomPositionY = map.height / 2 - initialRoom.height / 2
