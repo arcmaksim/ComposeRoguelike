@@ -88,6 +88,15 @@ class CharacterController @Inject constructor() {
             }
         }
     }
+
+    fun reset() {
+        modifyHealth(100)
+        _playerStateFlow.update { state ->
+            state.updateComponent<StatusComponent> {
+                StatusComponent()
+            }
+        }
+    }
     
 }
 

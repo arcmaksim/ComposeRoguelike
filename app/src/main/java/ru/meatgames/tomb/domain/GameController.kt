@@ -84,7 +84,7 @@ class GameControllerImpl @Inject constructor(
     override suspend fun startNewGame(
         mapType: MapCreator.MapType,
     ) {
-        characterController.modifyHealth(100)
+        characterController.reset()
         generateNewMap(mapType)
     }
 
