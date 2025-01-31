@@ -265,7 +265,7 @@ class MapScreenController @Inject constructor(
             is EnemyTurnResult.Move -> {
                 listOf(
                     result.position - bufferHolder.offset,
-                    result.position + result.direction.resolvedOffset - bufferHolder.offset,
+                    result.position - result.direction.resolvedOffset - bufferHolder.offset,
                 )
             }
 
@@ -292,18 +292,18 @@ class MapScreenController @Inject constructor(
                 val currentTileVisibility =
                     bufferHolder.fovBuffer.getOrElse(currentScreenSpaceIndex) { false }
 
-                val nextScreenSpacePosition =
-                    currentScreenSpacePosition + result.direction.resolvedOffset
-                val nextScreenSpaceIndex =
-                    nextScreenSpacePosition.first + nextScreenSpacePosition.second * bufferHolder.width
-                val nextTileVisibility =
-                    bufferHolder.fovBuffer.getOrElse(nextScreenSpaceIndex) { false }
+                val previousScreenSpacePosition =
+                    currentScreenSpacePosition - result.direction.resolvedOffset
+                val previousScreenSpaceIndex =
+                    previousScreenSpacePosition.first + previousScreenSpacePosition.second * bufferHolder.width
+                val previousTileVisibility =
+                    bufferHolder.fovBuffer.getOrElse(previousScreenSpaceIndex) { false }
 
                 result.enemyId to EnemyAnimation.Move(
                     direction = result.direction,
                     fade = when {
-                        !currentTileVisibility && nextTileVisibility -> EnemyAnimation.Move.Fade.IN
-                        currentTileVisibility && !nextTileVisibility -> EnemyAnimation.Move.Fade.OUT
+                        !currentTileVisibility && previousTileVisibility -> EnemyAnimation.Move.Fade.OUT
+                        currentTileVisibility && !previousTileVisibility -> EnemyAnimation.Move.Fade.IN
                         else -> EnemyAnimation.Move.Fade.NONE
                     },
                 )
