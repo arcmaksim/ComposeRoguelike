@@ -10,9 +10,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -58,7 +60,7 @@ fun TombApp(
                 is ScenesNavigator.Command.NavigateBack -> navController.popBackStack()
                 is ScenesNavigator.Command.NavigateTo -> {
                     navController.navigate(it.scene.id) {
-                        if (it.popUpToTop) popUpToTop(navController)
+                        if (it.popUpToRoot) popUpToRoot()
                     }
                 }
             }
@@ -74,13 +76,42 @@ fun TombApp(
     ) {
         NavHost(
             navController = navController,
-            startDestination = Scene.MainMenu.id,
+            route = Scene.Root.id,
+            startDestination = Scene.MainMenuRoot.id,
         ) {
+            mainMenuGraph(onCloseApp)
+            gameGraph(
+                onCloseApp = onCloseApp,
+                onCloseDialog = viewModel::closeDialog,
+            )
+        }
+    }
+}
+
+private fun NavGraphBuilder.mainMenuGraph(
+    onCloseApp: () -> Unit,
+) {
+    navigation(
+        route = Scene.MainMenuRoot.id,
+        startDestination = Scene.MainMenu.id,
+        builder = {
             composable(Scene.MainMenu.id) {
                 MainMenuScreen(
                     onCloseApp = onCloseApp,
                 )
             }
+        },
+    )
+}
+
+private fun NavGraphBuilder.gameGraph(
+    onCloseDialog: () -> Unit,
+    onCloseApp: () -> Unit,
+) {
+    navigation(
+        route = Scene.MainGameRoot.id,
+        startDestination = Scene.MainGame.id,
+        builder = {
             composable(Scene.MainGame.id) {
                 GameScreen()
             }
@@ -102,7 +133,7 @@ fun TombApp(
             dialog(Scene.GameScreenDialog.id) {
                 GameScreenDialog(
                     closeGame = {
-                        viewModel.closeDialog()
+                        onCloseDialog()
                         onCloseApp()
                     },
                 )
@@ -114,8 +145,8 @@ fun TombApp(
                     ),
                 )
             }
-        }
-    }
+        },
+    )
 }
 
 private fun NavController.safeNavigate(

@@ -13,7 +13,7 @@ class WinScreenVM @Inject constructor(
 ): ViewModel() {
     
     fun navigateToMainMenu() {
-        scenesNavigator.navigateTo(Scene.MainMenu.asNavigationToCommand(true))
+        scenesNavigator.navigateTo(Scene.MainMenuRoot.asNavigationToCommand(true))
     }
     
 }

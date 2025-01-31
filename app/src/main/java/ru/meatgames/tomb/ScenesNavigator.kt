@@ -20,7 +20,7 @@ interface ScenesNavigator {
 
         data class NavigateTo(
             val scene: Scene,
-            val popUpToTop: Boolean = false,
+            val popUpToRoot: Boolean = false,
         ) : Command()
     }
 
@@ -45,5 +45,5 @@ fun Scene.asNavigationToCommand(
     asTopMost: Boolean = false,
 ): Command = Command.NavigateTo(
     scene = this,
-    popUpToTop = asTopMost,
+    popUpToRoot = asTopMost,
 )

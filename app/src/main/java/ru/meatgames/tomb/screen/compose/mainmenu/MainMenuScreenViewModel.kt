@@ -34,7 +34,7 @@ class MainMenuScreenViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             gameController.startNewGame(mapType)
-            scenesNavigator.navigateTo(Scene.MainGame.asNavigationToCommand())
+            scenesNavigator.navigateTo(Scene.MainGameRoot.asNavigationToCommand(true))
         }
     }
     
