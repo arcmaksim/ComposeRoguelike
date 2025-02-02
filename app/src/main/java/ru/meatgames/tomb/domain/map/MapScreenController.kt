@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import ru.meatgames.tomb.config.FeatureToggle
+import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.di.MAP_VIEWPORT_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_VIEWPORT_WIDTH_KEY
 import ru.meatgames.tomb.domain.GameController
@@ -16,7 +18,6 @@ import ru.meatgames.tomb.domain.GameState
 import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.component.StatusComponent
 import ru.meatgames.tomb.domain.component.minus
-import ru.meatgames.tomb.domain.component.plus
 import ru.meatgames.tomb.domain.enemy.EnemyAnimation
 import ru.meatgames.tomb.domain.enemy.EnemyId
 import ru.meatgames.tomb.domain.player.CharacterController
@@ -165,7 +166,7 @@ class MapScreenController @Inject constructor(
         computeFov(
             originX = horizontalCenter,
             originY = verticalCenter,
-            maxDepth = horizontalCenter + 1,
+            maxDepth = horizontalCenter,
             revealTile = { x, y ->
                 fovBuffer[x + y * width] = true
                 visibilityCache[x + y * width] = true
@@ -179,14 +180,20 @@ class MapScreenController @Inject constructor(
             }
         )
 
-        for (i in 0 until width) {
-            fovBuffer[i] = false
-            fovBuffer[(height - 1) * width + i] = false
-        }
+        if (FeatureToggles.getToggleValue(FeatureToggle.RoundFov)) {
+            for (i in 0 until 2) {
+                fovBuffer[(i + 1) * width + 1] = false
+                fovBuffer[width + i + 1] = false
 
-        for (i in 0 until height) {
-            fovBuffer[i * width] = false
-            fovBuffer[(i + 1) * width - 1] = false
+                fovBuffer[2 * width - 2 - i] = false
+                fovBuffer[(2 + i) * width - 2] = false
+
+                fovBuffer[(height - i - 2) * width + 1] = false
+                fovBuffer[(height - 2) * width + 1 + i] = false
+
+                fovBuffer[(height - 1) * width - 2 - i] = false
+                fovBuffer[(height - 1 - i) * width - 2] = false
+            }
         }
     }
 
