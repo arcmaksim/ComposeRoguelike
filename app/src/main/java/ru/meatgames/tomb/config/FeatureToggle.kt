@@ -7,4 +7,6 @@ enum class FeatureToggle {
     ShowMovementControls,
     InputQueue,
     UndyingCharacter,
+    RoundFov,
+    DrawFogOfWar,
 }
