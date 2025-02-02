@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.awaitAll
 import ru.meatgames.tomb.R
+import ru.meatgames.tomb.config.FeatureToggle
+import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.design.component.IconButton
 import ru.meatgames.tomb.design.component.IllustrationButton
 import ru.meatgames.tomb.design.h1TextStyle
@@ -57,6 +59,7 @@ import ru.meatgames.tomb.domain.player.PlayerAnimation
 import ru.meatgames.tomb.domain.player.updatesScreenSpaceTiles
 import ru.meatgames.tomb.model.theme.ThemeAssets
 import ru.meatgames.tomb.render.Illustration
+import ru.meatgames.tomb.screen.compose.game.FovShape
 import ru.meatgames.tomb.screen.compose.game.GameScreenInteractionController
 import ru.meatgames.tomb.screen.compose.game.GameScreenNavigator
 import ru.meatgames.tomb.screen.compose.game.LocalBackgroundColor
@@ -75,9 +78,9 @@ import ru.meatgames.tomb.toIntOffset
 @Composable
 private fun GameScreenMapContainerPreview() {
     val context = LocalContext.current
-    
+
     val themeAssets = ThemeAssets(context)
-    
+
     GameScreenMapContainer(
         mapState = gameScreenMapContainerPreviewMapReadyState(themeAssets),
         isIdle = true,
@@ -106,10 +109,10 @@ internal fun GameScreenMapContainer(
         .fillMaxSize(),
 ) {
     val animationUpdatesScreenSpaceTiles = playerAnimation.updatesScreenSpaceTiles
-    
+
     val screenWidth = LocalDensity.current.run { maxWidth.toPx() }.toInt()
     val tileDimension = screenWidth / mapState.viewportWidth
-    
+
     val view = LocalView.current
     val shakeOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
     val enemiesAnimationUpdates = remember(enemiesAnimations) {
@@ -119,13 +122,13 @@ internal fun GameScreenMapContainer(
         x = (screenWidth - (tileDimension * mapState.viewportWidth)) / 2 + shakeOffset.value.x,
         y = 0,
     )
-    
+
     // Movement offsets
     val initialMovementOffset = (playerAnimation as? PlayerAnimation.Move)?.direction
         ?.toIntOffset(tileDimension)
         ?: IntOffset.Zero
     val animatedMovementOffset = remember(playerAnimation) { mutableStateOf(IntOffset.Zero) }
-    
+
     // Reveal offsets
     val revealedTilesAlpha = remember(playerAnimation) {
         mutableFloatStateOf(if (animationUpdatesScreenSpaceTiles) 0f else 1f)
@@ -133,9 +136,10 @@ internal fun GameScreenMapContainer(
     val fadedTilesAlpha = remember(playerAnimation) {
         mutableFloatStateOf(if (animationUpdatesScreenSpaceTiles) 1f else 0f)
     }
-    
+
     // Pose animation
-    val characterIdleTransition = rememberInfiniteTransition(label = "characterIdleInfiniteTransition")
+    val characterIdleTransition =
+        rememberInfiniteTransition(label = "characterIdleInfiniteTransition")
     val characterAnimationFrameIndex by characterIdleTransition.animateValue(
         initialValue = 0,
         targetValue = CHARACTER_IDLE_ANIMATION_FRAMES,
@@ -149,7 +153,7 @@ internal fun GameScreenMapContainer(
         ),
         label = "characterIdleAnimationFrameIndex",
     )
-    
+
     LaunchedEffect(playerAnimation) {
         awaitAll(
             *playerAnimation.assemblePlayerInputAnimations(
@@ -167,7 +171,7 @@ internal fun GameScreenMapContainer(
             interactionController.finishPlayerAnimation()
         }
     }
-    
+
     LaunchedEffect(enemiesAnimations) {
         when {
             enemiesAnimations == null -> return@LaunchedEffect
@@ -175,7 +179,7 @@ internal fun GameScreenMapContainer(
                 interactionController.finishEnemiesAnimation()
                 return@LaunchedEffect
             }
-            
+
             else -> {
                 awaitAll(
                     *enemiesAnimations.assembleEnemiesAnimations(
@@ -183,9 +187,10 @@ internal fun GameScreenMapContainer(
                         animationDurationMillis = animationDurationMillis,
                         tileDimension = tileDimension,
                         update = { it, state ->
-                            enemiesAnimationUpdates.value = enemiesAnimationUpdates.value.toMutableMap().apply {
-                                this[it] = state
-                            }
+                            enemiesAnimationUpdates.value =
+                                enemiesAnimationUpdates.value.toMutableMap().apply {
+                                    this[it] = state
+                                }
                         },
                     )
                 )
@@ -193,19 +198,19 @@ internal fun GameScreenMapContainer(
             }
         }
     }
-    
+
     val baseModifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1F)
         .align(Alignment.Center)
-    
+
     CompositionLocalProvider(
         LocalTileSize provides IntSize(tileDimension, tileDimension),
         LocalHorizontalOffset provides horizontalOffset,
         LocalBackgroundColor provides Color(0xFF212121),
     ) {
         val modifier = baseModifier.offset { shakeOffset.value }
-        
+
         GameScreenMap(
             modifier = modifier,
             tiles = mapState.tiles,
@@ -218,7 +223,7 @@ internal fun GameScreenMapContainer(
             revealedTilesAlpha = revealedTilesAlpha.floatValue,
             fadedTilesAlpha = fadedTilesAlpha.floatValue,
         )
-        
+
         GameScreenCharacter(
             modifier = modifier,
             frameIndex = characterAnimationFrameIndex,
@@ -226,7 +231,7 @@ internal fun GameScreenMapContainer(
             viewportHeight = mapState.viewportHeight,
             characterRenderData = mapState.characterRenderData,
         )
-        
+
         GameScreenEnemies(
             modifier = modifier,
             tiles = mapState.tiles,
@@ -241,13 +246,17 @@ internal fun GameScreenMapContainer(
             fadedTilesAlpha = fadedTilesAlpha.floatValue,
             characterFrameIndex = characterAnimationFrameIndex,
         )
+
+        if (FeatureToggles.getToggleValue(FeatureToggle.DrawFogOfWar)) {
+            FovShape()
+        }
     }
-    
+
     GameScreenControls(
         modifier = baseModifier,
         interactionController = interactionController,
     )
-    
+
     IconButton(
         modifier = Modifier
             .align(Alignment.TopEnd)
@@ -255,7 +264,7 @@ internal fun GameScreenMapContainer(
         iconResId = R.drawable.ic_cog,
         onClick = navigator::showDialog,
     )
-    
+
     BottomControls(
         modifier = Modifier
             .align(Alignment.BottomCenter)
@@ -265,7 +274,7 @@ internal fun GameScreenMapContainer(
         navigator = navigator,
         interactionController = interactionController,
     )
-    
+
     Text(
         modifier = Modifier
             .align(Alignment.TopCenter)
@@ -392,12 +401,12 @@ private fun EnemiesAnimations.toMap(
             tileDimension = tileDimension,
             moveState = animation,
         )
-        
+
         is EnemyAnimation.Attack -> id to EnemyAnimationState.Transition(
             offset = IntOffset.Zero,
             alpha = 1f,
         )
-        
+
         is EnemyAnimation.Icon -> id to null
     }
 }.toMap()
