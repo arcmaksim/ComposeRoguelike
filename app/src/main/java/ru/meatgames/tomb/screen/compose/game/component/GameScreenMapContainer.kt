@@ -367,7 +367,7 @@ private fun Stat(
     val shape = RoundedCornerShape(16.dp)
     Box(
         modifier = Modifier
-            .width(120.dp)
+            .width(136.dp)
             .height(64.dp)
             .background(
                 color = Color.DarkGray,
