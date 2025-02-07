@@ -38,7 +38,7 @@ class Enemy(
     )
 
     inline fun <reified C : Component> updateComponent(
-        crossinline update: (C) -> C,
+        crossinline update: C.() -> C,
     ): C {
         val component = getComponent<C>()
         components.remove(component)
@@ -55,10 +55,12 @@ class Enemy(
 
     override fun hashCode(): Int = id.hashCode()
 
-    override fun equals(other: Any?): Boolean {
-        other ?: return false
-        if (other !is Enemy) return false
-        return id == other.id
+    override fun equals(
+        other: Any?,
+    ): Boolean = when (other) {
+        null -> false
+        !is Enemy -> false
+        else -> id == other.id
     }
 
 }

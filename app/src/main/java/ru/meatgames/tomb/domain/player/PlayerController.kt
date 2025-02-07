@@ -44,7 +44,7 @@ class CharacterController @Inject constructor() {
     ) {
         _playerStateFlow.update { state ->
             state.updateComponent<PositionComponent> {
-                it + direction.resolvedOffset
+                this + direction.resolvedOffset
             }
         }
     }
@@ -64,7 +64,7 @@ class CharacterController @Inject constructor() {
     ) {
         _playerStateFlow.update { state ->
             state.updateComponent<HealthComponent> {
-                it.updateHealth(modifier)
+                updateHealth(modifier)
             }
         }
     }
@@ -74,7 +74,7 @@ class CharacterController @Inject constructor() {
     ) {
         _playerStateFlow.update { state ->
             state.updateComponent<StatusComponent> {
-                it.add(status)
+                add(status)
             }
         }
     }
@@ -84,7 +84,7 @@ class CharacterController @Inject constructor() {
     ) {
         _playerStateFlow.update { state ->
             state.updateComponent<StatusComponent> {
-                it.remove(status)
+                remove(status)
             }
         }
     }
@@ -109,7 +109,7 @@ data class PlayerState(
     constructor(
         position: PositionComponent,
         health: HealthComponent = HealthComponent(10),
-        status: StatusComponent = StatusComponent(emptySet()),
+        status: StatusComponent = StatusComponent(emptyMap()),
         initiative: Initiative = Initiative.Medium,
         inventory: List<Item> = emptyList<Item>(),
     ) : this(
@@ -123,7 +123,7 @@ data class PlayerState(
     )
 
     inline fun <reified C : Component> updateComponent(
-        crossinline update: (C) -> C,
+        crossinline update: C.() -> C,
     ): PlayerState {
         val component = getComponent<C>()
         val updatedComponent = update(component)

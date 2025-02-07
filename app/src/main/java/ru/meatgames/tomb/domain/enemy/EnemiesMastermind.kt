@@ -82,23 +82,21 @@ class EnemiesMastermind @Inject constructor(
         vectorToPlayer: Vector,
     ): EnemyTurnResult? {
         if (!flags[IS_PLAYER_VISIBLE]) {
-            updateComponent<GoalComponent> { _ ->
+            updateComponent<GoalComponent> {
                 GoalComponent(
                     activeGoal = GoalComponent.Goal.Position(
                         playerState.getComponent<PositionComponent>().toCoordinates(),
                     ),
                 )
             }
-            updateComponent<StatusComponent> { component ->
-                StatusComponent(
-                    statuses = component.statuses + setOf(Status.Confused),
-                )
+            updateComponent<StatusComponent> {
+                add(Status.Confused)
             }
             return toAlertResult()
         }
 
         if (!flags[IS_VISIBLE_BY_PLAYER]) {
-            updateComponent<GoalComponent> { _ ->
+            updateComponent<GoalComponent> {
                 GoalComponent(
                     activeGoal = GoalComponent.Goal.Position(
                         playerState.getComponent<PositionComponent>().toCoordinates(),
@@ -125,13 +123,13 @@ class EnemiesMastermind @Inject constructor(
         vectorToTarget: Vector,
     ): EnemyTurnResult? {
         if (flags[VISIBLE_CONTACT] && getComponent<StatusComponent>().has(Status.Confused)) {
-            updateComponent<GoalComponent> { _ ->
+            updateComponent<GoalComponent> {
                 GoalComponent(
                     activeGoal = GoalComponent.Goal.Player,
                 )
             }
-            updateComponent<StatusComponent> { component ->
-                component.remove(Status.Confused)
+            updateComponent<StatusComponent> {
+                remove(Status.Confused)
             }
             return toAlertResult()
         }
@@ -143,13 +141,13 @@ class EnemiesMastermind @Inject constructor(
 
                 // Stumbles on player upon movement
                 if (playerPosition == newPosition) {
-                    updateComponent<GoalComponent> { _ ->
+                    updateComponent<GoalComponent> {
                         GoalComponent(
                             activeGoal = GoalComponent.Goal.Player,
                         )
                     }
-                    updateComponent<StatusComponent> { component ->
-                        component.remove(Status.Confused)
+                    updateComponent<StatusComponent> {
+                        remove(Status.Confused)
                     }
                     characterController.removeStatus(Status.Invisible)
                     return toAlertResult()
@@ -166,7 +164,7 @@ class EnemiesMastermind @Inject constructor(
         }
 
         if (flags[VISIBLE_CONTACT]) {
-            updateComponent<GoalComponent> { _ ->
+            updateComponent<GoalComponent> {
                 GoalComponent(
                     activeGoal = GoalComponent.Goal.Player,
                 )
@@ -175,7 +173,7 @@ class EnemiesMastermind @Inject constructor(
         }
 
         if (flags[IS_PLAYER_VISIBLE] xor flags[IS_VISIBLE_BY_PLAYER]) {
-            updateComponent<GoalComponent> { _ ->
+            updateComponent<GoalComponent> {
                 GoalComponent(
                     activeGoal = null,
                 )
@@ -206,7 +204,7 @@ class EnemiesMastermind @Inject constructor(
 
     private fun Enemy.observe(): EnemyTurnResult? {
         if (flags[VISIBLE_CONTACT]) {
-            updateComponent<GoalComponent> { _ ->
+            updateComponent<GoalComponent> {
                 GoalComponent(
                     activeGoal = GoalComponent.Goal.Player,
                 )

@@ -76,7 +76,7 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         }
         
         val updatedComponent = enemy.updateComponent<HealthComponent> {
-            it.updateHealth(-damage)
+            updateHealth(-damage)
         }
         if (updatedComponent.isDepleted) {
             enemyMapping.remove(coordinates)

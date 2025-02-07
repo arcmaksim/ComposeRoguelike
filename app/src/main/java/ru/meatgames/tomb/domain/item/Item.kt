@@ -6,13 +6,11 @@ class Item(
 ) {
     
     override fun equals(
-        other: Any?
-    ): Boolean {
-        other ?: return false
-    
-        if (other !is Item) return false
-    
-        return other.id == id && other.name == name
+        other: Any?,
+    ): Boolean = when (other) {
+        null -> false
+        !is Item -> false
+        else -> other.id == id && other.name == name
     }
     
     override fun hashCode(): Int {
