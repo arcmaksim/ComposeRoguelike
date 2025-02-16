@@ -39,6 +39,11 @@ import javax.inject.Singleton
 
 typealias EnemiesAnimations = List<Pair<EnemyId, EnemyAnimation>>
 
+object Flags {
+    val mapDirty: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val characterDirty: MutableStateFlow<Boolean> = MutableStateFlow(true)
+}
+
 @Singleton
 class MapScreenController @Inject constructor(
     private val themeAssets: ThemeAssets,
@@ -64,7 +69,7 @@ class MapScreenController @Inject constructor(
             .flatMapLatest { map ->
                 when (map) {
                     is MapState.MapUnavailable -> flow { MapScreenState.Loading }
-                    is MapState.MapAvailable -> produceMapFlow(map.mapWrapper)
+                    is MapState.MapAvailable -> produceMapFlow(map.levelMap)
                 }
             }
             .onEach(_state::emit)
@@ -72,25 +77,24 @@ class MapScreenController @Inject constructor(
     }
 
     private fun produceMapFlow(
-        mapWrapper: LevelMapWrapper,
+        levelMap: LevelMap,
     ): Flow<MapScreenState> {
         var cachedMapState: MapScreenState = MapScreenState.Loading
         var latestGameState: GameState = GameState.Loading
 
         return combine(
-            mapWrapper.state,
-            characterController.playerStateFlow,
+            Flags.mapDirty,
+            Flags.characterDirty,
             gameController.state,
-        ) { streamedTiles, characterState, gameState ->
+        ) { mapDirty, characterDirty, gameState ->
             if (latestGameState == gameState) return@combine cachedMapState
+            if (!mapDirty && !characterDirty) return@combine cachedMapState
 
             latestGameState = gameState
 
             if (gameState.updatesState()) {
-                return@combine streamedTiles.toMapState(
-                    mapWidth = mapWrapper.width,
-                    mapHeight = mapWrapper.height,
-                    playerState = characterState,
+                return@combine levelMap.toMapState(
+                    playerState = characterController.playerStateSnapshot,
                     gameState = gameState,
                 ).also {
                     cachedMapState = it
@@ -106,9 +110,7 @@ class MapScreenController @Inject constructor(
             this is GameState.PrepareForEnemies || this is GameState.WaitingForInput
     }
 
-    private fun List<MapTile>.toMapState(
-        mapWidth: Int,
-        mapHeight: Int,
+    private fun LevelMap.toMapState(
         playerState: PlayerState,
         gameState: GameState,
     ): MapScreenState {
@@ -124,10 +126,9 @@ class MapScreenController @Inject constructor(
             verticalOffset = position.y - bufferHolder.verticalCenter,
         )
 
-        bufferHolder.fillMapBuffer(
-            tiles = this,
-            mapWidth = mapWidth,
-            mapHeight = mapHeight,
+        fillMapBuffer(
+            bufferHolder = bufferHolder,
+            levelMap = this,
         )
 
         bufferHolder.calculateFov()
@@ -197,45 +198,43 @@ class MapScreenController @Inject constructor(
         }
     }
 
-    private fun BufferHolder.fillMapBuffer(
-        tiles: List<MapTile>,
-        mapWidth: Int,
-        mapHeight: Int,
+    private fun fillMapBuffer(
+        bufferHolder: BufferHolder,
+        levelMap: LevelMap,
     ) {
-        (0 until height).map { line ->
-            val start = (verticalOffset + line) * mapWidth + horizontalOffset
+        for (line in 0 until bufferHolder.height) {
+            val start = (bufferHolder.verticalOffset + line) * levelMap.width + bufferHolder.horizontalOffset
 
-            (0 until width).map { index ->
-
+            for (index in 0 until bufferHolder.width) {
                 val tileIndex = start + index
 
                 val tile = when {
-                    verticalOffset + line !in 0 until mapHeight -> {
+                    bufferHolder.verticalOffset + line !in 0 until levelMap.height -> {
                         null
                     }
 
-                    horizontalOffset < 0 -> {
+                    bufferHolder.horizontalOffset < 0 -> {
                         when {
-                            horizontalOffset + index < 0 -> null
-                            else -> tiles[tileIndex]
+                            bufferHolder.horizontalOffset + index < 0 -> null
+                            else -> levelMap.getTile(tileIndex)
                         }
                     }
 
-                    horizontalOffset + width > mapWidth -> {
+                    bufferHolder.horizontalOffset + bufferHolder.width > levelMap.width -> {
                         when {
-                            horizontalOffset + index < mapWidth -> tiles[tileIndex]
+                            bufferHolder.horizontalOffset + index < levelMap.width -> levelMap.getTile(tileIndex)
                             else -> null
                         }
                     }
 
                     else -> {
-                        tiles[start + index]
+                        levelMap.getTile(start + index)
                     }
                 }
 
                 tile?.let {
-                    mapBuffer.set(
-                        index = line * width + index,
+                    bufferHolder.mapBuffer.set(
+                        index = line * bufferHolder.width + index,
                         value = it,
                     )
                 }

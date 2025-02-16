@@ -50,20 +50,14 @@ class MapControllerImpl @Inject constructor(
             MapCreator.MapType.TESTING_PLAYGROUND -> playgroundMapGenerator.generateMap(levelMap)
         }
 
-        _mapFlow.value = MapState.MapAvailable(
-            LevelMapWrapper(
-                width = configuration.mapWidth,
-                height = configuration.mapHeight,
-                state = levelMap.state,
-            )
-        )
+        _mapFlow.value = MapState.MapAvailable(levelMap)
 
         return configuration
     }
 
     override fun getTile(
         coordinates: Coordinates,
-    ): MapTile? = levelMap.getTile(coordinates.first, coordinates.second)
+    ): MapTile? = levelMap.getTile(coordinates)
 
     override fun changeObject(
         x: Int,
@@ -73,11 +67,12 @@ class MapControllerImpl @Inject constructor(
         levelMap.updateSingleTile(
             x = x,
             y = y,
-        ) {
-            copy(
-                objectEntityTile = objectEntityTile,
-            )
-        }
+            update = {
+                copy(
+                    objectEntityTile = objectEntityTile,
+                )
+            },
+        )
     }
 }
 
@@ -109,26 +104,10 @@ interface MapController {
     ): MapTile?
 }
 
-data class LevelMapWrapper(
-    val width: Int,
-    val height: Int,
-    val state: StateFlow<List<MapTile>>,
-) {
-
-    override fun toString(): String {
-        val flowValue = state.value
-        return flowValue.mapIndexed { index, value ->
-            val nextLinePostfix = if (index % width == width - 1) "\n" else ""
-            if (value.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
-        }.fold("") { acc, item -> acc + item }
-    }
-
-}
-
 sealed class MapState {
 
     data class MapAvailable(
-        val mapWrapper: LevelMapWrapper,
+        val levelMap: LevelMap,
     ) : MapState()
 
     object MapUnavailable : MapState()

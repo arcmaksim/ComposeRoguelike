@@ -2,9 +2,9 @@ package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.domain.enemy.EnemiesController
 import ru.meatgames.tomb.domain.item.ItemsController
-import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.item.Item
+import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
 import ru.meatgames.tomb.model.tile.data.FloorTileMapping
@@ -77,20 +77,18 @@ class PlaygroundMapGenerator @Inject constructor(
     }
 
     private fun LevelMap.clearMap() {
-        updateBatch {
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    updateSingleTile(
-                        x = x,
-                        y = y,
-                        update = {
-                            copy(
-                                floorEntityTile = FloorEntityTile.Floor,
-                                objectEntityTile = ObjectEntityTile.Wall,
-                            )
-                        },
-                    )
-                }
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                updateSingleTile(
+                    x = x,
+                    y = y,
+                    update = {
+                        copy(
+                            floorEntityTile = FloorEntityTile.Floor,
+                            objectEntityTile = ObjectEntityTile.Wall,
+                        )
+                    },
+                )
             }
         }
         outerWallsPool.clear()
@@ -101,22 +99,20 @@ class PlaygroundMapGenerator @Inject constructor(
         y: Int,
         room: Room,
     ) {
-        updateBatch {
-            for (i in 0 until room.width * room.height) {
-                val xOffset = i % room.width
-                val yOffset = i / room.width
+        for (i in 0 until room.width * room.height) {
+            val xOffset = i % room.width
+            val yOffset = i / room.width
 
-                updateSingleTile(
-                    x = x + xOffset,
-                    y = y + yOffset,
-                    update = {
-                        copy(
-                            floorEntityTile = room.floor[i].toFloorEntity(),
-                            objectEntityTile = room.objects[i].toObjectEntity(),
-                        )
-                    },
-                )
-            }
+            updateSingleTile(
+                x = x + xOffset,
+                y = y + yOffset,
+                update = {
+                    copy(
+                        floorEntityTile = room.floor[i].toFloorEntity(),
+                        objectEntityTile = room.objects[i].toObjectEntity(),
+                    )
+                },
+            )
         }
 
         for (wall in room.outerWalls) {

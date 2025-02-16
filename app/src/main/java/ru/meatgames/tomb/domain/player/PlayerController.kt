@@ -1,7 +1,10 @@
 package ru.meatgames.tomb.domain.player
 
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
@@ -12,6 +15,7 @@ import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.component.StatusComponent
 import ru.meatgames.tomb.domain.component.toPositionComponent
 import ru.meatgames.tomb.domain.item.Item
+import ru.meatgames.tomb.domain.map.Flags
 import ru.meatgames.tomb.domain.status.Status
 import ru.meatgames.tomb.resolvedOffset
 import javax.inject.Inject
@@ -28,6 +32,12 @@ class CharacterController @Inject constructor() {
     val playerStateFlow: StateFlow<PlayerState> = _playerStateFlow
     val playerStateSnapshot: PlayerState
         get() = _playerStateFlow.value
+
+    init {
+        playerStateFlow.onEach {
+            Flags.characterDirty.value = true
+        }.launchIn(GlobalScope)
+    }
 
     fun setPosition(
         coordinates: Coordinates,
@@ -109,7 +119,7 @@ data class PlayerState(
     constructor(
         position: PositionComponent,
         health: HealthComponent = HealthComponent(10),
-        status: StatusComponent = StatusComponent(emptyMap()),
+        status: StatusComponent = StatusComponent(emptySet()),
         initiative: Initiative = Initiative.Medium,
         inventory: List<Item> = emptyList<Item>(),
     ) : this(
