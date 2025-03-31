@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,17 +31,7 @@ private fun InventoryScreenPreview() {
 @Composable
 fun InventoryScreen(
     viewModel: InventoryViewModel = hiltViewModel(),
-    onBack: () -> Unit,
 ) {
-    LaunchedEffect(viewModel) {
-        viewModel.events.collect { event ->
-            when (event) {
-                InventoryEvent.Back -> onBack()
-                else -> Unit
-            }
-        }
-    }
-    
     val state by viewModel.state.collectAsStateWithLifecycle()
     
     InventoryScreenContent(

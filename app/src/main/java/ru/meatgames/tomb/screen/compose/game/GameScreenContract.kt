@@ -7,12 +7,6 @@ import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.map.MapScreenState
 import ru.meatgames.tomb.domain.player.PlayerAnimation
 
-enum class GameScreenEvent {
-    NavigateToWinScreen,
-    NavigateToInventory,
-    NavigateToCharacterSheet,
-}
-
 /**
  * Class to represent state fot the [GameScreen].
  *
@@ -54,5 +48,7 @@ interface GameScreenInteractionController {
     fun finishEnemiesAnimation()
     
     fun skipTurn()
+
+    fun toggleVisibility()
     
 }

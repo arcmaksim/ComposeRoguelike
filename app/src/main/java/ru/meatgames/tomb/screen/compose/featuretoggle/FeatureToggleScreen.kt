@@ -13,10 +13,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,7 +30,13 @@ import ru.meatgames.tomb.design.h3TextStyle
 @Composable
 fun FeatureToggleScreenPreview() {
     FeatureToggleScreenContent(
-        featureToggles = emptyList(),
+        featureToggles = listOf(
+            FeatureToggleState(
+                key = FeatureToggle.UndyingCharacter,
+                title = "Game over screen won't be triggered",
+                value = false,
+            ),
+        ),
         onFeatureToggleUpdate = { _, _ -> Unit },
         onBack = { Unit },
     )
@@ -39,17 +45,7 @@ fun FeatureToggleScreenPreview() {
 @Composable
 fun FeatureToggleScreen(
     viewModel: FeatureToggleScreenVM = hiltViewModel(),
-    onBack: () -> Unit,
 ) {
-    LaunchedEffect(viewModel) {
-        viewModel.events.collect { event ->
-            when (event) {
-                FeatureToggleScreenEvent.Back -> onBack()
-                else -> Unit
-            }
-        }
-    }
-    
     val featureToggles by viewModel.state.collectAsStateWithLifecycle()
     
     FeatureToggleScreenContent(
@@ -102,11 +98,11 @@ private fun FeatureToggle(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
+            modifier = Modifier.weight(1f),
             text = featureToggle.title,
             style = h3TextStyle,
+            textAlign = TextAlign.Start,
         )
-        
-        Spacer(modifier = Modifier.weight(1f))
         
         Switch(
             checked = featureToggle.value,

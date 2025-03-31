@@ -3,7 +3,7 @@ package ru.meatgames.tomb.domain.component
 data class HealthComponent(
     val currentHealth: Int,
     val maxHealth: Int,
-) {
+) : Component {
     
     val isDepleted: Boolean
         get() = currentHealth <= 0

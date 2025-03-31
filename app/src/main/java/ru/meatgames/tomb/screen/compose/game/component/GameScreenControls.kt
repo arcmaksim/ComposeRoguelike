@@ -40,6 +40,7 @@ private fun GameScreenControlsPreview() {
             override fun itemSelected(itemContainerId: ItemContainerId, itemId: ItemId) = Unit
             override fun finishEnemiesAnimation() = Unit
             override fun skipTurn() = Unit
+            override fun toggleVisibility() = Unit
         },
     )
 }

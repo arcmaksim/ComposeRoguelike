@@ -32,7 +32,7 @@ class RoomPreviewRenderDataAssembler(
             decorator.apply()
         }
 
-        bufferHolder.visibilityBuffer.fill(true)
+        bufferHolder.fovBuffer.fill(true)
         bufferHolder.resolveResultRenderingBuffer()
     }
 
@@ -53,7 +53,7 @@ class RoomPreviewRenderDataAssembler(
                 objectData = objectRenderTile?.toObjectRenderTileData(),
                 itemData = null,
                 enemyData = null,
-                isVisible = visibilityBuffer[index],
+                isVisible = fovBuffer[index],
                 decorations = objectAbove?.takeIf { it.hasBottomShadow() == true }
                     ?.let { listOf(themeAssets.resolveBottomShadow()) }
                     ?: emptyList(),

@@ -94,7 +94,7 @@ class GameMapRenderPipeline @Inject constructor(
                 itemData = itemsHolder.getItemContainer(coordinates)
                     ?.let { themeAssets.resolveItemRenderData() },
                 enemyData = enemy?.let { themeAssets.getEnemyRenderData(it) },
-                isVisible = visibilityBuffer[index],
+                isVisible = fovBuffer[index],
                 decorations = objectAbove?.takeIf { it.hasBottomShadow() == true }
                     ?.let { listOf(themeAssets.resolveBottomShadow()) }
                     ?: emptyList(),

@@ -2,12 +2,15 @@ package ru.meatgames.tomb.domain.enemy
 
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.component.PositionComponent
 import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.component.toPositionComponent
 import ru.meatgames.tomb.resolvedOffset
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.set
 
 @Singleton
 class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHolder {
@@ -43,12 +46,12 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
         direction: Direction,
     ): Boolean {
         val enemy = enemies[enemyId] ?: return false
-        val newPosition = (enemy.position + direction.resolvedOffset).toCoordinates()
+        val newPosition = (enemy.getComponent<PositionComponent>() + direction.resolvedOffset).toCoordinates()
         
         if (enemyMapping[newPosition] == null) {
-            enemyMapping.remove(enemy.position.toCoordinates())
+            enemyMapping.remove(enemy.getComponent<PositionComponent>().toCoordinates())
             enemyMapping[newPosition] = enemyId
-            enemies[enemyId] = enemy.copy(position = newPosition.toPositionComponent())
+            enemy.updateComponent<PositionComponent> { newPosition.toPositionComponent() }
             return true
         }
         
@@ -72,14 +75,15 @@ class EnemiesControllerImpl @Inject constructor() : EnemiesController, EnemiesHo
             return false
         }
         
-        val updatedComponent = enemy.health.updateHealth(-damage)
+        val updatedComponent = enemy.updateComponent<HealthComponent> {
+            updateHealth(-damage)
+        }
         if (updatedComponent.isDepleted) {
             enemyMapping.remove(coordinates)
             enemies.remove(enemyId)
             return true
         }
         
-        enemies[enemyId] = enemy.copy(health = updatedComponent)
         return true
     }
 }

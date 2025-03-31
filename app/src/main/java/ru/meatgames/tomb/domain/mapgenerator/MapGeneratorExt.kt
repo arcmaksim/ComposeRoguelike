@@ -2,9 +2,9 @@ package ru.meatgames.tomb.domain.mapgenerator
 
 import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesController
-import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.enemy.produceEnemy
+import ru.meatgames.tomb.domain.map.LevelMap
 import timber.log.Timber
 
 internal fun EnemiesController.placeEnemy(

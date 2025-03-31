@@ -1,18 +1,66 @@
 package ru.meatgames.tomb.domain.enemy
 
+import ru.meatgames.tomb.domain.component.Component
+import ru.meatgames.tomb.domain.component.GoalComponent
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.Initiative
 import ru.meatgames.tomb.domain.component.PositionComponent
+import ru.meatgames.tomb.domain.component.StatusComponent
 import java.util.UUID
-import javax.inject.Inject
 
 @JvmInline
 value class EnemyId(val id: UUID = UUID.randomUUID())
 
-data class Enemy @Inject constructor(
+class Enemy(
     val id: EnemyId = EnemyId(),
     val type: EnemyType,
-    val health: HealthComponent,
-    val position: PositionComponent,
     val initiative: Initiative,
-)
+    val components: MutableSet<Component>,
+) {
+
+    constructor(
+        id: EnemyId = EnemyId(),
+        type: EnemyType,
+        health: HealthComponent,
+        position: PositionComponent,
+        initiative: Initiative,
+        goal: GoalComponent,
+    ) : this(
+        id = id,
+        type = type,
+        initiative = initiative,
+        components = mutableSetOf(
+            health,
+            position,
+            goal,
+            StatusComponent(),
+        ),
+    )
+
+    inline fun <reified C : Component> updateComponent(
+        crossinline update: C.() -> C,
+    ): C {
+        val component = getComponent<C>()
+        components.remove(component)
+
+        val updatedComponent = update(component)
+        components.add(updatedComponent)
+
+        return updatedComponent
+    }
+
+    inline fun <reified C : Component> getComponent(): C {
+        return components.filterIsInstance<C>().first()
+    }
+
+    override fun hashCode(): Int = id.hashCode()
+
+    override fun equals(
+        other: Any?,
+    ): Boolean = when (other) {
+        null -> false
+        !is Enemy -> false
+        else -> id == other.id
+    }
+
+}

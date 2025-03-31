@@ -9,6 +9,7 @@ data class RenderData(
     val asset: ImageBitmap,
     val offset: IntOffset,
     val size: IntSize,
+    val sizeModifier: Float = 1f,
 )
 
 data class AnimationRenderData(
@@ -17,5 +18,6 @@ data class AnimationRenderData(
     val shadowRenderData: RenderData,
     val healthRatio: Float,
     val shadowHorizontalOffset: Int = 0,
+    val alpha: Float = 1f,
     val enemyId: EnemyId? = null,
 )

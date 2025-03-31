@@ -4,12 +4,15 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import ru.meatgames.tomb.domain.GameController
+import ru.meatgames.tomb.model.IllustrationAssets
+import ru.meatgames.tomb.screen.compose.LocalIllustrationAssets
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -18,16 +21,23 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var gameController: GameController
 
+    @Inject
+    lateinit var illustrationAssets: IllustrationAssets
+
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupFullScreenMode()
     
         setContent {
-            TombApp(
-                viewModel = hiltViewModel(),
-                onCloseApp = ::finish,
-            )
+            CompositionLocalProvider(
+                LocalIllustrationAssets provides illustrationAssets,
+            ) {
+                TombApp(
+                    viewModel = hiltViewModel(),
+                    onCloseApp = ::finish,
+                )
+            }
         }
     }
 

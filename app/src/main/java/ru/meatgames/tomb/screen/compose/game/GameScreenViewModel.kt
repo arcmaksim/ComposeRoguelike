@@ -3,8 +3,6 @@ package ru.meatgames.tomb.screen.compose.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -13,36 +11,41 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
+import ru.meatgames.tomb.Scene
+import ru.meatgames.tomb.ScenesNavigator
+import ru.meatgames.tomb.asNavigationToCommand
 import ru.meatgames.tomb.config.FeatureToggle
 import ru.meatgames.tomb.config.FeatureToggles
 import ru.meatgames.tomb.domain.DialogState
 import ru.meatgames.tomb.domain.GameController
 import ru.meatgames.tomb.domain.GameState
 import ru.meatgames.tomb.domain.PlayerInputProcessor
+import ru.meatgames.tomb.domain.component.HealthComponent
+import ru.meatgames.tomb.domain.component.StatusComponent
 import ru.meatgames.tomb.domain.item.ItemContainerId
 import ru.meatgames.tomb.domain.item.ItemId
 import ru.meatgames.tomb.domain.map.EnemiesAnimations
 import ru.meatgames.tomb.domain.map.MapScreenCharacterAnimations
 import ru.meatgames.tomb.domain.map.MapScreenController
 import ru.meatgames.tomb.domain.map.MapScreenState
+import ru.meatgames.tomb.domain.player.CharacterController
 import ru.meatgames.tomb.domain.player.PlayerAnimation
+import ru.meatgames.tomb.domain.status.Status
 import ru.meatgames.tomb.domain.turn.PlayerTurnResult
 import javax.inject.Inject
 
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
     mapScreenController: MapScreenController,
+    private val characterController: CharacterController,
     private val gameController: GameController,
     private val playerInputProcessor: PlayerInputProcessor,
+    private val scenesNavigator: ScenesNavigator,
 ) : ViewModel(), GameScreenNavigator, GameScreenInteractionController {
     
     private var queuedInput: Direction? = null
-    
-    private val _events = Channel<GameScreenEvent?>()
-    val events: Flow<GameScreenEvent?> = _events.receiveAsFlow()
     
     private val _state = MutableStateFlow(
         GameScreenState(
@@ -99,6 +102,18 @@ class GameScreenViewModel @Inject constructor(
             .mapNotNull { queuedInput?.also { queuedInput = null } }
             .onEach(::processCharacterMoveInput)
             .launchIn(viewModelScope)
+
+        characterController
+            .playerStateFlow
+            .filter {
+                val isHealthDepleted = it.getComponent<HealthComponent>().isDepleted
+                val isFtDisabled = !FeatureToggles.getToggleValue(FeatureToggle.UndyingCharacter)
+                isHealthDepleted && isFtDisabled
+            }
+            .onEach {
+                scenesNavigator.navigateTo(Scene.DeathScreen.asNavigationToCommand(true))
+            }
+            .launchIn(viewModelScope)
     }
     
     private fun MapScreenState.toPlayerAnimation(): PlayerAnimation? {
@@ -152,11 +167,11 @@ class GameScreenViewModel @Inject constructor(
     }
     
     override fun navigateToInventory() {
-        _events.trySend(GameScreenEvent.NavigateToInventory)
+        scenesNavigator.navigateTo(Scene.Inventory.asNavigationToCommand())
     }
     
     override fun navigateToCharacterSheet() {
-        _events.trySend(GameScreenEvent.NavigateToCharacterSheet)
+        scenesNavigator.navigateTo(Scene.Stats.asNavigationToCommand())
     }
     
     override fun showDialog() {
@@ -202,6 +217,18 @@ class GameScreenViewModel @Inject constructor(
             gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)
         }
     }
+
+    override fun toggleVisibility() {
+        if (!isIdle.value) return
+        viewModelScope.launch {
+            if (characterController.playerStateSnapshot.getComponent<StatusComponent>().has(Status.Invisible)) {
+                characterController.removeStatus(Status.Invisible)
+            } else {
+                characterController.addStatus(Status.Invisible)
+            }
+            gameController.blockPlayerTurn()
+            gameController.finishPlayerTurn(PlayerTurnResult.SkipTurn)
+        }
+    }
+
 }
-
-

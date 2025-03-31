@@ -2,11 +2,15 @@ package ru.meatgames.tomb.domain.map
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import ru.meatgames.tomb.config.FeatureToggles
+import ru.meatgames.tomb.di.MECHANICS_PLAYGROUND_MAP_GENERATOR
 import ru.meatgames.tomb.di.MAIN_MAP_GENERATOR
 import ru.meatgames.tomb.di.MAP_HEIGHT_KEY
 import ru.meatgames.tomb.di.MAP_WIDTH_KEY
-import ru.meatgames.tomb.di.PLAYGROUND_MAP_GENERATOR
+import ru.meatgames.tomb.di.TESTING_PLAYGROUND_MAP_GENERATOR
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.enemy.EnemiesHolder
+import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.mapgenerator.MapConfiguration
 import ru.meatgames.tomb.domain.mapgenerator.MapGenerator
 import ru.meatgames.tomb.model.tile.domain.ObjectEntityTile
@@ -19,7 +23,10 @@ class MapControllerImpl @Inject constructor(
     @Named(MAP_WIDTH_KEY) private val mapWidth: Int,
     @Named(MAP_HEIGHT_KEY) private val mapHeight: Int,
     @Named(MAIN_MAP_GENERATOR) private val mainMapGenerator: MapGenerator,
-    @Named(PLAYGROUND_MAP_GENERATOR) private val playgroundMapGenerator: MapGenerator,
+    @Named(MECHANICS_PLAYGROUND_MAP_GENERATOR) private val mechanicsPlaygroundMapGenerator: MapGenerator,
+    @Named(TESTING_PLAYGROUND_MAP_GENERATOR) private val playgroundMapGenerator: MapGenerator,
+    private val itemsHolder: ItemsHolder,
+    private val enemiesHolder: EnemiesHolder,
 ) : MapCreator, MapTerraformer, MapController {
 
     private lateinit var levelMap: LevelMap
@@ -33,25 +40,24 @@ class MapControllerImpl @Inject constructor(
         _mapFlow.value = MapState.MapUnavailable
     
         val levelMap = LevelMap(mapWidth, mapHeight).also { levelMap = it }
+        itemsHolder.clearContainers()
+        enemiesHolder.clearEnemies()
+        FeatureToggles.themeOverride = null
+
         val configuration = when (type) {
             MapCreator.MapType.MAIN -> mainMapGenerator.generateMap(levelMap)
-            MapCreator.MapType.PLAYGROUND -> playgroundMapGenerator.generateMap(levelMap)
+            MapCreator.MapType.MECHANICS_PLAYGROUND -> mechanicsPlaygroundMapGenerator.generateMap(levelMap)
+            MapCreator.MapType.TESTING_PLAYGROUND -> playgroundMapGenerator.generateMap(levelMap)
         }
 
-        _mapFlow.value = MapState.MapAvailable(
-            LevelMapWrapper(
-                width = configuration.mapWidth,
-                height = configuration.mapHeight,
-                state = levelMap.state,
-            )
-        )
+        _mapFlow.value = MapState.MapAvailable(levelMap)
 
         return configuration
     }
 
     override fun getTile(
         coordinates: Coordinates,
-    ): MapTile? = levelMap.getTile(coordinates.first, coordinates.second)
+    ): MapTile? = levelMap.getTile(coordinates)
 
     override fun changeObject(
         x: Int,
@@ -61,11 +67,12 @@ class MapControllerImpl @Inject constructor(
         levelMap.updateSingleTile(
             x = x,
             y = y,
-        ) {
-            copy(
-                objectEntityTile = objectEntityTile,
-            )
-        }
+            update = {
+                copy(
+                    objectEntityTile = objectEntityTile,
+                )
+            },
+        )
     }
 }
 
@@ -76,7 +83,8 @@ interface MapCreator {
     
     enum class MapType {
         MAIN,
-        PLAYGROUND,
+        MECHANICS_PLAYGROUND,
+        TESTING_PLAYGROUND,
     }
 }
 
@@ -96,26 +104,10 @@ interface MapController {
     ): MapTile?
 }
 
-data class LevelMapWrapper(
-    val width: Int,
-    val height: Int,
-    val state: StateFlow<List<MapTile>>,
-) {
-
-    override fun toString(): String {
-        val flowValue = state.value
-        return flowValue.mapIndexed { index, value ->
-            val nextLinePostfix = if (index % width == width - 1) "\n" else ""
-            if (value.objectEntityTile == null) ".$nextLinePostfix" else "#$nextLinePostfix"
-        }.fold("") { acc, item -> acc + item }
-    }
-
-}
-
 sealed class MapState {
 
     data class MapAvailable(
-        val mapWrapper: LevelMapWrapper,
+        val levelMap: LevelMap,
     ) : MapState()
 
     object MapUnavailable : MapState()

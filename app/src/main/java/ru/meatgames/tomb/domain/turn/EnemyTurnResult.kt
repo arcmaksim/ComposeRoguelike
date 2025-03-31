@@ -21,6 +21,11 @@ sealed class EnemyTurnResult {
         override val position: Coordinates,
         val direction: Direction,
     ) : EnemyTurnResult()
+
+    data class Alert(
+        override val enemyId: EnemyId,
+        override val position: Coordinates,
+    ) : EnemyTurnResult()
     
     data class SkipTurn(
         override val enemyId: EnemyId,

@@ -39,7 +39,7 @@ fun List<Pair<EnemyId, EnemyAnimation>>.assembleEnemiesAnimations(
         is EnemyAnimation.Icon -> animationState.asAnimationAsync(
             scope = scope,
             enemyId = enemyId,
-            durationMillis = animationDurationMillis,
+            durationMillis = (animationDurationMillis * animationState.durationModifier).toInt(),
             delayMillis = delayMillis,
             update = update,
         )

@@ -1,11 +1,16 @@
 package ru.meatgames.tomb
 
-enum class GameState(val id: String) {
+enum class Scene(val id: String) {
+    Root("root"),
+
+    MainMenuRoot("mainMenuRoot"),
     MainMenu("mainMenu"),
+
+    MainGameRoot("mainGameRoot"),
     MainGame("mainGame"),
     WinScreen("winScreen"),
-    Stub("stub"),
-    
+    DeathScreen("deathScreen"),
+
     GameScreenDialog("GameScreenDialog"),
     ContainerDialog("ContainerDialog/{itemContainerId}"),
     FeatureToggles("FeatureToggles"),

@@ -1,7 +1,6 @@
 package ru.meatgames.tomb.domain.map
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.logMessage
 
 class LevelMap(
@@ -9,27 +8,35 @@ class LevelMap(
     val height: Int,
 ) {
     
-    private val array = Array(width * height) { MapTile.initialTile }
-    
-    private val _state = MutableStateFlow(array.toList())
-    val state: StateFlow<List<MapTile>> = _state
-    
-    private val editor = EditorImpl()
+    val array = Array(width * height) { MapTile.initialTile }
+    val indices = array.indices
     
     fun getTile(
         x: Int,
         y: Int,
     ): MapTile? {
-        val capturedState = state.value
         val index = calcIndex(x, y)
-        if (index < 0 || index >= capturedState.size) {
+        return getTile(index)
+    }
+
+    fun getTile(
+        coordinates: Coordinates,
+    ): MapTile? {
+        val index = calcIndex(coordinates.first, coordinates.second)
+        return getTile(index)
+    }
+
+    fun getTile(
+        index: Int,
+    ): MapTile? {
+        if (index !in indices) {
             logMessage(
                 tag = "LevelMap",
-                message = "getTile - index out of bounds - [0 .. $index ${capturedState.size}]",
+                message = "getTile - index out of bounds - $indices",
             )
             return null
         }
-        return capturedState[calcIndex(x, y)]
+        return array[index]
     }
     
     fun updateSingleTile(
@@ -39,59 +46,28 @@ class LevelMap(
     ) {
         val index = calcIndex(x, y)
         if (!updateTile(index, update)) return
-        _state.value = array.toList()
     }
     
     private fun updateTile(
         index: Int,
         update: MapTile.() -> MapTile,
     ): Boolean {
-        val mapSize = state.value.size
-        if (index < 0 || index >= mapSize) {
+        if (index !in indices) {
             logMessage(
                 tag = "LevelMap",
-                message = "getTile - index out of bounds - [0 .. $index $mapSize]",
+                message = "getTile - index out of bounds - $indices",
             )
             return false
         }
         
         array[index] = array[index].update()
+        Flags.mapDirty.value = true
         return true
-    }
-    
-    fun updateBatch(
-        updateFunc: (Editor.() -> Unit),
-    ) {
-        updateFunc.invoke(editor)
-        _state.value = array.toList()
     }
     
     private fun calcIndex(
         x: Int,
         y: Int,
     ) = x + y * width
-    
-    
-    interface Editor {
-        
-        fun updateSingleTile(
-            x: Int,
-            y: Int,
-            update: MapTile.() -> MapTile,
-        )
-        
-    }
-    
-    inner class EditorImpl : Editor {
-        
-        override fun updateSingleTile(
-            x: Int,
-            y: Int,
-            update: MapTile.() -> MapTile,
-        ) {
-            if (!updateTile(calcIndex(x, y), update)) return
-        }
-        
-    }
     
 }

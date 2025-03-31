@@ -1,6 +1,7 @@
 package ru.meatgames.tomb.domain.enemy
 
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.component.GoalComponent
 import ru.meatgames.tomb.domain.component.HealthComponent
 import ru.meatgames.tomb.domain.component.Initiative
 import ru.meatgames.tomb.domain.component.toPositionComponent
@@ -12,6 +13,7 @@ fun EnemyType.produceEnemy(
     position = position.toPositionComponent(),
     health = resolveHealthComponent(),
     initiative = resolveInitiative(),
+    goal = GoalComponent(),
 )
 
 private fun EnemyType.resolveHealthComponent(): HealthComponent = HealthComponent(

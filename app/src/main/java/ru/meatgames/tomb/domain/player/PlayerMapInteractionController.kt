@@ -1,9 +1,9 @@
 package ru.meatgames.tomb.domain.player
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import ru.meatgames.tomb.Direction
 import ru.meatgames.tomb.domain.Coordinates
+import ru.meatgames.tomb.domain.component.PositionComponent
+import ru.meatgames.tomb.domain.component.toCoordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
 import ru.meatgames.tomb.domain.item.ItemsHolder
 import ru.meatgames.tomb.domain.item.ItemContainerId
@@ -18,28 +18,19 @@ import javax.inject.Singleton
 
 @Singleton
 class PlayerMapInteractionController @Inject constructor(
-    characterController: CharacterController,
+    private val characterController: CharacterController,
     private val mapController: MapController,
     private val tilesController: TilesController,
     private val itemsHolder: ItemsHolder,
     private val enemiesHolder: EnemiesHolder,
 ) {
     
-    private val characterStateFlow = characterController.characterStateFlow
-    
-    init {
-        // TODO update
-        GlobalScope.launch {
-            characterStateFlow.collect {}
-        }
-    }
-    
     fun resolveMoveResult(
         direction: Direction,
     ): PlayerTurnResult? {
         val (offsetX, offsetY) = direction.resolvedOffset
-        val capturedFlow = characterStateFlow.value
-        val coordinates = (capturedFlow.position.x + offsetX) to (capturedFlow.position.y + offsetY)
+        val playerState = characterController.playerStateSnapshot
+        val coordinates = (playerState.getComponent<PositionComponent>() + (offsetX to offsetY)).toCoordinates()
         
         val tile = mapController.getTile(coordinates) ?: return null
         

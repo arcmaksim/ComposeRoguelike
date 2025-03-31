@@ -92,7 +92,7 @@ fun DrawScope.drawCharacter(
     )
     
     iconState?.let {
-        val iconDimension = tileDimension / 2
+        val iconDimension = (tileDimension * it.renderData.sizeModifier).toInt()
         drawImage(
             renderData = it.renderData,
             dstOffset = dstOffset.copy(

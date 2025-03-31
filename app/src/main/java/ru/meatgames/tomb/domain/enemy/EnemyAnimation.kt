@@ -18,6 +18,7 @@ sealed class EnemyAnimation {
     
     data class Icon(
         val renderData: RenderData,
+        val durationModifier: Float = 1f,
     ) : EnemyAnimation()
 
 }

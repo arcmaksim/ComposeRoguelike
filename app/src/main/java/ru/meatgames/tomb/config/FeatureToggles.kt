@@ -21,7 +21,7 @@ object FeatureToggles {
             FeatureToggleState(
                 key = FeatureToggle.ShowEnemiesHealthBar,
                 title = "Show enemies health bar",
-                value = true,
+                value = false,
             ),
             FeatureToggleState(
                 key = FeatureToggle.ShowMovementControls,
@@ -33,11 +33,26 @@ object FeatureToggles {
                 title = "Enable input queue",
                 value = true,
             ),
+            FeatureToggleState(
+                key = FeatureToggle.UndyingCharacter,
+                title = "Game over screen won't be triggered",
+                value = false,
+            ),
+            FeatureToggleState(
+                key = FeatureToggle.RoundFov,
+                title = "Rounds FOV to the circle shape",
+                value = true,
+            ),
+            FeatureToggleState(
+                key = FeatureToggle.DrawFogOfWar,
+                title = "Enable drawing fog of war",
+                value = true,
+            ),
         )
     )
     val state: StateFlow<List<FeatureToggleState>> = _state
     
-    val themeOverride: String? = null
+    var themeOverride: String? = null
     
     private val cachedToggleValues: MutableMap<FeatureToggle, Boolean> = _state.value
         .associate { it.key to it.value }

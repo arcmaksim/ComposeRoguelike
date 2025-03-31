@@ -51,16 +51,6 @@ private fun GameScreenCharacterPreview() {
     }
 }
 
-sealed class CharacterData {
-
-    object Player : CharacterData()
-    
-    data class Enemy(
-        val enemyType: EnemyType,
-    ) : CharacterData()
-
-}
-
 @Composable
 internal fun GameScreenCharacter(
     modifier: Modifier,
@@ -84,7 +74,7 @@ internal fun GameScreenCharacter(
                 x = tileDimension * (viewportWidth / 2),
                 y = tileDimension * (viewportHeight / 2),
             ),
-            alpha = 1f,
+            alpha = characterRenderData.alpha,
             iconState = null,
         )
     }

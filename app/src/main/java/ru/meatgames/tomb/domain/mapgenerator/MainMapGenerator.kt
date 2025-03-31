@@ -5,11 +5,10 @@ import ru.meatgames.tomb.domain.Coordinates
 import ru.meatgames.tomb.domain.enemy.EnemiesController
 import ru.meatgames.tomb.domain.enemy.EnemiesHolder
 import ru.meatgames.tomb.domain.item.ItemsController
-import ru.meatgames.tomb.domain.item.ItemsHolder
-import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.domain.map.MapTile
 import ru.meatgames.tomb.domain.enemy.EnemyType
 import ru.meatgames.tomb.domain.item.Item
+import ru.meatgames.tomb.domain.map.LevelMap
 import ru.meatgames.tomb.logMessage
 import ru.meatgames.tomb.model.room.data.RoomsData
 import ru.meatgames.tomb.model.room.domain.Room
@@ -25,84 +24,79 @@ import kotlin.random.Random
 
 class MainMapGenerator @Inject constructor(
     roomsData: RoomsData,
-    private val itemsHolder: ItemsHolder,
     private val itemsController: ItemsController,
     private val enemiesHolder: EnemiesHolder,
     private val enemiesController: EnemiesController,
 ) : MapGenerator {
-    
+
     private val random = Random(System.currentTimeMillis())
-    
+
     private val rooms: List<Room> = roomsData.rooms
     private val floorMapping: List<FloorTileMapping> = roomsData.floorMapping
     private val objectMapping: List<ObjectTileMapping> = roomsData.objectMapping
-    
+
     private val outerWallsPool: MutableSet<Pair<Int, Int>> = mutableSetOf()
-    
+
     override fun generateMap(
         map: LevelMap,
     ): MapConfiguration {
-        itemsHolder.clearContainers()
-        enemiesHolder.clearEnemies()
-        
         val initialRoomPositionX = 10
         val initialRoomPositionY = 3
         val initialRoom = rooms.first()
-        
+
         map.clearMap()
-        
+
         map.placeRoom(
             x = initialRoomPositionX,
             y = initialRoomPositionY,
             room = initialRoom,
         )
-    
+
         Item("Initial item ${System.currentTimeMillis().toString().takeLast(5)}").placeItem(
             x = initialRoomPositionX + 2,
             y = initialRoomPositionY + 1,
         )
-        
+
         map.generateRooms(
             maxRoomsAttempts = 25,
             maxRoomPlacementAttempts = 50,
         )
-        
+
         map.placeItems(
             amount = 10,
             random = random,
         )
-        
+
         map.placeEnemies(
             amount = 20,
             random = random,
         )
-        
+
         return MapConfiguration(
             mapWidth = map.width,
             mapHeight = map.height,
             startCoordinates = initialRoomPositionX + 2 to initialRoomPositionY + 2,
         )
     }
-    
+
     private fun LevelMap.clearMap() {
-        updateBatch {
-            for (x in 0 until width) {
-                for (y in 0 until height) {
-                    updateSingleTile(
-                        x = x,
-                        y = y,
-                    ) {
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                updateSingleTile(
+                    x = x,
+                    y = y,
+                    update = {
                         copy(
                             floorEntityTile = FloorEntityTile.Floor,
                             objectEntityTile = ObjectEntityTile.Wall,
                         )
-                    }
-                }
+                    },
+                )
             }
         }
         outerWallsPool.clear()
     }
-    
+
     private fun LevelMap.generateRooms(
         maxRoomsAttempts: Int,
         maxRoomPlacementAttempts: Int,
@@ -112,9 +106,9 @@ class MainMapGenerator @Inject constructor(
             log("Attempting to place ${i + 1} room of $maxRoomsAttempts")
             val room = rooms.random(random).rotate(random)
             log("Selected room ${room.name} - ${room.width}x${room.height}")
-            
+
             log("Outer walls pool - $outerWallsPool")
-            
+
             for (roomPlacementAttempt in 0 until maxRoomPlacementAttempts) {
                 val (randomOuterWall, direction) = getRandomOuterWall(random) ?: break@roomLoop
                 val (mapX, mapY) = room.findTile(
@@ -122,49 +116,50 @@ class MainMapGenerator @Inject constructor(
                     direction = direction,
                     random = random,
                 ) ?: continue
-                
+
                 log("Attempt ${roomPlacementAttempt + 1} - selected outer wall ${randomOuterWall.first} ${randomOuterWall.second}")
                 log("mapX: $mapX, mapY: $mapY")
                 log("Direction was resolved - $direction")
-                
+
                 val isZoneEmpty = checkZone(
                     mapX = mapX,
                     mapY = mapY,
                     roomWidth = room.width,
                     roomHeight = room.height,
                 )
-                
+
                 if (!isZoneEmpty) continue
-                
+
                 placeRoom(mapX, mapY, room)
                 updateSingleTile(
                     x = randomOuterWall.first,
                     y = randomOuterWall.second,
-                ) {
-                    copy(
-                        objectEntityTile = ObjectEntityTile.DoorClosed,
-                    )
-                }
+                    update = {
+                        copy(
+                            objectEntityTile = ObjectEntityTile.DoorClosed,
+                        )
+                    },
+                )
                 log("Placed door at ${randomOuterWall.first} ${randomOuterWall.second}")
                 outerWallsPool.remove(randomOuterWall)
                 break
             }
         }
     }
-    
+
     private fun LevelMap.getRandomOuterWall(
         random: Random = Random,
     ): Pair<Coordinates, Direction>? {
         val localOuterWallsPool = outerWallsPool.map { it.first to it.second }.toMutableSet()
-        
+
         while (localOuterWallsPool.isNotEmpty()) {
             val wall = localOuterWallsPool.random(random)
-            
+
             val topTile = getTile(wall.first, wall.second - 1)
             val bottomTile = getTile(wall.first, wall.second + 1)
             val leftTile = getTile(wall.first - 1, wall.second)
             val rightTile = getTile(wall.first + 1, wall.second)
-            
+
             when {
                 topTile.isEmpty && bottomTile.isWall && leftTile.isWall && rightTile.isWall -> Direction.Down
                 bottomTile.isEmpty && leftTile.isWall && rightTile.isWall && topTile.isWall -> Direction.Up
@@ -174,27 +169,27 @@ class MainMapGenerator @Inject constructor(
             }?.let {
                 return wall to it
             }
-            
+
             localOuterWallsPool.remove(wall)
         }
-        
+
         return null
     }
-    
+
     private fun Room.findTile(
         randomOuterWall: Coordinates,
         direction: Direction,
         random: Random,
     ): Coordinates? {
         log("Resolving room wall for $name, at ${randomOuterWall.first} ${randomOuterWall.second} with $direction")
-        
+
         val wall = when (direction) {
             Direction.Up -> outerWalls.filter { it.second == height - 1 }.randomOrNull(random)
             Direction.Down -> outerWalls.filter { it.second == 0 }.randomOrNull(random)
             Direction.Left -> outerWalls.filter { it.first == width - 1 }.randomOrNull(random)
             Direction.Right -> outerWalls.filter { it.first == 0 }.randomOrNull(random)
         } ?: return null
-        
+
         return when (direction) {
             Direction.Up -> randomOuterWall.first - wall.first to randomOuterWall.second - wall.second
             Direction.Down -> randomOuterWall.first - wall.first to randomOuterWall.second
@@ -202,36 +197,35 @@ class MainMapGenerator @Inject constructor(
             Direction.Right -> randomOuterWall.first to randomOuterWall.second - wall.second
         }
     }
-    
+
     private fun LevelMap.placeRoom(
         x: Int,
         y: Int,
         room: Room,
     ) {
-        updateBatch {
-            for (i in 0 until room.width * room.height) {
-                val xOffset = i % room.width
-                val yOffset = i / room.width
-                
-                updateSingleTile(
-                    x = x + xOffset,
-                    y = y + yOffset,
-                ) {
+        for (i in 0 until room.width * room.height) {
+            val xOffset = i % room.width
+            val yOffset = i / room.width
+
+            updateSingleTile(
+                x = x + xOffset,
+                y = y + yOffset,
+                update = {
                     copy(
                         floorEntityTile = room.floor[i].toFloorEntity(),
                         objectEntityTile = room.objects[i].toObjectEntity(),
                     )
-                }
-            }
+                },
+            )
         }
-        
+
         for (wall in room.outerWalls) {
             outerWallsPool.add(x + wall.first to y + wall.second)
         }
-        
+
         log("Placed room at $x $y with dimensions ${room.width} x ${room.height}")
     }
-    
+
     private fun LevelMap.placeItems(
         amount: Int,
         random: Random,
@@ -248,7 +242,7 @@ class MainMapGenerator @Inject constructor(
             }
         }
     }
-    
+
     private fun LevelMap.placeEnemies(
         amount: Int,
         random: Random,
@@ -261,7 +255,7 @@ class MainMapGenerator @Inject constructor(
                 val coordinates = Coordinates(x, y)
                 if (tile.isEmpty && enemiesHolder.getEnemy(coordinates) == null) {
                     enemiesController.placeEnemy(
-                        enemyType = EnemyType.values().random(random),
+                        enemyType = EnemyType.entries.random(random),
                         coordinates = coordinates,
                         levelMap = this,
                     )
@@ -270,7 +264,7 @@ class MainMapGenerator @Inject constructor(
             }
         }
     }
-    
+
     private fun Item.placeItem(
         x: Int,
         y: Int,
@@ -280,15 +274,15 @@ class MainMapGenerator @Inject constructor(
             item = this,
         )
     }
-    
+
     private fun Char.toFloorEntity(): FloorEntityTile = floorMapping.first {
         it.symbol == this@toFloorEntity.toString()
     }.entity
-    
+
     private fun Char.toObjectEntity(): ObjectEntityTile? = objectMapping.first {
         it.symbol == this@toObjectEntity.toString()
     }.entity
-    
+
     private fun LevelMap.checkZone(
         mapX: Int,
         mapY: Int,
@@ -305,12 +299,7 @@ class MainMapGenerator @Inject constructor(
         }
         return true
     }
-    
-    private fun Room.verticallyMirrored(): Room = copy(
-        floor = floor.reversed(),
-        objects = objects.reversed(),
-    )
-    
+
     private fun Room.rotate(
         random: Random = Random,
     ): Room = when (random.nextInt(4)) {
@@ -319,14 +308,14 @@ class MainMapGenerator @Inject constructor(
         2 -> rotate180()
         else -> rotateCounterclockwise()
     }
-    
+
     private fun log(
         message: String,
     ) = logMessage(
         tag = "MapGeneration",
         message = message,
     )
-    
+
 }
 
 private val MapTile?.isWall: Boolean
